@@ -1,4 +1,5 @@
 /vendor/
 /logs/
 /cache/
+/notes/
 .env
