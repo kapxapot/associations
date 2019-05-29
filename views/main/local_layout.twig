@@ -1,0 +1,20 @@
+{% extends 'main/layout.twig' %}
+
+{% set font_awesome_css = true %}
+{% set no_admin_link = (auth.role.tag != 'admin') %}
+{% set sidebar = true %}
+
+{% set more_angular %}
+    {% if not debug %}
+        $scope.postSuccess = (data) => {
+    		reloadWindow();
+        };
+    {% endif %}
+
+    $scope.moreSignUpFields = (obj) => {
+        obj.age = $('#signUpForm').find('#su_age').val();
+        return obj;
+    };
+    
+    {{ even_more_angular }}
+{% endset %}

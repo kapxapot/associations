@@ -1,0 +1,62 @@
+actions:
+  - full:
+    - delete:
+      - edit:
+        - read:
+          - read_own:
+            - api_read
+        - create:
+          - api_create
+        - edit_own:
+          - api_edit
+        - publish:
+          - upload
+      - delete_own:
+        - api_delete
+
+templates:
+  admin_strict:
+    admin: [ full ]
+
+  admin_api:
+    admin: [ full ]
+    editor: [ api_read ]
+    author: [ api_read ]
+
+  editor_strict:
+    admin: [ full ]
+    editor: [ edit ]
+
+  editor:
+    admin: [ full ]
+    editor: [ edit ]
+    author: [ read ]
+
+  public:
+    admin: [ full ]
+    editor: [ edit ]
+    author: [ read_own, create, edit_own ]
+
+  public_extended:
+    admin: [ full ]
+    editor: [ edit ]
+    author: [ read, create, edit_own ]
+
+rights:
+  games:
+    template: public
+
+  menus:
+    template: admin_strict
+
+  menu_items:
+    template: admin_strict
+
+  roles:
+    template: admin_api
+
+  turns:
+    template: public
+
+  users:
+    template: admin_strict

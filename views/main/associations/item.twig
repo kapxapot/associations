@@ -1,0 +1,56 @@
+{% extends 'main/local_layout.twig' %}
+
+{% import 'macros.twig' as gm %}
+{% import 'main/local_macros.twig' as lm %}
+
+{% set title  = lm.association(association, null, true)|upper %}
+
+{% block content %}
+	<div class="panel panel-primary">
+    	<div class="panel-heading panel-title">
+    		<header>
+    			<h1>{{ title|raw }}</h1>
+    		</header>
+    	</div>
+	    
+	  	<div class="panel-body">
+	  	    {% if association.turns_by_users|length > 0 %}<span title="Использования" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2"><i class="fas fa-thumbs-up"></i> {{ association.turns_by_users|length }}</span>{% endif %}
+	  	    {% if association.dislikes.any %}<span title="Не нравится" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2"><i class="fas fa-thumbs-down"></i> {{ association.dislikes.count }}</span>{% endif %}
+	  	    <p><strong>Язык:</strong> {{ association.language.name }}</p>
+	  	    <p><strong>Слова:</strong> <a href="{{ association.first_word.url }}">{{ association.first_word.word }}</a> {% include 'components/association_sign.twig' with { 'association': association } only %} <a href="{{ association.second_word.url }}">{{ association.second_word.word }}</a></p>
+	  	    {#<p><strong>Рейтинг:</strong> {{ association.score }}</p>#}
+	  	    <p><strong>Статус:</strong> {{ association.is_approved ? 'общая' : 'личная' }} <i class="fas fa-question-circle" title="{{ association.is_approved ? 'Доступна всем игрокам' : 'Доступна только тем, кто ее использовал' }}" data-toggle="tooltip"></i></p>
+	  	    <p><strong>Добавил/а:</strong> {{ lm.user(association.creator) }}</p>
+	  	    <p><strong>Дата добавления:</strong> {{ gm.moment_local(association.created_at_iso) }}</p>
+	  	    <p><strong>Использована игроками:</strong></p>
+	  	    <ul>
+	  	        {% for user_id, turns in association.turns_by_users %}
+	  	            <li>
+	  	                <div>{{ lm.user(association_users[user_id]) }}</div>
+	  	                <ul>
+	  	                    {% for turn in turns %}
+	  	                        <li><a href="{{ turn.game.url }}">{{ turn.game.display_name }}</a>, {{ gm.moment_local(turn.created_at_iso) }}</li>
+	  	                    {% endfor %}
+	  	                </ul>
+	  	            </li>
+	  	        {% endfor %}
+	  	    </ul>
+            
+            {% if auth.user %}
+        	  	<div>
+            	    <a role="button" ng-click="problemsDialog()" class="btn btn-default problems" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
+        	  	</div>
+    	  	{% endif %}
+	    </div>
+	</div>
+    
+    {% if auth.user %}
+	    {% include 'main/modals/problems.twig' with { 'association': association, 'word_max_length': word_max_length } %}
+	{% endif %}
+{% endblock %}
+
+{% if auth.user %}
+    {% set even_more_angular %}
+        {% include 'main/scripts/problems.twig' with { 'association': association } only %}
+    {% endset %}
+{% endif %}

@@ -1,0 +1,156 @@
+associations:
+  table: associations
+  private:
+    - id
+    - language_id
+    - first_word_id
+    - second_word_id
+    - created_at
+    - created_by
+
+association_feedbacks:
+  table: association_feedbacks
+  private:
+    - id
+    - association_id
+    - dislike
+    - mature
+    - created_at
+    - created_by
+    - updated_at
+
+auth_tokens:
+  table: auth_tokens
+  private:
+    - id
+    - user_id
+    - token
+    - expires_at
+
+events:
+  table: events
+  private:
+    - id
+    - type_id
+    - entity_type
+    - entity_id
+    - created_at
+    - created_by
+    - details
+
+event_types:
+  table: event_types
+  private:
+    - id
+    - name
+
+games:
+  table: games
+  api: full
+  private:
+    - id
+    - user_id
+    - language_id
+    - created_at
+    - finished_at
+
+languages:
+  table: languages
+  private:
+    - id
+    - name
+    - created_at
+    - created_by
+
+menus:
+  table: menus
+  api: full
+  name_field: text
+  sort: created_at
+  reverse: true
+  private:
+    - id
+    - link
+    - text
+    - position
+    - created_at
+    - updated_at
+
+menu_items:
+  table: menu_items
+  api: full
+  name_field: text
+  sort: position
+  private:
+    - id
+    - menu_id
+    - link
+    - text
+    - position
+    - created_at
+    - updated_at
+
+roles:
+  table: roles
+  api: full
+  name_field: name
+  sort: name
+  public:
+    - id
+    - name
+    - tag
+
+tags:
+  table: tags
+
+turns:
+  table: turns
+  api: full
+  private:
+    - id
+    - game_id
+    - user_id
+    - word_id
+    - association_id
+    - created_at
+    - finished_at
+    - prev_turn_id
+
+users:
+  table: users
+  api: full
+  name_field: login
+  sort: created_at
+  reverse: true
+  public:
+    - id
+    - login
+    - name
+    - role_id
+    - created_at
+    - updated_at
+  private:
+    - email
+    - age
+
+words:
+  table: words
+  private:
+    - id
+    - word
+    - language_id
+    - created_at
+    - created_by
+
+word_feedbacks:
+  table: word_feedbacks
+  private:
+    - id
+    - word_id
+    - dislike
+    - typo
+    - duplicate_id
+    - mature
+    - created_at
+    - created_by
+    - updated_at

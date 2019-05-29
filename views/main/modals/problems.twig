@@ -1,0 +1,79 @@
+{% set full = word and association %}
+
+{% extends full ? 'modal.twig' : 'modals/narrow.twig' %}
+
+{% set modal_name = 'problems' %}
+{% set modal_title %}
+    <i class="fas fa-exclamation-triangle problems"></i> Что-то не так?
+{% endset %}
+{% set modal_save_label = 'Отправить' %}
+
+{% set modal_body_style = 'pb-1' %}
+
+{% set var_loading = 'modalLoading' %}
+{% set var_saving = 'modalSaving' %}
+{% set var_alert_error = 'modalAlertError' %}
+
+{% block modal_body %}
+    <div class="row mh-0">
+    {% if word %}
+        <div class="col-xs-12{% if full %} col-sm-6{% endif %}" >
+            <div>Слово <strong>{{ word.word }}</strong>:</div>
+    
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.word.dislike">
+                    Не нравится
+                </label>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.word.withTypo" ng-change="focusTypo()">
+                    Ошибка/опечатка...
+                </label>
+            </div>
+        	<div class="form-group" ng-if="model.word.withTypo">
+        		<input type="text" id="problemsWordTypo" placeholder="ваш вариант" class="form-control" maxlength="{{ word_max_length }}" required ng-model="model.word.typo" />
+        	</div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.word.withDuplicate" ng-change="focusDuplicate()">
+                    Дублирует слово...
+                </label>
+            </div>
+        	<div class="form-group" ng-if="model.word.withDuplicate">
+        		<input type="text" id="problemsWordDuplicate" placeholder="главное слово" class="form-control" maxlength="{{ word_max_length }}" required ng-model="model.word.duplicate" />
+        	</div>
+        	{% if auth.user.is_mature %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="model.word.mature">
+                        Не для детей (16+)
+                    </label>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+    
+    {% if association %}
+        <div class="col-xs-12{% if full %} col-sm-6{% endif %}" >
+            <div>Ассоциация <strong>{% include 'components/association.twig' with { 'association': association, 'by_word': prev_word, 'no_link': true } only %}</strong>:</div>
+
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="model.association.dislike">
+                    Не нравится
+                </label>
+            </div>
+        	{% if auth.user.is_mature %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" ng-model="model.association.mature">
+                        Не для детей (16+)
+                    </label>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+    </div>
+{% endblock %}

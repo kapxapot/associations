@@ -1,0 +1,29 @@
+{
+    "name": "plasticode/boilerplate",
+    "description": "Boilerplate for Plasticode engine",
+    "keywords": [ "PHP", "Plasticode", "Boilerplate", "Bootstrap", "Slim", "Twig", "API" ],
+    "homepage": "http://github.com/kapxapot/plasticode-boilerplate",
+    "license": "TBD",
+    "authors": [
+        {
+            "name": "Sergey Atroshchenko (kapxapot)",
+            "email": "kapxapot@gmail.com",
+            "homepage": "http://kapxapot.ru"
+        }
+    ],
+    "require": {
+        "slim/slim": "^3.8",
+        "monolog/monolog": "^1.22",
+        "respect/validation": "^1.1",
+        "j4mie/idiorm": "^1.5",
+        "symfony/yaml": "^3.3",
+        "slim/twig-view": "^2.2",
+        "vlucas/phpdotenv": "^2.4"
+    },
+    "autoload": {
+    	"psr-4": {
+    		"App\\": "src",
+    		"Plasticode\\": "../plasticode/src"
+    	}
+    }
+}

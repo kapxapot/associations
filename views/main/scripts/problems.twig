@@ -1,0 +1,87 @@
+$scope.model = {};
+
+{% if word %}
+    {% set word_feedback = word.current_feedback %}
+
+    $scope.model.word = {
+        word_id: {{ word.id }},
+        dislike: {{ word_feedback.is_disliked ? 'true' : 'false' }},
+        withTypo: {{ word_feedback.typo ? 'true' : 'false' }},
+        typo: {% if word_feedback.typo %}'{{ word_feedback.typo }}'{% else %}null{% endif %},
+        withDuplicate: {{ word_feedback.duplicate ? 'true' : 'false' }},
+        duplicate: {% if word_feedback.duplicate %}'{{ word_feedback.duplicate.word }}'{% else %}null{% endif %},
+        mature: {{ word_feedback.is_mature ? 'true' : 'false' }}
+    };
+{% endif %}
+
+{% if association %}
+    {% set association_feedback = association.current_feedback %}
+
+    $scope.model.association = {
+        association_id: {{ association.id }},
+        dislike: {{ association_feedback.is_disliked ? 'true' : 'false' }},
+        mature: {{ association_feedback.is_mature ? 'true' : 'false' }}
+    };
+{% endif %}
+
+$scope.problemsDialog = () => {
+    showModal('problems');
+};
+
+$('#problemsForm').submit(function(e) {
+    if (e != null) {
+	    e.preventDefault();
+    }
+	
+	$scope.modalAlertError = null;
+	$scope.alertSuccess = null;
+	
+	hideModalAlerts();
+
+	$scope.modalSaving = true;
+
+	let obj = $.extend(true, {}, $scope.model);
+
+    if (obj.word) {
+        if (obj.word.withTypo !== true) {
+            delete obj.word.typo;
+        }
+        
+        if (obj.word.withDuplicate !== true) {
+            delete obj.word.duplicate;
+        }
+        
+        delete obj.word.withTypo;
+        delete obj.word.withDuplicate;
+    }
+
+	//console.log(obj);
+    
+	$scope.ajax({
+		url: '{{ path_for('actions.feedback') }}',
+		data: obj,
+		view: 'problems',
+		setError: (msg) => { $scope.modalAlertError = msg; },
+		showError: () => { showModalAlertError(); },
+		setLoading: (loading) => { $scope.modalLoading = loading; },
+		setSaving: (saving) => { $scope.modalSaving = saving; },
+		onSuccess: $scope.postSuccess,
+		noSuccessMessage: true
+	});
+});
+
+$scope.focusTypo = () => {
+    if ($scope.model.word.withTypo) {
+        setTimeout(() => {
+            $('#problemsWordTypo').focus();
+        }, 100);
+    }
+};
+
+$scope.focusDuplicate = () => {
+    if ($scope.model.word.withDuplicate) {
+        setTimeout(() => {
+            $('#problemsWordDuplicate').focus();
+        }, 100);
+    }
+};

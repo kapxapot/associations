@@ -1,0 +1,19 @@
+https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key=dict.1.1.20190509T092647Z.20186823eba95808.1234084e01a202675a653bd64340660b8756c5fb&lang=ru-ru&text=%D0%BE%D0%B2%D0%BE%D1%89%D1%8C
+
+{
+  "head": {
+    
+  },
+  "def": [
+    {
+      "text": "овощь",
+      "pos": "noun",
+      "tr": [
+        {
+          "text": "овощи",
+          "pos": "noun"
+        }
+      ]
+    }
+  ]
+}

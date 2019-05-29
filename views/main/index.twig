@@ -1,0 +1,196 @@
+{% extends 'main/local_layout.twig' %}
+
+{% import 'macros.twig' as gm %}
+
+{% set no_disqus = true %}
+
+{% if game %}
+    {% set last_turn = game.last_turn %}
+    {% set before_last_turn = game.before_last_turn %}
+    
+    {% if last_turn %}
+        {% set with_problems = true %}
+        {% set problems_word = last_turn.word %}
+        {% set problems_association = last_turn.association %}
+    {% endif %}
+{% endif %}
+
+{% set title = short_site_description %}
+
+{% block content %}
+	<div class="panel">
+	    <div class="panel-body">
+        	{% if not auth.user %}
+        		<div>Для игры в <strong>Ассоциации</strong> вам нужно <a href="javascript:void(0);" ng-click="signIn()">войти</a> или <a href="javascript:void(0);" ng-click="signUp()">зарегистрироваться</a>.</div>
+        	{% else %}
+                {% if game %}
+                    {% set game_turns_count = game.turns.count %}
+                    <div ng-cloak class="mb-2">Идет игра! Началась {{ gm.moment_from_now(game.created_at_iso) }}, ход: {{ game_turns_count + 1 }}.</div>
+                    {% if game_turns_count > 1 %}
+                        <div class="mb-2">
+                            {% include 'components/game_log_inline.twig' with { 'game': game } only %}
+                        </div>
+                    {% endif %}
+                    {% if last_turn %}
+                        {% if before_last_turn %}
+                            {% set msg %}В ответ на {% include 'components/turn_word.twig' with { 'turn': before_last_turn } only %} {% endset %}
+                        {% endif %}
+                        {% set msg_part_two %}
+                            {% if last_turn.is_ai_turn %}
+                                {% if msg %}к{% else %}К{% endif %}омпьютер
+                            {% elseif last_turn.user %}
+                                {% if msg %}и{% else %}И{% endif %}грок <strong>{{ last_turn.user.display_name }}</strong>
+                            {% endif %}
+                            говорит: {% include 'components/turn_word.twig' with { 'turn': last_turn } only %}
+                        {% endset %}
+                        {% set msg = msg ? msg ~ msg_part_two : msg_part_two %}
+                        <div>{{ msg|raw }}</div>
+                    {% endif %}
+                    
+                    <div ng-cloak class="col-md-6 col-xs-12 mt-2 ph-0">
+                        <form autocomplete="off">
+                            <div class="form-group mb-2">
+                                <label for="nextWord">Ваше слово:</label>
+                            	<input name="nextWord" id="nextWord" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
+                            </div>
+
+    			        	<button type="submit" ng-click="sendWord()" class="btn btn-success ajax-button" ng-disabled="loading || saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Отправить</span></button>
+
+    			        	<a role="button" ng-click="giveUp()" class="btn btn-default ml-2" ng-disabled="loading || saving">Сдаться</a>
+    			        	
+    			        	{% if with_problems %}
+    			        	    <a role="button" ng-click="problemsDialog()" class="btn btn-default problems ml-2" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
+    			        	{% endif %}
+                        </form>
+                    </div>
+                    <div class="clearfix"></div>
+                {% else %}
+                    {% if last_game %}
+                        <div class="mb-2">
+                            <strong>
+                                {% if last_game.is_won_by_player %}
+                                    Поздравляем! Вы победили! :)
+                                {% else %}
+                                    Вы проиграли. :( Попробуйте еще!
+                                {% endif %}
+                            </strong>
+                        </div>
+                        <div class="mb-2">Запись игры ({{ last_game.turns.count }} {{ last_game.turns_count_str }}):</div>
+                        <div class="mb-2">
+                            {% include 'components/game_log_inline.twig' with { 'game': last_game } only %}
+                        </div>
+                    {% else %}
+                        <div class="mb-2">
+                            Привет, <strong>{{ auth.user.display_name }}</strong>!
+                        </div>
+                    {% endif %}
+
+                    <div class="mb-2">{% if last_game %}Сыграем еще?{% else %}Поиграем?{% endif %}</div>
+                    <div ng-cloak>
+			        	<button ng-click="newGame()" class="btn btn-success ajax-button" ng-disabled="loading || saving" data-focus><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Начать игру</span></button>
+                    </div>
+                {% endif %}
+
+				<div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
+					<a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
+					<div ng-bind-html="alertError|rawHtml"></div>
+				</div>
+        	{% endif %}
+	    </div>
+	</div>
+	
+	{% include 'main/modals/problems.twig' with {
+	    'word': problems_word,
+	    'association': problems_association,
+	    'prev_word': before_last_turn.word,
+	    'word_max_length': word_max_length
+	} %}
+{% endblock %}
+
+{% set even_more_angular %}
+    $scope.languageId = {{ language.id }};
+
+    autofocus();
+
+    {% if not game %}
+        $scope.newGame = () => {
+			$scope.prePost(null);
+
+        	$scope.ajax({
+        		url: '{{ api }}games',
+        		data: { language_id: $scope.languageId },
+        		onSuccess: $scope.postSuccess,
+        		noSuccessMessage: true,
+        	});
+        };
+    {% else %}
+        $scope.normalize = (word) => {
+            return word.trim().toLowerCase();
+        };
+        
+        $scope.showWordError = (error) => {
+            $scope.alertError = error;
+			showAlertError();
+        };
+        
+        $scope.sendWord = () => {
+            let nextWord = $('#nextWord').val();
+            nextWord = $scope.normalize(nextWord);
+            
+            console.log(nextWord);
+
+            if (!nextWord || nextWord.length == 0) {
+                $scope.showWordError('Слово не может быть пустым.');
+                return;
+            }
+            
+            {% if last_turn %}
+                const prevWord = '{{ last_turn.word.word }}';
+    
+                if (nextWord == prevWord) {
+                    $scope.showWordError('Слово совпадает с предыдущим.');
+                    return;
+                }
+
+                {% if before_last_turn %}
+                    const beforePrevWord = '{{ before_last_turn.word.word }}';
+            
+                    if (nextWord == beforePrevWord) {
+                        $scope.showWordError('Слово совпадает с предпоследним.');
+                        return;
+                    }
+                {% endif %}
+            {% endif %}
+
+			$scope.prePost(null);
+
+        	$scope.ajax({
+        		url: '{{ api }}turns',
+        		data: {
+        		    game_id: {{ game.id }},
+        		    {% if last_turn %}
+        		        prev_turn_id: {{ last_turn.id }},
+        		    {% endif %}
+        		    word: nextWord
+        		},
+        		onSuccess: $scope.postSuccess,
+        		noSuccessMessage: true,
+        	});
+        };
+        
+        $scope.giveUp = () => {
+	    	$scope.ajax({
+	    		url: '{{ path_for('actions.game.finish') }}',
+	    		onSuccess: $scope.postSuccess,
+	    		noSuccessMessage: true,
+	    	});
+        };
+
+        {% if with_problems %}
+            {% include 'main/scripts/problems.twig' with {
+                'word': problems_word,
+                'association': problems_association
+            } only %}
+        {% endif %}
+    {% endif %}
+{% endset %}

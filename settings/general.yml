@@ -1,0 +1,55 @@
+displayErrorDetails: true
+addContentLengthHeader: false
+
+# constants for PHP code
+log_errors: true
+debug: {DEBUG}
+
+db:
+  host: {DB_HOST}
+  database: {DB_DATABASE}
+  user: {DB_USER}
+  password: {DB_PASSWORD}
+
+# validation
+password_min: 5
+login_min: 3
+login_max: 20
+
+# auth
+# 1..16 digits
+captcha_digits: 2
+# in hours
+token_ttl: 168
+
+# folders for PHP code
+folders:
+  root: {ROOT_PATH}
+
+logger:
+  name: pc-boiler
+  path: /../logs/app.log
+
+view:
+  templates_path:
+    - /../views/
+    - {PLASTICODE_TEMPLATES_PATH}
+  cache_path: false
+
+associations:
+  approval_threshold: 2
+  coeffs:
+    usage: 1
+    dislike: 1
+
+languages:
+  default_id: 1
+
+users:
+  mature_age: 16
+
+words:
+  approval_threshold: 1
+  coeffs:
+    approved_association: 1
+    dislike: 1

@@ -1,0 +1,134 @@
+menus:
+
+  name_gen: меню
+  name_accus: меню
+  title: Меню
+
+  delete_extra_message: " ' + i.text + ' (со всеми элементами)' + '"
+
+  columns:
+    id:
+      name: id
+      attributes: [ readonly ]
+
+    link:
+      name: Ссылка
+      type: site_url
+      template: >
+        '<a href="' + row.link + '">' + row.text + '</a>'
+
+    text:
+      name: Текст
+      attributes: [ hidden ]
+
+    position:
+      name: Позиция
+      type: number
+      default: 1
+    
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [ readonly ]
+
+    menu_items:
+      name: Подменю
+      template: >
+        '<a href="menus/' + row.id + '/menu_items"><button type="button" class="btn btn-success btn-pad"><span class="glyphicon glyphicon-align-justify" title="Редактировать элементы меню"></span></button></a>'
+      attributes: [ no_sort, readonly ]
+
+
+menu_items:
+
+  name_gen: элемента меню
+  name_accus: элемент меню
+  title: Элементы меню
+
+  columns:
+    id:
+      name: id
+      attributes: [ readonly ]
+    
+    link:
+      name: Ссылка
+      type: site_url
+      template: >
+        '<a href="' + row.link + '">' + row.text + '</a>'
+
+    text:
+      name: Текст
+      attributes: [ hidden ]
+
+    position:
+      name: Позиция
+      type: number
+      default: 1
+    
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [ readonly ]
+
+
+roles:
+
+  name_gen: роли
+  name_accus: роль
+  title: Роли
+  
+  columns:
+    id:
+      name: id
+      attributes: [ readonly ]
+    
+    name:
+      name: Название
+
+    tag:
+      name: Тег
+
+
+users:
+
+  name_gen: пользователя
+  name_accus: пользователя
+  title: Пользователи
+
+  columns:
+    id:
+      name: id
+      attributes: [ readonly ]
+
+    login:
+      name: Логин
+      template: >
+        row.login + (row.name ? ' (' + row.name + ')' : '')
+
+    name:
+      name: Отображаемое имя
+      attributes: [ nullable, hidden ]
+      tooltip: По умолчанию совпадает с логином.
+
+    email:
+      name: E-mail
+      type: email
+
+    age:
+      name: Возраст
+      type: number
+
+    role_id:
+      name: Роль
+      entity: roles
+      default: 3
+
+    password:
+      name: Пароль
+      type: password
+      tooltip: Введите пароль, если хотите его изменить. Иначе оставьте поле пустым.
+      attributes: [ nullable, hidden, readonly, on_form ]
+
+    created_at:
+      name: Дата регистрации
+      type: date
+      attributes: [ readonly ]

@@ -1,0 +1,41 @@
+site_name: Associ.ru
+site_bare_url: warcry.ru
+site_url: 'https://warcry.ru'
+cool_site_url: '//warcry.ru'
+site_description: 'Игра в Ассоциации для детей и взрослых'
+short_site_description: 'Ассоциации - Игра для детей и взрослых'
+twitter_card_image: 'http://yoursite.com/images/logo.png'
+touch_icon: 'http://yoursite.com/images/logo.png'
+contact_email: kapxapot [sobaka] gmail [dot] com
+copyright_from: 2019
+admin_copyright_from: 2019
+site_keywords: plasticode, ассоциации, associations
+lang: ru
+
+no_search: true
+
+# folders for Twig only
+folders:
+  global: {PLASTICODE_PUBLIC_PATH}
+  local: {SITE_PUBLIC_PATH}
+
+mde: true
+
+disqus_alias: associ
+google_analytics_id: your-google-analytics-id
+twitter_alias: YourTwitter
+
+angular:
+  app: bsApp
+  ctrl: bsCtrl
+
+word_min_length: 1
+word_max_length: 250
+
+admin_menu:
+  - group:
+      title: Сайт
+      items:
+        - users
+        - roles
+        - menus

@@ -1,0 +1,38 @@
+{% extends 'modals/narrow.twig' %}
+
+{% set modal_name = 'signUp' %}
+{% set modal_title = 'Регистрация' %}
+{% set modal_save_label = 'Зарегистрироваться' %}
+
+{% block modal_body %}
+	<div class="form-group required">
+		<label for="su_login">Логин</label>
+		<input type="text" name="su_login" id="su_login" placeholder="от 3 до 20 латинских букв или цифр" class="form-control" data-modalfocus required />
+	</div>
+	<div class="form-group required">
+		<label for="su_email">E-mail</label>
+		<input type="email" name="su_email" id="su_email" placeholder="ваша@поч.та" class="form-control" required />
+	</div>
+	<div class="form-group required">
+		<label for="su_password">Пароль</label>
+		<input type="password" name="su_password" id="su_password" placeholder="не менее 5 символов" class="form-control" required />
+	</div>
+	<div class="form-group required">
+		<label for="su_age">Возраст</label>
+		<input type="number" name="su_age" id="su_age" class="form-control" required />
+	</div>
+	<div class="form-group required">
+		<label for="su_captcha">Напишите цифрами</label>
+		<div class="captcha">
+			<button type="button" class="btn btn-warning btn-xs btn-pad" ng-click="refreshCaptcha()" tabindex="-1">
+				<span class="glyphicon glyphicon-refresh" title="Обновить"></span>
+			</button>
+			{{ '{{captcha}}' }}
+		</div>
+		<input type="text" name="su_captcha" id="su_captcha" placeholder="you shall not pass" class="form-control" required autocomplete="off" />
+	</div>
+	<div class="checkbox">
+		<label><input type="checkbox" name="su_remember" id="su_remember" checked>Запомнить</label>
+	</div>
+	<span class="help-block">Уже зарегистрированы? <a href="javascript:void(0);" ng-click="switchFromTo('{{ modal_name }}', 'signIn')">Войдите</a>.</span>
+{% endblock %}
