@@ -38,6 +38,7 @@ view:
 
 associations:
   approval_threshold: 2
+  mature_threshold: 2
   coeffs:
     usage: 1
     dislike: 1

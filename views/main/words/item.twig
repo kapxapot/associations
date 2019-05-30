@@ -6,98 +6,98 @@
 
 {% block content %}
 	<div class="panel panel-primary">
-	    {% set word_upper = word.word|upper %}
-    	<div class="panel-heading panel-title">
-    		<header>
-    			<h1>{{ word_upper }}</h1>
-    		</header>
-    	</div>
-	    
-	    {{ m.breadcrumbs(_context, [
-	        { 'url': path_for('main.words'), 'text': 'Слова' }
-	    ], word_upper) }}
-	    
-	  	<div class="panel-body">
+		{% set word_upper = word.word|upper %}
+		<div class="panel-heading panel-title">
+			<header>
+				<h1>{{ word_upper }}</h1>
+			</header>
+		</div>
+		
+		{{ m.breadcrumbs(_context, [
+			{ 'url': path_for('main.words'), 'text': 'Слова' }
+		], word_upper) }}
+		
+		<div class="panel-body">
 			{% if word.is_mature %}
 				<span title="Не для детей" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2 problems">
 					<i class="fas fa-minus-circle"></i>
 				</span>
 			{% endif %}
-	  	    
-	  	    {% if word.approved_associations.any %}
+	
+			{% if word.approved_associations.any %}
 				<span title="Общие ассоциации" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2">
 					<i class="fas fa-thumbs-up"></i> {{ word.approved_associations.count }}
 				</span>
 			{% endif %}
 			
-    	  	{% if word.dislikes.any %}
+			{% if word.dislikes.any %}
 				<span title="Не нравится" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2">
 					<i class="fas fa-thumbs-down"></i> {{ word.dislikes.count }}
 				</span>
 			{% endif %}
 			
 			<p><strong>Язык:</strong> {{ word.language.name }}</p>
-	  	    {#<p><strong>Рейтинг:</strong> {{ word.score }}</p>#}
-	  	    <p><strong>Статус:</strong> {{ word.is_approved ? 'общее' : 'личное' }} <i class="fas fa-question-circle" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто его использовал' }}" data-toggle="tooltip"></i></p>
-	  	    <p><strong>Добавил/а:</strong> {{ lm.user(word.creator) }}</p>
-	  	    <p ng-cloak><strong>Дата добавления:</strong> {{ gm.moment_local(word.created_at_iso) }}</p>
+			{#<p><strong>Рейтинг:</strong> {{ word.score }}</p>#}
+			<p><strong>Статус:</strong> {{ word.is_approved ? 'общее' : 'личное' }} <i class="fas fa-question-circle" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто его использовал' }}" data-toggle="tooltip"></i></p>
+			<p><strong>Добавил/а:</strong> {{ lm.user(word.creator) }}</p>
+			<p ng-cloak><strong>Дата добавления:</strong> {{ gm.moment_local(word.created_at_iso) }}</p>
 
-	  	    {% if word.approved_associations.any %}
-    	  	    <p><strong>Общие ассоциации ({{ word.approved_associations.count }}):</strong></p>
-    	  	    <ul class="vgap-2">
-    	  	        {% for assoc in word.approved_associations %}
-    	  	            <li>{{ lm.association(assoc, word) }} ({{ lm.user(assoc.creator) }})</li>
-    	  	        {% endfor %}
-    	  	    </ul>
-    	  	{% endif %}
+			{% if word.approved_associations.any %}
+				<p><strong>Общие ассоциации ({{ word.approved_associations.count }}):</strong></p>
+				<ul class="vgap-2">
+					{% for assoc in word.approved_associations %}
+						<li>{{ lm.association(assoc, word) }} ({{ lm.user(assoc.creator) }})</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
 
-	  	    {% if word.unapproved_associations.any %}
-    	  	    <p><strong>Личные ассоциации ({{ word.unapproved_associations.count }}):</strong></p>
-    	  	    <ul class="vgap-2">
-    	  	        {% for assoc in word.unapproved_associations %}
-    	  	            <li>{{ lm.association(assoc, word) }} ({{ lm.user(assoc.creator) }})</li>
-    	  	        {% endfor %}
-    	  	    </ul>
-    	  	{% endif %}
-    	  	
-    	  	{% if word.proposed_typos|length > 0 %}
-    	  	    <p><strong>Возможные исправления:</strong></p>
-    	  	    <ul class="vgap-2">
-    	  	        {% for typo, typo_items in word.proposed_typos %}
-    	  	            <li>{{ typo }}</a> ({{ typo_items|length }})</li>
-    	  	        {% endfor %}
-    	  	    </ul>
-    	  	{% endif %}
-    	  	
-    	  	{% if word.proposed_duplicates|length > 0 %}
-    	  	    <p><strong>Возможные дубликаты:</strong></p>
-    	  	    <ul class="vgap-2">
-    	  	        {% for dup_id, dup_items in word.proposed_duplicates %}
-    	  	            {% set duplicate = dup_items[0].duplicate %}
-    	  	            <li><a href="{{ duplicate.url }}">{{ duplicate.word }}</a> ({{ dup_items|length }})</li>
-    	  	        {% endfor %}
-    	  	    </ul>
-    	  	{% endif %}
+			{% if word.unapproved_associations.any %}
+				<p><strong>Личные ассоциации ({{ word.unapproved_associations.count }}):</strong></p>
+				<ul class="vgap-2">
+					{% for assoc in word.unapproved_associations %}
+						<li>{{ lm.association(assoc, word) }} ({{ lm.user(assoc.creator) }})</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
 
-    	  	{% if auth.user %}    
-        	  	<div>
-            	    <a role="button" ng-click="problemsDialog()" class="btn btn-default problems" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
-        	  	</div>
-        	{% endif %}
-	    </div>
-	    
-	    <div class="panel-footer">
-    	  	<i class="fas fa-info-circle"></i> <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x" class="mr-2">Грамота.ру</a> <i class="fas fa-info-circle"></i> <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловарь</a>
-	    </div>
+			{% if word.proposed_typos|length > 0 %}
+				<p><strong>Возможные исправления:</strong></p>
+				<ul class="vgap-2">
+					{% for typo, typo_items in word.proposed_typos %}
+						<li>{{ typo }}</a> ({{ typo_items|length }})</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+			
+			{% if word.proposed_duplicates|length > 0 %}
+				<p><strong>Возможные дубликаты:</strong></p>
+				<ul class="vgap-2">
+					{% for dup_id, dup_items in word.proposed_duplicates %}
+						{% set duplicate = dup_items[0].duplicate %}
+						<li><a href="{{ duplicate.url }}">{{ duplicate.word }}</a> ({{ dup_items|length }})</li>
+					{% endfor %}
+				</ul>
+			{% endif %}
+
+			{% if auth.user %}
+				<div>
+					<a role="button" ng-click="problemsDialog()" class="btn btn-default problems" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
+				</div>
+			{% endif %}
+		</div>
+		
+		<div class="panel-footer">
+			<i class="fas fa-info-circle"></i> <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x" class="mr-2">Грамота.ру</a> <i class="fas fa-info-circle"></i> <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловарь</a>
+		</div>
 	</div>
 
-    {% if auth.user %}
-	    {% include 'main/modals/problems.twig' with { 'word': word, 'word_max_length': word_max_length } %}
+	{% if auth.user %}
+		{% include 'main/modals/problems.twig' with { 'word': word, 'word_max_length': word_max_length } %}
 	{% endif %}
 {% endblock %}
 
 {% if auth.user %}
-    {% set even_more_angular %}
-        {% include 'main/scripts/problems.twig' with { 'word': word } only %}
-    {% endset %}
+	{% set even_more_angular %}
+		{% include 'main/scripts/problems.twig' with { 'word': word } only %}
+	{% endset %}
 {% endif %}
