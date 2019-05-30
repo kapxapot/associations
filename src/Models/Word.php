@@ -206,4 +206,11 @@ class Word extends DbModel
         return $this->feedbacks()
             ->where('mature', 1);
     }
+
+    public function isMature() : bool
+    {
+        $threshold = self::getSettings('words.mature_threshold');
+        
+        return $this->matures()->count() >= $threshold;
+    }
 }

@@ -50,6 +50,7 @@ users:
 
 words:
   approval_threshold: 1
+  mature_threshold: 2
   coeffs:
     approved_association: 1
     dislike: 1
