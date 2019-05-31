@@ -34,12 +34,19 @@
 			{% endif %}
 
 			<p><strong>Язык:</strong> {{ association.language.name }}</p>
+
 			<p><strong>Слова:</strong> <a href="{{ association.first_word.url }}">{{ association.first_word.word }}</a> {% include 'components/association_sign.twig' with { 'association': association } only %} <a href="{{ association.second_word.url }}">{{ association.second_word.word }}</a></p>
+
 			{#<p><strong>Рейтинг:</strong> {{ association.score }}</p>#}
+
 			<p><strong>Статус:</strong> {{ association.is_approved ? 'общая' : 'личная' }} <i class="fas fa-question-circle" title="{{ association.is_approved ? 'Доступна всем игрокам' : 'Доступна только тем, кто ее использовал' }}" data-toggle="tooltip"></i></p>
+
 			<p><strong>Добавил/а:</strong> {{ lm.user(association.creator) }}</p>
+
 			<p><strong>Дата добавления:</strong> {{ gm.moment_local(association.created_at_iso) }}</p>
+
 			<p><strong>Использована игроками:</strong></p>
+			
 			<ul>
 				{% for user_id, turns in association.turns_by_users %}
 					<li>

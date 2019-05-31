@@ -37,13 +37,18 @@
 			{% endif %}
 			
 			<p><strong>Язык:</strong> {{ word.language.name }}</p>
+
 			{#<p><strong>Рейтинг:</strong> {{ word.score }}</p>#}
+
 			<p><strong>Статус:</strong> {{ word.is_approved ? 'общее' : 'личное' }} <i class="fas fa-question-circle" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто его использовал' }}" data-toggle="tooltip"></i></p>
+
 			<p><strong>Добавил/а:</strong> {{ lm.user(word.creator) }}</p>
+
 			<p ng-cloak><strong>Дата добавления:</strong> {{ gm.moment_local(word.created_at_iso) }}</p>
 
 			{% if word.approved_associations.any %}
 				<p><strong>Общие ассоциации ({{ word.approved_associations.count }}):</strong></p>
+
 				<ul class="vgap-2">
 					{% for assoc in word.approved_associations %}
 						<li>{{ lm.association(assoc, word) }} ({{ lm.user(assoc.creator) }})</li>
@@ -53,6 +58,7 @@
 
 			{% if word.unapproved_associations.any %}
 				<p><strong>Личные ассоциации ({{ word.unapproved_associations.count }}):</strong></p>
+
 				<ul class="vgap-2">
 					{% for assoc in word.unapproved_associations %}
 						<li>{{ lm.association(assoc, word) }} ({{ lm.user(assoc.creator) }})</li>
@@ -62,6 +68,7 @@
 
 			{% if word.proposed_typos|length > 0 %}
 				<p><strong>Возможные исправления:</strong></p>
+
 				<ul class="vgap-2">
 					{% for typo, typo_items in word.proposed_typos %}
 						<li>{{ typo }}</a> ({{ typo_items|length }})</li>
@@ -71,6 +78,7 @@
 			
 			{% if word.proposed_duplicates|length > 0 %}
 				<p><strong>Возможные дубликаты:</strong></p>
+				
 				<ul class="vgap-2">
 					{% for dup_id, dup_items in word.proposed_duplicates %}
 						{% set duplicate = dup_items[0].duplicate %}
