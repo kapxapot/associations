@@ -1,8 +1,8 @@
 {
-	"name": "plasticode/boilerplate",
-	"description": "Boilerplate for Plasticode engine",
-	"keywords": [ "PHP", "Plasticode", "Boilerplate", "Bootstrap", "Slim", "Twig", "API" ],
-	"homepage": "http://github.com/kapxapot/plasticode-boilerplate",
+	"name": "kapxapot/associations",
+	"description": "Game of associations",
+	"keywords": [ "Plasticode", "game", "associations" ],
+	"homepage": "http://github.com/kapxapot/associations",
 	"license": "TBD",
 	"authors": [
 		{
@@ -12,6 +12,7 @@
 		}
 	],
 	"require": {
+		"php": "^7.0",
 		"slim/slim": "^3.8",
 		"monolog/monolog": "^1.22",
 		"respect/validation": "^1.1",
