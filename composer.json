@@ -3,7 +3,7 @@
 	"description": "Game of associations",
 	"keywords": [ "Plasticode", "game", "associations" ],
 	"homepage": "http://github.com/kapxapot/associations",
-	"license": "TBD",
+	"license": "MIT",
 	"authors": [
 		{
 			"name": "Sergey Atroshchenko (kapxapot)",
@@ -19,7 +19,8 @@
 		"j4mie/idiorm": "^1.5",
 		"symfony/yaml": "^3.3",
 		"slim/twig-view": "^2.2",
-		"vlucas/phpdotenv": "^2.4"
+		"vlucas/phpdotenv": "^2.4",
+		"robmorgan/phinx": "^0.10.7"
 	},
 	"autoload": {
 		"psr-4": {
