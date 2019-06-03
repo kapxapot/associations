@@ -6,7 +6,9 @@ log_errors: true
 debug: {DEBUG}
 
 db:
+  adapter: {DB_ADAPTER}
   host: {DB_HOST}
+  port: {DB_PORT}
   database: {DB_DATABASE}
   user: {DB_USER}
   password: {DB_PASSWORD}
@@ -18,7 +20,7 @@ login_max: 20
 
 # auth
 # 1..16 digits
-captcha_digits: 2
+captcha_digits: 3
 # in hours
 token_ttl: 168
 
@@ -27,8 +29,8 @@ folders:
   root: {ROOT_PATH}
 
 logger:
-  name: pc-boiler
-  path: /../logs/app.log
+  name: pc-associ
+  path: {LOG_PATH}
 
 view:
   templates_path:
