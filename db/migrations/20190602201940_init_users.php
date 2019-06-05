@@ -11,9 +11,9 @@ class InitUsers extends AbstractMigration
         $table
             ->addColumn('login', 'string', ['limit' => 20])
             ->addColumn('password', 'string', ['limit' => 255])
-            ->addColumn('name', 'string', ['limit' => 255, 'null' => true, 'default' => 'NULL'])
+            ->addColumn('name', 'string', ['limit' => 255, 'null' => true])
             ->addColumn('role_id', 'integer', ['null' => true, 'default' => 3])
-            ->addColumn('email', 'string', ['limit' => 255, 'null' => true, 'default' => 'NULL'])
+            ->addColumn('email', 'string', ['limit' => 255, 'null' => true])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addForeignKey('role_id', 'roles', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
