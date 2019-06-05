@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7b7f7e02bfaad207fb57da6cf2f54476",
+    "content-hash": "e9c16db41b2e3f9a5e9eafedad0eb468",
     "packages": [
         {
             "name": "cakephp/cache",
@@ -343,6 +343,126 @@
             "time": "2019-03-14T14:41:29+00:00"
         },
         {
+            "name": "composer/installers",
+            "version": "v1.6.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/installers.git",
+                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/installers/zipball/cfcca6b1b60bc4974324efb5783c13dca6932b5b",
+                "reference": "cfcca6b1b60bc4974324efb5783c13dca6932b5b",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.0"
+            },
+            "replace": {
+                "roundcube/plugin-installer": "*",
+                "shama/baton": "*"
+            },
+            "require-dev": {
+                "composer/composer": "1.0.*@dev",
+                "phpunit/phpunit": "^4.8.36"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Composer\\Installers\\Plugin",
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\Installers\\": "src/Composer/Installers"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle Robinson Young",
+                    "email": "kyle@dontkry.com",
+                    "homepage": "https://github.com/shama"
+                }
+            ],
+            "description": "A multi-framework Composer library installer",
+            "homepage": "https://composer.github.io/installers/",
+            "keywords": [
+                "Craft",
+                "Dolibarr",
+                "Eliasis",
+                "Hurad",
+                "ImageCMS",
+                "Kanboard",
+                "Lan Management System",
+                "MODX Evo",
+                "Mautic",
+                "Maya",
+                "OXID",
+                "Plentymarkets",
+                "Porto",
+                "RadPHP",
+                "SMF",
+                "Thelia",
+                "WolfCMS",
+                "agl",
+                "aimeos",
+                "annotatecms",
+                "attogram",
+                "bitrix",
+                "cakephp",
+                "chef",
+                "cockpit",
+                "codeigniter",
+                "concrete5",
+                "croogo",
+                "dokuwiki",
+                "drupal",
+                "eZ Platform",
+                "elgg",
+                "expressionengine",
+                "fuelphp",
+                "grav",
+                "installer",
+                "itop",
+                "joomla",
+                "kohana",
+                "laravel",
+                "lavalite",
+                "lithium",
+                "magento",
+                "majima",
+                "mako",
+                "mediawiki",
+                "modulework",
+                "modx",
+                "moodle",
+                "osclass",
+                "phpbb",
+                "piwik",
+                "ppi",
+                "puppet",
+                "pxcms",
+                "reindex",
+                "roundcube",
+                "shopware",
+                "silverstripe",
+                "sydes",
+                "symfony",
+                "typo3",
+                "wordpress",
+                "yawik",
+                "zend",
+                "zikula"
+            ],
+            "time": "2018-08-27T06:10:37+00:00"
+        },
+        {
             "name": "container-interop/container-interop",
             "version": "1.2.0",
             "source": {
@@ -434,6 +554,121 @@
                 "query builder"
             ],
             "time": "2018-05-30T23:57:49+00:00"
+        },
+        {
+            "name": "jublonet/codebird-php",
+            "version": "3.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/jublonet/codebird-php.git",
+                "reference": "100a8e8f1928a5738b4476f0caf83f2c2ba6da5b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/jublonet/codebird-php/zipball/100a8e8f1928a5738b4476f0caf83f2c2ba6da5b",
+                "reference": "100a8e8f1928a5738b4476f0caf83f2c2ba6da5b",
+                "shasum": ""
+            },
+            "require": {
+                "composer/installers": "~1.0",
+                "ext-hash": "*",
+                "ext-json": "*",
+                "lib-openssl": "*",
+                "php": ">=5.5.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": ">=3.7",
+                "satooshi/php-coveralls": ">=0.6",
+                "squizlabs/php_codesniffer": "2.*"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "src/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Joshua Atkins",
+                    "email": "joshua.atkins@jublo.net",
+                    "homepage": "http://atkins.im/",
+                    "role": "Developer"
+                },
+                {
+                    "name": "J.M.",
+                    "email": "jm@jublo.net",
+                    "homepage": "http://mynetx.net/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Easy access to the Twitter REST API, Collections API, Streaming API, TON (Object Nest) API and Twitter Ads API — all from one PHP library.",
+            "homepage": "https://www.jublo.net/projects/codebird/php",
+            "keywords": [
+                "api",
+                "networking",
+                "twitter"
+            ],
+            "time": "2016-02-15T18:38:55+00:00"
+        },
+        {
+            "name": "kapxapot/plasticode",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kapxapot/plasticode.git",
+                "reference": "a96db215b7def08a6964edefe830579ddddbea43"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/a96db215b7def08a6964edefe830579ddddbea43",
+                "reference": "a96db215b7def08a6964edefe830579ddddbea43",
+                "shasum": ""
+            },
+            "require": {
+                "j4mie/idiorm": "^1.5",
+                "jublonet/codebird-php": "^3.1",
+                "monolog/monolog": "^1.22",
+                "php": "^7.0",
+                "respect/validation": "^1.1",
+                "slim/slim": "^3.8",
+                "slim/twig-view": "^2.2",
+                "symfony/yaml": "^3.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Plasticode\\": "src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sergey Atroshchenko (kapxapot)",
+                    "email": "kapxapot@gmail.com",
+                    "homepage": "http://kapxapot.ru"
+                }
+            ],
+            "description": "PHP framework based on Slim framework",
+            "homepage": "http://github.com/kapxapot/plasticode",
+            "keywords": [
+                "API",
+                "Bootstrap",
+                "PHP",
+                "Plasticode",
+                "Slim",
+                "Twig"
+            ],
+            "support": {
+                "source": "https://github.com/kapxapot/plasticode/tree/0.1.1",
+                "issues": "https://github.com/kapxapot/plasticode/issues"
+            },
+            "time": "2019-06-03T19:24:16+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -1545,16 +1780,16 @@
         },
         {
             "name": "twig/twig",
-            "version": "v2.11.0",
+            "version": "v2.11.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/twigphp/Twig.git",
-                "reference": "c344879ae57dc1487b1df3e3d8325936125ba2cc"
+                "reference": "0418e17113266e84c03ccf758680af8abc4b22dc"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/twigphp/Twig/zipball/c344879ae57dc1487b1df3e3d8325936125ba2cc",
-                "reference": "c344879ae57dc1487b1df3e3d8325936125ba2cc",
+                "url": "https://api.github.com/repos/twigphp/Twig/zipball/0418e17113266e84c03ccf758680af8abc4b22dc",
+                "reference": "0418e17113266e84c03ccf758680af8abc4b22dc",
                 "shasum": ""
             },
             "require": {
@@ -1565,7 +1800,7 @@
             "require-dev": {
                 "psr/container": "^1.0",
                 "symfony/debug": "^2.7",
-                "symfony/phpunit-bridge": "^3.4.19|^4.1.8"
+                "symfony/phpunit-bridge": "^3.4.19|^4.1.8|^5.0"
             },
             "type": "library",
             "extra": {
@@ -1608,7 +1843,7 @@
             "keywords": [
                 "templating"
             ],
-            "time": "2019-05-31T06:21:42+00:00"
+            "time": "2019-06-04T11:32:47+00:00"
         },
         {
             "name": "vlucas/phpdotenv",
@@ -1665,7 +1900,9 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "kapxapot/plasticode": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {

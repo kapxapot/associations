@@ -1,31 +1,33 @@
 {
-	"name": "kapxapot/associations",
-	"description": "Game of associations",
-	"keywords": [ "Plasticode", "game", "associations" ],
-	"homepage": "http://github.com/kapxapot/associations",
-	"license": "MIT",
-	"authors": [
-		{
-			"name": "Sergey Atroshchenko (kapxapot)",
-			"email": "kapxapot@gmail.com",
-			"homepage": "http://kapxapot.ru"
-		}
-	],
-	"require": {
-		"php": "^7.0",
-		"slim/slim": "^3.8",
-		"monolog/monolog": "^1.22",
-		"respect/validation": "^1.1",
-		"j4mie/idiorm": "^1.5",
-		"symfony/yaml": "^3.3",
-		"slim/twig-view": "^2.2",
-		"vlucas/phpdotenv": "^2.4",
-		"robmorgan/phinx": "^0.10.7"
-	},
-	"autoload": {
-		"psr-4": {
-			"App\\": "src",
-			"Plasticode\\": "../plasticode/src"
-		}
-	}
+    "name": "kapxapot/associations",
+    "description": "Game of associations",
+    "keywords": [ "Plasticode", "game", "associations" ],
+    "homepage": "http://github.com/kapxapot/associations",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sergey Atroshchenko (kapxapot)",
+            "email": "kapxapot@gmail.com",
+            "homepage": "http://kapxapot.ru"
+        }
+    ],
+    "require": {
+        "php": "^7.0",
+        "kapxapot/plasticode": "dev-master",
+        "slim/slim": "^3.8",
+        "respect/validation": "^1.1",
+        "vlucas/phpdotenv": "^2.4",
+        "robmorgan/phinx": "^0.10.7"
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/kapxapot/plasticode"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "App\\": "src"
+        }
+    }
 }
