@@ -29,7 +29,7 @@ session_start();
 $path = $root . '/settings';
 $appSettings = \Plasticode\Core\Settings::load($path);
 
-$app = new \Slim\App($appSettings);
+$app = \Plasticode\Core\App::get($appSettings);
 $container = $app->getContainer();
 $settings = $container->get('settings');
 
