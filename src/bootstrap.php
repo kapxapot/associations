@@ -1,26 +1,28 @@
 <?php
 
 function debugModeOn() {
-	global $debug;
-	
-	if ($debug !== true) {
-		error_reporting(E_ALL & ~E_NOTICE);
-		ini_set("display_errors", 1);
-		
-		$debug = true;
-	}
+    global $debug;
+    
+    if ($debug !== true) {
+        error_reporting(E_ALL & ~E_NOTICE);
+        ini_set("display_errors", 1);
+        
+        $debug = true;
+    }
 }
 
 if (isset($_GET['debug'])) {
-	debugModeOn();
+    debugModeOn();
 }
 
 $root = __DIR__ . '/..';
 
 require $root . '/vendor/autoload.php';
 
-$dotenv = new \Dotenv\Dotenv($root);
-$dotenv->load();
+if (getenv('APP_ENV') !== 'prod') {
+    $dotenv = new \Dotenv\Dotenv($root);
+    $dotenv->load();
+}
 
 session_start();
 
@@ -32,7 +34,7 @@ $container = $app->getContainer();
 $settings = $container->get('settings');
 
 if ($settings['debug']) {
-	debugModeOn();
+    debugModeOn();
 }
 
 $bootstrap = new \App\Config\Bootstrap($settings, $debug, __DIR__);
