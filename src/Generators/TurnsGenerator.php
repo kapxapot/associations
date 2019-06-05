@@ -15,21 +15,21 @@ use App\Models\Word;
 
 class TurnsGenerator extends EntityGenerator
 {
-	public function getRules($data, $id = null)
-	{
-	    $rules = parent::getRules($data, $id);
+    public function getRules($data, $id = null)
+    {
+        $rules = parent::getRules($data, $id);
 
-		$rules['game_id'] = $this
-		    ->rule('posInt')
-		    ->gameExists() // v
-		    ->gameIsCurrent() // v
-		    ->gameTurnIsCorrect($data['prev_turn_id'] ?? null); // v
-		
-		if (array_key_exists('prev_turn_id', $data)) {
-		    $rules['prev_turn_id'] = $this
-		        ->rule('posInt')
-		        ->turnExists(); // v
-		}
+        $rules['game_id'] = $this
+            ->rule('posInt')
+            ->gameExists() // v
+            ->gameIsCurrent() // v
+            ->gameTurnIsCorrect($data['prev_turn_id'] ?? null); // v
+        
+        if (array_key_exists('prev_turn_id', $data)) {
+            $rules['prev_turn_id'] = $this
+                ->rule('posInt')
+                ->turnExists(); // v
+        }
         
         $rules['word'] = $this
             ->rule('text')
@@ -37,14 +37,14 @@ class TurnsGenerator extends EntityGenerator
             ->wordIsValid() // v
             ->wordIsNotRepetitive($data['game_id']); // v
 
-		return $rules;
-	}
-	
-	public function beforeSave($data, $id = null)
-	{
-	    $data = parent::beforeSave($data, $id);
-	    
-	    $user = $this->auth->getUser();
+        return $rules;
+    }
+    
+    public function beforeSave($data, $id = null)
+    {
+        $data = parent::beforeSave($data, $id);
+        
+        $user = $this->auth->getUser();
 
         $data['user_id'] = $user->getId();
         
@@ -55,10 +55,6 @@ class TurnsGenerator extends EntityGenerator
         }
         
         $wordStr = $data['word'];
-        
-        /*if ($game->getId() == 2380) {
-            dd([$wordStr, $this->gameService->validatePlayerTurn($game, $wordStr)]);
-        }*/
 
         $language = $game->language();
         
@@ -89,17 +85,17 @@ class TurnsGenerator extends EntityGenerator
             $data['association_id'] = $association->getId();
         }
 
-		return $data;
-	}
-	
-	public function afterSave($item, $data)
-	{
-	    parent::afterSave($item, $data);
+        return $data;
+    }
+    
+    public function afterSave($item, $data)
+    {
+        parent::afterSave($item, $data);
 
-		$turn = Turn::get($item->id);
-		
-		if ($turn !== null) {
-		    $this->gameService->processPlayerTurn($turn);
-		}
-	}
+        $turn = Turn::get($item->id);
+        
+        if ($turn !== null) {
+            $this->gameService->processPlayerTurn($turn);
+        }
+    }
 }
