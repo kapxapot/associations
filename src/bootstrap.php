@@ -1,5 +1,7 @@
 <?php
 
+$debug = false;
+
 function debugModeOn() {
     global $debug;
     
@@ -19,10 +21,7 @@ $root = __DIR__ . '/..';
 
 require $root . '/vendor/autoload.php';
 
-if (getenv('APP_ENV') !== 'prod') {
-    $dotenv = new \Dotenv\Dotenv($root);
-    $dotenv->load();
-}
+\Plasticode\Core\Env::load($root);
 
 session_start();
 
@@ -44,6 +43,6 @@ $bootstrap = new \App\Config\Bootstrap($settings, $debug, __DIR__);
 $app->add(new \Plasticode\Middleware\SlashMiddleware($container));
 $app->add(new \Plasticode\Middleware\CookieAuthMiddleware($container, $settings['auth_token_key']));
 
-require $src . 'routes.php';
+require $root . '/src/routes.php';
 
 $app->run();

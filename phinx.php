@@ -1,13 +1,10 @@
 <?php
 
-if (getenv('APP_ENV') !== 'prod') {
-    $root = __DIR__;
+$root = __DIR__;
 
-    require $root . '/vendor/autoload.php';
-    
-    $dotenv = new \Dotenv\Dotenv($root);
-    $dotenv->load();
-}
+require $root . '/vendor/autoload.php';
+
+\Plasticode\Core\Env::load($root);
 
 $db = [
     'adapter' => getenv('DB_ADAPTER'),
