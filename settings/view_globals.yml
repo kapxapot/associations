@@ -1,11 +1,11 @@
 site_name: Associ.ru
-site_bare_url: warcry.ru
-site_url: 'https://warcry.ru'
-cool_site_url: '//warcry.ru'
+site_bare_url: associ.ru
+site_url: 'http://associ.ru'
+cool_site_url: '//associ.ru'
 site_description: 'Игра в Ассоциации для детей и взрослых'
 short_site_description: 'Ассоциации - Игра для детей и взрослых'
-twitter_card_image: 'http://yoursite.com/images/logo.png'
-touch_icon: 'http://yoursite.com/images/logo.png'
+#twitter_card_image: 'http://yoursite.com/images/logo.png'
+#touch_icon: 'http://yoursite.com/images/logo.png'
 contact_email: kapxapot [sobaka] gmail [dot] com
 copyright_from: 2019
 admin_copyright_from: 2019
@@ -22,8 +22,8 @@ folders:
 mde: true
 
 disqus_alias: associ
-google_analytics_id: your-google-analytics-id
-twitter_alias: YourTwitter
+google_analytics_id: {GOOGLE_ANALYTICS_ID}
+twitter_alias: AssociRu
 
 angular:
   app: bsApp
