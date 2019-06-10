@@ -620,12 +620,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kapxapot/plasticode.git",
-                "reference": "b4fb1cc981c6a5364a187ae568e21383538b05fb"
+                "reference": "62d5c330c7e00aa3d19299f5b2bfda28eb936c55"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/b4fb1cc981c6a5364a187ae568e21383538b05fb",
-                "reference": "b4fb1cc981c6a5364a187ae568e21383538b05fb",
+                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/62d5c330c7e00aa3d19299f5b2bfda28eb936c55",
+                "reference": "62d5c330c7e00aa3d19299f5b2bfda28eb936c55",
                 "shasum": ""
             },
             "require": {
@@ -672,7 +672,7 @@
                 "source": "https://github.com/kapxapot/plasticode/tree/master",
                 "issues": "https://github.com/kapxapot/plasticode/issues"
             },
-            "time": "2019-06-07T09:18:36+00:00"
+            "time": "2019-06-07T12:07:54+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -3186,16 +3186,16 @@
         },
         {
             "name": "sebastian/type",
-            "version": "1.0.0",
+            "version": "1.1.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/type.git",
-                "reference": "c2362deb2d0b708abe0c4a6d35633c19ae40cd4a"
+                "reference": "79fd7f2f8acff994d4a330bb434b09b813479068"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/c2362deb2d0b708abe0c4a6d35633c19ae40cd4a",
-                "reference": "c2362deb2d0b708abe0c4a6d35633c19ae40cd4a",
+                "url": "https://api.github.com/repos/sebastianbergmann/type/zipball/79fd7f2f8acff994d4a330bb434b09b813479068",
+                "reference": "79fd7f2f8acff994d4a330bb434b09b813479068",
                 "shasum": ""
             },
             "require": {
@@ -3207,12 +3207,15 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0-dev"
+                    "dev-master": "1.1-dev"
                 }
             },
             "autoload": {
                 "classmap": [
                     "src/"
+                ],
+                "files": [
+                    "tests/_fixture/callback_function.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -3228,7 +3231,7 @@
             ],
             "description": "Collection of value objects that represent the types of the PHP type system",
             "homepage": "https://github.com/sebastianbergmann/type",
-            "time": "2019-06-06T11:58:04+00:00"
+            "time": "2019-06-07T09:58:20+00:00"
         },
         {
             "name": "sebastian/version",
