@@ -153,7 +153,7 @@ class Word extends DbModel
         return [
             'id' => $this->getId(),
             'word' => $this->word,
-            'url' => self::$linker->abs($this->url()),
+            'url' => $this->url(),
             'language' => $this->language()->serialize(),
             'creator' => $this->creator()->serialize(),
             'created_at' => $this->createdAtIso(),
