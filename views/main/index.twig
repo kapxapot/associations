@@ -18,11 +18,11 @@
 {% set title = short_site_description %}
 
 {% block content %}
-	<div class="panel">
-	    <div class="panel-body">
-        	{% if not auth.user %}
-        		<div>Для игры в <strong>Ассоциации</strong> вам нужно <a href="javascript:void(0);" ng-click="signIn()">войти</a> или <a href="javascript:void(0);" ng-click="signUp()">зарегистрироваться</a>.</div>
-        	{% else %}
+    <div class="panel">
+        <div class="panel-body">
+            {% if not auth.user %}
+                <div>Для игры в <strong>Ассоциации</strong> вам нужно <a href="javascript:void(0);" ng-click="signIn()">войти</a> или <a href="javascript:void(0);" ng-click="signUp()">зарегистрироваться</a>.</div>
+            {% else %}
                 {% if game %}
                     {% set game_turns_count = game.turns.count %}
                     <div ng-cloak class="mb-2">Идет игра! Началась {{ gm.moment_from_now(game.created_at_iso) }}, ход: {{ game_turns_count + 1 }}.</div>
@@ -51,16 +51,16 @@
                         <form autocomplete="off">
                             <div class="form-group mb-2">
                                 <label for="nextWord">Ваше слово:</label>
-                            	<input name="nextWord" id="nextWord" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
+                                <input name="nextWord" id="nextWord" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
                             </div>
 
-    			        	<button type="submit" ng-click="sendWord()" class="btn btn-success ajax-button" ng-disabled="loading || saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Отправить</span></button>
+                            <button type="submit" ng-click="sendWord()" class="btn btn-success ajax-button" ng-disabled="loading || saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Отправить</span></button>
 
-    			        	<a role="button" ng-click="giveUp()" class="btn btn-default ml-2" ng-disabled="loading || saving">Сдаться</a>
-    			        	
-    			        	{% if with_problems %}
-    			        	    <a role="button" ng-click="problemsDialog()" class="btn btn-default problems ml-2" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
-    			        	{% endif %}
+                            <a role="button" ng-click="giveUp()" class="btn btn-default ml-2" ng-disabled="loading || saving">Сдаться</a>
+                            
+                            {% if with_problems %}
+                                <a role="button" ng-click="problemsDialog()" class="btn btn-default problems ml-2" ng-disabled="loading || saving" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
+                            {% endif %}
                         </form>
                     </div>
                     <div class="clearfix"></div>
@@ -87,24 +87,24 @@
 
                     <div class="mb-2">{% if last_game %}Сыграем еще?{% else %}Поиграем?{% endif %}</div>
                     <div ng-cloak>
-			        	<button ng-click="newGame()" class="btn btn-success ajax-button" ng-disabled="loading || saving" data-focus><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Начать игру</span></button>
+                        <button ng-click="newGame()" class="btn btn-success ajax-button" ng-disabled="loading || saving" data-focus><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Начать игру</span></button>
                     </div>
                 {% endif %}
 
-				<div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
-					<a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
-					<div ng-bind-html="alertError|rawHtml"></div>
-				</div>
-        	{% endif %}
-	    </div>
-	</div>
-	
-	{% include 'main/modals/problems.twig' with {
-	    'word': problems_word,
-	    'association': problems_association,
-	    'prev_word': before_last_turn.word,
-	    'word_max_length': word_max_length
-	} %}
+                <div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
+                    <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
+                    <div ng-bind-html="alertError|rawHtml"></div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    {% include 'main/modals/problems.twig' with {
+        'word': problems_word,
+        'association': problems_association,
+        'prev_word': before_last_turn.word,
+        'word_max_length': word_max_length
+    } %}
 {% endblock %}
 
 {% set even_more_angular %}
@@ -114,14 +114,14 @@
 
     {% if not game %}
         $scope.newGame = () => {
-			$scope.prePost(null);
+            $scope.prePost(null);
 
-        	$scope.ajax({
-        		url: '{{ api }}games',
-        		data: { language_id: $scope.languageId },
-        		onSuccess: $scope.postSuccess,
-        		noSuccessMessage: true,
-        	});
+            $scope.ajax({
+                url: '{{ api }}games',
+                data: { language_id: $scope.languageId },
+                onSuccess: $scope.postSuccess,
+                noSuccessMessage: true,
+            });
         };
     {% else %}
         $scope.normalize = (word) => {
@@ -130,7 +130,7 @@
         
         $scope.showWordError = (error) => {
             $scope.alertError = error;
-			showAlertError();
+            showAlertError();
         };
         
         $scope.sendWord = () => {
@@ -162,28 +162,28 @@
                 {% endif %}
             {% endif %}
 
-			$scope.prePost(null);
+            $scope.prePost(null);
 
-        	$scope.ajax({
-        		url: '{{ api }}turns',
-        		data: {
-        		    game_id: {{ game.id }},
-        		    {% if last_turn %}
-        		        prev_turn_id: {{ last_turn.id }},
-        		    {% endif %}
-        		    word: nextWord
-        		},
-        		onSuccess: $scope.postSuccess,
-        		noSuccessMessage: true,
-        	});
+            $scope.ajax({
+                url: '{{ api }}turns',
+                data: {
+                    game_id: {{ game.id }},
+                    {% if last_turn %}
+                        prev_turn_id: {{ last_turn.id }},
+                    {% endif %}
+                    word: nextWord
+                },
+                onSuccess: $scope.postSuccess,
+                noSuccessMessage: true,
+            });
         };
         
         $scope.giveUp = () => {
-	    	$scope.ajax({
-	    		url: '{{ path_for('actions.game.finish') }}',
-	    		onSuccess: $scope.postSuccess,
-	    		noSuccessMessage: true,
-	    	});
+            $scope.ajax({
+                url: '{{ path_for('actions.game.finish') }}',
+                onSuccess: $scope.postSuccess,
+                noSuccessMessage: true,
+            });
         };
 
         {% if with_problems %}
