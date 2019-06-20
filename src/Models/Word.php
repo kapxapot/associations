@@ -39,11 +39,11 @@ class Word extends DbModel
     public static function getApproved(Language $language) : Collection
     {
         return Association::getApproved($language)
-	        ->map(function ($assoc) {
-	            return $assoc->words();
-	        })
-	        ->flatten()
-	        ->distinct();
+            ->map(function ($assoc) {
+                return $assoc->words();
+            })
+            ->flatten()
+            ->distinct();
     }
     
     // properties
@@ -93,22 +93,26 @@ class Word extends DbModel
     
     public function score()
     {
-        $approvedAssocs = $this->approvedAssociations();
-        $approvedAssocsCount = count($approvedAssocs);
-        
-        $dislikeCount = $this->dislikes()->count();
-        
-        $assocCoeff = self::getSettings('words.coeffs.approved_association');
-        $dislikeCoeff = self::getSettings('words.coeffs.dislike');
-        
-        return $approvedAssocsCount * $assocCoeff - $dislikeCount * $dislikeCoeff;
+        return $this->lazy(function () {
+            $approvedAssocs = $this->approvedAssociations();
+            $approvedAssocsCount = count($approvedAssocs);
+            
+            $dislikeCount = $this->dislikes()->count();
+            
+            $assocCoeff = self::getSettings('words.coeffs.approved_association');
+            $dislikeCoeff = self::getSettings('words.coeffs.dislike');
+            
+            return $approvedAssocsCount * $assocCoeff - $dislikeCount * $dislikeCoeff;
+        });
     }
     
     public function isApproved() : bool
     {
-        $threshold = self::getSettings('words.approval_threshold');
+        return $this->lazy(function () {
+            $threshold = self::getSettings('words.approval_threshold');
         
-        return $this->score() >= $threshold;
+            return $this->score() >= $threshold;
+        });
     }
 
     public function associatedWords(User $user) : Collection
@@ -140,6 +144,9 @@ class Word extends DbModel
             ->group('user_id');
     }
     
+    /**
+     * Currently not used.
+     */
     public function isApprovedByUsage() : bool
     {
         $threshold = self::getSettings('words.approval_threshold');
@@ -209,8 +216,10 @@ class Word extends DbModel
 
     public function isMature() : bool
     {
-        $threshold = self::getSettings('words.mature_threshold');
+        return $this->lazy(function () {
+            $threshold = self::getSettings('words.mature_threshold');
         
-        return $this->matures()->count() >= $threshold;
+            return $this->matures()->count() >= $threshold;
+        });
     }
 }

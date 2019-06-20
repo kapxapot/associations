@@ -109,22 +109,26 @@ class Association extends DbModel
     
     public function score()
     {
-        $turnsByUsers = $this->turnsByUsers();
-        $turnCount = count($turnsByUsers);
-        
-        $dislikeCount = $this->dislikes()->count();
-        
-        $usageCoeff = self::getSettings('associations.coeffs.usage');
-        $dislikeCoeff = self::getSettings('associations.coeffs.dislike');
-        
-        return $turnCount * $usageCoeff - $dislikeCount * $dislikeCoeff;
+        return $this->lazy(function () {
+            $turnsByUsers = $this->turnsByUsers();
+            $turnCount = count($turnsByUsers);
+            
+            $dislikeCount = $this->dislikes()->count();
+            
+            $usageCoeff = self::getSettings('associations.coeffs.usage');
+            $dislikeCoeff = self::getSettings('associations.coeffs.dislike');
+            
+            return $turnCount * $usageCoeff - $dislikeCount * $dislikeCoeff;
+        });
     }
     
     public function isApproved() : bool
     {
-        $threshold = self::getSettings('associations.approval_threshold');
+        return $this->lazy(function () {
+            $threshold = self::getSettings('associations.approval_threshold');
         
-        return $this->score() >= $threshold;
+            return $this->score() >= $threshold;
+        });
     }
     
     public function feedbacks() : Query
@@ -160,8 +164,14 @@ class Association extends DbModel
 
     public function isMature() : bool
     {
-        $threshold = self::getSettings('associations.mature_threshold');
-        
-        return $this->matures()->count() >= $threshold;
+        return $this->lazy(function () {
+            if ($this->firstWord()->isMature() || $this->secondWord()->isMature()) {
+                return true;
+            }
+    
+            $threshold = self::getSettings('associations.mature_threshold');
+            
+            return $this->matures()->count() >= $threshold;
+        });
     }
 }
