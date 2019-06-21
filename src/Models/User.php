@@ -39,7 +39,7 @@ class User extends UserBase
         return Turn::getByUser($this, $language);
     }
     
-    public function wordsUsed(Language $language) : Collection
+    public function wordsUsed(Language $language = null) : Collection
     {
         return $this
             ->turns($language)
