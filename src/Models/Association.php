@@ -30,17 +30,17 @@ class Association extends DbModel
     
     // getters - many
     
-    public static function getApproved(Language $language = null) : Collection
+    public static function getApproved(Language $language = null, bool $excludeMature = null) : Collection
     {
-        return self::staticLazy(function () use ($language) {
+        return self::staticLazy(function () use ($language, $excludeMature) {
             $query = ($language !== null)
                 ? self::getByLanguage($language)
                 : self::query();
             
             return $query
                 ->all()
-                ->where(function ($assoc) {
-                    return $assoc->isApproved();
+                ->where(function ($assoc) use ($excludeMature) {
+                    return $assoc->isApproved() && ($excludeMature !== true || !$assoc->isMature());
                 });
         });
     }

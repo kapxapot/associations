@@ -17,6 +17,11 @@ class Language extends DbModel
         return Word::getByLanguage($this)
             ->orderByAsc('word');
     }
+
+    public function approvedWords(bool $excludeMature = null)
+    {
+        return Word::getApproved($this, $excludeMature);
+    }
     
     public function lastAddedWords(int $limit = null) : Query
     {
@@ -28,6 +33,11 @@ class Language extends DbModel
     public function associations() : Query
     {
         return Association::getByLanguage($this);
+    }
+
+    public function approvedAssociations(bool $excludeMature = null)
+    {
+        return Association::getApproved($this, $excludeMature);
     }
     
     public function lastAddedAssociations(int $limit = null) : Query

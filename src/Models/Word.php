@@ -36,14 +36,19 @@ class Word extends DbModel
 
     // getters - many
     
-    public static function getApproved(Language $language) : Collection
+    public static function getApproved(Language $language = null, bool $excludeMature = null) : Collection
     {
-        return Association::getApproved($language)
-            ->map(function ($assoc) {
-                return $assoc->words();
-            })
-            ->flatten()
-            ->distinct();
+        return self::staticLazy(function () use ($language, $excludeMature) {
+            $query = ($language !== null)
+                ? self::getByLanguage($language)
+                : self::query();
+            
+            return $query
+                ->all()
+                ->where(function ($word) use ($excludeMature) {
+                    return $word->isApproved() && ($excludeMature !== true || !$word->isMature());
+                });
+        });
     }
     
     // properties
@@ -86,7 +91,7 @@ class Word extends DbModel
             return $this->associations()
                 ->all()
                 ->where(function ($assoc) use ($user) {
-                    return $assoc->isApproved() || $user->getId() === $assoc->creator()->getId();
+                    return ($assoc->isApproved() && ($user->isMature() || !$assoc->isMature())) || $user->getId() === $assoc->creator()->getId();
                 });
         });
     }

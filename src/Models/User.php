@@ -67,8 +67,10 @@ class User extends UserBase
     
     public function isMature() : bool
     {
-        $matureAge = self::getSettings('users.mature_age', 16);
+        return $this->lazy(function () {
+            $matureAge = self::getSettings('users.mature_age', 16);
         
-        return $this->ageNow >= $matureAge;
+            return $this->ageNow >= $matureAge;
+        });
     }
 }
