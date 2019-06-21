@@ -2,39 +2,39 @@
 
 {#<div class="panel-secondary-heading">А это Sidebar</div>#}
 <div class="panel panel-secondary">
-	<div class="panel-body">
-		<div class="mb-2"><strong>Язык:</strong> {{ language.name }}</div>
+    <div class="panel-body">
+        <div class="mb-2"><strong>Язык:</strong> {{ language.name }}</div>
 
-		{% if word_count + association_count > 0 %}
-			<div class="mb-2">В игре {{ word_count }} {{ word_count_str }} и {{ association_count }} {{ association_count_str }} на этом языке.</div>
+        {% if word_count + association_count > 0 %}
+            <div class="mb-2">В игре {{ word_count }} {{ word_count_str }} и {{ association_count }} {{ association_count_str }} на этом языке.</div>
 
-			{% if word_anniversary %}
-				<div class="mb-2">Ура, у нас {{ word_anniversary }} слов! \o/</div>
-			{% endif %}
-			
-			{% if association_anniversary %}
-				<div class="mb-2">Ура, у нас {{ association_anniversary }} ассоциаций! \o/</div>
-			{% endif %}
-			
-			{% if word_count > 0 %}
-				<div class="mb-1">Новые слова:</div>
-				<ul>
-					{% for word in language.last_added_words.all %}
-						<li><a href="{{ word.url }}">{{ word.word }}</a>{% if word.creator %} ({{ lm.user(word.creator) }}){% endif %}</li>
-					{% endfor %}
-				</ul>
-			{% endif %}
+            {% if word_anniversary %}
+                <div class="mb-2">Ура, у нас {{ word_anniversary }} слов! \o/</div>
+            {% endif %}
+            
+            {% if association_anniversary %}
+                <div class="mb-2">Ура, у нас {{ association_anniversary }} ассоциаций! \o/</div>
+            {% endif %}
+            
+            {% if word_count > 0 %}
+                <div class="mb-1">Новые слова:</div>
+                <ul>
+                    {% for word in language.last_added_words.all %}
+                        <li><a href="{{ word.url }}">{{ word.word }}</a>{% if word.creator %} <span class="nowrap">({{ lm.user(word.creator) }})</span>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
 
-			{% if association_count > 0 %}
-				<div class="mb-1">Новые ассоциации:</div>
-				<ul class="mb-0">
-					{% for assoc in language.last_added_associations.all %}
-						<li>{{ lm.association(assoc) }}{% if assoc.creator %} ({{ lm.user(assoc.creator) }}){% endif %}</li>
-					{% endfor %}
-				</ul>
-			{% endif %}
-		{% else %}
-			<div>В игре нет слов на этом языке. :(</div>
-		{% endif %}
-	</div>
+            {% if association_count > 0 %}
+                <div class="mb-1">Новые ассоциации:</div>
+                <ul class="mb-0">
+                    {% for assoc in language.last_added_associations.all %}
+                        <li>{{ lm.association(assoc) }}{% if assoc.creator %} <span class="nowrap">({{ lm.user(assoc.creator) }})</span>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% else %}
+            <div>В игре нет слов на этом языке. :(</div>
+        {% endif %}
+    </div>
 </div>
