@@ -174,4 +174,49 @@ class Association extends DbModel
             return $this->matures()->count() >= $threshold;
         });
     }
+    
+    public function isUsedByUser(User $user) : bool
+    {
+        return $this
+            ->turns()
+            ->where('user_id', $user->getId())
+            ->any();
+    }
+
+    public function isDislikedByUser(User $user) : bool
+    {
+        return $this
+            ->dislikes()
+            ->where('created_by', $user->getId())
+            ->any();
+    }
+
+    /**
+     * Maturity check.
+     */
+    public function isVisibleForUser(User $user = null)
+    {
+        // 1. non-mature words are visible for everyone
+        // 2. mature words are invisible for non-authed users ($user == null)
+        // 3. mature words are visible for non-mature users only if they used the word
+
+        return 
+            !$this->isMature() ||
+            ($user !== null &&
+                ($user->isMature() || $this->isUsedByUser($user))
+            );
+    }
+
+    public function isPlayableAgainstUser(User $user)
+    {
+        // word can't be played against user, if
+        //
+        // 1. word is mature, user is not mature (maturity check)
+        // 2. word is not approved, user disliked the word
+
+        return $this->isVisibleForUser($user) &&
+            ($this->isApproved() ||
+                ($this->isUsedByUser($user) && !$this->isDislikedByUser($user))
+            );
+    }
 }
