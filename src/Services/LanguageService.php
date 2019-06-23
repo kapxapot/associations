@@ -29,17 +29,18 @@ class LanguageService extends Contained
     
     public function getRandomWordForUser(Language $language, User $user, Collection $exclude = null)
     {
-        $excludeMature = !$user->isMature();
-        
         // get common words
-        $approvedWords = $language->approvedWords($excludeMature);
+        $approvedWords = Word::getApproved($language);
 
         // get user's words
-        $userWords = $user->wordsUsed($language);
+        $userWords = $user->usedWords($language);
         
         // union them & distinct
         $words = Collection::merge($approvedWords, $userWords)
-            ->distinct();
+            ->distinct()
+            ->where(function ($word) use ($user) {
+                return $word->isPlayableAgainstUser($user);
+            });
 
         if ($exclude !== null && $exclude->any()) {
             $words = $words->whereNotIn('id', $exclude->ids());

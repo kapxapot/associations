@@ -97,41 +97,41 @@ class GameService extends Contained
     
     public function processAiTurn(Turn $turn)
     {
-	    // finish prev turn
-	    if ($turn->prev() !== null) {
-	        $this->turnService->finish($turn->prev(), $turn->createdAt);
-	    }
+        // finish prev turn
+        if ($turn->prev() !== null) {
+            $this->turnService->finish($turn->prev(), $turn->createdAt);
+        }
     }
     
     public function processPlayerTurn(Turn $turn)
     {
-	    // finish prev turn
-	    if ($turn->prev() !== null) {
-	        $this->turnService->finish($turn->prev(), $turn->createdAt);
-	    }
-	    
-	    // AI next turn
-	    $game = $turn->game();
-	    $word = $this->associationService->findAnswer($turn);
+        // finish prev turn
+        if ($turn->prev() !== null) {
+            $this->turnService->finish($turn->prev(), $turn->createdAt);
+        }
+        
+        // AI next turn
+        $game = $turn->game();
+        $word = $this->associationService->findAnswer($turn);
 
-	    if ($word !== null) {
-    	    $this->newAiTurn($game, $word);
-	    }
-	    else {
-	        $this->finish($game);
-	    }
+        if ($word !== null) {
+            $this->newAiTurn($game, $word);
+        }
+        else {
+            $this->finish($game);
+        }
     }
     
     public function validatePlayerTurn(Game $game, string $word) : bool
     {
-	    $lastTurnWord = $game->lastTurnWord();
-	    $beforeLastTurnWord = $game->beforeLastTurnWord();
+        $lastTurnWord = $game->lastTurnWord();
+        $beforeLastTurnWord = $game->beforeLastTurnWord();
         
         $language = $game->language();
-	    
-	    $word = $this->languageService->normalizeWord($language, $word);
+        
+        $word = $this->languageService->normalizeWord($language, $word);
 
-		return ($lastTurnWord === null || $lastTurnWord->word !== $word) &&
-		    ($beforeLastTurnWord === null || $beforeLastTurnWord->word !== $word);
+        return ($lastTurnWord === null || $lastTurnWord->word !== $word) &&
+            ($beforeLastTurnWord === null || $beforeLastTurnWord->word !== $word);
     }
 }

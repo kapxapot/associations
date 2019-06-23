@@ -39,22 +39,22 @@ class Word extends DbModel
 
     public static function getUsedByUser(User $user, Language $language = null) : Collection
     {
-        return $user->wordsUsed($language);
+        return $user->usedWords($language);
     }
 
     // getters - many
     
-    public static function getApproved(Language $language = null, bool $excludeMature = null) : Collection
+    public static function getApproved(Language $language = null) : Collection
     {
-        return self::staticLazy(function () use ($language, $excludeMature) {
+        return self::staticLazy(function () use ($language) {
             $query = ($language !== null)
                 ? self::getByLanguage($language)
                 : self::query();
             
             return $query
                 ->all()
-                ->where(function ($word) use ($excludeMature) {
-                    return $word->isApproved() && ($excludeMature !== true || !$word->isMature());
+                ->where(function ($word) {
+                    return $word->isApproved();
                 });
         });
     }
@@ -99,7 +99,7 @@ class Word extends DbModel
             return $this->associations()
                 ->all()
                 ->where(function ($assoc) use ($user) {
-                    return ($assoc->isApproved() && ($user->isMature() || !$assoc->isMature())) || $user->getId() === $assoc->creator()->getId();
+                    return $assoc->isPlayableAgainstUser($user);
                 });
         });
     }
@@ -138,7 +138,7 @@ class Word extends DbModel
             });
     }
     
-    public function url()
+    public function url() : ?string
     {
         return self::$linker->word($this);
     }

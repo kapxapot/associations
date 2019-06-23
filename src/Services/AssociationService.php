@@ -68,9 +68,11 @@ class AssociationService extends Contained
 
     public function findAnswer(Turn $turn)
     {
+        $user = $turn->user();
+
         return $turn
             ->word()
-            ->associatedWords($turn->user())
+            ->associatedWords($user)
             ->whereNotIn('id', $turn->game()->words()->ids())
             ->random();
     }

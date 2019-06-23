@@ -29,7 +29,7 @@ class User extends UserBase
             ->one();
     }
     
-    public function wordsCreated() : Query
+    public function createdWords() : Query
     {
         return Word::getCreatedByUser($this);
     }
@@ -39,7 +39,7 @@ class User extends UserBase
         return Turn::getByUser($this, $language);
     }
     
-    public function wordsUsed(Language $language = null) : Collection
+    public function usedWords(Language $language = null) : Collection
     {
         return $this
             ->turns($language)

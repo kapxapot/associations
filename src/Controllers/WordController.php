@@ -51,9 +51,8 @@ class WordController extends Controller
         $word = Word::get($id);
         
         $user = $this->auth->getUser();
-        $matureUser = $user !== null && $user->isMature();
 
-        if ($word === null || ($word->isMature() && !$matureUser)) {
+        if ($word === null || !$word->isVisibleForUser($user)) {
             return $this->notFound($request, $response);
         }
 

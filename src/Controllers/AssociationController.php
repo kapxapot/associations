@@ -15,9 +15,8 @@ class AssociationController extends Controller
         $association = Association::get($id);
         
         $user = $this->auth->getUser();
-        $matureUser = $user !== null && $user->isMature();
 
-        if ($association === null || ($association->isMature() && !$matureUser)) {
+        if ($association === null || !$association->isVisibleForUser($user)) {
             return $this->notFound($request, $response);
         }
         

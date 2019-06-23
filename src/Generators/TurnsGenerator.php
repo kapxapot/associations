@@ -75,6 +75,9 @@ class TurnsGenerator extends EntityGenerator
 
         // association_id
         if ($game->lastTurn() !== null) {
+            // potential problem here:
+            // association can be created by another user
+            // at the same time
             $association = Association::getByPair($game->lastTurnWord(), $word, $language)
                 ?? $this->associationService->create($game->lastTurnWord(), $word, $user, $language);
             
