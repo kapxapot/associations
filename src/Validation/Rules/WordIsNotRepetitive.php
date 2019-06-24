@@ -26,6 +26,6 @@ class WordIsNotRepetitive extends ContainerRule
 	        throw new ApplicationException('Game not found.');
 	    }
 	    
-	    return $this->container->gameService->validatePlayerTurn($game, $input);
+	    return $this->container->turnService->validatePlayerTurn($game, $input);
 	}
 }

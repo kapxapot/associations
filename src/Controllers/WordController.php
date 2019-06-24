@@ -29,6 +29,9 @@ class WordController extends Controller
     {
         $limit = $request->getQueryParam('limit', 0);
         
+        // due to isMature this works incorrectly
+        // will work correctly only when isMature becomes a table column
+        // and gets filtered before all()
         $words = Word::query()
             ->limit($limit)
             ->all()

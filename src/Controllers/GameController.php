@@ -38,7 +38,7 @@ class GameController extends Controller
 	        $game = $user->currentGame();
 	        
 	        if ($game !== null) {
-	            $this->gameService->finish($game);
+	            $this->gameService->finishGame($game);
 	        }
 	    }
 

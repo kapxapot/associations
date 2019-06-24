@@ -6,6 +6,7 @@ use Plasticode\Contained;
 use Plasticode\Util\Date;
 
 use App\Models\Association;
+use App\Models\Game;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;

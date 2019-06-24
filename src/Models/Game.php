@@ -107,7 +107,7 @@ class Game extends DbModel
 
         // new word
         if ($word === null) {
-            return true;
+            return false;
         }
 
         return $this->containsWord($word);
