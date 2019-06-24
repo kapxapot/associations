@@ -21,7 +21,7 @@ class Localization extends LocalizationBase
                 'Game is already on.' => 'Игра уже идет.',
                 'Provided game is finished. Please, reload the page.' => 'Указанная игра уже завершена. Пожалуйста, обновите страницу.',
                 'Game turn is not correct. Please, reload the page.' => 'Некорректный ход игры. Пожалуйста, обновите страницу.',
-                'Word must differ from two previous words.' => 'Слово должно отличаться от двух предыдущих.',
+                'Word is already used in this game.' => 'Слово уже использовано в этой игре.',
                 'Word must contain only letters, digits, -, _ and \'.' => 'Слово должно содержать только буквы, цифры, -, _ и \'.',
                 'Main word must exist and be different.' => 'Главное слово должно существовать и отличаться от текущего.',
             ]
