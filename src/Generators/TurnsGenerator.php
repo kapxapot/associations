@@ -98,7 +98,7 @@ class TurnsGenerator extends EntityGenerator
         $turn = Turn::get($item->id);
         
         if ($turn !== null) {
-            $this->gameService->processPlayerTurn($turn);
+            $this->turnService->processPlayerTurn($turn);
         }
     }
 }

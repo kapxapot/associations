@@ -69,6 +69,11 @@ class Game extends DbModel
     {
         return self::getUser($this->userId);
     }
+
+    public function isStarted() : bool
+    {
+        return $this->turns()->any();
+    }
     
     public function isFinished() : bool
     {
@@ -94,6 +99,25 @@ class Game extends DbModel
                 return $turn->user();
             })
             ->distinct();
+    }
+
+    public function containsWordStr(string $wordStr) : bool
+    {
+        $word = Word::findInLanguage($this->language, $wordStr);
+
+        // new word
+        if ($word === null) {
+            return true;
+        }
+
+        return $this->containsWord($word);
+    }
+
+    public function containsWord(Word $word) : bool
+    {
+        return $this
+            ->words()
+            ->any('id', $word->getId());
     }
     
     public function url()
