@@ -13,6 +13,15 @@ use App\Models\Word;
 
 class AssociationService extends Contained
 {
+    /**
+     * Creates association.
+     * 
+     * !!!!!!!!!!!!!!!!!!!!!!!
+     * Potential problem here:
+     *  association can be created by another user
+     *  at the same time.
+     * !!!!!!!!!!!!!!!!!!!!!!!
+     */
     public function create(Word $first, Word $second, User $user = null, Language $language = null)
     {
         if (Association::getByPair($first, $second) !== null) {

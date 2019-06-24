@@ -18,9 +18,16 @@ class WordService extends Contained
     }
 
     /**
+     * Creates new word.
+     * 
      * Word should be normalized in advance!
+     * 
+     * !!!!!!!!!!!!!!!!!!!
+     * Same problem as with duplicate association
+     * Two users can add the same word in parallel
+     * !!!!!!!!!!!!!!!!!!!
      */
-    public function add(Language $language, string $wordStr, User $user)
+    public function create(Language $language, string $wordStr, User $user)
     {
         if ($language === null) {
             throw new \InvalidArgumentException('Language must be non-null.');

@@ -63,7 +63,7 @@ class TurnsGenerator extends EntityGenerator
         $wordStr = $this->languageService->normalizeWord($language, $wordStr);
         
         $word = Word::findInLanguage($language, $wordStr)
-            ?? $this->wordService->add($language, $wordStr, $user);
+            ?? $this->wordService->create($language, $wordStr, $user);
         
         if ($word === null) {
             throw new ApplicationException('Word can\'t be found or added.');
@@ -75,9 +75,6 @@ class TurnsGenerator extends EntityGenerator
 
         // association_id
         if ($game->lastTurn() !== null) {
-            // potential problem here:
-            // association can be created by another user
-            // at the same time
             $association = Association::getByPair($game->lastTurnWord(), $word, $language)
                 ?? $this->associationService->create($game->lastTurnWord(), $word, $user, $language);
             
