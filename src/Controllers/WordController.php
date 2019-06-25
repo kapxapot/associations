@@ -45,7 +45,7 @@ class WordController extends Controller
         return Core::json($response, $words, ['params' => $request->getQueryParams()]);
     }
     
-    public function item($request, $response, $args)
+    public function get($request, $response, $args)
     {
         $id = $args['id'];
         

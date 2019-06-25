@@ -2,16 +2,14 @@
 
 namespace App\Controllers;
 
+use Plasticode\Exceptions\NotFoundException;
+
 use App\Models\Game;
+use App\Models\Language;
 
 class GameController extends Controller
 {
-    public function create($request, $response, $args)
-    {
-        
-    }
-
-    public function item($request, $response, $args)
+    public function get($request, $response, $args)
     {
         $id = $args['id'];
         
@@ -35,6 +33,32 @@ class GameController extends Controller
         return $this->view->render($response, 'main/games/item.twig', $params);
     }
     
+    public function start($request, $response, $args)
+    {
+        $user = $this->auth->getUser();
+
+        $languageId = $request->getParam('language_id');
+        $language = Language::get($languageId);
+
+        if ($language === null) {
+            throw new NotFoundException('Language not found.');
+        }
+
+        var_dump($languageId);
+        die();
+        
+        $this->logger->info("Changed password for user: {$user}");
+        
+        return Core::json($response, [
+            'message' => $this->translate('Password change successful.'),
+        ]);
+    }
+
+    public function turn($request, $response, $args)
+    {
+        
+    }
+
     public function finish($request, $response, $args)
     {
         $user = $this->auth->getUser();

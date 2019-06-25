@@ -6,7 +6,7 @@ use App\Models\Association;
 
 class AssociationController extends Controller
 {
-    public function item($request, $response, $args)
+    public function get($request, $response, $args)
     {
         $id = $args['id'];
         

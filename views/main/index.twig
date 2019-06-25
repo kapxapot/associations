@@ -117,7 +117,7 @@
             $scope.prePost(null);
 
             $scope.ajax({
-                url: '{{ api }}games',
+                url: '{{ path_for('actions.game.start') }}',
                 data: { language_id: $scope.languageId },
                 onSuccess: $scope.postSuccess,
                 noSuccessMessage: true,
@@ -165,7 +165,7 @@
             $scope.prePost(null);
 
             $scope.ajax({
-                url: '{{ api }}turns',
+                url: '{{ path_for('actions.game.turn') }}',
                 data: {
                     game_id: {{ game.id }},
                     {% if last_turn %}

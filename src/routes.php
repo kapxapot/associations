@@ -1,12 +1,20 @@
 <?php
 
+use Plasticode\Controllers\Auth\AuthController;
+use Plasticode\Controllers\Auth\PasswordController;
+use Plasticode\Controllers\ParserController;
 use Plasticode\Core\Core;
 use Plasticode\Middleware\AuthMiddleware;
 use Plasticode\Middleware\GuestMiddleware;
 use Plasticode\Middleware\AccessMiddleware;
 use Plasticode\Middleware\TokenAuthMiddleware;
 
-//use App\Controllers;
+use App\Controllers\AssociationController;
+use App\Controllers\FeedbackController;
+use App\Controllers\GameController;
+use App\Controllers\IndexController;
+use App\Controllers\TestController;
+use App\Controllers\WordController;
 
 $access = function($entity, $action, $redirect = null) use ($container) {
     return new AccessMiddleware($container, $entity, $action, $redirect);
@@ -24,7 +32,7 @@ $app->group($root, function() use ($trueRoot, $settings, $access, $container) {
             return Core::json($response, [ 'captcha' => $captcha['captcha'] ]);
         });
 
-        $this->get('/public/words', \App\Controllers\WordController::class . ':publicWords')
+        $this->get('/public/words', WordController::class . ':publicWords')
             ->setName('api.public.words');
     });
     
@@ -36,7 +44,7 @@ $app->group($root, function() use ($trueRoot, $settings, $access, $container) {
             }
         }
     
-        $this->post('/parser/parse', \Plasticode\Controllers\ParserController::class . ':parse')
+        $this->post('/parser/parse', ParserController::class . ':parse')
             ->setName('api.parser.parse');
     })->add(new TokenAuthMiddleware($container));
     
@@ -56,29 +64,32 @@ $app->group($root, function() use ($trueRoot, $settings, $access, $container) {
     // site
     
     $this->group('/actions', function() {
-        $this->post('/game/finish', \App\Controllers\GameController::class . ':finish')->setName('actions.game.finish');
-        $this->post('/feedback', \App\Controllers\FeedbackController::class . ':save')->setName('actions.feedback');
+        $this->post('/game/start', GameController::class . ':start')->setName('actions.game.start');
+        $this->post('/game/finish', GameController::class . ':finish')->setName('actions.game.finish');
+        $this->post('/game/turn', GameController::class . ':turn')->setName('actions.game.turn');
+        $this->post('/feedback', FeedbackController::class . ':save')->setName('actions.feedback');
     })->add(new TokenAuthMiddleware($container));
 
-    $this->get('/associations/{id:\d+}', \App\Controllers\AssociationController::class . ':item')->setName('main.association');
-    $this->get('/games/{id:\d+}', \App\Controllers\GameController::class . ':item')->setName('main.game');
+    $this->get('/associations/{id:\d+}', AssociationController::class . ':get')->setName('main.association');
 
-    $this->get('/words/{id:\d+}', \App\Controllers\WordController::class . ':item')->setName('main.word');
-    $this->get('/words', \App\Controllers\WordController::class . ':index')->setName('main.words');
+    $this->get('/games/{id:\d+}', GameController::class . ':get')->setName('main.game');
+
+    $this->get('/words/{id:\d+}', WordController::class . ':get')->setName('main.word');
+    $this->get('/words', WordController::class . ':index')->setName('main.words');
     
-    $this->get('/test', \App\Controllers\TestController::class . ':index')->setName('main.test');
+    $this->get('/test', TestController::class . ':index')->setName('main.test');
 
-    $this->get($trueRoot ? '/' : '', \App\Controllers\IndexController::class . ':index')->setName('main.index');
+    $this->get($trueRoot ? '/' : '', IndexController::class . ':index')->setName('main.index');
 
     // auth
     
     $this->group('/auth', function() {
-        $this->post('/signup', \Plasticode\Controllers\Auth\AuthController::class . ':postSignUp')->setName('auth.signup');
-        $this->post('/signin', \Plasticode\Controllers\Auth\AuthController::class . ':postSignIn')->setName('auth.signin');
+        $this->post('/signup', AuthController::class . ':postSignUp')->setName('auth.signup');
+        $this->post('/signin', AuthController::class . ':postSignIn')->setName('auth.signin');
     })->add(new GuestMiddleware($container, 'main.index'));
         
     $this->group('/auth', function() {
-        $this->post('/signout', \Plasticode\Controllers\Auth\AuthController::class . ':postSignOut')->setName('auth.signout');
-        $this->post('/password/change', \Plasticode\Controllers\Auth\PasswordController::class . ':postChangePassword')->setName('auth.password.change');
+        $this->post('/signout', AuthController::class . ':postSignOut')->setName('auth.signout');
+        $this->post('/password/change', PasswordController::class . ':postChangePassword')->setName('auth.password.change');
     })->add(new AuthMiddleware($container, 'main.index'));
 });
