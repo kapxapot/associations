@@ -20,7 +20,7 @@ class Localization extends LocalizationBase
                 'Turn not found.' => 'Ход не найден.',
                 'Word not found.' => 'Слово не найдено.',
                 'Game is already on.' => 'Игра уже идет.',
-                'Provided game is finished. Please, reload the page.' => 'Указанная игра уже завершена. Пожалуйста, обновите страницу.',
+                'Game is finished. Please, reload the page.' => 'Игра уже завершена. Пожалуйста, обновите страницу.',
                 'Game turn is not correct. Please, reload the page.' => 'Некорректный ход игры. Пожалуйста, обновите страницу.',
                 'Word is already used in this game.' => 'Слово уже использовано в этой игре.',
                 'Word must contain only letters, digits, -, _ and \'.' => 'Слово должно содержать только буквы, цифры, -, _ и \'.',

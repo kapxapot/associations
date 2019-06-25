@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use Plasticode\Core\Core;
+use Plasticode\Exceptions\BadRequestException;
 use Plasticode\Exceptions\NotFoundException;
 
 use App\Models\Game;
@@ -46,15 +47,10 @@ class GameController extends Controller
         }
 
         if ($user->currentGame() !== null) {
-            throw new \Exception('Game is already on.');
+            throw new BadRequestException('Game is already on.');
         };
 
-        $game = Game::create();
-        $game->languageId = $languageId;
-        $game->userId = $user->getId();
-        $game->save();
-
-        $this->gameService->startGame($game);
+        $this->gameService->newGame($language, $user);
         
         return Core::json($response, [
             'message' => $this->translate('New game started.'),
@@ -63,7 +59,69 @@ class GameController extends Controller
 
     public function turn($request, $response, $args)
     {
+        $user = $this->auth->getUser();
+
+        // validate game
+        $gameId = $request->getParam('game_id');
+        $game = Game::get($gameId);
+
+        if ($game === null) {
+            throw new NotFoundException('Game not found.');
+        }
+
+        if ($game->getId() !== $user->currentGame()->getId()) {
+            throw new BadRequestException('Game is finished. Please, reload the page.');
+        }
+
+        $language = $game->language();
+
+        // validate prev turn
+        $prevTurnId = $request->getParam('prev_turn_id');
+        $prevTurn = Turn::get($prevTurnId);
+
+        if (!$this->gameService->validateLastTurn($prevTurn)) {
+            throw new BadRequestException('Game turn is not correct. Please, reload the page.');
+        }
+
+        $rules['word'] = $this
+            ->rule('text')
+            ->length($this->config->wordMinLength(), $this->config->wordMaxLength())
+            ->wordIsValid() // v
+            ->wordIsNotRepetitive($data['game_id']); // v
         
+        $wordStr = $data['word'];
+        
+        $wordStr = $this->languageService->normalizeWord($language, $wordStr);
+        
+        $word = Word::findInLanguage($language, $wordStr)
+            ?? $this->wordService->create($language, $wordStr, $user);
+        
+        if ($word === null) {
+            throw new ApplicationException('Word can\'t be found or added.');
+        }
+        
+        // association_id
+        if ($game->lastTurn() !== null) {
+            $association = Association::getByPair($game->lastTurnWord(), $word, $language)
+                ?? $this->associationService->create($game->lastTurnWord(), $word, $user, $language);
+            
+            if ($association === null) {
+                throw new ApplicationException('Association can\'t be found or added.');
+            }
+        }
+
+        $turn = Turn::create();
+        $turn->userId = $user->getId();
+        $turn->languageId = $language->getId();
+        $turn->wordId = $word->getId();
+        $turn->associationId = $association->getId();
+        $turn->save();
+        
+        $this->turnService->processPlayerTurn($turn);
+
+        return Core::json($response, [
+            'message' => $this->translate('Turn successfully done.'),
+        ]);
     }
 
     public function finish($request, $response, $args)
