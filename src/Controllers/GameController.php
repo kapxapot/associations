@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use Plasticode\Core\Core;
 use Plasticode\Exceptions\NotFoundException;
 
 use App\Models\Game;
@@ -44,13 +45,19 @@ class GameController extends Controller
             throw new NotFoundException('Language not found.');
         }
 
-        var_dump($languageId);
-        die();
-        
-        $this->logger->info("Changed password for user: {$user}");
+        if ($user->currentGame() !== null) {
+            throw new \Exception('Game is already on.');
+        };
+
+        $game = Game::create();
+        $game->languageId = $languageId;
+        $game->userId = $user->getId();
+        $game->save();
+
+        $this->gameService->startGame($game);
         
         return Core::json($response, [
-            'message' => $this->translate('Password change successful.'),
+            'message' => $this->translate('New game started.'),
         ]);
     }
 

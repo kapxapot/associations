@@ -14,6 +14,7 @@ class Localization extends LocalizationBase
                 'age' => 'Возраст',
                 
                 'Language not found.' => 'Язык не найден.',
+                'New game started.' => 'Начата новая игра.',
                 'Association not found.' => 'Ассоциация не найдена.',
                 'Game not found.' => 'Игра не найдена.',
                 'Turn not found.' => 'Ход не найден.',
