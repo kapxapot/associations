@@ -16,9 +16,9 @@ class AssociationService extends Contained
     public function getOrCreate(Word $first, Word $second, User $user = null, Language $language = null) : Association
     {
         $association =
-            $this->getByPair($prevWord, $word, $language)
+            $this->getByPair($first, $second, $language)
             ??
-            $this->create($prevWord, $word, $user, $language);
+            $this->create($first, $second, $user, $language);
 
         if ($association === null) {
             throw new ApplicationException('Association can\'t be found or added.');
@@ -88,11 +88,11 @@ class AssociationService extends Contained
             : [ $second, $first ];
     }
     
-    public function getByPair(Word $first, Word $second, Language $language = null) : Association
+    public function getByPair(Word $first, Word $second, Language $language = null) : ?Association
     {
-        $service->checkPair($first, $second, $language);
+        $this->checkPair($first, $second, $language);
         
-        list($first, $second) = $service->orderPair($first, $second);
+        list($first, $second) = $this->orderPair($first, $second);
         
         return Association::getByPair($first, $second);
     }

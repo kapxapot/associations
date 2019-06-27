@@ -8,6 +8,7 @@ use Plasticode\Exceptions\NotFoundException;
 
 use App\Models\Game;
 use App\Models\Language;
+use App\Models\Turn;
 
 class GameController extends Controller
 {
@@ -79,7 +80,7 @@ class GameController extends Controller
         $prevTurnId = $request->getParam('prev_turn_id');
         $prevTurn = Turn::get($prevTurnId);
 
-        if (!$this->gameService->validateLastTurn($prevTurn)) {
+        if (!$this->gameService->validateLastTurn($game, $prevTurn)) {
             throw new BadRequestException('Game turn is not correct. Please, reload the page.');
         }
 

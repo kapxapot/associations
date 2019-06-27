@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use Respect\Validation\Validator;
+
 use Plasticode\Contained;
 use Plasticode\Exceptions\ApplicationException;
 use Plasticode\Exceptions\ValidationException;
@@ -78,7 +80,7 @@ class WordService extends Contained
     /**
      * Returns validation rules chain for word.
      */
-    public function getRule() : array
+    public function getRule() : Validator
     {
         $rules = new ValidationRules($this->container);
 
@@ -88,7 +90,7 @@ class WordService extends Contained
             ->wordIsValid();
     }
 
-    public function validateWord(string $wordStr) : bool
+    public function validateWord(string $wordStr) : void
     {
         $validation = $this->validator->validateArray(['word' => $wordStr], ['word' => $this->getRule()]);
         
