@@ -17,17 +17,17 @@ class WordFeedbackService extends Contained
 {
     public function toModel(array $data) : WordFeedback
     {
-		$this->validate($data);
-		
+        $this->validate($data);
+        
         return $this->convertToModel($data);
     }
 
-	private function convertToModel(array $data) : WordFeedback
-	{
-	    $wordId = $data['word_id'];
-	    $word = Word::get($wordId);
-	    
-	    $user = $this->auth->getUser();
+    private function convertToModel(array $data) : WordFeedback
+    {
+        $wordId = $data['word_id'];
+        $word = Word::get($wordId);
+        
+        $user = $this->auth->getUser();
         
         $model =
             WordFeedback::getByWordAndUser($word, $user)
@@ -53,41 +53,39 @@ class WordFeedbackService extends Contained
         }
         
         return $model;
-	}
+    }
 
-	private function validate(array $data)
-	{
-	    $rules = $this->getRules($data);
-		$validation = $this->validator->validateArray($data, $rules);
-		
-		if ($validation->failed()) {
-			throw new ValidationException($validation->errors);
-		}
-	}
+    private function validate(array $data)
+    {
+        $rules = $this->getRules($data);
+        $validation = $this->validator->validateArray($data, $rules);
+        
+        if ($validation->failed()) {
+            throw new ValidationException($validation->errors);
+        }
+    }
 
-	private function getRules(array $data) : array
-	{
-		$rules = new ValidationRules($this->container);
+    private function getRules(array $data) : array
+    {
+        $rules = new ValidationRules($this->container);
 
-		$result = [
-			'word_id' => $rules->get('posInt')
-			    ->wordExists(),
-		];
-		
-		if (($data['typo'] ?? null) !== null) {
-			$result['typo'] = $rules->get('text')
-                ->length($this->config->wordMinLength(), $this->config->wordMaxLength())
-                ->wordIsValid();
-		}
-		
-		if (($data['duplicate'] ?? null) !== null) {
-		    $word = Word::get($data['word_id'] ?? null);
-		    
-		    if ($word !== null) {
-    		    $result['duplicate'] = v::wordByWordExists($word->language(), $word);
-		    }
-		}
-		
-		return $result;
-	}
+        $result = [
+            'word_id' => $rules->get('posInt')
+                ->wordExists(),
+        ];
+        
+        if (($data['typo'] ?? null) !== null) {
+            $result['typo'] = $this->wordService->getRule();
+        }
+        
+        if (($data['duplicate'] ?? null) !== null) {
+            $word = Word::get($data['word_id'] ?? null);
+            
+            if ($word !== null) {
+                $result['duplicate'] = v::mainWordExists($word->language(), $word);
+            }
+        }
+        
+        return $result;
+    }
 }

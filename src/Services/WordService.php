@@ -4,7 +4,9 @@ namespace App\Services;
 
 use Plasticode\Contained;
 use Plasticode\Exceptions\ApplicationException;
+use Plasticode\Exceptions\ValidationException;
 use Plasticode\Util\Strings;
+use Plasticode\Validation\ValidationRules;
 
 use App\Models\Language;
 use App\Models\User;
@@ -12,7 +14,25 @@ use App\Models\Word;
 
 class WordService extends Contained
 {
-    public function normalize($word)
+    /**
+     * Normalized word string expected.
+     */
+    public function getOrCreate(Language $language, string $wordStr, User $user) : Word
+    {
+        $word =
+            Word::findInLanguage($language, $wordStr)
+            ??
+            $this->create($language, $wordStr, $user);
+
+        if ($word === null) {
+            throw new ApplicationException('Word can\'t be found or added.');
+        }
+    
+        return $word;
+    }
+
+
+    public function normalize($word) : string
     {
         return Strings::normalize($word);
     }
@@ -27,7 +47,7 @@ class WordService extends Contained
      * Two users can add the same word in parallel
      * !!!!!!!!!!!!!!!!!!!
      */
-    public function create(Language $language, string $wordStr, User $user)
+    public function create(Language $language, string $wordStr, User $user) : Word
     {
         if ($language === null) {
             throw new \InvalidArgumentException('Language must be non-null.');
@@ -53,5 +73,27 @@ class WordService extends Contained
         $word->createdBy = $user->getId();
 
         return $word->save();
+    }
+
+    /**
+     * Returns validation rules chain for word.
+     */
+    public function getRule() : array
+    {
+        $rules = new ValidationRules($this->container);
+
+        return $rules
+            ->get('text')
+            ->length($this->config->wordMinLength(), $this->config->wordMaxLength())
+            ->wordIsValid();
+    }
+
+    public function validateWord(string $wordStr) : bool
+    {
+        $validation = $this->validator->validateArray(['word' => $wordStr], ['word' => $this->getRule()]);
+        
+        if ($validation->failed()) {
+            throw new ValidationException($validation->errors);
+        }
     }
 }

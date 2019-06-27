@@ -47,14 +47,8 @@ class Association extends DbModel
     
     // getters - one
     
-    public static function getByPair(Word $first, Word $second, Language $language = null)
+    public static function getByPair(Word $first, Word $second) : ?self
     {
-        $service = self::service();
-        
-        $service->checkPair($first, $second, $language);
-        
-        list($first, $second) = $service->orderPair($first, $second);
-        
         return self::baseQuery()
             ->where('first_word_id', $first->getId())
             ->where('second_word_id', $second->getId())
@@ -62,12 +56,7 @@ class Association extends DbModel
     }
 
     // properties
-    
-    private static function service()
-    {
-        return self::$container->associationService;
-    }
-        
+
     public function language() : Language
     {
         return Language::get($this->languageId);

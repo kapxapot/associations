@@ -13,7 +13,7 @@ use App\Models\User;
 class GameService extends Contained
 {
     /**
-     * Creates and startes new game.
+     * Creates and starts new game.
      */
     public function newGame(Language $language, User $user) : Game
     {

@@ -101,6 +101,9 @@ class Game extends DbModel
             ->distinct();
     }
 
+    /**
+     * Normalized word string expected.
+     */
     public function containsWordStr(string $wordStr) : bool
     {
         $word = Word::findInLanguage($this->language, $wordStr);

@@ -13,6 +13,20 @@ use App\Models\Word;
 
 class AssociationService extends Contained
 {
+    public function getOrCreate(Word $first, Word $second, User $user = null, Language $language = null) : Association
+    {
+        $association =
+            $this->getByPair($prevWord, $word, $language)
+            ??
+            $this->create($prevWord, $word, $user, $language);
+
+        if ($association === null) {
+            throw new ApplicationException('Association can\'t be found or added.');
+        }
+
+        return $association;
+    }
+
     /**
      * Creates association.
      * 
@@ -22,9 +36,9 @@ class AssociationService extends Contained
      *  at the same time.
      * !!!!!!!!!!!!!!!!!!!!!!!
      */
-    public function create(Word $first, Word $second, User $user = null, Language $language = null)
+    public function create(Word $first, Word $second, User $user, Language $language = null) : Association
     {
-        if (Association::getByPair($first, $second) !== null) {
+        if ($this->getByPair($first, $second, $language) !== null) {
             throw new ApplicationException('Association already exists.');
         }
         
@@ -36,10 +50,7 @@ class AssociationService extends Contained
         
         $association->firstWordId = $first->getId();
         $association->secondWordId = $second->getId();
-        
-        if ($user !== null) {
-            $association->createdBy = $user->getId();
-        }
+        $association->createdBy = $user->getId();
         
         if ($language !== null) {
             $association->languageId = $language->getId();
@@ -48,7 +59,7 @@ class AssociationService extends Contained
         return $association->save();
     }
 
-    public function checkPair(Word $first, Word $second, Language $language = null)
+    public function checkPair(Word $first, Word $second, Language $language = null) : void
     {
         if ($first === null || $second === null) {
             throw new \InvalidArgumentException('Both word must be non-null.');
@@ -57,21 +68,32 @@ class AssociationService extends Contained
         if ($first->getId() == $second->getId()) {
             throw new \InvalidArgumentException('Words can\'t be the same.');
         }
+
+        $firstLanguage = $first->language();
+        $secondLanguage = $second->language();
+
+        if (!$firstLanguage->equals($secondLanguage)) {
+            throw new \InvalidArgumentException('Words must be of the same language.');
+        }
         
-        if ($language !== null) {
-            $firstLanguage = $first->language();
-            $secondLanguage = $second->language();
-            
-            if ($firstLanguage->getId() != $language->getId() || $secondLanguage->getId() != $language->getId()) {
-                throw new \InvalidArgumentException('Both words must be of the specified language.');
-            }
+        if ($language !== null && !$firstLanguage->equals($language)) {
+            throw new \InvalidArgumentException('Words must be of the specified language.');
         }
     }
     
-    public function orderPair(Word $first, Word $second)
+    public function orderPair(Word $first, Word $second) : array
     {
         return $first->getId() < $second->getId()
             ? [ $first, $second ]
             : [ $second, $first ];
+    }
+    
+    public function getByPair(Word $first, Word $second, Language $language = null) : Association
+    {
+        $service->checkPair($first, $second, $language);
+        
+        list($first, $second) = $service->orderPair($first, $second);
+        
+        return Association::getByPair($first, $second);
     }
 }

@@ -48,30 +48,26 @@ class TurnService extends Contained
     
     private function newTurn(Game $game, Word $word, User $user = null) : Turn
     {
+        $language = $game->language();
+
         $turn = Turn::create();
-        
         $turn->gameId = $game->getId();
-        $turn->languageId = $game->languageId;
+        $turn->languageId = $language->getId();
         
         if ($user !== null) {
             $turn->userId = $user->getId();
         }
         
         $turn->wordId = $word->getId();
-
         $prevTurn = $game->lastTurn();
 
         if ($prevTurn !== null) {
             $turn->prevTurnId = $prevTurn->getId();
-            
-            $prevWord = $prevTurn->word();
-            
-            $association = Association::getByPair($prevWord, $word)
-                ?? $this->associationService->create($prevWord, $word, $user, $word->language());
 
-            if ($association !== null) {
-                $turn->associationId = $association->getId();
-            }
+            $prevWord = $prevTurn->word();
+            $association = $this->associationService->getOrCreate($prevWord, $word, $user, $language);
+
+            $turn->associationId = $association->getId();
         }
         
         return $turn->save();

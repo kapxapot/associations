@@ -83,42 +83,22 @@ class GameController extends Controller
             throw new BadRequestException('Game turn is not correct. Please, reload the page.');
         }
 
-        $rules['word'] = $this
-            ->rule('text')
-            ->length($this->config->wordMinLength(), $this->config->wordMaxLength())
-            ->wordIsValid() // v
-            ->wordIsNotRepetitive($data['game_id']); // v
-        
-        $wordStr = $data['word'];
-        
+        // validate word
+        $wordStr = $request->getParam('word');
         $wordStr = $this->languageService->normalizeWord($language, $wordStr);
-        
-        $word = Word::findInLanguage($language, $wordStr)
-            ?? $this->wordService->create($language, $wordStr, $user);
-        
-        if ($word === null) {
-            throw new ApplicationException('Word can\'t be found or added.');
+
+        $this->wordService->validateWord($wordStr);
+
+        if (!$this->turnService->validatePlayerTurn($game, $wordStr)) {
+            throw new BadRequestException('Word is already used in this game.');
         }
         
-        // association_id
-        if ($game->lastTurn() !== null) {
-            $association = Association::getByPair($game->lastTurnWord(), $word, $language)
-                ?? $this->associationService->create($game->lastTurnWord(), $word, $user, $language);
-            
-            if ($association === null) {
-                throw new ApplicationException('Association can\'t be found or added.');
-            }
-        }
+        // get word
+        $word = $this->wordService->getOrCreate($language, $wordStr, $user);
 
-        $turn = Turn::create();
-        $turn->userId = $user->getId();
-        $turn->languageId = $language->getId();
-        $turn->wordId = $word->getId();
-        $turn->associationId = $association->getId();
-        $turn->save();
+        // new turn
+        $this->turnService->newPlayerTurn($game, $word, $user);
         
-        $this->turnService->processPlayerTurn($turn);
-
         return Core::json($response, [
             'message' => $this->translate('Turn successfully done.'),
         ]);

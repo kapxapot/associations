@@ -21,10 +21,13 @@ class Word extends DbModel
             ->where('language_id', $language->getId());
     }
     
-    public static function findInLanguage(Language $language, string $word)
+    /**
+     * Normalized word string expected.
+     */
+    public static function findInLanguage(Language $language, string $wordStr)
     {
         return self::getByLanguage($language)
-            ->where('word_bin', $word)
+            ->where('word_bin', $wordStr)
             ->one();
     }
     
