@@ -1,6 +1,7 @@
 {% extends 'main/layout.twig' %}
 
 {% set font_awesome_css = true %}
+{% set no_social = true %}
 {% set no_admin_link = (auth.role.tag != 'admin') %}
 {% set sidebar = true %}
 
