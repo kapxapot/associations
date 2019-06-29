@@ -1,17 +1,10 @@
 .panel-title h1 {
     margin-top: 2px;
     margin-bottom: 0;
-    /*color: var(--gray-9);*/
     font-size: 100%;
 }
 
-/*.panel-title header,
-.panel-title h1 {
-    color: var(--gray-3);
-}*/
-
 .panel-heading.panel-title {
-    /*background-color: hsl(110, 20%, 20%);*/
     background: linear-gradient(to right, #3f2f73, #672929);
 }
 
@@ -20,17 +13,21 @@
     padding-bottom: 3px;
 }
 
+.social-links a:hover {
+    color: #66ff94;
+}
+
 .turn-label a {
-    color: white;
+    color: var(--white);
     text-decoration: none;
 }
 
 a.assoc-arrow {
-    color: #333;
+    color: var(--gray-3);
     text-decoration: none;
 }
 
-/* words indes */
+/* words index */
 
 #words-table_wrapper .dataTables_paginate {
     margin-top: 1rem;
