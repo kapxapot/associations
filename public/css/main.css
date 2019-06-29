@@ -13,10 +13,6 @@
     padding-bottom: 3px;
 }
 
-.social-links a:hover {
-    color: #66ff94;
-}
-
 .turn-label a {
     color: var(--white);
     text-decoration: none;
