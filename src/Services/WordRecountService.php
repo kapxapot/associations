@@ -3,14 +3,27 @@
 namespace App\Services;
 
 use Plasticode\Contained;
+use Plasticode\Events\Event;
 use Plasticode\Util\Date;
 
-use App\Events\WordMatureUpdatedEvent;
+use App\Events\WordFeedbackEvent;
+use App\Events\WordApprovedEvent;
+use App\Events\WordMatureEvent;
 use App\Models\Word;
 
 class WordRecountService extends Contained
 {
-    public function recountApproved(Word $word) : Word
+    public function processWordFeedbackEvent(WordFeedbackEvent $event) : iterable
+    {
+        $word = $event->getFeedback()->word();
+
+
+        return new WordApprovedEvent($wordUpdated);
+        yield $this->recountApproved($word);
+        yield $this->recountMature($word);
+    }
+
+    private function recountApproved(Word $word) : Word
     {
         $assocCoeff = $this->getSettings('words.coeffs.approved_association');
         $dislikeCoeff = $this->getSettings('words.coeffs.dislike');
@@ -23,10 +36,11 @@ class WordRecountService extends Contained
         
         $word->approved = ($score >= $threshold) ? 1 : 0;
         $word->approvedUpdatedAt = Date::dbNow();
-        $word->save();
+
+        return $word->save();
     }
 
-    public function recountMature(Word $word) : void
+    private function recountMature(Word $word) : Event
     {
         $threshold = $this->getSettings('words.mature_threshold');
         
@@ -37,6 +51,6 @@ class WordRecountService extends Contained
         
         $wordUpdated = $word->save();
         
-        $this->dispatcher->dispatch(new WordMatureUpdatedEvent($wordUpdated));
+        return new WordMatureEvent($wordUpdated);
     }
 }

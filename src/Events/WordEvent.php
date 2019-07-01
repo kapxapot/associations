@@ -6,7 +6,7 @@ use Plasticode\Events\Event;
 
 use App\Models\Word;
 
-class WordMatureUpdatedEvent extends Event
+abstract class WordEvent extends Event
 {
     private $word;
 
