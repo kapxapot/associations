@@ -17,11 +17,25 @@ class WordFeedback extends DbModel
             ->where('word_id', $word->getId());
     }
     
-    public static function getByWordAndUser(Word $word, User $user)
+    public static function filterDisliked(Query $query) : Query
     {
-        return self::getByWord($word)
-            ->where('created_by', $user->getId())
-            ->one();
+        return $query->where('dislike', 1);
+    }
+    
+    public static function filterMature(Query $query) : Query
+    {
+        return $query->where('mature', 1);
+    }
+
+    public static function filterByCreator(Query $query, User $user) : Query
+    {
+        return $query->where('created_by', $user->getId());
+    }
+    
+    public static function getByWordAndUser(Word $word, User $user) : ?self
+    {
+        $query = self::getByWord($word);
+        return self::filterByCreator($query, $user)->one();
     }
     
     public function word() : Word
@@ -31,7 +45,7 @@ class WordFeedback extends DbModel
     
     public function isDisliked() : bool
     {
-        return $this->dislike == 1;
+        return $this->dislike === 1;
     }
     
     public function hasTypo() : bool
@@ -46,9 +60,9 @@ class WordFeedback extends DbModel
     
     public function isMature() : bool
     {
-        return $this->mature == 1;
+        return $this->mature === 1;
     }
-        
+
     public function updatedAtIso()
     {
         return Date::iso($this->updatedAt);

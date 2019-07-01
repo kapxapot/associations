@@ -16,7 +16,7 @@ class Association extends DbModel
     public static function getByWord(Word $word) : Query
     {
         return self::baseQuery()
-		    ->whereAnyIs([
+            ->whereAnyIs([
                 [ 'first_word_id' => $word->getId() ],
                 [ 'second_word_id' => $word->getId() ],
             ]);
@@ -25,23 +25,27 @@ class Association extends DbModel
     public static function getByLanguage(Language $language) : Query
     {
         return self::baseQuery()
-		    ->where('language_id', $language->getId());
+            ->where('language_id', $language->getId());
+    }
+
+    public static function filterApproved(Query $query) : Query
+    {
+        return $query->where('approved', 1);
+    }
+
+    public static function filterMature(Query $query) : Query
+    {
+        return $query->where('mature', 1);
     }
     
-    // getters - many
-    
-    public static function getApproved(Language $language = null) : Collection
+    public static function getApproved(Language $language = null) : Query
     {
         return self::staticLazy(function () use ($language) {
             $query = ($language !== null)
                 ? self::getByLanguage($language)
                 : self::query();
             
-            return $query
-                ->all()
-                ->where(function ($assoc) {
-                    return $assoc->isApproved();
-                });
+            return self::filterApproved($query);
         });
     }
     
@@ -76,8 +80,18 @@ class Association extends DbModel
     {
         return Word::get($this->secondWordId);
     }
+
+    /**
+     * Returns on of the association's word different from provided word.
+     */
+    public function otherWord(Word $word) : Word
+    {
+        return $this->firstWord()->getId() === $word->getId()
+            ? $this->secondWord()
+            : $this->firstWord();
+    }
     
-    public function url()
+    public function url() : ?string
     {
         return self::$linker->association($this);
     }

@@ -21,45 +21,38 @@ class Word extends DbModel
             ->where('language_id', $language->getId());
     }
     
-    /**
-     * Normalized word string expected.
-     */
-    public static function findInLanguage(Language $language, string $wordStr)
-    {
-        return self::getByLanguage($language)
-            ->where('word_bin', $wordStr)
-            ->one();
-    }
-    
     public static function getCreatedByUser(User $user, Language $language = null) : Query
     {
         $query = ($language !== null)
             ? self::getByLanguage($language)
             : self::query();
-
+        
         return $query->where('created_by', $user->getId());
     }
-
-    public static function getUsedByUser(User $user, Language $language = null) : Collection
-    {
-        return $user->usedWords($language);
-    }
-
-    // getters - many
     
-    public static function getApproved(Language $language = null) : Collection
+    public static function getApproved(Language $language = null) : Query
     {
         return self::staticLazy(function () use ($language) {
             $query = ($language !== null)
                 ? self::getByLanguage($language)
                 : self::query();
             
-            return $query
-                ->all()
-                ->where(function ($word) {
-                    return $word->isApproved();
-                });
+            return $query->where('approved', 1);
         });
+    }
+
+    // getters - one
+    
+    /**
+     * Finds the word by string in the specified language.
+     * 
+     * Normalized word string expected.
+     */
+    public static function findInLanguage(Language $language, string $wordStr) : ?Word
+    {
+        return self::getByLanguage($language)
+            ->where('word_bin', $wordStr)
+            ->one();
     }
     
     // properties
@@ -74,26 +67,9 @@ class Word extends DbModel
         return Association::getByWord($this);
     }
     
-    public function approvedAssociations() : Collection
+    public function approvedAssociations() : Query
     {
-        return $this->lazy(function () {
-            return $this->associations()
-                ->all()
-                ->where(function ($assoc) {
-                    return $assoc->isApproved();
-                });
-        });
-    }
-    
-    public function unapprovedAssociations() : Collection
-    {
-        return $this->lazy(function () {
-            return $this->associations()
-                ->all()
-                ->where(function ($assoc) {
-                    return !$assoc->isApproved();
-                });
-        });
+        return Association::filterApproved($this->associations());
     }
     
     public function associationsForUser(User $user) : Collection
@@ -106,38 +82,12 @@ class Word extends DbModel
                 });
         });
     }
-    
-    public function score()
-    {
-        return $this->lazy(function () {
-            $approvedAssocs = $this->approvedAssociations();
-            $approvedAssocsCount = count($approvedAssocs);
-            
-            $dislikeCount = $this->dislikes()->count();
-            
-            $assocCoeff = self::getSettings('words.coeffs.approved_association');
-            $dislikeCoeff = self::getSettings('words.coeffs.dislike');
-            
-            return $approvedAssocsCount * $assocCoeff - $dislikeCount * $dislikeCoeff;
-        });
-    }
-    
-    public function isApproved() : bool
-    {
-        return $this->lazy(function () {
-            $threshold = self::getSettings('words.approval_threshold');
-        
-            return $this->score() >= $threshold;
-        });
-    }
 
     public function associatedWords(User $user) : Collection
     {
         return $this->associationsForUser($user)
             ->map(function ($assoc) {
-                return $assoc->firstWord->getId() === $this->getId()
-                    ? $assoc->secondWord()
-                    : $assoc->firstWord();
+                return $assoc->otherWord($this);
             });
     }
     
@@ -160,18 +110,7 @@ class Word extends DbModel
             ->group('user_id');
     }
     
-    /**
-     * Currently not used.
-     */
-    public function isApprovedByUsage() : bool
-    {
-        $threshold = self::getSettings('words.approval_threshold');
-        $turnsByUsers = $this->turnsByUsers();
-        
-        return count($turnsByUsers) >= $threshold;
-    }
-        
-    public function serialize()
+    public function serialize() : array
     {
         return [
             'id' => $this->getId(),
@@ -188,12 +127,12 @@ class Word extends DbModel
         return WordFeedback::getByWord($this);
     }
     
-    public function feedbackByUser(User $user)
+    public function feedbackByUser(User $user) : ?WordFeedback
     {
         return WordFeedback::getByWordAndUser($this, $user);
     }
     
-    public function currentFeedback()
+    public function currentFeedback() : ?WordFeedback
     {
         $user = self::getCurrentUser();
         
@@ -220,23 +159,22 @@ class Word extends DbModel
     
     public function dislikes() : Query
     {
-        return $this->feedbacks()
-            ->where('dislike', 1);
+        return WordFeedback::filterDisliked($this->feedbacks());
     }
     
     public function matures() : Query
     {
-        return $this->feedbacks()
-            ->where('mature', 1);
+        return WordFeedback::filterMature($this->feedbacks());
+    }
+    
+    public function isApproved() : bool
+    {
+        return $this->approved === 1;
     }
 
     public function isMature() : bool
     {
-        return $this->lazy(function () {
-            $threshold = self::getSettings('words.mature_threshold');
-        
-            return $this->matures()->count() >= $threshold;
-        });
+        return $this->mature === 1;
     }
     
     public function isUsedByUser(User $user) : bool
@@ -249,12 +187,14 @@ class Word extends DbModel
 
     public function isDislikedByUser(User $user) : bool
     {
-        return $this
-            ->dislikes()
-            ->where('created_by', $user->getId())
+        return
+            WordFeedback::filterByCreator(
+                $this->dislikes(),
+                $user
+            )
             ->any();
     }
-
+    
     /**
      * Maturity check.
      */
@@ -277,7 +217,7 @@ class Word extends DbModel
         //
         // 1. word is mature, user is not mature (maturity check)
         // 2. word is not approved, user disliked the word
-
+        
         return $this->isVisibleForUser($user) &&
             ($this->isApproved() ||
                 ($this->isUsedByUser($user) && !$this->isDislikedByUser($user))
