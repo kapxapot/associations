@@ -4,42 +4,10 @@ namespace App\Models;
 
 use Plasticode\Collection;
 use Plasticode\Query;
-use Plasticode\Models\DbModel;
-use Plasticode\Models\Traits\Created;
 
-class Word extends DbModel
+class Word extends Element
 {
-    use Created;
-    
     protected static $sortField = 'word';
-    
-    // queries
-    
-    public static function getByLanguage(Language $language) : Query
-    {
-        return self::baseQuery()
-            ->where('language_id', $language->getId());
-    }
-    
-    public static function getCreatedByUser(User $user, Language $language = null) : Query
-    {
-        $query = ($language !== null)
-            ? self::getByLanguage($language)
-            : self::query();
-        
-        return $query->where('created_by', $user->getId());
-    }
-    
-    public static function getApproved(Language $language = null) : Query
-    {
-        return self::staticLazy(function () use ($language) {
-            $query = ($language !== null)
-                ? self::getByLanguage($language)
-                : self::query();
-            
-            return $query->where('approved', 1);
-        });
-    }
 
     // getters - one
     
@@ -56,11 +24,6 @@ class Word extends DbModel
     }
     
     // properties
-    
-    public function language() : Language
-    {
-        return Language::get($this->languageId);
-    }
     
     public function associations() : Query
     {

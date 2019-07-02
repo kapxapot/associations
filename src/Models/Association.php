@@ -4,49 +4,18 @@ namespace App\Models;
 
 use Plasticode\Collection;
 use Plasticode\Query;
-use Plasticode\Models\DbModel;
-use Plasticode\Models\Traits\Created;
 
-class Association extends DbModel
+class Association extends Element
 {
-    use Created;
-    
     // queries
     
     public static function getByWord(Word $word) : Query
     {
         return self::baseQuery()
             ->whereAnyIs([
-                [ 'first_word_id' => $word->getId() ],
-                [ 'second_word_id' => $word->getId() ],
+                ['first_word_id' => $word->getId()],
+                ['second_word_id' => $word->getId()],
             ]);
-    }
-    
-    public static function getByLanguage(Language $language) : Query
-    {
-        return self::baseQuery()
-            ->where('language_id', $language->getId());
-    }
-
-    public static function filterApproved(Query $query) : Query
-    {
-        return $query->where('approved', 1);
-    }
-
-    public static function filterMature(Query $query) : Query
-    {
-        return $query->where('mature', 1);
-    }
-    
-    public static function getApproved(Language $language = null) : Query
-    {
-        return self::staticLazy(function () use ($language) {
-            $query = ($language !== null)
-                ? self::getByLanguage($language)
-                : self::query();
-            
-            return self::filterApproved($query);
-        });
     }
     
     // getters - one
