@@ -10,8 +10,10 @@ abstract class TurnEvent extends Event
 {
     private $turn;
 
-    public function __construct(Turn $turn)
+    public function __construct(Turn $turn, Event $parent = null)
     {
+        parent::__construct($parent);
+
         $this->turn = $turn;
     }
 

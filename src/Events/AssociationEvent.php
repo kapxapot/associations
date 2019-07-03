@@ -10,8 +10,10 @@ abstract class AssociationEvent extends Event
 {
     private $association;
 
-    public function __construct(Association $association)
+    public function __construct(Association $association, Event $parent = null)
     {
+        parent::__construct($parent);
+
         $this->association = $association;
     }
 

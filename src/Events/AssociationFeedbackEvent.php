@@ -10,8 +10,10 @@ class AssociationFeedbackEvent extends Event
 {
     private $feedback;
 
-    public function __construct(AssociationFeedback $feedback)
+    public function __construct(AssociationFeedback $feedback, Event $parent = null)
     {
+        parent::__construct($parent);
+
         $this->feedback = $feedback;
     }
 

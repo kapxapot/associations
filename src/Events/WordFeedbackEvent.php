@@ -10,8 +10,10 @@ class WordFeedbackEvent extends Event
 {
     private $feedback;
 
-    public function __construct(WordFeedback $feedback)
+    public function __construct(WordFeedback $feedback, Event $parent = null)
     {
+        parent::__construct($parent);
+        
         $this->feedback = $feedback;
     }
 

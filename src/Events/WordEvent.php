@@ -10,8 +10,10 @@ abstract class WordEvent extends Event
 {
     private $word;
 
-    public function __construct(Word $word)
+    public function __construct(Word $word, Event $parent = null)
     {
+        parent::__construct($parent);
+
         $this->word = $word;
     }
 

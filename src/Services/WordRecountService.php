@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use Plasticode\Contained;
+use Plasticode\Events\EventProcessor;
 use Plasticode\Util\Date;
 
 use App\Events\AssociationApprovedEvent;
@@ -11,7 +11,7 @@ use App\Events\WordFeedbackEvent;
 use App\Events\WordMatureEvent;
 use App\Models\Word;
 
-class WordRecountService extends Contained
+class WordRecountService extends EventProcessor
 {
     /**
      * AssociationApprovedEvent event processing.
@@ -24,7 +24,7 @@ class WordRecountService extends Contained
             $word = $this->recountApproved($word);
             $word = $word->save();
     
-            yield new WordApprovedEvent($word);
+            yield new WordApprovedEvent($word, $event);
         }
     }
 
@@ -39,8 +39,8 @@ class WordRecountService extends Contained
         $word = $this->recountMature($word);
         $word = $word->save();
 
-        yield new WordApprovedEvent($word);
-        yield new WordMatureEvent($word);
+        yield new WordApprovedEvent($word, $event);
+        yield new WordMatureEvent($word, $event);
     }
 
     private function recountApproved(Word $word) : Word

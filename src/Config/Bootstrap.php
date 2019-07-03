@@ -36,11 +36,22 @@ class Bootstrap extends BootstrapBase
                     return new \App\Config\Config($c);
                 },
 
-                'dispatcher' => function ($c) {
-                    return new \Plasticode\Events\EventDispatcher();
+                'eventProcessors' => function ($c) {
+                    return [
+                        $c->wordRecountService,
+                        $c->associationRecountService,
+                    ];
                 },
                 
                 // services
+
+                'wordRecountService' => function ($c) {
+                    return new \App\Services\WordRecountService($c);
+                },
+
+                'associationRecountService' => function ($c) {
+                    return new \App\Services\AssociationRecountService($c);
+                },
                 
                 'associationService' => function ($c) {
                     return new \App\Services\AssociationService($c);

@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use Plasticode\Contained;
+use Plasticode\Events\EventProcessor;
 use Plasticode\Util\Date;
 
 use App\Events\AssociationApprovedEvent;
@@ -12,7 +12,7 @@ use App\Events\NewTurnEvent;
 use App\Events\WordMatureEvent;
 use App\Models\Association;
 
-class AssociationRecountService extends Contained
+class AssociationRecountService extends EventProcessor
 {
     /**
      * NewTurnEvent event processing.
@@ -24,7 +24,7 @@ class AssociationRecountService extends Contained
         $assoc = $this->recountApproved($assoc);
         $assoc = $assoc->save();
 
-        yield new AssociationApprovedEvent($assoc);
+        yield new AssociationApprovedEvent($assoc, $event);
     }
 
     /**
@@ -38,8 +38,8 @@ class AssociationRecountService extends Contained
         $assoc = $this->recountMature($assoc);
         $assoc = $assoc->save();
 
-        yield new AssociationApprovedEvent($assoc);
-        yield new AssociationMatureEvent($assoc);
+        yield new AssociationApprovedEvent($assoc, $event);
+        yield new AssociationMatureEvent($assoc, $event);
     }
 
     /**
@@ -53,7 +53,7 @@ class AssociationRecountService extends Contained
             $assoc = $this->recountMature($assoc);
             $assoc = $assoc->save();
     
-            yield new AssociationMatureEvent($assoc);
+            yield new AssociationMatureEvent($assoc, $event);
         }
     }
 
