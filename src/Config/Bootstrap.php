@@ -29,11 +29,15 @@ class Bootstrap extends BootstrapBase
                 },
 
                 'linker' => function ($c) {
-                	return new \App\Core\Linker($c);
+                    return new \App\Core\Linker($c);
                 },
                 
                 'config' => function ($c) {
                     return new \App\Config\Config($c);
+                },
+
+                'dispatcher' => function ($c) {
+                    return new \Plasticode\Events\EventDispatcher();
                 },
                 
                 // services
@@ -69,7 +73,7 @@ class Bootstrap extends BootstrapBase
                 // handlers
                 
                 'notFoundHandler' => function ($c) {
-                	return new \App\Handlers\NotFoundHandler($c);
+                    return new \App\Handlers\NotFoundHandler($c);
                 },
             ]
         );
