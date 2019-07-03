@@ -30,6 +30,11 @@ class Turn extends DbModel
         return self::query()
             ->where('language_id', $language->getId());
     }
+
+    public static function filterByUser(Query $query, User $user) : Query
+    {
+        return $query->where('user_id', $user->getId());
+    }
     
     public static function getByUser(User $user, Language $language = null) : Query
     {
@@ -37,8 +42,7 @@ class Turn extends DbModel
             ? self::getByLanguage($language)
             : self::query();
             
-        return $query
-            ->where('user_id', $user->getId());
+        return self::filterByUser($query);
     }
     
     public static function getByWord(Word $word) : Query
@@ -59,12 +63,12 @@ class Turn extends DbModel
         return Word::get($this->wordId);
     }
     
-    public function user()
+    public function user() : ?User
     {
         return self::getUser($this->userId);
     }
     
-    public function association()
+    public function association() : ?Association
     {
         return Association::get($this->associationId);
     }
@@ -79,7 +83,7 @@ class Turn extends DbModel
         return !$this->isPlayerTurn();
     }
     
-    public function prev()
+    public function prev() : ?Turn
     {
         return self::get($this->prevTurnId);
     }
@@ -89,8 +93,16 @@ class Turn extends DbModel
         return $this->finishedAt != null;
     }
     
-    public function createdAtIso()
+    public function createdAtIso() : string
     {
         return Date::iso($this->createdAt);
+    }
+
+    public static function groupByUsers(Query $query) : array
+    {
+        return $query
+            ->whereNotNull('user_id')
+            ->all()
+            ->group('user_id');
     }
 }

@@ -56,12 +56,9 @@ abstract class Element extends DbModel
     
     public abstract function feedbacks() : Query;
     
-    public function feedbackByUser(User $user) : ?Feedback
-    {
-        return WordFeedback::getByWordAndUser($this, $user);
-    }
+    public abstract function feedbackByUser(User $user) : ?Feedback;
     
-    public function currentFeedback() : ?WordFeedback
+    public function currentFeedback() : ?Feedback
     {
         $user = self::getCurrentUser();
         
@@ -72,12 +69,12 @@ abstract class Element extends DbModel
     
     public function dislikes() : Query
     {
-        return WordFeedback::filterDisliked($this->feedbacks());
+        return Feedback::filterDisliked($this->feedbacks());
     }
     
     public function matures() : Query
     {
-        return WordFeedback::filterMature($this->feedbacks());
+        return Feedback::filterMature($this->feedbacks());
     }
     
     public function isApproved() : bool
@@ -89,20 +86,29 @@ abstract class Element extends DbModel
     {
         return $this->mature === 1;
     }
-    
-    public function isUsedByUser(User $user) : bool
-    {
-        return $this
-            ->turns()
-            ->where('user_id', $user->getId())
-            ->any();
-    }
 
     public function isDislikedByUser(User $user) : bool
     {
         return
-            WordFeedback::filterByCreator(
+            Feedback::filterByCreator(
                 $this->dislikes(),
+                $user
+            )
+            ->any();
+    }
+
+    public abstract function turns() : Query;
+    
+    public function turnsByUsers() : array
+    {
+        return Turn::groupByUsers($this->turns());
+    }
+    
+    public function isUsedByUser(User $user) : bool
+    {
+        return
+            Turn::filterByUser(
+                $this->turns(),
                 $user
             )
             ->any();

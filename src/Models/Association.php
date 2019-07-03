@@ -29,11 +29,6 @@ class Association extends Element
     }
 
     // properties
-
-    public function language() : Language
-    {
-        return Language::get($this->languageId);
-    }
     
     public function words() : Collection
     {
@@ -51,7 +46,7 @@ class Association extends Element
     }
 
     /**
-     * Returns on of the association's word different from provided word.
+     * Returns one of the association's word different from the provided one.
      */
     public function otherWord(Word $word) : Word
     {
@@ -70,97 +65,14 @@ class Association extends Element
         return Turn::getByAssociation($this);
     }
     
-    public function turnsByUsers()
-    {
-        return $this
-            ->turns()
-            ->whereNotNull('user_id')
-            ->all()
-            ->group('user_id');
-    }
-    
-    public function score()
-    {
-        return $this->lazy(function () {
-            $turnsByUsers = $this->turnsByUsers();
-            $turnCount = count($turnsByUsers);
-            
-            $dislikeCount = $this->dislikes()->count();
-            
-            $usageCoeff = self::getSettings('associations.coeffs.usage');
-            $dislikeCoeff = self::getSettings('associations.coeffs.dislike');
-            
-            return $turnCount * $usageCoeff - $dislikeCount * $dislikeCoeff;
-        });
-    }
-    
-    public function isApproved() : bool
-    {
-        return $this->lazy(function () {
-            $threshold = self::getSettings('associations.approval_threshold');
-        
-            return $this->score() >= $threshold;
-        });
-    }
-    
     public function feedbacks() : Query
     {
         return AssociationFeedback::getByAssociation($this);
     }
     
-    public function feedbackByUser(User $user)
+    public function feedbackByUser(User $user) : ?Feedback
     {
         return AssociationFeedback::getByAssociationAndUser($this, $user);
-    }
-    
-    public function currentFeedback()
-    {
-        $user = self::getCurrentUser();
-        
-        return $user !== null
-            ? $this->feedbackByUser($user)
-            : null;
-    }
-    
-    public function dislikes() : Query
-    {
-        return $this->feedbacks()
-            ->where('dislike', 1);
-    }
-    
-    public function matures() : Query
-    {
-        return $this->feedbacks()
-            ->where('mature', 1);
-    }
-
-    public function isMature() : bool
-    {
-        return $this->lazy(function () {
-            if ($this->firstWord()->isMature() || $this->secondWord()->isMature()) {
-                return true;
-            }
-    
-            $threshold = self::getSettings('associations.mature_threshold');
-            
-            return $this->matures()->count() >= $threshold;
-        });
-    }
-    
-    public function isUsedByUser(User $user) : bool
-    {
-        return $this
-            ->turns()
-            ->where('user_id', $user->getId())
-            ->any();
-    }
-
-    public function isDislikedByUser(User $user) : bool
-    {
-        return $this
-            ->dislikes()
-            ->where('created_by', $user->getId())
-            ->any();
     }
 
     /**

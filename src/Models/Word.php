@@ -64,15 +64,6 @@ class Word extends Element
         return Turn::getByWord($this);
     }
     
-    public function turnsByUsers()
-    {
-        return $this
-            ->turns()
-            ->whereNotNull('user_id')
-            ->all()
-            ->group('user_id');
-    }
-    
     public function serialize() : array
     {
         return [
@@ -90,18 +81,9 @@ class Word extends Element
         return WordFeedback::getByWord($this);
     }
     
-    public function feedbackByUser(User $user) : ?WordFeedback
+    public function feedbackByUser(User $user) : ?Feedback
     {
         return WordFeedback::getByWordAndUser($this, $user);
-    }
-    
-    public function currentFeedback() : ?WordFeedback
-    {
-        $user = self::getCurrentUser();
-        
-        return $user !== null
-            ? $this->feedbackByUser($user)
-            : null;
     }
     
     public function proposedTypos()
@@ -118,44 +100,6 @@ class Word extends Element
             ->whereNotNull('duplicate_id')
             ->all()
             ->group('duplicate_id');
-    }
-    
-    public function dislikes() : Query
-    {
-        return WordFeedback::filterDisliked($this->feedbacks());
-    }
-    
-    public function matures() : Query
-    {
-        return WordFeedback::filterMature($this->feedbacks());
-    }
-    
-    public function isApproved() : bool
-    {
-        return $this->approved === 1;
-    }
-
-    public function isMature() : bool
-    {
-        return $this->mature === 1;
-    }
-    
-    public function isUsedByUser(User $user) : bool
-    {
-        return $this
-            ->turns()
-            ->where('user_id', $user->getId())
-            ->any();
-    }
-
-    public function isDislikedByUser(User $user) : bool
-    {
-        return
-            WordFeedback::filterByCreator(
-                $this->dislikes(),
-                $user
-            )
-            ->any();
     }
     
     /**
