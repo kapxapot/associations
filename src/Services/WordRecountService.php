@@ -24,7 +24,7 @@ class WordRecountService extends EventProcessor
             $word = $this->recountApproved($word);
             $word = $word->save();
     
-            yield new WordApprovedEvent($word, $event);
+            yield new WordApprovedEvent($word);
         }
     }
 
@@ -39,8 +39,8 @@ class WordRecountService extends EventProcessor
         $word = $this->recountMature($word);
         $word = $word->save();
 
-        yield new WordApprovedEvent($word, $event);
-        yield new WordMatureEvent($word, $event);
+        yield new WordApprovedEvent($word);
+        yield new WordMatureEvent($word);
     }
 
     private function recountApproved(Word $word) : Word

@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use Plasticode\Events\Event;
+use Plasticode\Models\DbModel;
 
 use App\Models\AssociationFeedback;
 
@@ -20,5 +21,10 @@ class AssociationFeedbackEvent extends Event
     public function getFeedback() : AssociationFeedback
     {
         return $this->feedback;
+    }
+
+    public function getEntity() : DbModel
+    {
+        return $this->getFeedback();
     }
 }

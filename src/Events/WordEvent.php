@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use Plasticode\Events\Event;
+use Plasticode\Models\DbModel;
 
 use App\Models\Word;
 
@@ -20,5 +21,10 @@ abstract class WordEvent extends Event
     public function getWord() : Word
     {
         return $this->word;
+    }
+
+    public function getEntity() : DbModel
+    {
+        return $this->getWord();
     }
 }

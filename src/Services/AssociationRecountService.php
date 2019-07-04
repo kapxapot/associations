@@ -24,7 +24,7 @@ class AssociationRecountService extends EventProcessor
         $assoc = $this->recountApproved($assoc);
         $assoc = $assoc->save();
 
-        yield new AssociationApprovedEvent($assoc, $event);
+        yield new AssociationApprovedEvent($assoc);
     }
 
     /**
@@ -38,8 +38,8 @@ class AssociationRecountService extends EventProcessor
         $assoc = $this->recountMature($assoc);
         $assoc = $assoc->save();
 
-        yield new AssociationApprovedEvent($assoc, $event);
-        yield new AssociationMatureEvent($assoc, $event);
+        yield new AssociationApprovedEvent($assoc);
+        yield new AssociationMatureEvent($assoc);
     }
 
     /**
@@ -53,7 +53,7 @@ class AssociationRecountService extends EventProcessor
             $assoc = $this->recountMature($assoc);
             $assoc = $assoc->save();
     
-            yield new AssociationMatureEvent($assoc, $event);
+            yield new AssociationMatureEvent($assoc);
         }
     }
 

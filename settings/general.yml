@@ -32,6 +32,10 @@ logger:
   name: pc-associ
   path: {LOG_PATH}
 
+event_log:
+  name: pc-event-log
+  path: {EVENT_LOG_PATH}
+
 view:
   templates_path:
     - /../views/
