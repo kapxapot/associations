@@ -2,29 +2,6 @@
 
 namespace App\Events;
 
-use Plasticode\Events\Event;
-use Plasticode\Models\DbModel;
-
-use App\Models\AssociationFeedback;
-
-class AssociationFeedbackEvent extends Event
+class AssociationFeedbackEvent extends FeedbackEvent
 {
-    private $feedback;
-
-    public function __construct(AssociationFeedback $feedback, Event $parent = null)
-    {
-        parent::__construct($parent);
-
-        $this->feedback = $feedback;
-    }
-
-    public function getFeedback() : AssociationFeedback
-    {
-        return $this->feedback;
-    }
-
-    public function getEntity() : DbModel
-    {
-        return $this->getFeedback();
-    }
 }
