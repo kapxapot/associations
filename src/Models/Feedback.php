@@ -28,12 +28,12 @@ abstract class Feedback extends DbModel
     
     public function isDisliked() : bool
     {
-        return $this->dislike === 1;
+        return $this->dislike == 1;
     }
     
     public function isMature() : bool
     {
-        return $this->mature === 1;
+        return $this->mature == 1;
     }
 
     public function updatedAtIso()

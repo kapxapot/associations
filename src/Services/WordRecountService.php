@@ -64,7 +64,7 @@ class WordRecountService extends EventProcessor
     {
         $threshold = $this->getSettings('words.mature_threshold');
         
-        $score = $this->matures()->count();
+        $score = $word->matures()->count();
         
         $word->mature = ($score >= $threshold) ? 1 : 0;
         $word->matureUpdatedAt = Date::dbNow();

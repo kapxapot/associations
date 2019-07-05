@@ -49,7 +49,9 @@ class AssociationRecountService extends EventProcessor
     {
         $word = $event->getWord();
 
-        foreach ($word->associations() as $assoc) {
+        $assocs = $word->associations()->all();
+
+        foreach ($assocs as $assoc) {
             $assoc = $this->recountMature($assoc);
             $assoc = $assoc->save();
     
@@ -71,6 +73,7 @@ class AssociationRecountService extends EventProcessor
         $score = $turnCount * $usageCoeff - $dislikeCount * $dislikeCoeff;
 
         $assoc->approved = ($score >= $threshold) ? 1 : 0;
+        $assoc->approvedUpdatedAt = Date::dbNow();
 
         return $assoc;
     }
@@ -89,6 +92,7 @@ class AssociationRecountService extends EventProcessor
         }
 
         $assoc->mature = $mature ? 1 : 0;
+        $assoc->matureUpdatedAt = Date::dbNow();
 
         return $assoc;
     }

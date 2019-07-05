@@ -25,7 +25,16 @@ abstract class Element extends DbModel
             ? self::getByLanguage($language)
             : self::query();
         
-        return $query->where('created_by', $user->getId());
+        return self::filterByCreator($query, $user);
+    }
+
+    public static function getPublic(Language $language = null) : Query
+    {
+        $query = ($language !== null)
+            ? self::getByLanguage($language)
+            : self::query();
+        
+        return self::filterNonmature($query);
     }
 
     public static function filterApproved(Query $query) : Query
@@ -33,9 +42,19 @@ abstract class Element extends DbModel
         return $query->where('approved', 1);
     }
 
+    public static function filterUnapproved(Query $query) : Query
+    {
+        return $query->where('approved', 0);
+    }
+
     public static function filterMature(Query $query) : Query
     {
         return $query->where('mature', 1);
+    }
+
+    public static function filterNonmature(Query $query) : Query
+    {
+        return $query->where('mature', 0);
     }
     
     public static function getApproved(Language $language = null) : Query
@@ -79,12 +98,12 @@ abstract class Element extends DbModel
     
     public function isApproved() : bool
     {
-        return $this->approved === 1;
+        return $this->approved == 1;
     }
 
     public function isMature() : bool
     {
-        return $this->mature === 1;
+        return $this->mature == 1;
     }
 
     public function isDislikedByUser(User $user) : bool

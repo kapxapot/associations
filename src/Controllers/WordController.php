@@ -12,12 +12,9 @@ class WordController extends Controller
     {
         $debug = $request->getQueryParam('debug', null) !== null;
 
-        $words = Word::getAll();
-
         $params = $this->buildParams([
             'params' => [
                 'title' => 'Слова',
-                'words' => $words,
                 'debug' => $debug,
             ],
         ]);
@@ -27,17 +24,10 @@ class WordController extends Controller
     
     public function publicWords($request, $response, $args)
     {
-        $limit = $request->getQueryParam('limit', 0);
-        
-        // due to isMature this works incorrectly
-        // will work correctly only when isMature becomes a table column
-        // and gets filtered before all()
-        $words = Word::query()
-            ->limit($limit)
+        $user = $this->auth->getUser();
+
+        $words = Word::getPublic()
             ->all()
-            ->where(function ($word) {
-                return !$word->isMature();
-            })
             ->map(function ($word) {
                 return $word->serialize();
             });

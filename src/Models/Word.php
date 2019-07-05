@@ -30,9 +30,16 @@ class Word extends Element
         return Association::getByWord($this);
     }
     
-    public function approvedAssociations() : Query
+    public function approvedAssociations() : Collection
     {
-        return Association::filterApproved($this->associations());
+        return Association::filterApproved($this->associations())
+            ->all();
+    }
+    
+    public function unapprovedAssociations() : Collection
+    {
+        return Association::filterUnapproved($this->associations())
+            ->all();
     }
     
     public function associationsForUser(User $user) : Collection
@@ -86,7 +93,7 @@ class Word extends Element
         return WordFeedback::getByWordAndUser($this, $user);
     }
     
-    public function proposedTypos()
+    public function proposedTypos() : array
     {
         return $this->feedbacks()
             ->whereNotNull('typo')
@@ -94,7 +101,7 @@ class Word extends Element
             ->group('typo');
     }
     
-    public function proposedDuplicates()
+    public function proposedDuplicates() : array
     {
         return $this->feedbacks()
             ->whereNotNull('duplicate_id')
@@ -105,7 +112,7 @@ class Word extends Element
     /**
      * Maturity check.
      */
-    public function isVisibleForUser(User $user = null)
+    public function isVisibleForUser(User $user = null) : bool
     {
         // 1. non-mature words are visible for everyone
         // 2. mature words are invisible for non-authed users ($user == null)
@@ -118,7 +125,7 @@ class Word extends Element
             );
     }
 
-    public function isPlayableAgainstUser(User $user)
+    public function isPlayableAgainstUser(User $user) : bool
     {
         // word can't be played against user, if
         //

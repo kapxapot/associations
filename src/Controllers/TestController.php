@@ -4,20 +4,31 @@ namespace App\Controllers;
 
 use Plasticode\Collection;
 use Plasticode\Exceptions\ValidationException;
+use Plasticode\Util\Strings;
 
+use App\Events\WordFeedbackEvent;
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Word;
+use App\Models\WordFeedback;
 
 class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
-        $this->eventLogTest();
+        $this->eventTest();
 
-        die();
+        die('done');
 
         //return $response;
+    }
+
+    private function eventTest()
+    {
+        $wordFeedback = WordFeedback::get(2);
+        $event = new WordFeedbackEvent($wordFeedback);
+
+        $this->dispatcher->dispatch($event);
     }
 
     private function eventLogTest()
