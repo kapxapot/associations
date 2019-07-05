@@ -13,6 +13,20 @@ class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
+        $this->eventLogTest();
+
+        die();
+
+        //return $response;
+    }
+
+    private function eventLogTest()
+    {
+        $this->eventLog->info('Test');
+    }
+
+    private function runFeedbackTests()
+    {
         $results = [
             'empty word array' => $this->wordFeedbackEmptyTest(),
             'full word array' => $this->wordFeedbackFullTest(),
@@ -20,9 +34,7 @@ class TestController extends Controller
             'full association array' => $this->associationFeedbackFullTest(),
         ];
         
-        dd($results);
-
-        //return $response;
+        var_dump($results);
     }
     
     /*
@@ -125,7 +137,7 @@ class TestController extends Controller
         
         $end = microtime(true);
         
-        dd($word->id, $word->word, $word->creator()->displayName(), $end - $start);
+        return [$word->id, $word->word, $word->creator()->displayName(), $end - $start];
     }
     
     private function wordsApprovedTest()
@@ -148,7 +160,7 @@ class TestController extends Controller
         
         var_dump($wordsCount, $approvedCount, $approvedByAssocCount);
         
-        dd($approvedByAssoc->extract('word'));
+        return $approvedByAssoc->extract('word');
     }
     
     private function collectionFlattenTest()
@@ -162,8 +174,6 @@ class TestController extends Controller
             'the end',
         ]);
         
-        var_dump($coll);
-        
-        dd($coll->flatten());
+        return [$coll, $coll->flatten()];
     }
 }

@@ -7,7 +7,12 @@ use Plasticode\Util\Cases;
 
 class Bootstrap extends BootstrapBase
 {
-    public function getMappings()
+    /**
+     * Get mappings for DI container.
+     *
+     * @return array
+     */
+    public function getMappings() : array
     {
         $mappings = parent::getMappings();
         
