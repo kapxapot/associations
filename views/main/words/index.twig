@@ -5,62 +5,62 @@
 {% set with_datatables = true %}
 
 {% block content %}
-	<div class="panel panel-primary">
-    	<div class="panel-heading panel-title">
-    		<header>
-    			<h1>{{ title }}</h1>
-    		</header>
-    	</div>
+    <div class="panel panel-primary">
+        <div class="panel-heading panel-title">
+            <header>
+                <h1>{{ title }}</h1>
+            </header>
+        </div>
 
         <div class="panel-body table-responsive">
-        	<table id="words-table" class="display table table-striped mb-0">
-        		<thead>
-        			<tr>
-        				<th>id</th>
-        				<th>Слово</th>
-        				<th>Язык</th>
-        				<th>Добавил/а</th>
-        				<th>Дата добавления</th>
-        			</tr>
-        		</thead>
-        	</table>
+            <table id="words-table" class="display table table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>id</th>
+                        <th>Слово</th>
+                        <th>Язык</th>
+                        <th>Добавил/а</th>
+                        <th>Дата добавления</th>
+                    </tr>
+                </thead>
+            </table>
         </div>
-	</div>
+    </div>
 {% endblock %}
 
 {% block more_js %}
     <script>
-    	$('#words-table').DataTable({
-    		dom: "<'row'<'col-sm-12'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-6'i><'col-sm-6'l>><'row'<'col-sm-12'p>>", //'ftrilp',
-    		language: {
-    			url: '{{ folders.global }}datatables/ru.json'
-    		},
-			ajax: '{{ api }}public/words?format=dt',
-    		order: [[ 1, 'asc' ]],
-    		rowId: 'id',
-			columns: [
-				{
-					data: 'id'
-				},
-				{
-				    data: 'word',
-				    render: function (data, type, row) {
+        $('#words-table').DataTable({
+            dom: "<'row'<'col-sm-12'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-6'i><'col-sm-6'l>><'row'<'col-sm-12'p>>", //'ftrilp',
+            language: {
+                url: '{{ folders.global }}datatables/ru.json'
+            },
+            ajax: '{{ api }}public/words?format=dt',
+            order: [[ 1, 'asc' ]],
+            rowId: 'id',
+            columns: [
+                {
+                    data: 'id'
+                },
+                {
+                    data: 'word',
+                    render: function (data, type, row) {
                         if (type === 'display' || type === 'filter') {
                             return '<a href="' + row.url + '">' + data + '</a>';
                         }
                  
                         return data;
                     }
-				},
-				{
-					data: 'language.name'
-				},
-				{
-					data: 'creator.name'
-				},
-				{
-				    data: 'created_at',
-				    render: function (data, type, row) {
+                },
+                {
+                    data: 'language.name'
+                },
+                {
+                    data: 'creator.name'
+                },
+                {
+                    data: 'created_at',
+                    render: function (data, type, row) {
                         if (type === 'display' || type === 'filter') {
                             return moment(data).format('DD.MM.Y HH:mm');
                         }
@@ -68,7 +68,7 @@
                         return moment(data).format('X');
                     }
                 }
-	        ]
-    	});
+            ]
+        });
     </script>
 {% endblock %}
