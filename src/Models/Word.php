@@ -137,4 +137,48 @@ class Word extends Element
                 ($this->isUsedByUser($user) && !$this->isDislikedByUser($user))
             );
     }
+
+    /**
+     * Returns the typo provided by current user.
+     *
+     * @return string|null
+     */
+    public function currentTypo() : ?string
+    {
+        $feedback = $this->currentFeedback();
+
+        return (!is_null($feedback) && strlen($feedback->typo) > 0)
+            ? $feedback->typo
+            : null;
+    }
+
+    /**
+     * Returns word or current typo with '*' (if any)
+     *
+     * @return string
+     */
+    public function displayName() : string
+    {
+        $typo = $this->currentTypo();
+
+        return is_null($typo)
+            ? $this->word
+            : $typo . '*';
+    }
+
+    /**
+     * Returns the original word + current typo
+     *
+     * @return string
+     */
+    public function fullDisplayName() : string
+    {
+        $name = $this->displayName();
+
+        if ($this->currentTypo() !== null) {
+            $name .= ' (' . $this->word . ')';
+        }
+
+        return $name;
+    }
 }

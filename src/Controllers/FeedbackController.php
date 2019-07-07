@@ -4,6 +4,9 @@ namespace App\Controllers;
 
 use Plasticode\Core\Core;
 
+use App\Events\AssociationFeedbackEvent;
+use App\Events\WordFeedbackEvent;
+
 class FeedbackController extends Controller
 {
     public function save($request, $response, $args)
@@ -18,15 +21,21 @@ class FeedbackController extends Controller
         }
         
         if (!empty($wordData)) {
-            $this->wordFeedbackService
+            $wordFeedback = $this->wordFeedbackService
                 ->toModel($wordData)
                 ->save();
+            
+            $event = new WordFeedbackEvent($wordFeedback);
+            $this->dispatcher->dispatch($event);
         }
         
         if (!empty($associationData)) {
-            $this->associationFeedbackService
+            $assocFeedback = $this->associationFeedbackService
                 ->toModel($associationData)
                 ->save();
+
+            $event = new AssociationFeedbackEvent($assocFeedback);
+            $this->dispatcher->dispatch($event);
         }
         
         return Core::json($response, [

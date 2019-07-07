@@ -1,1 +1,1 @@
-<span class="label {% if turn.is_ai_turn %}label-info{% else %}label-success{% endif %} turn-label"><a href="{{ turn.word.url }}">{{ turn.word.word }}</a></span>
+<span class="label {% if turn.is_ai_turn %}label-info{% else %}label-success{% endif %} turn-label">{% include "components/word.twig" with { 'word': turn.word } only %}</span>

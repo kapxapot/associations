@@ -5,6 +5,7 @@ namespace App\Services;
 use Plasticode\Contained;
 use Plasticode\Util\Date;
 
+use App\Events\NewTurnEvent;
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Turn;
@@ -31,6 +32,9 @@ class TurnService extends Contained
     public function newPlayerTurn(Game $game, Word $word, User $user) : Turn
     {
         $turn = $this->newTurn($game, $word, $user);
+
+        $event = new NewTurnEvent($turn);
+        $this->dispatcher->dispatch($event);
         
         $this->processPlayerTurn($turn);
         

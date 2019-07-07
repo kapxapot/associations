@@ -42,7 +42,7 @@ class Turn extends DbModel
             ? self::getByLanguage($language)
             : self::query();
             
-        return self::filterByUser($query);
+        return self::filterByUser($query, $user);
     }
     
     public static function getByWord(Word $word) : Query

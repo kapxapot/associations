@@ -4,9 +4,11 @@
 {% import 'main/macros.twig' as m %}
 {% import 'main/local_macros.twig' as lm %}
 
+{% set word_upper = word.full_display_name|upper %}
+{% set title = word_upper ~ ' - Слова' %}
+
 {% block content %}
     <div class="panel panel-primary">
-        {% set word_upper = word.word|upper %}
         <div class="panel-heading panel-title">
             <header>
                 <h1>{{ word_upper }}</h1>
@@ -34,6 +36,15 @@
                 <span title="Не нравится" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2">
                     <i class="fas fa-thumbs-down"></i> {{ word.dislikes.count }}
                 </span>
+            {% endif %}
+
+            {% if word.current_typo %}
+                <div class="quote">
+                    <div class="quote-body">
+                        <p>Оригинальное слово <strong>{{ word.word }}</strong> исправлено вами на слово <strong>{{ word.current_typo }}</strong>.</p>
+                        <p>Это исправление видите <strong>только вы</strong>.</p>
+                    </div>
+                </div>
             {% endif %}
             
             <p><strong>Язык:</strong> {{ word.language.name }}</p>

@@ -9,6 +9,6 @@
             {% set first = association.first_word %}
             {% set second = association.second_word %}
         {% endif %}
-        {% if not no_link %}<a href="{{ association.url }}"{% if short %} class="assoc-arrow"{% endif %}>{% endif %}{% if not short %}{{ first.word }} {% endif %}{{ sign }}{% if not short %} {{ second.word }}{% endif %}{% if not no_link %}</a>{% endif %}
+        {% if not no_link %}<a href="{{ association.url }}"{% if short %} class="assoc-arrow"{% endif %}>{% endif %}{% if not short %}{{ first.display_name }} {% endif %}{{ sign }}{% if not short %} {{ second.display_name }}{% endif %}{% if not no_link %}</a>{% endif %}
     {% else %}{{ sign }}{% endif %}
 {% endspaceless %}

@@ -51,7 +51,6 @@ class WordController extends Controller
 
         $params = $this->buildParams([
             'params' => [
-                'title' => mb_strtoupper($word->word) . ' - Слова',
                 'word' => $word,
                 'disqus_id' => 'word' . $word->getId(),
                 'debug' => $debug,

@@ -30,7 +30,7 @@ class LanguageService extends Contained
     public function getRandomWordForUser(Language $language, User $user, Collection $exclude = null)
     {
         // get common words
-        $approvedWords = Word::getApproved($language);
+        $approvedWords = Word::getApproved($language)->all();
 
         // get user's words
         $userWords = $user->usedWords($language);
