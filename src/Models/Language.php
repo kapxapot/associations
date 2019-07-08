@@ -20,7 +20,9 @@ class Language extends DbModel
     
     public function lastAddedWords(int $limit = null) : Query
     {
-        return Word::getByLanguage($this)
+        $query = Word::getApproved($this);
+
+        return Word::filterNonmature($query)
             ->orderByDesc('created_at')
             ->limit($limit ?? 10);
     }
@@ -32,25 +34,11 @@ class Language extends DbModel
     
     public function lastAddedAssociations(int $limit = null) : Query
     {
-        return Association::getByLanguage($this)
+        $query = Association::getApproved($this);
+
+        return Association::filterNonmature($query)
             ->orderByDesc('created_at')
             ->limit($limit ?? 10);
-    }
-    
-    /**
-     * Heavy.
-     */
-    public function lastApprovedAssociations(int $limit = null) : Collection
-    {
-        return $this->lazy(function () use ($limit) {
-            return Association::getByLanguage($this)
-                ->orderByDesc('created_at')
-                ->all()
-                ->where(function ($assoc) {
-                    return $assoc->isApproved();
-                })
-                ->take($limit ?? 10);
-        });
     }
     
     public function serialize()
