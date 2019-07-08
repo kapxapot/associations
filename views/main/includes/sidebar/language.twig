@@ -27,7 +27,7 @@
         <div class="panel-body">
             <ul class="mb-0 pl-3">
                 {% for word in language.last_added_words.all %}
-                    <li>{% include "components/word.twig" with { 'word': word } only %}{% if word.creator %} <span class="nowrap">({{ lm.user(word.creator) }})</span>{% endif %}</li>
+                    <li>{% include "components/word.twig" with { 'word': word } only %}{% if word.creator %} <span class="nowrap">{{ lm.user(word.creator) }}</span>{% endif %}</li>
                 {% endfor %}
             </ul>
         </div>
@@ -40,7 +40,7 @@
         <div class="panel-body">
             <ul class="mb-0 pl-3">
                 {% for assoc in language.last_added_associations.all %}
-                    <li>{{ lm.association(assoc) }}{% if assoc.creator %} <span class="nowrap">({{ lm.user(assoc.creator) }})</span>{% endif %}</li>
+                    <li>{{ lm.association(assoc) }}{% if assoc.creator %} <span class="nowrap">{{ lm.user(assoc.creator) }}</span>{% endif %}</li>
                 {% endfor %}
             </ul>
         </div>

@@ -15,35 +15,27 @@
 
         
         <div class="panel-body">
-            {% if association.is_mature %}
-                <span title="Не для детей" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2 problems">
-                    <i class="fas fa-minus-circle"></i>
-                </span>
-            {% endif %}
+            <p>
+                <span class="label label-default" title="Язык: {{ association.language.name }}" data-toggle="tooltip">{{ association.language.name|lower }}</span>
+                <span class="label {{ association.is_approved ? 'label-success' : 'label-primary' }}" title="{{ association.is_approved ? 'Доступна всем игрокам' : 'Доступна только тем, кто ее использовал' }}" data-toggle="tooltip">{{ association.is_approved ? 'общая' : 'личная' }}</span>
+                {% if association.is_mature %}
+                    <span class="label label-danger" title="Не для детей" data-toggle="tooltip">16+</span>
+                {% endif %}
+                {% if association.turns_by_users|length > 0 %}
+                    <span class="label label-success" title="Использования" data-toggle="tooltip">
+                        <i class="fas fa-thumbs-up"></i> {{ association.turns_by_users|length }}
+                    </span>
+                {% endif %}
+                {% if association.dislikes.any %}
+                    <span class="label label-danger" title="Не нравится" data-toggle="tooltip">
+                        <i class="fas fa-thumbs-down"></i> {{ association.dislikes.count }}
+                    </span>
+                {% endif %}
+            </p>
 
-            {% if association.turns_by_users|length > 0 %}
-                <span title="Использования" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2">
-                    <i class="fas fa-thumbs-up"></i> {{ association.turns_by_users|length }}
-                </span>
-            {% endif %}
+            <p>{% include "components/word.twig" with { 'word': association.first_word } only %} {% include 'components/association_sign.twig' with { 'association': association } only %} {% include "components/word.twig" with { 'word': association.second_word } only %}</p>
 
-            {% if association.dislikes.any %}
-                <span title="Не нравится" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2">
-                    <i class="fas fa-thumbs-down"></i> {{ association.dislikes.count }}
-                </span>
-            {% endif %}
-
-            <p><strong>Язык:</strong> {{ association.language.name }}</p>
-
-            <p><strong>Слова:</strong> {% include "components/word.twig" with { 'word': association.first_word } only %} {% include 'components/association_sign.twig' with { 'association': association } only %} {% include "components/word.twig" with { 'word': association.second_word } only %}</p>
-
-            {#<p><strong>Рейтинг:</strong> {{ association.score }}</p>#}
-
-            <p><strong>Статус:</strong> {{ association.is_approved ? 'общая' : 'личная' }} <i class="fas fa-question-circle" title="{{ association.is_approved ? 'Доступна всем игрокам' : 'Доступна только тем, кто ее использовал' }}" data-toggle="tooltip"></i></p>
-
-            <p><strong>Добавил/а:</strong> {{ lm.user(association.creator) }}</p>
-
-            <p><strong>Дата добавления:</strong> {{ gm.moment_local(association.created_at_iso) }}</p>
+            <p>Добавил/а {{ lm.user(association.creator, true) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
 
             <p><strong>Использована игроками:</strong></p>
             

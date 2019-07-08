@@ -20,23 +20,23 @@
         ], word_upper) }}
         
         <div class="panel-body">
-            {% if word.is_mature %}
-                <span title="Не для детей" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2 problems">
-                    <i class="fas fa-minus-circle"></i>
-                </span>
-            {% endif %}
-    
-            {% if word.approved_associations.any %}
-                <span title="Общие ассоциации" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2">
-                    <i class="fas fa-thumbs-up"></i> {{ word.approved_associations.count }}
-                </span>
-            {% endif %}
-            
-            {% if word.dislikes.any %}
-                <span title="Не нравится" data-toggle="tooltip" class="inline-block font-130 hgap-2 mb-2">
-                    <i class="fas fa-thumbs-down"></i> {{ word.dislikes.count }}
-                </span>
-            {% endif %}
+            <p>
+                <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
+                <span class="label {{ word.is_approved ? 'label-success' : 'label-primary' }}" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто его использовал' }}" data-toggle="tooltip">{{ word.is_approved ? 'общее' : 'личное' }}</span>
+                {% if word.is_mature %}
+                    <span class="label label-danger" title="Не для детей" data-toggle="tooltip">16+</span>
+                {% endif %}
+                {% if word.approved_associations.any %}
+                    <span class="label label-success" title="Общие ассоциации" data-toggle="tooltip">
+                        <i class="fas fa-thumbs-up"></i> {{ word.approved_associations.count }}
+                    </span>
+                {% endif %}
+                {% if word.dislikes.any %}
+                    <span class="label label-danger" title="Не нравится" data-toggle="tooltip">
+                        <i class="fas fa-thumbs-down"></i> {{ word.dislikes.count }}
+                    </span>
+                {% endif %}
+            </p>
 
             {% if word.current_typo %}
                 <div class="quote">
@@ -47,22 +47,14 @@
                 </div>
             {% endif %}
             
-            <p><strong>Язык:</strong> {{ word.language.name }}</p>
-
-            {#<p><strong>Рейтинг:</strong> {{ word.score }}</p>#}
-
-            <p><strong>Статус:</strong> {{ word.is_approved ? 'общее' : 'личное' }} <i class="fas fa-question-circle" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто его использовал' }}" data-toggle="tooltip"></i></p>
-
-            <p><strong>Добавил/а:</strong> {{ lm.user(word.creator) }}</p>
-
-            <p ng-cloak><strong>Дата добавления:</strong> {{ gm.moment_local(word.created_at_iso) }}</p>
+            <p>Добавил/а {{ lm.user(word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
 
             {% if word.approved_associations.any %}
                 <p><strong>Общие ассоциации ({{ word.approved_associations.count }}):</strong></p>
 
                 <ul class="vgap-2">
                     {% for assoc in word.approved_associations %}
-                        <li>{{ lm.association(assoc, word) }} ({{ lm.user(assoc.creator) }})</li>
+                        <li>{{ lm.association(assoc, word) }} {{ lm.user(assoc.creator) }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -72,7 +64,7 @@
 
                 <ul class="vgap-2">
                     {% for assoc in word.unapproved_associations %}
-                        <li>{{ lm.association(assoc, word) }} ({{ lm.user(assoc.creator) }})</li>
+                        <li>{{ lm.association(assoc, word) }} {{ lm.user(assoc.creator) }}</li>
                     {% endfor %}
                 </ul>
             {% endif %}
