@@ -4,28 +4,28 @@
 {% import 'main/local_macros.twig' as lm %}
 
 {% block content %}
-	<div class="panel panel-primary">
-    	<div class="panel-heading panel-title">
-    		<header>
-    			<h1>{{ title }}</h1>
-    		</header>
-    	</div>
-	    
-	  	<div class="panel-body">
-	  	    <p><strong>Язык:</strong> {{ game.language.name }}</p>
-	  	    <p>
-	  	        <strong>Участники:</strong>
-	  	        {% for player in game.players %}
-	  	            {{ player ? lm.user(player) : 'компьютер' }}{% if not loop.last %}, {% endif %}
-	  	        {% endfor %}
-	  	    </p>
-	  	    <p>
-	  	        <strong>Даты:</strong>
-	  	        {{ gm.moment_short_range(game.created_at_iso, game.finished_at_iso, 'D MMMM Y, H:MM') }}
-	  	    </p>
-	  	    <p><strong>Ходов:</strong> {{ game.turns.count }}</p>
-	  	    <p><strong>Ход игры:</strong></p>
-	  	    {% include 'components/game_log_inline.twig' with { 'game': game } only %}
-	    </div>
-	</div>
+    <div class="panel panel-primary">
+        <div class="panel-heading panel-title">
+            <header>
+                <h1>{{ title }}</h1>
+            </header>
+        </div>
+        
+          <div class="panel-body">
+              <p><strong>Язык:</strong> {{ game.language.name }}</p>
+              <p>
+                  <strong>Участники:</strong>
+                  {% for player in game.players %}
+                      {{ player ? lm.user(player, true) : 'компьютер' }}{% if not loop.last %}, {% endif %}
+                  {% endfor %}
+              </p>
+              <p>
+                  <strong>Даты:</strong>
+                  {{ gm.moment_short_range(game.created_at_iso, game.finished_at_iso, 'D MMMM Y, H:MM') }}
+              </p>
+              <p><strong>Ходов:</strong> {{ game.turns.count }}</p>
+              <p><strong>Ход игры:</strong></p>
+              {% include 'components/game_log_inline.twig' with { 'game': game } only %}
+        </div>
+    </div>
 {% endblock %}
