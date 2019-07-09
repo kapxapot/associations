@@ -11,21 +11,28 @@
             </header>
         </div>
         
-          <div class="panel-body">
-              <p><strong>Язык:</strong> {{ game.language.name }}</p>
-              <p>
-                  <strong>Участники:</strong>
-                  {% for player in game.players %}
-                      {{ player ? lm.user(player, true) : 'компьютер' }}{% if not loop.last %}, {% endif %}
-                  {% endfor %}
-              </p>
-              <p>
-                  <strong>Даты:</strong>
-                  {{ gm.moment_short_range(game.created_at_iso, game.finished_at_iso, 'D MMMM Y, H:MM') }}
-              </p>
-              <p><strong>Ходов:</strong> {{ game.turns.count }}</p>
-              <p><strong>Ход игры:</strong></p>
-              {% include 'components/game_log_inline.twig' with { 'game': game } only %}
+        <div class="panel-body">
+            <p>
+                <span class="label label-default" title="Язык: {{ game.language.name }}" data-toggle="tooltip">{{ game.language.name|lower }}</span>
+            </p>
+
+            <p>
+                <strong>Участники:</strong>
+                {% for player in game.players %}
+                    {{ player ? lm.user(player, true) : 'компьютер' }}{% if not loop.last %}, {% endif %}
+                {% endfor %}
+            </p>
+
+            <p>
+                <strong>Даты:</strong>
+                {{ gm.moment_short_range(game.created_at_iso, game.finished_at_iso, 'D MMMM Y, H:MM') }}
+            </p>
+
+            <p><strong>Ходов:</strong> {{ game.turns.count }}</p>
+
+            <p><strong>Ход игры:</strong></p>
+
+            {% include 'components/game_log_inline.twig' with { 'game': game } only %}
         </div>
     </div>
 {% endblock %}

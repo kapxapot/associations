@@ -42,7 +42,7 @@
             <ul>
                 {% for user_id, turns in association.turns_by_users %}
                     <li>
-                        <div>{{ lm.user(association_users[user_id]) }}</div>
+                        <div>{{ lm.user(association_users[user_id], true) }}</div>
                         <ul>
                             {% for turn in turns %}
                                 <li><a href="{{ turn.game.url }}">{{ turn.game.display_name }}</a>, {{ gm.moment_local(turn.created_at_iso) }}</li>

@@ -21,7 +21,7 @@ class Turn extends DbModel
     
     public static function getByAssociation(Association $association) : Query
     {
-        return self::query()
+        return self::baseQuery()
             ->where('association_id', $association->getId());
     }
     
@@ -47,7 +47,7 @@ class Turn extends DbModel
     
     public static function getByWord(Word $word) : Query
     {
-        return self::query()
+        return self::baseQuery()
             ->where('word_id', $word->getId());
     }
     
@@ -102,6 +102,7 @@ class Turn extends DbModel
     {
         return $query
             ->whereNotNull('user_id')
+            ->orderByAsc('created_at')
             ->all()
             ->group('user_id');
     }

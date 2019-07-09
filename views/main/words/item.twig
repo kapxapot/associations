@@ -54,7 +54,13 @@
 
                 <ul class="vgap-2">
                     {% for assoc in word.approved_associations %}
-                        <li>{{ lm.association(assoc, word) }} {{ lm.user(assoc.creator) }}</li>
+                        <li>
+                            {{ lm.association(assoc, word) }}
+                            
+                            {% for user in assoc.users %}
+                                {{ lm.user(user) }}
+                            {% endfor %}
+                        </li>
                     {% endfor %}
                 </ul>
             {% endif %}

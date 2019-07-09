@@ -60,9 +60,29 @@ class Association extends Element
         return self::$linker->association($this);
     }
     
+    /**
+     * Turns with this association.
+     *
+     * @return Query
+     */
     public function turns() : Query
     {
         return Turn::getByAssociation($this);
+    }
+
+    /**
+     * Users that used this association.
+     *
+     * @return Collection
+     */
+    public function users() : Collection
+    {
+        $userIds = array_keys($this->turnsByUsers());
+
+        return Collection::make($userIds)
+            ->map(function ($userId) {
+                return self::getUser($userId);
+            });
     }
     
     public function feedbacks() : Query
