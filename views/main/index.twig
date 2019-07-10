@@ -56,7 +56,7 @@
 
                             <button type="submit" ng-click="sendWord()" class="btn btn-success ajax-button" ng-disabled="loading || saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Отправить</span></button>
 
-                            <a role="button" ng-click="giveUp()" class="btn btn-default ml-2" ng-disabled="loading || saving">Сдаться</a>
+                            <a role="button" ng-click="giveUp()" class="btn btn-default ml-3" ng-disabled="loading || saving">Сдаться</a>
                             
                             {% if with_problems %}
                                 <a role="button" ng-click="problemsDialog()" class="btn btn-default problems ml-2" ng-disabled="loading || saving" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>

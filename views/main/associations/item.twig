@@ -33,7 +33,11 @@
                 {% endif %}
             </p>
 
-            <p>{% include "components/word.twig" with { 'word': association.first_word } only %} {% include 'components/association_sign.twig' with { 'association': association } only %} {% include "components/word.twig" with { 'word': association.second_word } only %}</p>
+            <p class="font-130">
+                {% include "components/word.twig" with { 'word': association.first_word } only %}
+                {% include 'components/association_sign.twig' with { 'association': association } only %}
+                {% include "components/word.twig" with { 'word': association.second_word } only %}
+            </p>
 
             <p>Добавил/а {{ lm.user(association.creator, true) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
 
@@ -41,7 +45,7 @@
             
             <ul>
                 {% for user_id, turns in association.turns_by_users %}
-                    <li>
+                    <li class="vgap-1">
                         <div>{{ lm.user(association_users[user_id], true) }}</div>
                         <ul>
                             {% for turn in turns %}
