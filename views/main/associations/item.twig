@@ -3,6 +3,8 @@
 {% import 'macros.twig' as gm %}
 {% import 'main/local_macros.twig' as lm %}
 
+{% set can_see_all_games = can('games', 'edit') %}
+
 {% set title  = lm.association(association, null, true)|upper %}
 
 {% block content %}
@@ -46,12 +48,15 @@
             <ul>
                 {% for user_id, turns in association.turns_by_users %}
                     <li class="vgap-1">
-                        <div>{{ lm.user(association_users[user_id], true) }}</div>
-                        <ul>
-                            {% for turn in turns %}
-                                <li><a href="{{ turn.game.url }}">{{ turn.game.display_name }}</a>, {{ gm.moment_local(turn.created_at_iso) }}</li>
-                            {% endfor %}
-                        </ul>
+                        {% set full_access = can_see_all_games or user_id == auth.user.id %}
+                        <div>{{ lm.user(association_users[user_id], true) }}{% if not full_access %} ({{ turns.count }}){% endif %}</div>
+                        {% if full_access %}
+                            <ul>
+                                {% for turn in turns %}
+                                    <li><a href="{{ turn.game.url }}">{{ turn.game.display_name }}</a>, {{ gm.moment_local(turn.created_at_iso) }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
                     </li>
                 {% endfor %}
             </ul>

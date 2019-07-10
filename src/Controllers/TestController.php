@@ -16,11 +16,19 @@ class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
-        $this->invisibleCountTest();
+        $this->hasPlayerTest();
 
         die('done');
 
         //return $response;
+    }
+
+    private function hasPlayerTest()
+    {
+        $game = Game::get(43);
+        $user = $this->userRepository->get(3);
+
+        var_dump($game->hasPlayer($user));
     }
 
     private function invisibleCountTest()

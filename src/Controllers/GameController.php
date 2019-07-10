@@ -20,7 +20,16 @@ class GameController extends Controller
 
         $game = Game::get($id);
 
-        if ($game === null) {
+        $user = $this->auth->getUser();
+
+        if (is_null($game) || is_null($user)) {
+            return $this->notFound($request, $response);
+        }
+
+        $canSeeAllGames = $this->access->checkRights('games', 'edit');
+        $hasPlayer = $game->hasPlayer($user);
+
+        if (!$canSeeAllGames && !$hasPlayer) {
             return $this->notFound($request, $response);
         }
 

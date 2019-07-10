@@ -26,15 +26,15 @@ class Game extends DbModel
     
     public function turnsCountStr() : string
     {
-	    return self::$cases->caseForNumber('ход', $this->turns()->count());
+        return self::$cases->caseForNumber('ход', $this->turns()->count());
     }
     
-    public function lastTurn()
+    public function lastTurn() : ?Turn
     {
         return $this->turns()->one();
     }
 
-    public function beforeLastTurn()
+    public function beforeLastTurn() : ?Turn
     {
         return $this->lastTurn() !== null
             ? $this->lastTurn()->prev()
@@ -48,26 +48,33 @@ class Game extends DbModel
         });
     }
     
-    public function lastTurnWord() {
-	    return $this->lastTurn() !== null
-	        ? $this->lastTurn()->word()
-	        : null;
-    }
-	
-	public function beforeLastTurnWord() {   
-	    return $this->beforeLastTurn() !== null
-	        ? $this->beforeLastTurn()->word()
-	        : null;
+    public function lastTurnWord() : ?Word
+    {
+        return $this->lastTurn() !== null
+            ? $this->lastTurn()->word()
+            : null;
     }
     
-    public function language()
+    public function beforeLastTurnWord() : ?Word
+    {
+        return $this->beforeLastTurn() !== null
+            ? $this->beforeLastTurn()->word()
+            : null;
+    }
+    
+    public function language() : Language
     {
         return Language::get($this->languageId);
     }
     
-    public function user()
+    public function user() : User
     {
         return self::getUser($this->userId);
+    }
+
+    public function creator() : User
+    {
+        return $this->user();
     }
 
     public function isStarted() : bool
@@ -101,6 +108,14 @@ class Game extends DbModel
             ->distinct();
     }
 
+    public function hasPlayer(User $user) : bool
+    {
+        return $this
+            ->players()
+            ->ids()
+            ->contains($user->getId());
+    }
+
     /**
      * Normalized word string expected.
      */
@@ -123,22 +138,22 @@ class Game extends DbModel
             ->any('id', $word->getId());
     }
     
-    public function url()
+    public function url() : ?string
     {
         return self::$linker->game($this);
     }
     
-    public function displayName()
+    public function displayName() : string
     {
         return 'Игра #' . $this->getId();
     }
     
-    public function createdAtIso()
+    public function createdAtIso() : string
     {
         return Date::iso($this->createdAt);
     }
     
-    public function finishedAtIso()
+    public function finishedAtIso() : string
     {
         return Date::iso($this->finishedAt);
     }

@@ -11,12 +11,12 @@ use App\Models\Word;
 
 class Linker extends LinkerBase
 {
-    private function check(DbModel $model)
+    private function check(DbModel $model) : bool
     {
         return $model !== null && $model->isPersisted();
     }
     
-    public function association(Association $association)
+    public function association(Association $association) : ?string
     {
         if (!$this->check($association)) {
             return null;
@@ -25,7 +25,7 @@ class Linker extends LinkerBase
         return $this->router->pathFor('main.association', ['id' => $association->getId()]);
     }
 
-    public function game(Game $game)
+    public function game(Game $game) : ?string
     {
         if (!$this->check($game)) {
             return null;
@@ -34,7 +34,7 @@ class Linker extends LinkerBase
         return $this->router->pathFor('main.game', ['id' => $game->getId()]);
     }
 
-    public function word(Word $word)
+    public function word(Word $word) : ?string
     {
         if (!$this->check($word)) {
             return null;
