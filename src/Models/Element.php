@@ -80,9 +80,9 @@ abstract class Element extends DbModel
     
     public function currentFeedback() : ?Feedback
     {
-        $me = self::getCurrentUser();
+        $user = self::getCurrentUser();
         
-        return $user !== null
+        return !is_null($user)
             ? $this->feedbackByUser($user)
             : null;
     }
