@@ -23,7 +23,6 @@ class Language extends DbModel
         $query = Word::getApproved($this);
 
         return Word::filterNonmature($query)
-            ->orderByDesc('created_at')
             ->limit($limit ?? 10);
     }
     
@@ -37,7 +36,6 @@ class Language extends DbModel
         $query = Association::getApproved($this);
 
         return Association::filterNonmature($query)
-            ->orderByDesc('created_at')
             ->limit($limit ?? 10);
     }
     

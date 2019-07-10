@@ -29,17 +29,26 @@ class Word extends Element
     {
         return Association::getByWord($this);
     }
+
+    private function compareAssociations() : \Closure
+    {
+        return function ($assocA, $assocB) {
+            return strcmp($assocA->otherWord($this)->word, $assocB->otherWord($this)->word);
+        };
+    }
     
     public function approvedAssociations() : Collection
     {
         return Association::filterApproved($this->associations())
-            ->all();
+            ->all()
+            ->orderByFunc($this->compareAssociations());
     }
     
     public function unapprovedAssociations() : Collection
     {
         return Association::filterUnapproved($this->associations())
-            ->all();
+            ->all()
+            ->orderByFunc($this->compareAssociations());
     }
     
     public function associationsForUser(User $user) : Collection

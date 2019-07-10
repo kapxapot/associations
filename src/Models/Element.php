@@ -63,7 +63,8 @@ abstract class Element extends DbModel
             ? self::getByLanguage($language)
             : self::query();
         
-        return self::filterApproved($query);
+        return self::filterApproved($query)
+            ->orderByDesc('approved_updated_at');
     }
     
     // properties
