@@ -30,7 +30,7 @@ class Word extends Element
         return Association::getByWord($this);
     }
 
-    private function compareAssociations() : \Closure
+    private function compareByOtherWord() : \Closure
     {
         return function ($assocA, $assocB) {
             return strcmp($assocA->otherWord($this)->word, $assocB->otherWord($this)->word);
@@ -41,14 +41,14 @@ class Word extends Element
     {
         return Association::filterApproved($this->associations())
             ->all()
-            ->orderByFunc($this->compareAssociations());
+            ->orderByFunc($this->compareByOtherWord());
     }
     
     public function unapprovedAssociations() : Collection
     {
         return Association::filterUnapproved($this->associations())
             ->all()
-            ->orderByFunc($this->compareAssociations());
+            ->orderByFunc($this->compareByOtherWord());
     }
     
     public function associationsForUser(User $user) : Collection
