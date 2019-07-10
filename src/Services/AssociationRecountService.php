@@ -8,6 +8,7 @@ use Plasticode\Util\Date;
 use App\Events\AssociationApprovedEvent;
 use App\Events\AssociationFeedbackEvent;
 use App\Events\AssociationMatureEvent;
+use App\Events\AssociationOutOfDateEvent;
 use App\Events\NewTurnEvent;
 use App\Events\WordMatureEvent;
 use App\Models\Association;
@@ -28,21 +29,6 @@ class AssociationRecountService extends EventProcessor
     }
 
     /**
-     * AssociationFeedbackEvent event processing.
-     */
-    public function processAssociationFeedbackEvent(AssociationFeedbackEvent $event) : iterable
-    {
-        $assoc = $event->getFeedback()->association();
-
-        $assoc = $this->recountApproved($assoc);
-        $assoc = $this->recountMature($assoc);
-        $assoc = $assoc->save();
-
-        yield new AssociationApprovedEvent($assoc);
-        yield new AssociationMatureEvent($assoc);
-    }
-
-    /**
      * WordMatureEvent event processing.
      */
     public function processWordMatureEvent(WordMatureEvent $event) : iterable
@@ -59,7 +45,35 @@ class AssociationRecountService extends EventProcessor
         }
     }
 
-    public function recountApproved(Association $assoc) : Association
+    /**
+     * AssociationFeedbackEvent event processing.
+     */
+    public function processAssociationFeedbackEvent(AssociationFeedbackEvent $event) : iterable
+    {
+        $assoc = $event->getFeedback()->association();
+        return $this->recountAll($assoc);
+    }
+
+    /**
+     * AssociationOutOfDateEvent event processing.
+     */
+    public function processAssociationOutOfDateEvent(AssociationOutOfDateEvent $event) : iterable
+    {
+        $assoc = $event->getAssociation();
+        return $this->recountAll($assoc);
+    }
+
+    private function recountAll(Association $assoc) : iterable
+    {
+        $assoc = $this->recountApproved($assoc);
+        $assoc = $this->recountMature($assoc);
+        $assoc = $assoc->save();
+
+        yield new AssociationApprovedEvent($assoc);
+        yield new AssociationMatureEvent($assoc);
+    }
+
+    private function recountApproved(Association $assoc) : Association
     {
         $usageCoeff = self::getSettings('associations.coeffs.usage');
         $dislikeCoeff = self::getSettings('associations.coeffs.dislike');
@@ -78,7 +92,7 @@ class AssociationRecountService extends EventProcessor
         return $assoc;
     }
 
-    public function recountMature(Association $assoc) : Association
+    private function recountMature(Association $assoc) : Association
     {
         if ($assoc->firstWord()->isMature() || $assoc->secondWord()->isMature()) {
             $mature = true;

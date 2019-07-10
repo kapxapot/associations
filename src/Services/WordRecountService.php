@@ -9,6 +9,7 @@ use App\Events\AssociationApprovedEvent;
 use App\Events\WordApprovedEvent;
 use App\Events\WordFeedbackEvent;
 use App\Events\WordMatureEvent;
+use App\Events\WordOutOfDateEvent;
 use App\Models\Word;
 
 class WordRecountService extends EventProcessor
@@ -34,7 +35,20 @@ class WordRecountService extends EventProcessor
     public function processWordFeedbackEvent(WordFeedbackEvent $event) : iterable
     {
         $word = $event->getFeedback()->word();
+        return $this->recountAll($word);
+    }
 
+    /**
+     * WordOutOfDateEvent event processing.
+     */
+    public function processWordOutOfDateEvent(WordOutOfDateEvent $event) : iterable
+    {
+        $word = $event->getWord();
+        return $this->recountAll($word);
+    }
+
+    private function recountAll(Word $word) : iterable
+    {
         $word = $this->recountApproved($word);
         $word = $this->recountMature($word);
         $word = $word->save();

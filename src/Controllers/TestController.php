@@ -6,7 +6,9 @@ use Plasticode\Collection;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Util\Strings;
 
+use App\Events\AssociationOutOfDateEvent;
 use App\Events\WordFeedbackEvent;
+use App\Events\WordOutOfDateEvent;
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Word;
@@ -16,11 +18,35 @@ class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
-        $this->hasPlayerTest();
+        $this->associationUpdateTest();
 
         die('done');
 
         //return $response;
+    }
+
+    private function associationUpdateTest()
+    {
+        $start = microtime(true);
+
+        $assocs = Association::query()
+            ->orderByAsc('approved_updated_at')
+            ->all()
+            ->map(function ($assoc) {
+                return [
+                    'id' => $assoc->getId(),
+                    'approved_updated_at' => $assoc->approvedUpdatedAt,
+                ];
+            });
+
+        var_dump($assocs);
+
+        // $association = 
+        // $event = new AssociationOutOfDateEvent()
+        
+        $end = microtime(true);
+
+        var_dump([$end - $start]);
     }
 
     private function hasPlayerTest()
