@@ -53,7 +53,7 @@
                 <p><strong>Общие ассоциации ({{ word.approved_associations.count }}):</strong></p>
 
                 <ul class="vgap-2">
-                    {% for assoc in word.approved_associations %}
+                    {% for assoc in word.approved_visible_associations %}
                         <li>
                             {{ lm.association(assoc, word) }}
                             
@@ -63,16 +63,30 @@
                         </li>
                     {% endfor %}
                 </ul>
+
+                {% if word.approved_invisible_associations_str %}
+                    <p>{{ word.approved_invisbile_associations_str }}</p>
+                {% endif %}
             {% endif %}
 
             {% if word.unapproved_associations.any %}
                 <p><strong>Личные ассоциации ({{ word.unapproved_associations.count }}):</strong></p>
 
                 <ul class="vgap-2">
-                    {% for assoc in word.unapproved_associations %}
-                        <li>{{ lm.association(assoc, word) }} {{ lm.user(assoc.creator) }}</li>
+                    {% for assoc in word.unapproved_visible_associations %}
+                        <li>
+                            {{ lm.association(assoc, word) }}
+                            
+                            {% for user in assoc.users %}
+                                {{ lm.user(user) }}
+                            {% endfor %}
+                        </li>
                     {% endfor %}
                 </ul>
+
+                {% if word.unapproved_invisible_associations_str %}
+                    <p>{{ word.unapproved_invisible_associations_str }}</p>
+                {% endif %}
             {% endif %}
 
             {% if word.proposed_typos|length > 0 %}

@@ -16,11 +16,18 @@ class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
-        $this->eventTest();
+        $this->invisibleCountTest();
 
         die('done');
 
         //return $response;
+    }
+
+    private function invisibleCountTest()
+    {
+        $word = Word::get(2);
+        var_dump(['approved', $word->approvedInvisibleAssociationsStr()]);
+        var_dump(['unapproved', $word->unapprovedInvisibleAssociationsStr()]);
     }
 
     private function eventTest()

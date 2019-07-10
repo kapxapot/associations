@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Plasticode\Collection;
 use Plasticode\Query;
+use Plasticode\Util\Cases;
 
 class Word extends Element
 {
@@ -39,18 +40,71 @@ class Word extends Element
     
     public function approvedAssociations() : Collection
     {
-        return Association::filterApproved($this->associations())
-            ->all()
-            ->orderByFunc($this->compareByOtherWord());
+        return $this->lazy(function () {
+            return Association::filterApproved($this->associations())
+                ->all()
+                ->orderByFunc($this->compareByOtherWord());
+        });
+    }
+
+    public function approvedVisibleAssociations() : Collection
+    {
+        $assocs = $this->approvedAssociations();
+        return $this->filterVisibleForMe($assocs);
+    }
+
+    public function approvedInvisibleAssociations() : Collection
+    {
+        $assocs = $this->approvedAssociations();
+        return $this->filterInvisibleForMe($assocs);
+    }
+
+    private function countStr(int $count) : ?string
+    {
+        if ($count <= 0) {
+            return null;
+        }
+
+        $isPlural = (self::$cases->numberForNumber($count) == Cases::PLURAL);
+
+        $str = $count . ' ' . self::$cases->caseForNumber('ассоциация', $count) . ' ' . ($isPlural ? 'скрыто' : 'скрыта') . '.';
+
+        return $str;
+    }
+
+    public function approvedInvisibleAssociationsStr() : ?string
+    {
+        $count = $this->approvedInvisibleAssociations()->count();
+        return $this->countStr($count);
     }
     
     public function unapprovedAssociations() : Collection
     {
-        return Association::filterUnapproved($this->associations())
-            ->all()
-            ->orderByFunc($this->compareByOtherWord());
+        return $this->lazy(function () {
+            return Association::filterUnapproved($this->associations())
+                ->all()
+                ->orderByFunc($this->compareByOtherWord());
+        });
     }
-    
+
+    public function unapprovedVisibleAssociations() : Collection
+    {
+        $assocs = $this->unapprovedAssociations();
+        return $this->filterVisibleForMe($assocs);
+    }
+
+    public function unapprovedInvisibleAssociations() : Collection
+    {
+        $assocs = $this->unapprovedAssociations();
+        return $this->filterInvisibleForMe($assocs);
+    }
+
+    public function unapprovedInvisibleAssociationsStr() : ?string
+    {
+        $count = $this->unapprovedInvisibleAssociations()->count();
+        return $this->countStr($count);
+    }
+
     public function associationsForUser(User $user) : Collection
     {
         return $this->lazy(function () use ($user) {

@@ -98,7 +98,7 @@ class Association extends Element
     /**
      * Maturity check.
      */
-    public function isVisibleForUser(User $user = null)
+    public function isVisibleForUser(User $user = null) : bool
     {
         // 1. non-mature words are visible for everyone
         // 2. mature words are invisible for non-authed users ($user == null)
@@ -111,7 +111,7 @@ class Association extends Element
             );
     }
 
-    public function isPlayableAgainstUser(User $user)
+    public function isPlayableAgainstUser(User $user) : bool
     {
         // word can't be played against user, if
         //

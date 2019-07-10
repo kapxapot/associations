@@ -80,7 +80,7 @@ abstract class Element extends DbModel
     
     public function currentFeedback() : ?Feedback
     {
-        $user = self::getCurrentUser();
+        $me = self::getCurrentUser();
         
         return $user !== null
             ? $this->feedbackByUser($user)
@@ -132,5 +132,37 @@ abstract class Element extends DbModel
                 $user
             )
             ->any();
+    }
+
+    public abstract function isVisibleForUser(User $user = null) : bool;
+
+    public abstract function isPlayableAgainstUser(User $user) : bool;
+
+    public function isVisibleForMe() : bool
+    {
+        $me = self::getCurrentUser();
+        return $this->isVisibleForUser($me);
+    }
+
+    public function isPlayableAgainstMe() : bool
+    {
+        $me = self::getCurrentUser();
+        return $this->isPlayableAgainstUser($me);
+    }
+
+    protected function filterVisibleForMe(Collection $elements) : Collection
+    {
+        return $elements
+            ->where(function ($element) {
+                return $element->isVisibleForMe();
+            });
+    }
+
+    protected function filterInvisibleForMe(Collection $elements) : Collection
+    {
+        return $elements
+            ->where(function ($element) {
+                return !$element->isVisibleForMe();
+            });
     }
 }
