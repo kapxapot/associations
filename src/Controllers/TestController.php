@@ -29,20 +29,51 @@ class TestController extends Controller
     {
         $start = microtime(true);
 
-        $assocs = Association::query()
-            ->orderByAsc('approved_updated_at')
-            ->all()
-            ->map(function ($assoc) {
-                return [
-                    'id' => $assoc->getId(),
-                    'approved_updated_at' => $assoc->approvedUpdatedAt,
-                ];
-            });
+        $wordApprovedLimit = 10;
+        $wordMatureLimit = 10;
+        $assocApprovedLimit = 10;
+        $assocMatureLimit = 10;
 
-        var_dump($assocs);
+        $wordApprovedTtl = new \DateInterval('1 day');
+        $wordMatureTtl = new \DateInterval('1 day');
+        $assocApprovedTtl = new \DateInterval('1 day');
+        $assocMatureTtl = new \DateInterval('1 day');
 
-        // $association = 
-        // $event = new AssociationOutOfDateEvent()
+        $oldestApprovedWords = Word::getOldestApproved($wordApprovedTtl)
+            ->limit($wordApprovedLimit)
+            ->all();
+        
+        $oldestMatureWords = Word::getOldestMature($wordMatureTtl)
+            ->limit($wordMatureLimit)
+            ->all();
+        
+        $oldestApprovedAssocs = Association::getOldestApproved($assocApprovedTtl)
+            ->limit($assocApprovedLimit)
+            ->all();
+        
+        $oldestMatureAssocs = Association::getOldestApproved($assocMatureTtl)
+            ->limit($assocMatureLimit)
+            ->all();
+
+        foreach ($oldestApprovedWords as $word) {
+            $event = new WordOutOfDateEvent($word);
+            $this->dispatcher->dispatch($event);
+        }
+
+        foreach ($oldestMatureWords as $word) {
+            $event = new WordOutOfDateEvent($word);
+            $this->dispatcher->dispatch($event);
+        }
+
+        foreach ($oldestApprovedAssocs as $assoc) {
+            $event = new AssociationOutOfDateEvent($assoc);
+            $this->dispatcher->dispatch($event);
+        }
+
+        foreach ($oldestMatureAssocs as $assoc) {
+            $event = new AssociationOutOfDateEvent($assoc);
+            $this->dispatcher->dispatch($event);
+        }
         
         $end = microtime(true);
 

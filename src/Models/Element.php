@@ -165,4 +165,30 @@ abstract class Element extends DbModel
                 return !$element->isVisibleForMe();
             });
     }
+
+    // queries for updates
+
+    public static function getOldestApproved(int $ttlHours) : Query
+    {
+        $query = self::query()
+            ->whereRaw(
+                '(approved_updated_at is null or approved_updated_at < date_sub(now(), interval ' . $ttlHours . ' hour))',
+                []
+            )
+            ->orderByAsc('approved_updated_at');
+
+        return $query;
+    }
+
+    public static function getOldestMature(int $limit = null) : Query
+    {
+        $query = self::query()
+            ->orderByAsc('mature_updated_at');
+
+        if ($limit > 0) {
+            $query = $query->limit($limit);
+        }
+
+        return $query;
+    }
 }
