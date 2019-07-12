@@ -69,16 +69,16 @@
         </div>
     </div>
 
-    <div class="panel-secondary-heading">Модераторская панель</div>
-    <div class="panel panel-secondary">
-        <div class="panel-body">
-            {% if is_moderator %}
-                <strong>Последнее обновление:</strong> {{ gm.moment_local(association.updated_at_iso) }}<br>
-                <strong>...статуса «общая» (approved):</strong> {{ gm.moment_local(association.approved_updated_at_iso) }}<br>
-                <strong>...статуса «не для детей» (mature):</strong> {{ gm.moment_local(association.mature_updated_at_iso) }}
-            {% endif %}
+    {% if is_moderator %}
+        <div class="panel-secondary-heading">Модераторская панель</div>
+        <div class="panel panel-secondary">
+            <div class="panel-body">
+                    <strong>Последнее обновление:</strong> {{ gm.moment_local(association.updated_at_iso) }}<br>
+                    <strong>...статуса «общая» (approved):</strong> {{ gm.moment_local(association.approved_updated_at_iso) }}<br>
+                    <strong>...статуса «не для детей» (mature):</strong> {{ gm.moment_local(association.mature_updated_at_iso) }}
+            </div>
         </div>
-    </div>
+    {% endif %}
     
     {% if auth.user %}
         {% include 'main/modals/problems.twig' with { 'association': association, 'word_max_length': word_max_length } %}
