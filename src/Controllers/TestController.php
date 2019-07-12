@@ -16,7 +16,7 @@ class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
-        // test()...
+        $this->eventTest();
 
         die('done');
 
