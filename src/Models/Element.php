@@ -37,6 +37,32 @@ abstract class Element extends DbModel
         return self::filterNonmature($query);
     }
 
+    /**
+     * Returns elements out of date
+     *
+     * @param integer $ttlMin Time to live in minutes
+     * @return Query
+     */
+    public static function getOutOfDate(int $ttlMin) : Query
+    {
+        return self::baseQuery()
+            ->whereRaw(
+                '(approved_updated_at is null or approved_updated_at < date_sub(now(), interval ' . $ttlMin . ' minute) or mature_updated_at is null or mature_updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))'
+            );
+    }
+    
+    public static function getApproved(Language $language = null) : Query
+    {
+        $query = ($language !== null)
+            ? self::getByLanguage($language)
+            : self::query();
+        
+        return self::filterApproved($query)
+            ->orderByDesc('approved_updated_at');
+    }
+
+    // filters
+
     public static function filterApproved(Query $query) : Query
     {
         return $query->where('approved', 1);
@@ -56,15 +82,23 @@ abstract class Element extends DbModel
     {
         return $query->where('mature', 0);
     }
+
+    // filtered collections
     
-    public static function getApproved(Language $language = null) : Query
+    protected function filterVisibleForMe(Collection $elements) : Collection
     {
-        $query = ($language !== null)
-            ? self::getByLanguage($language)
-            : self::query();
-        
-        return self::filterApproved($query)
-            ->orderByDesc('approved_updated_at');
+        return $elements
+            ->where(function ($element) {
+                return $element->isVisibleForMe();
+            });
+    }
+
+    protected function filterInvisibleForMe(Collection $elements) : Collection
+    {
+        return $elements
+            ->where(function ($element) {
+                return !$element->isVisibleForMe();
+            });
     }
     
     // properties
@@ -148,47 +182,5 @@ abstract class Element extends DbModel
     {
         $me = self::getCurrentUser();
         return $this->isPlayableAgainstUser($me);
-    }
-
-    protected function filterVisibleForMe(Collection $elements) : Collection
-    {
-        return $elements
-            ->where(function ($element) {
-                return $element->isVisibleForMe();
-            });
-    }
-
-    protected function filterInvisibleForMe(Collection $elements) : Collection
-    {
-        return $elements
-            ->where(function ($element) {
-                return !$element->isVisibleForMe();
-            });
-    }
-
-    // queries for updates
-
-    public static function getOldestApproved(int $ttlHours) : Query
-    {
-        $query = self::query()
-            ->whereRaw(
-                '(approved_updated_at is null or approved_updated_at < date_sub(now(), interval ' . $ttlHours . ' hour))',
-                []
-            )
-            ->orderByAsc('approved_updated_at');
-
-        return $query;
-    }
-
-    public static function getOldestMature(int $limit = null) : Query
-    {
-        $query = self::query()
-            ->orderByAsc('mature_updated_at');
-
-        if ($limit > 0) {
-            $query = $query->limit($limit);
-        }
-
-        return $query;
     }
 }

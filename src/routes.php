@@ -13,6 +13,7 @@ use App\Controllers\AssociationController;
 use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
 use App\Controllers\IndexController;
+use App\Controllers\JobController;
 use App\Controllers\TestController;
 use App\Controllers\WordController;
 
@@ -80,6 +81,13 @@ $app->group($root, function() use ($trueRoot, $settings, $access, $container) {
     $this->get('/test', TestController::class . ':index')->setName('main.test');
 
     $this->get($trueRoot ? '/' : '', IndexController::class . ':index')->setName('main.index');
+
+    // jobs
+    
+    $this->group('/jobs', function () {
+        $this->get('/update/associations', JobController::class . ':updateAssociations')->setName('main.jobs.update.associations');
+        $this->get('/update/words', JobController::class . ':updateWords')->setName('main.jobs.update.words');
+    });
 
     // auth
     

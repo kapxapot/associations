@@ -2,36 +2,28 @@
 
 namespace App\Jobs;
 
+use Plasticode\Collection;
 use Plasticode\Contained;
 
+use App\Events\WordOutOfDateEvent;
 use App\Models\Word;
 
 class UpdateWordsJob extends Contained
 {
-    public function run()
+    public function run() : Collection
     {
-        $wordApprovedLimit = 10;
-        $wordMatureLimit = 10;
+        $limit = $this->getSettings('words.update.limit');
+        $ttl = $this->getSettings('words.update.ttl_min');
 
-        $wordApprovedTtl = new \DateInterval('1 day');
-        $wordMatureTtl = new \DateInterval('1 day');
-
-        $oldestApprovedWords = Word::getOldestApproved($wordApprovedTtl)
-            ->limit($wordApprovedLimit)
-            ->all();
-        
-        $oldestMatureWords = Word::getOldestMature($wordMatureTtl)
-            ->limit($wordMatureLimit)
+        $outOfDate = Word::getOutOfDate($ttl)
+            ->limit($limit)
             ->all();
 
-        foreach ($oldestApprovedWords as $word) {
+        foreach ($outOfDate as $word) {
             $event = new WordOutOfDateEvent($word);
             $this->dispatcher->dispatch($event);
         }
 
-        foreach ($oldestMatureWords as $word) {
-            $event = new WordOutOfDateEvent($word);
-            $this->dispatcher->dispatch($event);
-        }
+        return $outOfDate;
     }
 }

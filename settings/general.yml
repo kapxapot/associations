@@ -49,12 +49,8 @@ associations:
     usage: 1
     dislike: 1
   update:
-    approved:
-      ttl_hours: 24
-      limit: 10
-    mature:
-      ttl_hours: 24
-      limit: 10
+    ttl_min: 1440
+    limit: 100
 
 languages:
   default_id: 1
@@ -69,9 +65,5 @@ words:
     approved_association: 1
     dislike: 1
   update:
-    approved:
-      ttl_hours: 24
-      limit: 10
-    mature:
-      ttl_hours: 24
-      limit: 10
+    ttl_min: 1440
+    limit: 100

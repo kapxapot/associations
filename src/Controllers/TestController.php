@@ -6,9 +6,7 @@ use Plasticode\Collection;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Util\Strings;
 
-use App\Events\AssociationOutOfDateEvent;
 use App\Events\WordFeedbackEvent;
-use App\Events\WordOutOfDateEvent;
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Word;
@@ -18,66 +16,11 @@ class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
-        $this->associationUpdateTest();
+        // test()...
 
         die('done');
 
         //return $response;
-    }
-
-    private function associationUpdateTest()
-    {
-        $start = microtime(true);
-
-        $wordApprovedLimit = 10;
-        $wordMatureLimit = 10;
-        $assocApprovedLimit = 10;
-        $assocMatureLimit = 10;
-
-        $wordApprovedTtl = new \DateInterval('1 day');
-        $wordMatureTtl = new \DateInterval('1 day');
-        $assocApprovedTtl = new \DateInterval('1 day');
-        $assocMatureTtl = new \DateInterval('1 day');
-
-        $oldestApprovedWords = Word::getOldestApproved($wordApprovedTtl)
-            ->limit($wordApprovedLimit)
-            ->all();
-        
-        $oldestMatureWords = Word::getOldestMature($wordMatureTtl)
-            ->limit($wordMatureLimit)
-            ->all();
-        
-        $oldestApprovedAssocs = Association::getOldestApproved($assocApprovedTtl)
-            ->limit($assocApprovedLimit)
-            ->all();
-        
-        $oldestMatureAssocs = Association::getOldestApproved($assocMatureTtl)
-            ->limit($assocMatureLimit)
-            ->all();
-
-        foreach ($oldestApprovedWords as $word) {
-            $event = new WordOutOfDateEvent($word);
-            $this->dispatcher->dispatch($event);
-        }
-
-        foreach ($oldestMatureWords as $word) {
-            $event = new WordOutOfDateEvent($word);
-            $this->dispatcher->dispatch($event);
-        }
-
-        foreach ($oldestApprovedAssocs as $assoc) {
-            $event = new AssociationOutOfDateEvent($assoc);
-            $this->dispatcher->dispatch($event);
-        }
-
-        foreach ($oldestMatureAssocs as $assoc) {
-            $event = new AssociationOutOfDateEvent($assoc);
-            $this->dispatcher->dispatch($event);
-        }
-        
-        $end = microtime(true);
-
-        var_dump([$end - $start]);
     }
 
     private function hasPlayerTest()
