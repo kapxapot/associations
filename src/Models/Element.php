@@ -6,6 +6,7 @@ use Plasticode\Collection;
 use Plasticode\Query;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\Created;
+use Plasticode\Util\Date;
 
 abstract class Element extends DbModel
 {
@@ -46,9 +47,8 @@ abstract class Element extends DbModel
     public static function getOutOfDate(int $ttlMin) : Query
     {
         return self::baseQuery()
-            ->whereRaw(
-                '(approved_updated_at is null or approved_updated_at < date_sub(now(), interval ' . $ttlMin . ' minute) or mature_updated_at is null or mature_updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))'
-            );
+            ->whereLt('updated_at', 'date_sub(now(), interval ' . $ttlMin . ' minute')
+            ->orderByAsc('updated_at');
     }
     
     public static function getApproved(Language $language = null) : Query
@@ -182,5 +182,22 @@ abstract class Element extends DbModel
     {
         $me = self::getCurrentUser();
         return $this->isPlayableAgainstUser($me);
+    }
+    
+    // timestamps
+
+    public function updatedAtIso() : string
+    {
+        return Date::iso($this->updatedAt);
+    }
+
+    public function approvedUpdatedAtIso() : string
+    {
+        return Date::iso($this->approvedUpdatedAt);
+    }
+
+    public function matureUpdatedAtIso() : string
+    {
+        return Date::iso($this->matureUpdatedAt);
     }
 }

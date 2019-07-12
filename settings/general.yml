@@ -50,7 +50,7 @@ associations:
     dislike: 1
   update:
     ttl_min: 1440
-    limit: 100
+    limit: 500
 
 languages:
   default_id: 1
@@ -66,4 +66,4 @@ words:
     dislike: 1
   update:
     ttl_min: 1440
-    limit: 100
+    limit: 500

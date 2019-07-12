@@ -4,6 +4,7 @@
 {% import 'main/local_macros.twig' as lm %}
 
 {% set can_see_all_games = can('games', 'edit') %}
+{% set is_moderator = can('associations', 'edit') %}
 
 {% set title  = lm.association(association, null, true)|upper %}
 
@@ -15,7 +16,6 @@
             </header>
         </div>
 
-        
         <div class="panel-body">
             <p>
                 <span class="label label-default" title="Язык: {{ association.language.name }}" data-toggle="tooltip">{{ association.language.name|lower }}</span>
@@ -35,7 +35,7 @@
                 {% endif %}
             </p>
 
-            <p class="font-130">
+            <p class="font-xl">
                 {% include "components/word.twig" with { 'word': association.first_word } only %}
                 {% include 'components/association_sign.twig' with { 'association': association } only %}
                 {% include "components/word.twig" with { 'word': association.second_word } only %}
@@ -65,6 +65,17 @@
                 <div>
                     <a role="button" ng-click="problemsDialog()" class="btn btn-default problems" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
                 </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="panel-secondary-heading">Модераторская панель</div>
+    <div class="panel panel-secondary">
+        <div class="panel-body">
+            {% if is_moderator %}
+                <strong>Последнее обновление:</strong> {{ gm.moment_local(association.updated_at_iso) }}<br>
+                <strong>...статуса «общая» (approved):</strong> {{ gm.moment_local(association.approved_updated_at_iso) }}<br>
+                <strong>...статуса «не для детей» (mature):</strong> {{ gm.moment_local(association.mature_updated_at_iso) }}
             {% endif %}
         </div>
     </div>

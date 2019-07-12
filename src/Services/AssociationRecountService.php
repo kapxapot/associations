@@ -85,9 +85,16 @@ class AssociationRecountService extends EventProcessor
         $dislikeCount = $assoc->dislikes()->count();
         
         $score = $turnCount * $usageCoeff - $dislikeCount * $dislikeCoeff;
+        $approved = ($score >= $threshold);
 
-        $assoc->approved = ($score >= $threshold) ? 1 : 0;
-        $assoc->approvedUpdatedAt = Date::dbNow();
+        $now = Date::dbNow();
+
+        if ($assoc->isApproved() !== $approved) {
+            $assoc->approved = $approved ? 1 : 0;
+            $assoc->approvedUpdatedAt = $now;
+        }
+
+        $assoc->updatedAt = $now;
 
         return $assoc;
     }
@@ -105,8 +112,14 @@ class AssociationRecountService extends EventProcessor
             $mature = ($maturesCount >= $threshold);
         }
 
-        $assoc->mature = $mature ? 1 : 0;
-        $assoc->matureUpdatedAt = Date::dbNow();
+        $now = Date::dbNow();
+
+        if ($assoc->isMature() !== $mature) {
+            $assoc->mature = $mature ? 1 : 0;
+            $assoc->matureUpdatedAt = $now;
+        }
+
+        $assoc->updatedAt = $now;
 
         return $assoc;
     }

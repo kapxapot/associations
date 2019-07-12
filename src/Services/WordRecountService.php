@@ -67,9 +67,16 @@ class WordRecountService extends EventProcessor
         $dislikeCount = $word->dislikes()->count();
         
         $score = $approvedAssocsCount * $assocCoeff - $dislikeCount * $dislikeCoeff;
-        
-        $word->approved = ($score >= $threshold) ? 1 : 0;
-        $word->approvedUpdatedAt = Date::dbNow();
+        $approved = ($score >= $threshold);
+
+        $now = Date::dbNow();
+
+        if ($word->isApproved() !== $approved) {
+            $word->approved = $approved ? 1 : 0;
+            $word->approvedUpdatedAt = $now;
+        }
+
+        $word->updatedAt = $now;
 
         return $word;
     }
@@ -79,9 +86,16 @@ class WordRecountService extends EventProcessor
         $threshold = $this->getSettings('words.mature_threshold');
         
         $score = $word->matures()->count();
-        
-        $word->mature = ($score >= $threshold) ? 1 : 0;
-        $word->matureUpdatedAt = Date::dbNow();
+        $mature = ($score >= $threshold);
+
+        $now = Date::dbNow();
+
+        if ($word->isMature() !== $mature) {
+            $word->mature = $mature ? 1 : 0;
+            $word->matureUpdatedAt = $now;
+        }
+
+        $word->updatedAt = $now;
         
         return $word;
     }

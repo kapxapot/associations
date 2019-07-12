@@ -4,6 +4,8 @@
 {% import 'main/macros.twig' as m %}
 {% import 'main/local_macros.twig' as lm %}
 
+{% set is_moderator = can('associations', 'edit') %}
+
 {% set word_upper = word.full_display_name|upper %}
 {% set title = word_upper ~ ' - Слова' %}
 
@@ -119,6 +121,17 @@
         
         <div class="panel-footer">
             <i class="fas fa-info-circle"></i> <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x" class="mr-2">Грамота.ру</a> <i class="fas fa-info-circle"></i> <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловарь</a>
+        </div>
+    </div>
+
+    <div class="panel-secondary-heading">Модераторская панель</div>
+    <div class="panel panel-secondary">
+        <div class="panel-body">
+            {% if is_moderator %}
+                <strong>Последнее обновление:</strong> {{ gm.moment_local(word.updated_at_iso) }}<br>
+                <strong>...статуса «общее» (approved):</strong> {{ gm.moment_local(word.approved_updated_at_iso) }}<br>
+                <strong>...статуса «не для детей» (mature):</strong> {{ gm.moment_local(word.mature_updated_at_iso) }}
+            {% endif %}
         </div>
     </div>
 

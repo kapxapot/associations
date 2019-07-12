@@ -43,6 +43,9 @@ templates:
     author: [ read, create, edit_own ]
 
 rights:
+  associations:
+    template: editor
+
   games:
     template: public
 
@@ -60,3 +63,6 @@ rights:
 
   users:
     template: admin_strict
+
+  words:
+    template: editor
