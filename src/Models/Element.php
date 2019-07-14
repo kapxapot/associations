@@ -47,7 +47,7 @@ abstract class Element extends DbModel
     public static function getOutOfDate(int $ttlMin) : Query
     {
         return self::baseQuery()
-            ->whereLt('updated_at', 'date_sub(now(), interval ' . $ttlMin . ' minute')
+            ->whereRaw('(updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))')
             ->orderByAsc('updated_at');
     }
     
@@ -191,13 +191,17 @@ abstract class Element extends DbModel
         return Date::iso($this->updatedAt);
     }
 
-    public function approvedUpdatedAtIso() : string
+    public function approvedUpdatedAtIso() : ?string
     {
-        return Date::iso($this->approvedUpdatedAt);
+        return !is_null($this->approvedUpdatedAt)
+            ? Date::iso($this->approvedUpdatedAt)
+            : null;
     }
 
-    public function matureUpdatedAtIso() : string
+    public function matureUpdatedAtIso() : ?string
     {
-        return Date::iso($this->matureUpdatedAt);
+        return !is_null($this->matureUpdatedAt)
+            ? Date::iso($this->matureUpdatedAt)
+            : null;
     }
 }

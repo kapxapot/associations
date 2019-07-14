@@ -89,7 +89,7 @@ class AssociationRecountService extends EventProcessor
 
         $now = Date::dbNow();
 
-        if ($assoc->isApproved() !== $approved) {
+        if ($assoc->isApproved() !== $approved || is_null($assoc->approvedUpdatedAt)) {
             $assoc->approved = $approved ? 1 : 0;
             $assoc->approvedUpdatedAt = $now;
         }
@@ -114,7 +114,7 @@ class AssociationRecountService extends EventProcessor
 
         $now = Date::dbNow();
 
-        if ($assoc->isMature() !== $mature) {
+        if ($assoc->isMature() !== $mature || is_null($assoc->matureUpdateAt)) {
             $assoc->mature = $mature ? 1 : 0;
             $assoc->matureUpdatedAt = $now;
         }

@@ -71,7 +71,7 @@ class WordRecountService extends EventProcessor
 
         $now = Date::dbNow();
 
-        if ($word->isApproved() !== $approved) {
+        if ($word->isApproved() !== $approved || is_null($word->approvedUpdatedAt)) {
             $word->approved = $approved ? 1 : 0;
             $word->approvedUpdatedAt = $now;
         }
@@ -90,7 +90,7 @@ class WordRecountService extends EventProcessor
 
         $now = Date::dbNow();
 
-        if ($word->isMature() !== $mature) {
+        if ($word->isMature() !== $mature || is_null($word->matureUpdatedAt)) {
             $word->mature = $mature ? 1 : 0;
             $word->matureUpdatedAt = $now;
         }
