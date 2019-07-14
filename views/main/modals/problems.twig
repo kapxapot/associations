@@ -2,6 +2,8 @@
 
 {% extends full ? 'modal.twig' : 'modals/narrow.twig' %}
 
+{% import 'main/local_macros.twig' as lm %}
+
 {% set modal_name = 'problems' %}
 {% set modal_title %}
     <i class="fas fa-exclamation-triangle problems"></i> Что-то не так?
@@ -31,20 +33,22 @@
                     <input type="checkbox" ng-model="model.word.withTypo" ng-change="focusTypo()">
                     Ошибка/опечатка...
                 </label>
+                {{ lm.info('Правильное слово может отсутствовать в игре') }}
             </div>
-        	<div class="form-group" ng-if="model.word.withTypo">
-        		<input type="text" id="problemsWordTypo" placeholder="ваш вариант" class="form-control" maxlength="{{ word_max_length }}" required ng-model="model.word.typo" />
-        	</div>
+            <div class="form-group" ng-if="model.word.withTypo">
+                <input type="text" id="problemsWordTypo" placeholder="ваш вариант" class="form-control" maxlength="{{ word_max_length }}" required ng-model="model.word.typo" />
+            </div>
             <div class="checkbox">
                 <label>
                     <input type="checkbox" ng-model="model.word.withDuplicate" ng-change="focusDuplicate()">
                     Дублирует слово...
                 </label>
+                {{ lm.info('Главное слово должно присутствовать в игре') }}
             </div>
-        	<div class="form-group" ng-if="model.word.withDuplicate">
-        		<input type="text" id="problemsWordDuplicate" placeholder="главное слово" class="form-control" maxlength="{{ word_max_length }}" required ng-model="model.word.duplicate" />
-        	</div>
-        	{% if auth.user.is_mature %}
+            <div class="form-group" ng-if="model.word.withDuplicate">
+                <input type="text" id="problemsWordDuplicate" placeholder="главное слово" class="form-control" maxlength="{{ word_max_length }}" required ng-model="model.word.duplicate" />
+            </div>
+            {% if auth.user.is_mature %}
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" ng-model="model.word.mature">
@@ -57,7 +61,7 @@
     
     {% if association %}
         <div class="col-xs-12{% if full %} col-sm-6{% endif %}" >
-            <div>Ассоциация <strong>{% include 'components/association.twig' with { 'association': association, 'by_word': prev_word, 'no_link': true } only %}</strong>:</div>
+            <div>Ассоциация <strong>{{ lm.association(association, prev_word, true ) }}</strong>:</div>
 
             <div class="checkbox">
                 <label>
@@ -65,7 +69,7 @@
                     Не нравится
                 </label>
             </div>
-        	{% if auth.user.is_mature %}
+            {% if auth.user.is_mature %}
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" ng-model="model.association.mature">

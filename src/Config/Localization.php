@@ -24,7 +24,7 @@ class Localization extends LocalizationBase
                 'Game turn is not correct. Please, reload the page.' => 'Некорректный ход игры. Пожалуйста, обновите страницу.',
                 'Word is already used in this game.' => 'Слово уже использовано в этой игре.',
                 'Word must contain only letters, digits, -, _ and \'.' => 'Слово должно содержать только буквы, цифры, -, _ и \'.',
-                'Main word must exist and be different.' => 'Главное слово должно существовать и отличаться от текущего.',
+                'Main word must be different and present in game.' => 'Главное слово должно присутствовать в игре и отличаться от текущего.',
             ]
         );
     }

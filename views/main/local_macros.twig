@@ -1,3 +1,5 @@
 {% macro association(assoc, by_word = null, no_link = false) %}{% include 'components/association.twig' with { 'association': assoc, 'by_word': by_word, 'no_link': no_link } only %}{% endmacro %}
 
 {% macro user(user, full = false, big = false) %}{% include 'components/user.twig' with { 'user': user, 'full': full, 'big': big } only %}{% endmacro %}
+
+{% macro info(text) %}<i class="fas fa-question-circle" title="{{ text }}" data-toggle="tooltip"></i>{% endmacro %}
