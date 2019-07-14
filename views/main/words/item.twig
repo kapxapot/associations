@@ -29,14 +29,10 @@
                     <span class="label label-danger" title="Не для детей" data-toggle="tooltip">16+</span>
                 {% endif %}
                 {% if word.approved_associations.any %}
-                    <span class="label label-success" title="Общие ассоциации" data-toggle="tooltip">
-                        <i class="fas fa-thumbs-up"></i> {{ word.approved_associations.count }}
-                    </span>
+                    <span class="label label-success" title="Общие ассоциации" data-toggle="tooltip"><i class="fas fa-thumbs-up"></i> {{ word.approved_associations.count }}</span>
                 {% endif %}
                 {% if word.dislikes.any %}
-                    <span class="label label-danger" title="Не нравится" data-toggle="tooltip">
-                        <i class="fas fa-thumbs-down"></i> {{ word.dislikes.count }}
-                    </span>
+                    <span class="label label-danger" title="Не нравится" data-toggle="tooltip"><i class="fas fa-thumbs-down"></i> {{ word.dislikes.count }}</span>
                 {% endif %}
             </p>
 
@@ -128,9 +124,9 @@
         <div class="panel-secondary-heading">Модераторская панель</div>
         <div class="panel panel-secondary">
             <div class="panel-body">
-                <strong>Последнее обновление:</strong> {{ gm.moment_local(word.updated_at_iso) }}<br>
-                <strong>...статуса «общее» (approved):</strong> {{ gm.moment_local(word.approved_updated_at_iso) }}<br>
-                <strong>...статуса «не для детей» (mature):</strong> {{ gm.moment_local(word.mature_updated_at_iso) }}
+                <strong>Обновлено:</strong> {{ gm.moment_local(word.updated_at_iso) }}<br>
+                <strong>...общее:</strong> {{ gm.moment_local(word.approved_updated_at_iso, 'никогда') }}<br>
+                <strong>...не для детей:</strong> {{ gm.moment_local(word.mature_updated_at_iso, 'никогда') }}
             </div>
         </div>
     {% endif %}

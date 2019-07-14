@@ -21,7 +21,7 @@
     </div>
 </div>
 
-{% if word_count > 0 %}
+{% if language.last_added_words.any %}
     <div class="panel-secondary-heading">Новые слова</div>
     <div class="panel panel-secondary">
         <div class="panel-body">
@@ -34,7 +34,7 @@
     </div>
 {% endif %}
 
-{% if association_count > 0 %}
+{% if language.last_added_associations.any %}
     <div class="panel-secondary-heading">Новые ассоциации</div>
     <div class="panel panel-secondary">
         <div class="panel-body">
