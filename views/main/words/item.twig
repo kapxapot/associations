@@ -92,7 +92,13 @@
 
                 <ul class="vgap-2">
                     {% for typo, typo_items in word.proposed_typos %}
-                        <li>{{ typo }}</a> ({{ typo_items|length }})</li>
+                        <li>
+                            {{ typo }}
+                            
+                            {% for typo_item in typo_items %}
+                                {{ lm.user(typo_item.creator) }}
+                            {% endfor %}
+                        </li>
                     {% endfor %}
                 </ul>
             {% endif %}
@@ -103,7 +109,13 @@
                 <ul class="vgap-2">
                     {% for dup_id, dup_items in word.proposed_duplicates %}
                         {% set duplicate = dup_items[0].duplicate %}
-                        <li><a href="{{ duplicate.url }}">{{ duplicate.word }}</a> ({{ dup_items|length }})</li>
+                        <li>
+                            {{ lm.word(duplicate) }}
+                            
+                            {% for dup_item in dup_items %}
+                                {{ lm.user(dup_item.creator) }}
+                            {% endfor %}
+                        </li>
                     {% endfor %}
                 </ul>
             {% endif %}
