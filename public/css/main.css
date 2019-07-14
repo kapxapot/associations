@@ -41,3 +41,22 @@ a.assoc-arrow {
     width: 40px;
     height: 40px;
 }
+
+/* logo */
+
+.textlogo {
+    position: relative;
+    width: 157px;
+}
+
+.textlogo > * {
+    position: absolute;
+}
+
+.textlogo__bg {
+    background: #7b1c1c;
+    width: 32px;
+    height: 32px;
+    left: -7px;
+    top: 3px;
+}

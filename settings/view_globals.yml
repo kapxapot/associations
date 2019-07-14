@@ -4,12 +4,14 @@ site_url: 'https://associ.ru'
 cool_site_url: '//associ.ru'
 site_description: 'Игра в Ассоциации для детей и взрослых'
 short_site_description: 'Ассоциации - Игра для детей и взрослых'
-#twitter_card_image: 'http://yoursite.com/images/logo.png'
-#touch_icon: 'http://yoursite.com/images/logo.png'
+logo: '{ASSETS_PATH}images/logo.jpg'
+fav_icon: '{ASSETS_PATH}images/logo.jpg'
+twitter_card_image: '{ASSETS_PATH}images/logo.jpg'
+touch_icon: '{ASSETS_PATH}images/logo.jpg'
 contact_email: kapxapot [sobaka] gmail [dot] com
 copyright_from: 2019
 admin_copyright_from: 2019
-site_keywords: plasticode, ассоциации, associations
+site_keywords: plasticode, ассоциации, associations, игра, игра в ассоциации
 lang: ru
 
 no_search: true
