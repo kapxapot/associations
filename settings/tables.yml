@@ -154,3 +154,14 @@ word_feedbacks:
     - created_at
     - created_by
     - updated_at
+
+yandex_dict_words:
+  table: yandex_dict_words
+  private:
+    - id
+    - word
+    - language
+    - response
+    - pos
+    - created_at
+    - updated_at
