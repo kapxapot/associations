@@ -67,3 +67,6 @@ words:
   update:
     ttl_min: 1440
     limit: 500
+
+yandex_dict:
+  key: {YANDEX_DICT_KEY}

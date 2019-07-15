@@ -16,11 +16,26 @@ class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
-        $this->eventTest();
+        $this->yandexDictTest();
 
         die('done');
 
         //return $response;
+    }
+
+    private function yandexDictTest()
+    {
+        $result = $this->yandexDict->request('конь');
+        $data = json_decode($result, true);
+
+        $def = $data['def'][0] ?? null;
+
+        if ($def) {
+            $text = $def['text'] ?? null;
+            $pos = $def['pos'] ?? null;
+        }
+
+        var_dump([$text, $pos, $data]);
     }
 
     private function hasPlayerTest()

@@ -86,6 +86,13 @@ class Bootstrap extends BootstrapBase
                     return new \App\Services\WordFeedbackService($c);
                 },
 
+                // external
+
+                'yandexDict' => function ($c) use ($settings) {
+                    $key = $this->settings['yandex_dict']['key'];
+                    return new \App\External\YandexDictionary($key);
+                },
+
                 // handlers
                 
                 'notFoundHandler' => function ($c) {
