@@ -9,6 +9,7 @@ use Plasticode\Util\Strings;
 use App\Events\WordFeedbackEvent;
 use App\Models\Association;
 use App\Models\Game;
+use App\Models\Language;
 use App\Models\Word;
 use App\Models\WordFeedback;
 
@@ -16,16 +17,32 @@ class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
-        $this->yandexDictTest();
+        $this->dictionaryWordStrTest('самолет');
+        $this->dictionaryWordTest(1);
 
         die('done');
 
         //return $response;
     }
 
-    private function yandexDictTest()
+    private function dictionaryWordStrTest(string $wordStr)
     {
-        $result = $this->yandexDict->request('конь');
+        $language = Language::get(Language::RUSSIAN);
+        var_dump($wordStr);
+        var_dump($this->dictionaryService->isWordStrKnown($language, $wordStr));
+    }
+
+    private function dictionaryWordTest(int $id)
+    {
+        $word = Word::get($id);
+        var_dump($word->word);
+        var_dump($this->dictionaryService->isWordKnown($word));
+    }
+
+    private function yandexDictTest(string $word)
+    {
+        $language = Language::get(Language::RUSSIAN);
+        $result = $this->yandexDict->request($language->yandexDictCode, $word);
         $data = json_decode($result, true);
 
         $def = $data['def'][0] ?? null;

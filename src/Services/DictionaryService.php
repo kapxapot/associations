@@ -10,34 +10,17 @@ use App\Models\YandexDictWord;
 
 class DictionaryService extends Contained
 {
-    public function getYandexDictWordByWord(Word $word) : ?YandexDictWord
+    public function isWordKnown(Word $word) : bool
     {
-        return $this->getYandexDictWord($word->language(), $word->word);
+        $dictWord = $this->yandexDictService->getWord($word);
+
+        return !is_null($dictWord) && $dictWord->isValid();
     }
 
-    public function getYandexDictWord(Language $language, string $wordStr) : ?YandexDictWord
+    public function isWordStrKnown(Language $language, string $wordStr) : bool
     {
-        $yandexLanguage = $this->languageToYandexDictFormat($language);
+        $dictWord = $this->yandexDictService->getWordStr($language, $wordStr);
 
-        if (is_null($yandexLanguage)) {
-            return null;
-        }
-
-        $dictWord = YandexDictWord::getByWordStr($language, $wordStr);
-
-        if (!is_null($dictWord)) {
-            return $dictWord;
-        }
-
-        // load from dictionary
-    }
-
-    private function languageToYandexDictFormat(Language $language) : ?string
-    {
-        if ($language->getId() === Language::RUSSIAN) {
-            return "ru-ru";
-        }
-
-        return null;
+        return !is_null($dictWord) && $dictWord->isValid();
     }
 }
