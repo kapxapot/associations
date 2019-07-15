@@ -55,8 +55,10 @@ a.assoc-arrow {
 
 .textlogo__bg {
     background: #7b1c1c;
-    width: 32px;
-    height: 32px;
-    left: -7px;
-    top: 3px;
+    width: 36px;
+    height: 36px;
+    left: -10px;
+    top: 1px;
+    border-radius: 5px;
+    transform: rotate(-10deg);
 }
