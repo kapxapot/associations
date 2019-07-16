@@ -17,6 +17,12 @@ class YandexDictService extends Contained
 
     public function getWordStr(Language $language, string $wordStr) : ?YandexDictWord
     {
+        $word = Word::findInLanguage($language, $wordStr);
+
+        if (!is_null($word)) {
+            return $this->getWord($word);
+        }
+
         return $this->get($language, $wordStr);
     }
 
@@ -86,7 +92,7 @@ class YandexDictService extends Contained
             $def = $data['def'][0] ?? null;
             $pos = $def['pos'] ?? null;
 
-            $dictword->pos = $pos;
+            $dictWord->pos = $pos;
         }
 
         return $dictWord;

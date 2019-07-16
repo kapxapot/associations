@@ -17,7 +17,9 @@ class TestController extends Controller
 {
     public function index($request, $response, $args)
     {
+        $this->dictionaryWordStrTest('чучундрик');
         $this->dictionaryWordStrTest('самолет');
+        $this->dictionaryWordStrTest('таблица');
         $this->dictionaryWordTest(1);
 
         die('done');
