@@ -26,6 +26,7 @@ mde: true
 disqus_alias: associ
 google_analytics_id: {GOOGLE_ANALYTICS_ID}
 twitter_alias: AssociRu
+vk_alias: associ_ru
 
 angular:
   app: bsApp
