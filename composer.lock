@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a48c725f2d2c5cf50c66614011e3b641",
+    "content-hash": "8fbdb84406d90c20b5c5f4ea4ea718e9",
     "packages": [
         {
             "name": "cakephp/cache",
@@ -620,12 +620,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kapxapot/plasticode.git",
-                "reference": "bdeaa060a1bee7adc82618905f596e594310103c"
+                "reference": "90880866a131dc3d18fd1ad972748593d5fca5c4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/bdeaa060a1bee7adc82618905f596e594310103c",
-                "reference": "bdeaa060a1bee7adc82618905f596e594310103c",
+                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/90880866a131dc3d18fd1ad972748593d5fca5c4",
+                "reference": "90880866a131dc3d18fd1ad972748593d5fca5c4",
                 "shasum": ""
             },
             "require": {
@@ -672,7 +672,7 @@
                 "source": "https://github.com/kapxapot/plasticode/tree/master",
                 "issues": "https://github.com/kapxapot/plasticode/issues"
             },
-            "time": "2019-07-13T17:01:51+00:00"
+            "time": "2019-07-17T08:36:52+00:00"
         },
         {
             "name": "monolog/monolog",
