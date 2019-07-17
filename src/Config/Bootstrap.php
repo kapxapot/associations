@@ -28,10 +28,6 @@ class Bootstrap extends BootstrapBase
                 'localization' => function ($c) {
                     return new \App\Config\Localization();
                 },
-            
-                'captchaConfig' => function ($c) {
-                    return new \App\Config\Captcha;  
-                },
 
                 'linker' => function ($c) {
                     return new \App\Core\Linker($c);
