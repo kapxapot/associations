@@ -36,7 +36,11 @@ class Bootstrap extends BootstrapBase
                 'config' => function ($c) {
                     return new \App\Config\Config($c);
                 },
-
+            
+                'captchaConfig' => function ($c) {
+                    return new \App\Config\Captcha();  
+                },
+        
                 'eventProcessors' => function ($c) {
                     return [
                         $c->wordRecountService,

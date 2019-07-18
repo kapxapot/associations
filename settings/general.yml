@@ -20,7 +20,7 @@ login_max: 20
 
 # auth
 # 1..16 digits
-captcha_digits: 3
+captcha_digits: 2
 # in hours
 token_ttl: 168
 
