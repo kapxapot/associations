@@ -2,22 +2,17 @@
 
 $debug = false;
 
-function debugModeOn() {
-    global $debug;
-    
-    if ($debug !== true) {
-        error_reporting(E_ALL & ~E_NOTICE);
-        ini_set("display_errors", 1);
-        
-        $debug = true;
-    }
-}
+// exclude notice errors by default
+$errorLevel = error_reporting();
+error_reporting($errorLevel & ~E_NOTICE);
+
+$root = __DIR__ . '/..';
+
+require $root . '/src/functions.php';
 
 if (isset($_GET['debug'])) {
     debugModeOn();
 }
-
-$root = __DIR__ . '/..';
 
 require $root . '/vendor/autoload.php';
 
