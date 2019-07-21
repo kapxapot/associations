@@ -1,37 +1,31 @@
 <?php
 
-$debug = false;
-
-// exclude notice errors by default
-$errorLevel = error_reporting();
-error_reporting($errorLevel & ~E_NOTICE);
-
-$root = __DIR__ . '/..';
-
-require $root . '/src/functions.php';
-
-if (isset($_GET['debug'])) {
-    debugModeOn();
-}
+$dir = __DIR__;
+$root = $dir . '/..';
 
 require $root . '/vendor/autoload.php';
+require $root . '/src/functions.php';
 
 \Plasticode\Core\Env::load($root);
 
 session_start();
 
-$path = $root . '/settings';
-$appSettings = \Plasticode\Core\Settings::load($path);
+$appSettings = \Plasticode\Core\Settings::load($root . '/settings');
 
 $app = \Plasticode\Core\App::get($appSettings);
 $container = $app->getContainer();
 $settings = $container->get('settings');
 
 if ($settings['debug']) {
-    debugModeOn();
+    error_reporting(E_ALL & ~E_NOTICE);
+    ini_set("display_errors", 1);
+}
+else {
+    $errorLevel = error_reporting();
+    error_reporting($errorLevel & ~E_NOTICE);
 }
 
-$bootstrap = new \App\Config\Bootstrap($settings, $debug, __DIR__);
+$bootstrap = new \App\Config\Bootstrap($settings, $dir);
 \Plasticode\Core\Core::bootstrap($container, $bootstrap->getMappings());
 
 // middleware
