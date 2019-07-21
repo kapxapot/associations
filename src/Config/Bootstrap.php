@@ -3,7 +3,6 @@
 namespace App\Config;
 
 use Plasticode\Config\Bootstrap as BootstrapBase;
-use Plasticode\Util\Cases;
 
 class Bootstrap extends BootstrapBase
 {
@@ -96,7 +95,7 @@ class Bootstrap extends BootstrapBase
 
                 // external
 
-                'yandexDict' => function ($c) use ($settings) {
+                'yandexDict' => function ($c) {
                     $key = $this->settings['yandex_dict']['key'];
                     return new \App\External\YandexDict($key);
                 },
