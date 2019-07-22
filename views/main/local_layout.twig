@@ -1,14 +1,17 @@
 {% extends 'main/layout.twig' %}
 
 {% set font_awesome_css = true %}
-{% set no_social = true %}
 {% set no_admin_link = (auth.role.tag != 'admin') %}
+
+{% set no_social = true %}
 {% set sidebar = true %}
+
+{% set signin_onload = true %}
 
 {% set more_angular %}
     {% if not debug %}
         $scope.postSuccess = (data) => {
-    		reloadWindow();
+            reloadWindow();
         };
     {% endif %}
 
