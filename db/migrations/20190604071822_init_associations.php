@@ -20,8 +20,8 @@ class InitAssociations extends AbstractMigration
             ->addForeignKey('language_id', 'languages', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('first_word_id', 'words', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('second_word_id', 'words', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
-            ->addForeignKey('created_by', 'users', 'id', ['delete' => 'SET NULL', 'update' => 'CASCADE'])
-            ->addForeignKey('deleted_by', 'users', 'id', ['delete' => 'SET NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('created_by', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('deleted_by', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
             ->create();
     }
 }

@@ -22,7 +22,7 @@ class InitTurns extends AbstractMigration
             ->addForeignKey('user_id', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('word_id', 'words', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('association_id', 'associations', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
-            ->addForeignKey('prev_turn_id', 'turns', 'id', ['delete' => 'SET NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('prev_turn_id', 'turns', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
             ->create();
     }
 }

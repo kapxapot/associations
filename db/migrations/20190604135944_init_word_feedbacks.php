@@ -18,7 +18,7 @@ class InitWordFeedbacks extends AbstractMigration
             ->addColumn('created_by', 'integer')
             ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addForeignKey('word_id', 'words', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
-            ->addForeignKey('duplicate_id', 'words', 'id', ['delete' => 'SET NULL', 'update' => 'CASCADE'])
+            ->addForeignKey('duplicate_id', 'words', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
             ->addForeignKey('created_by', 'users', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->create();
     }
