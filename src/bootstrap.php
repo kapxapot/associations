@@ -8,8 +8,6 @@ require $root . '/src/functions.php';
 
 \Plasticode\Core\Env::load($root);
 
-session_start();
-
 $appSettings = \Plasticode\Core\Settings::load($root . '/settings');
 
 $app = \Plasticode\Core\App::get($appSettings);
@@ -19,11 +17,14 @@ $settings = $container->get('settings');
 if ($settings['debug']) {
     error_reporting(E_ALL & ~E_NOTICE);
     ini_set("display_errors", 1);
+    ini_set("log_errors_max_len", 0);
 }
 else {
     $errorLevel = error_reporting();
     error_reporting($errorLevel & ~E_NOTICE);
 }
+
+session_start();
 
 $bootstrap = new \App\Config\Bootstrap($settings, $dir);
 \Plasticode\Core\Core::bootstrap($container, $bootstrap->getMappings());
