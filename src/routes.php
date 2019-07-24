@@ -1,5 +1,13 @@
 <?php
 
+use App\Controllers\AssociationController;
+use App\Controllers\FeedbackController;
+use App\Controllers\GameController;
+use App\Controllers\IndexController;
+use App\Controllers\JobController;
+use App\Controllers\TestController;
+use App\Controllers\TurnController;
+use App\Controllers\WordController;
 use Plasticode\Controllers\Auth\AuthController;
 use Plasticode\Controllers\Auth\PasswordController;
 use Plasticode\Controllers\ParserController;
@@ -9,15 +17,7 @@ use Plasticode\Middleware\GuestMiddleware;
 use Plasticode\Middleware\AccessMiddleware;
 use Plasticode\Middleware\TokenAuthMiddleware;
 
-use App\Controllers\AssociationController;
-use App\Controllers\FeedbackController;
-use App\Controllers\GameController;
-use App\Controllers\IndexController;
-use App\Controllers\JobController;
-use App\Controllers\TestController;
-use App\Controllers\WordController;
-
-$access = function($entity, $action, $redirect = null) use ($container) {
+$access = function ($entity, $action, $redirect = null) use ($container) {
     return new AccessMiddleware($container, $entity, $action, $redirect);
 };
 
