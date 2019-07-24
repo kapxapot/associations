@@ -2,13 +2,14 @@
 
 namespace App\Controllers;
 
-use Plasticode\Core\Core;
-
 use App\Models\Word;
+use Plasticode\Core\Response;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class WordController extends Controller
 {
-    public function index($request, $response, $args)
+    public function index(ServerRequestInterface $request, ResponseInterface $response) : ResponseInterface
     {
         $debug = $request->getQueryParam('debug', null) !== null;
 
@@ -19,23 +20,21 @@ class WordController extends Controller
             ],
         ]);
         
-        return $this->view->render($response, 'main/words/index.twig', $params);
+        return $this->render($response, 'main/words/index.twig', $params);
     }
     
-    public function publicWords($request, $response, $args)
+    public function publicWords(ServerRequestInterface $request, ResponseInterface $response) : ResponseInterface
     {
-        $user = $this->auth->getUser();
-
         $words = Word::getPublic()
             ->all()
             ->map(function ($word) {
                 return $word->serialize();
             });
 
-        return Core::json($response, $words, ['params' => $request->getQueryParams()]);
+        return Response::json($response, $words, ['params' => $request->getQueryParams()]);
     }
     
-    public function get($request, $response, $args)
+    public function get(ServerRequestInterface $request, ResponseInterface $response, array $args) : ResponseInterface
     {
         $id = $args['id'];
         
@@ -57,6 +56,6 @@ class WordController extends Controller
             ],
         ]);
         
-        return $this->view->render($response, 'main/words/item.twig', $params);
+        return $this->render($response, 'main/words/item.twig', $params);
     }
 }

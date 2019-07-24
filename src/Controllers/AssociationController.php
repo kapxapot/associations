@@ -3,10 +3,12 @@
 namespace App\Controllers;
 
 use App\Models\Association;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class AssociationController extends Controller
 {
-    public function get($request, $response, $args)
+    public function get(ServerRequestInterface $request, ResponseInterface $response, array $args) : ResponseInterface
     {
         $id = $args['id'];
         
@@ -19,25 +21,15 @@ class AssociationController extends Controller
         if ($association === null || !$association->isVisibleForUser($user)) {
             return $this->notFound($request, $response);
         }
-        
-        $userIds = array_keys($association->turnsByUsers());
-        
-        $users = [];
-        
-        foreach ($userIds as $id) {
-            $users[$id] = $this->userRepository->get($id);
-        }
 
         $params = $this->buildParams([
             'params' => [
-                'title' => mb_strtoupper($association->firstWord()->word . ' → ' . $association->secondWord()->word),
                 'association' => $association,
-                'association_users' => $users,
                 'disqus_id' => 'association' . $association->getId(),
                 'debug' => $debug,
             ],
         ]);
         
-        return $this->view->render($response, 'main/associations/item.twig', $params);
+        return $this->render($response, 'main/associations/item.twig', $params);
     }
 }

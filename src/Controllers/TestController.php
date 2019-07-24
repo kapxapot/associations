@@ -2,20 +2,20 @@
 
 namespace App\Controllers;
 
-use Plasticode\Collection;
-use Plasticode\Exceptions\ValidationException;
-use Plasticode\Util\Strings;
-
 use App\Events\WordFeedbackEvent;
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Language;
 use App\Models\Word;
 use App\Models\WordFeedback;
+use Plasticode\Collection;
+use Plasticode\Exceptions\ValidationException;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class TestController extends Controller
 {
-    public function index($request, $response, $args)
+    public function index(ServerRequestInterface $request, ResponseInterface $response)
     {
         $this->dictionaryWordStrTest('чучундрик');
         $this->dictionaryWordStrTest('самолет');
@@ -98,7 +98,6 @@ class TestController extends Controller
     }
     
     /*
-
     {
         word: {
             id: 194,
@@ -115,7 +114,6 @@ class TestController extends Controller
             mature: false
         }
     }
-            
     */
     
     private function associationFeedbackFullTest()

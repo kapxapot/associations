@@ -4,13 +4,16 @@ namespace App\Controllers;
 
 use Plasticode\Controllers\Controller as BaseController;
 
-use App\Models\Language;
-
 class Controller extends BaseController
 {
+    /**
+     * Auto-switch to one-column layout?
+     * 
+     * @var boolean
+     */
     protected $autoOneColumn = false;
     
-    protected function buildParams($settings)
+    protected function buildParams(array $settings) : array
     {
         $params = $settings['params'] ?? [];
         
@@ -23,6 +26,7 @@ class Controller extends BaseController
                 : $this->languageService->getDefaultLanguage();
         }
         
+        // todo: move this to SidebarPartsProviderService
         if ($language !== null) {
             $wordCount = $language->words()->count();
             $wordCountStr = $this->cases->caseForNumber('слово', $wordCount);
@@ -49,6 +53,7 @@ class Controller extends BaseController
         return parent::buildParams(['params' => $params]);
     }
     
+    // todo: move this to SidebarPartsProviderService
     private function isAnniversary(int $num) : bool
     {
         if ($num < 1000) {
@@ -64,6 +69,7 @@ class Controller extends BaseController
         return $rem < 2;
     }
     
+    // todo: move this to SidebarPartsProviderService
     private function toAnniversaryNumber(int $num) : int
     {
         $mult = 1;

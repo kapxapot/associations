@@ -165,7 +165,7 @@
             $scope.prePost(null);
 
             $scope.ajax({
-                url: '{{ path_for('actions.game.turn') }}',
+                url: '{{ path_for('actions.turn.create') }}',
                 data: {
                     game_id: {{ game.id }},
                     {% if last_turn %}

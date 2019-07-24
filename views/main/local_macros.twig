@@ -4,4 +4,6 @@
 
 {% macro user(user, full = false, big = false) %}{% include 'components/user.twig' with { 'user': user, 'full': full, 'big': big } only %}{% endmacro %}
 
+{% macro user_full(user, big = false) %}{% import _self as m %}{{ m.user(user, true, big) }}{% endmacro %}
+
 {% macro info(text) %}<i class="fas fa-question-circle" title="{{ text }}" data-toggle="tooltip"></i>{% endmacro %}

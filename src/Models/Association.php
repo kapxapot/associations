@@ -46,7 +46,7 @@ class Association extends Element
     }
 
     /**
-     * Returns one of the association's word different from the provided one.
+     * Returns one of the association's word different from the provided one
      */
     public function otherWord(Word $word) : Word
     {
@@ -61,7 +61,7 @@ class Association extends Element
     }
     
     /**
-     * Turns with this association.
+     * Turns with this association
      *
      * @return Query
      */
@@ -71,7 +71,7 @@ class Association extends Element
     }
 
     /**
-     * Users that used this association.
+     * Users that used this association
      *
      * @return Collection
      */
@@ -96,7 +96,7 @@ class Association extends Element
     }
 
     /**
-     * Maturity check.
+     * Maturity check
      */
     public function isVisibleForUser(User $user = null) : bool
     {

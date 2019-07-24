@@ -37,15 +37,16 @@
                 {% include "components/word.twig" with { 'word': association.second_word } only %}
             </p>
 
-            <p>Добавил/а {{ lm.user(association.creator, true) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
+            <p>Добавил/а {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
 
             <p><strong>Использована игроками:</strong></p>
             
             <ul>
-                {% for user_id, turns in association.turns_by_users %}
+                {% for user in association.users %}
+                    {% set turns = association.turns_by_users[user.id] %}
                     <li class="vgap-1">
-                        {% set full_access = can_see_all_games or user_id == auth.user.id %}
-                        <div>{{ lm.user(association_users[user_id], true) }}{% if not full_access %} ({{ turns.count }}){% endif %}</div>
+                        {% set full_access = can_see_all_games or user.id == auth.user.id %}
+                        <div>{{ lm.user_full(user) }}{% if not full_access %} ({{ turns.count }}){% endif %}</div>
                         {% if full_access %}
                             <ul>
                                 {% for turn in turns %}

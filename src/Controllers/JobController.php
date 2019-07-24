@@ -4,10 +4,12 @@ namespace App\Controllers;
 
 use App\Jobs\UpdateAssociationsJob;
 use App\Jobs\UpdateWordsJob;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class JobController extends Controller
 {
-    public function updateAssociations($request, $response, $args)
+    public function updateAssociations(ServerRequestInterface $request, ResponseInterface $response)
     {
         $start = microtime(true);
         $job = new UpdateAssociationsJob($this->container);
@@ -17,11 +19,11 @@ class JobController extends Controller
             'time' => $end - $start,
             'ids' => $job->run()->ids(),
         ]);
-        
+
         return;
     }
 
-    public function updateWords($request, $response, $args)
+    public function updateWords(ServerRequestInterface $request, ResponseInterface $response)
     {
         $start = microtime(true);
         $job = new UpdateWordsJob($this->container);

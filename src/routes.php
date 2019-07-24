@@ -67,7 +67,7 @@ $app->group($root, function () use ($trueRoot, $settings, $access, $container) {
     $this->group('/actions', function () {
         $this->post('/game/start', GameController::class . ':start')->setName('actions.game.start');
         $this->post('/game/finish', GameController::class . ':finish')->setName('actions.game.finish');
-        $this->post('/game/turn', GameController::class . ':turn')->setName('actions.game.turn');
+        $this->post('/turn/create', TurnController::class . ':create')->setName('actions.turn.create');
         $this->post('/feedback', FeedbackController::class . ':save')->setName('actions.feedback');
     })->add(new TokenAuthMiddleware($container));
 

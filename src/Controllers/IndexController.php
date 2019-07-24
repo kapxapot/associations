@@ -2,22 +2,17 @@
 
 namespace App\Controllers;
 
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+
 class IndexController extends Controller
 {
-    public function index($request, $response, $args)
+    public function index(ServerRequestInterface $request, ResponseInterface $response) : ResponseInterface
     {
         $debug = $request->getQueryParam('debug', null) !== null;
         
         $user = $this->auth->getUser();
-
         $game = $user ? $user->currentGame() : null;
-        $lastTurn = $game ? $game->lastTurn() : null;
-        $word = $lastTurn ? $lastTurn->word() : null;
-        $association = $lastTurn ? $lastTurn->association() : null;
-
-        /*if ($debug) {
-            die('ok');
-        }*/
         
         $params = $this->buildParams([
             'params' => [
@@ -27,6 +22,6 @@ class IndexController extends Controller
             ],
         ]);
         
-        return $this->view->render($response, 'main/index.twig', $params);
+        return $this->render($response, 'main/index.twig', $params);
     }
 }
