@@ -620,12 +620,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kapxapot/plasticode.git",
-                "reference": "47f9281ec867ffab9c389b31264ddde64e2ee6de"
+                "reference": "ddc1681ee62d3ee81843b26fcc268fd803483079"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/47f9281ec867ffab9c389b31264ddde64e2ee6de",
-                "reference": "47f9281ec867ffab9c389b31264ddde64e2ee6de",
+                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/ddc1681ee62d3ee81843b26fcc268fd803483079",
+                "reference": "ddc1681ee62d3ee81843b26fcc268fd803483079",
                 "shasum": ""
             },
             "require": {
@@ -672,7 +672,7 @@
                 "source": "https://github.com/kapxapot/plasticode/tree/master",
                 "issues": "https://github.com/kapxapot/plasticode/issues"
             },
-            "time": "2019-07-23T13:35:15+00:00"
+            "time": "2019-07-24T09:27:46+00:00"
         },
         {
             "name": "monolog/monolog",
