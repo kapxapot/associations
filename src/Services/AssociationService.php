@@ -2,14 +2,14 @@
 
 namespace App\Services;
 
-use Plasticode\Contained;
-use Plasticode\Exceptions\ApplicationException;
-
 use App\Models\Association;
 use App\Models\Language;
 use App\Models\User;
-use App\Models\Turn;
 use App\Models\Word;
+use Plasticode\Contained;
+use Plasticode\Exceptions\InvalidArgumentException;
+use Plasticode\Exceptions\InvalidOperationException;
+use Plasticode\Exceptions\InvalidResultException;
 
 class AssociationService extends Contained
 {
@@ -21,7 +21,7 @@ class AssociationService extends Contained
             $this->create($first, $second, $user, $language);
 
         if ($association === null) {
-            throw new ApplicationException('Association can\'t be found or added.');
+            throw new InvalidResultException('Association can\'t be found or added.');
         }
 
         return $association;
@@ -39,7 +39,7 @@ class AssociationService extends Contained
     public function create(Word $first, Word $second, User $user, Language $language = null) : Association
     {
         if ($this->getByPair($first, $second, $language) !== null) {
-            throw new ApplicationException('Association already exists.');
+            throw new InvalidOperationException('Association already exists.');
         }
         
         self::checkPair($first, $second);
@@ -62,22 +62,22 @@ class AssociationService extends Contained
     public function checkPair(Word $first, Word $second, Language $language = null) : void
     {
         if ($first === null || $second === null) {
-            throw new \InvalidArgumentException('Both word must be non-null.');
+            throw new InvalidArgumentException('Both word must be non-null.');
         }
         
         if ($first->getId() == $second->getId()) {
-            throw new \InvalidArgumentException('Words can\'t be the same.');
+            throw new InvalidArgumentException('Words can\'t be the same.');
         }
 
         $firstLanguage = $first->language();
         $secondLanguage = $second->language();
 
         if (!$firstLanguage->equals($secondLanguage)) {
-            throw new \InvalidArgumentException('Words must be of the same language.');
+            throw new InvalidArgumentException('Words must be of the same language.');
         }
         
         if ($language !== null && !$firstLanguage->equals($language)) {
-            throw new \InvalidArgumentException('Words must be of the specified language.');
+            throw new InvalidArgumentException('Words must be of the specified language.');
         }
     }
     

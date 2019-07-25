@@ -2,17 +2,17 @@
 
 namespace App\Services;
 
-use Respect\Validation\Validator;
-
-use Plasticode\Contained;
-use Plasticode\Exceptions\ApplicationException;
-use Plasticode\Exceptions\ValidationException;
-use Plasticode\Util\Strings;
-use Plasticode\Validation\ValidationRules;
-
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
+use Plasticode\Contained;
+use Plasticode\Exceptions\InvalidArgumentException;
+use Plasticode\Exceptions\InvalidOperationException;
+use Plasticode\Exceptions\InvalidResultException;
+use Plasticode\Exceptions\ValidationException;
+use Plasticode\Util\Strings;
+use Plasticode\Validation\ValidationRules;
+use Respect\Validation\Validator;
 
 class WordService extends Contained
 {
@@ -27,7 +27,7 @@ class WordService extends Contained
             $this->create($language, $wordStr, $user);
 
         if ($word === null) {
-            throw new ApplicationException('Word can\'t be found or added.');
+            throw new InvalidResultException('Word can\'t be found or added.');
         }
     
         return $word;
@@ -52,19 +52,19 @@ class WordService extends Contained
     public function create(Language $language, string $wordStr, User $user) : Word
     {
         if ($language === null) {
-            throw new \InvalidArgumentException('Language must be non-null.');
+            throw new InvalidArgumentException('Language must be non-null.');
         }
         
         if (strlen($wordStr) === 0) {
-            throw new \InvalidArgumentException('Word can\'t be empty.');
+            throw new InvalidArgumentException('Word can\'t be empty.');
         }
 
         if ($user === null) {
-            throw new \InvalidArgumentException('User must be non-null.');
+            throw new InvalidArgumentException('User must be non-null.');
         }
         
         if (Word::findInLanguage($language, $wordStr) !== null) {
-            throw new ApplicationException('Word already exists.');
+            throw new InvalidOperationException('Word already exists.');
         }
         
         $word = Word::create();
@@ -92,7 +92,10 @@ class WordService extends Contained
 
     public function validateWord(string $wordStr) : void
     {
-        $validation = $this->validator->validateArray(['word' => $wordStr], ['word' => $this->getRule()]);
+        $validation = $this->validator->validateArray(
+            ['word' => $wordStr],
+            ['word' => $this->getRule()]
+        );
         
         if ($validation->failed()) {
             throw new ValidationException($validation->errors);
