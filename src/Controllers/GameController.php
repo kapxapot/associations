@@ -33,14 +33,16 @@ class GameController extends Controller
             return $this->notFound($request, $response);
         }
 
-        $params = $this->buildParams([
-            'params' => [
-                'title' => $game->displayName(),
-                'game' => $game,
-                'disqus_id' => 'game' . $game->getId(),
-                'debug' => $debug,
-            ],
-        ]);
+        $params = $this->buildParams(
+            [
+                'params' => [
+                    'title' => $game->displayName(),
+                    'game' => $game,
+                    'disqus_id' => 'game' . $game->getId(),
+                    'debug' => $debug,
+                ],
+            ]
+        );
         
         return $this->render($response, 'main/games/item.twig', $params);
     }
@@ -62,9 +64,10 @@ class GameController extends Controller
 
         $this->gameService->newGame($language, $user);
         
-        return Response::json($response, [
-            'message' => $this->translate('New game started.'),
-        ]);
+        return Response::json(
+            $response,
+            ['message' => $this->translate('New game started.')]
+        );
     }
 
     public function finish(ServerRequestInterface $request, ResponseInterface $response) : ResponseInterface
@@ -79,8 +82,9 @@ class GameController extends Controller
             }
         }
         
-        return Response::json($response, [
-            'message' => $this->translate('Game finished.'),
-        ]);
+        return Response::json(
+            $response,
+            ['message' => $this->translate('Game finished.')]
+        );
     }
 }
