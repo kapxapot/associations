@@ -27,11 +27,22 @@ else {
 session_start();
 
 $bootstrap = new \App\Config\Bootstrap($settings, $dir);
-\Plasticode\Core\Core::bootstrap($container, $bootstrap->getMappings());
+
+\Plasticode\Core\Core::bootstrap(
+    $container,
+    $bootstrap->getMappings(),
+    ['App\\Validation\\Rules\\']
+);
 
 // middleware
+
 $app->add(new \Plasticode\Middleware\SlashMiddleware($container));
-$app->add(new \Plasticode\Middleware\CookieAuthMiddleware($container, $settings['auth_token_key']));
+
+$app->add(
+    new \Plasticode\Middleware\CookieAuthMiddleware(
+        $container, $settings['auth_token_key']
+    )
+);
 
 require $root . '/src/routes.php';
 
