@@ -3,6 +3,7 @@
 namespace App\Config;
 
 use Plasticode\Config\Bootstrap as BootstrapBase;
+use Psr\Container\ContainerInterface;
 
 class Bootstrap extends BootstrapBase
 {
@@ -20,90 +21,90 @@ class Bootstrap extends BootstrapBase
             [
                 // $c == $container
                 
-                'userClass' => function ($c) {
+                'userClass' => function (ContainerInterface $container) {
                     return \App\Models\User::class;
                 },
 
-                'localization' => function ($c) {
+                'localization' => function (ContainerInterface $container) {
                     return new \App\Config\Localization();
                 },
 
-                'linker' => function ($c) {
-                    return new \App\Core\Linker($c);
+                'linker' => function (ContainerInterface $container) {
+                    return new \App\Core\Linker($container);
                 },
                 
-                'config' => function ($c) {
-                    return new \App\Config\Config($c);
+                'config' => function (ContainerInterface $container) {
+                    return new \App\Config\Config($container);
                 },
             
-                'captchaConfig' => function ($c) {
+                'captchaConfig' => function (ContainerInterface $container) {
                     return new \App\Config\Captcha();  
                 },
         
-                'eventProcessors' => function ($c) {
+                'eventProcessors' => function (ContainerInterface $container) {
                     return [
-                        $c->wordRecountService,
-                        $c->associationRecountService,
+                        $container->wordRecountService,
+                        $container->associationRecountService,
                     ];
                 },
                 
                 // services
 
-                'wordRecountService' => function ($c) {
-                    return new \App\Services\WordRecountService($c);
+                'wordRecountService' => function (ContainerInterface $container) {
+                    return new \App\Services\WordRecountService($container);
                 },
 
-                'associationRecountService' => function ($c) {
-                    return new \App\Services\AssociationRecountService($c);
+                'associationRecountService' => function (ContainerInterface $container) {
+                    return new \App\Services\AssociationRecountService($container);
                 },
                 
-                'associationService' => function ($c) {
-                    return new \App\Services\AssociationService($c);
+                'associationService' => function (ContainerInterface $container) {
+                    return new \App\Services\AssociationService($container);
                 },
                 
-                'associationFeedbackService' => function ($c) {
-                    return new \App\Services\AssociationFeedbackService($c);
+                'associationFeedbackService' => function (ContainerInterface $container) {
+                    return new \App\Services\AssociationFeedbackService($container);
                 },
                 
-                'languageService' => function ($c) {
-                    return new \App\Services\LanguageService($c);
+                'languageService' => function (ContainerInterface $container) {
+                    return new \App\Services\LanguageService($container);
                 },
 
-                'gameService' => function ($c) {
-                    return new \App\Services\GameService($c);
+                'gameService' => function (ContainerInterface $container) {
+                    return new \App\Services\GameService($container);
                 },
 
-                'turnService' => function ($c) {
-                    return new \App\Services\TurnService($c);
+                'turnService' => function (ContainerInterface $container) {
+                    return new \App\Services\TurnService($container);
                 },
                 
-                'wordService' => function ($c) {
-                    return new \App\Services\WordService($c);
+                'wordService' => function (ContainerInterface $container) {
+                    return new \App\Services\WordService($container);
                 },
                 
-                'wordFeedbackService' => function ($c) {
-                    return new \App\Services\WordFeedbackService($c);
+                'wordFeedbackService' => function (ContainerInterface $container) {
+                    return new \App\Services\WordFeedbackService($container);
                 },
 
-                'yandexDictService' => function ($c) {
-                    return new \App\Services\YandexDictService($c);
+                'yandexDictService' => function (ContainerInterface $container) {
+                    return new \App\Services\YandexDictService($container);
                 },
 
-                'dictionaryService' => function ($c) {
-                    return new \App\Services\DictionaryService($c);
+                'dictionaryService' => function (ContainerInterface $container) {
+                    return new \App\Services\DictionaryService($container);
                 },
 
                 // external
 
-                'yandexDict' => function ($c) {
+                'yandexDict' => function (ContainerInterface $container) {
                     $key = $this->settings['yandex_dict']['key'];
                     return new \App\External\YandexDict($key);
                 },
 
                 // handlers
                 
-                'notFoundHandler' => function ($c) {
-                    return new \App\Handlers\NotFoundHandler($c);
+                'notFoundHandler' => function (ContainerInterface $container) {
+                    return new \App\Handlers\NotFoundHandler($container);
                 },
             ]
         );

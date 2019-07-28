@@ -18,8 +18,7 @@ if ($settings['debug']) {
     error_reporting(E_ALL & ~E_NOTICE);
     ini_set("display_errors", 1);
     ini_set("log_errors_max_len", 0);
-}
-else {
+} else {
     $errorLevel = error_reporting();
     error_reporting($errorLevel & ~E_NOTICE);
 }
