@@ -30,17 +30,17 @@ $scope.problemsDialog = () => {
 
 $('#problemsForm').submit(function(e) {
     if (e != null) {
-	    e.preventDefault();
+        e.preventDefault();
     }
-	
-	$scope.modalAlertError = null;
-	$scope.alertSuccess = null;
-	
-	hideModalAlerts();
+    
+    $scope.modalAlertError = null;
+    $scope.alertSuccess = null;
+    
+    hideModalAlerts();
 
-	$scope.modalSaving = true;
+    $scope.modalSaving = true;
 
-	let obj = $.extend(true, {}, $scope.model);
+    let obj = $.extend(true, {}, $scope.model);
 
     if (obj.word) {
         if (obj.word.withTypo !== true) {
@@ -55,19 +55,19 @@ $('#problemsForm').submit(function(e) {
         delete obj.word.withDuplicate;
     }
 
-	//console.log(obj);
+    //console.log(obj);
     
-	$scope.ajax({
-		url: '{{ path_for('actions.feedback') }}',
-		data: obj,
-		view: 'problems',
-		setError: (msg) => { $scope.modalAlertError = msg; },
-		showError: () => { showModalAlertError(); },
-		setLoading: (loading) => { $scope.modalLoading = loading; },
-		setSaving: (saving) => { $scope.modalSaving = saving; },
-		onSuccess: $scope.postSuccess,
-		noSuccessMessage: true
-	});
+    $scope.ajax({
+        url: '{{ path_for('actions.feedback') }}',
+        data: obj,
+        view: 'problems',
+        setError: (msg) => { $scope.modalAlertError = msg; },
+        showError: () => { showModalAlertError(); },
+        setLoading: (loading) => { $scope.modalLoading = loading; },
+        setSaving: (saving) => { $scope.modalSaving = saving; },
+        onSuccess: $scope.postSuccess,
+        noSuccessMessage: true
+    });
 });
 
 $scope.focusTypo = () => {

@@ -2,12 +2,11 @@
 
 namespace App\Services;
 
-use Plasticode\Contained;
-use Plasticode\Collection;
-
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
+use Plasticode\Contained;
+use Plasticode\Collection;
 
 class LanguageService extends Contained
 {
@@ -52,10 +51,6 @@ class LanguageService extends Contained
     public function normalizeWord(Language $language, string $word) : string
     {
         $word = $this->wordService->normalize($word);
-        
-        /*if ($language->getId() == Language::RUSSIAN) {
-            return str_replace('ё', 'е', $word);
-        }*/
         
         return $word;
     }

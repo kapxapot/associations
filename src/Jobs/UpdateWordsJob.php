@@ -2,11 +2,10 @@
 
 namespace App\Jobs;
 
-use Plasticode\Collection;
-use Plasticode\Contained;
-
 use App\Events\WordOutOfDateEvent;
 use App\Models\Word;
+use Plasticode\Collection;
+use Plasticode\Contained;
 
 class UpdateWordsJob extends Contained
 {

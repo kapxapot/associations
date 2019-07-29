@@ -2,12 +2,10 @@
 
 namespace App\Validation\Rules;
 
-use Respect\Validation\Rules\AbstractRule;
-
-use Plasticode\Util\Strings;
-
 use App\Models\Language;
 use App\Models\Word;
+use Plasticode\Util\Strings;
+use Respect\Validation\Rules\AbstractRule;
 
 class MainWordExists extends AbstractRule
 {

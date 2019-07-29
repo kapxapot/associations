@@ -2,20 +2,19 @@
 
 namespace App\Services;
 
-use Plasticode\Events\EventProcessor;
-use Plasticode\Util\Date;
-
 use App\Events\AssociationApprovedEvent;
 use App\Events\WordApprovedEvent;
 use App\Events\WordFeedbackEvent;
 use App\Events\WordMatureEvent;
 use App\Events\WordOutOfDateEvent;
 use App\Models\Word;
+use Plasticode\Events\EventProcessor;
+use Plasticode\Util\Date;
 
 class WordRecountService extends EventProcessor
 {
     /**
-     * AssociationApprovedEvent event processing.
+     * AssociationApprovedEvent event processing
      */
     public function processAssociationApprovedEvent(AssociationApprovedEvent $event) : iterable
     {
@@ -30,7 +29,7 @@ class WordRecountService extends EventProcessor
     }
 
     /**
-     * WordFeedbackEvent event processing.
+     * WordFeedbackEvent event processing
      */
     public function processWordFeedbackEvent(WordFeedbackEvent $event) : iterable
     {
@@ -39,7 +38,7 @@ class WordRecountService extends EventProcessor
     }
 
     /**
-     * WordOutOfDateEvent event processing.
+     * WordOutOfDateEvent event processing
      */
     public function processWordOutOfDateEvent(WordOutOfDateEvent $event) : iterable
     {

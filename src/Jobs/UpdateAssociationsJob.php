@@ -2,15 +2,14 @@
 
 namespace App\Jobs;
 
+use App\Events\AssociationOutOfDateEvent;
+use App\Models\Association;
 use Plasticode\Collection;
 use Plasticode\Contained;
 
-use App\Events\AssociationOutOfDateEvent;
-use App\Models\Association;
-
 class UpdateAssociationsJob extends Contained
 {
-    public function run()
+    public function run() : Collection
     {
         $limit = $this->getSettings('associations.update.limit');
         $ttl = $this->getSettings('associations.update.ttl_min');

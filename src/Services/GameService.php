@@ -2,18 +2,17 @@
 
 namespace App\Services;
 
-use Plasticode\Contained;
-use Plasticode\Util\Date;
-
 use App\Models\Game;
 use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
+use Plasticode\Contained;
+use Plasticode\Util\Date;
 
 class GameService extends Contained
 {
     /**
-     * Creates and starts new game.
+     * Creates and starts new game
      */
     public function newGame(Language $language, User $user) : Game
     {
@@ -58,7 +57,7 @@ class GameService extends Contained
     }
 
     /**
-     * Returns true on success.
+     * Returns true on success
      */
     public function finishGame(Game $game) : bool
     {
@@ -77,7 +76,8 @@ class GameService extends Contained
     }
 
     /**
-     * Returns true, if the provided turn is the last turn of the game OR turn is null and game contains no turns.
+     * Returns true, if the provided turn is the last turn of the game
+     * OR turn is null and game contains no turns
      */
     public function validateLastTurn(Game $game, Turn $turn) : bool
     {

@@ -17,7 +17,7 @@ use Respect\Validation\Validator;
 class WordService extends Contained
 {
     /**
-     * Normalized word string expected.
+     * Normalized word string expected
      */
     public function getOrCreate(Language $language, string $wordStr, User $user) : Word
     {
@@ -33,14 +33,13 @@ class WordService extends Contained
         return $word;
     }
 
-
     public function normalize($word) : string
     {
         return Strings::normalize($word);
     }
 
     /**
-     * Creates new word.
+     * Creates new word
      * 
      * Word should be normalized in advance!
      * 
@@ -78,7 +77,7 @@ class WordService extends Contained
     }
 
     /**
-     * Returns validation rules chain for word.
+     * Returns validation rules chain for word
      */
     public function getRule() : Validator
     {

@@ -2,16 +2,14 @@
 
 namespace App\Services;
 
-use Respect\Validation\Validator as v;
-
+use App\Models\Word;
+use App\Models\WordFeedback;
 use Plasticode\Contained;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Util\Date;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\ValidationRules;
-
-use App\Models\Word;
-use App\Models\WordFeedback;
+use Respect\Validation\Validator;
 
 class WordFeedbackService extends Contained
 {
@@ -82,7 +80,7 @@ class WordFeedbackService extends Contained
             $word = Word::get($data['word_id'] ?? null);
             
             if ($word !== null) {
-                $result['duplicate'] = v::mainWordExists($word->language(), $word);
+                $result['duplicate'] = Validator::mainWordExists($word->language(), $word);
             }
         }
         

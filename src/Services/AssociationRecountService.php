@@ -16,7 +16,7 @@ use App\Models\Association;
 class AssociationRecountService extends EventProcessor
 {
     /**
-     * NewTurnEvent event processing.
+     * NewTurnEvent event processing
      */
     public function processNewTurnEvent(NewTurnEvent $event) : iterable
     {
@@ -29,7 +29,7 @@ class AssociationRecountService extends EventProcessor
     }
 
     /**
-     * WordMatureEvent event processing.
+     * WordMatureEvent event processing
      */
     public function processWordMatureEvent(WordMatureEvent $event) : iterable
     {
@@ -46,7 +46,7 @@ class AssociationRecountService extends EventProcessor
     }
 
     /**
-     * AssociationFeedbackEvent event processing.
+     * AssociationFeedbackEvent event processing
      */
     public function processAssociationFeedbackEvent(AssociationFeedbackEvent $event) : iterable
     {
@@ -55,7 +55,7 @@ class AssociationRecountService extends EventProcessor
     }
 
     /**
-     * AssociationOutOfDateEvent event processing.
+     * AssociationOutOfDateEvent event processing
      */
     public function processAssociationOutOfDateEvent(AssociationOutOfDateEvent $event) : iterable
     {

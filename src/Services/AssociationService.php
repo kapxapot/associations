@@ -28,7 +28,7 @@ class AssociationService extends Contained
     }
 
     /**
-     * Creates association.
+     * Creates association
      * 
      * !!!!!!!!!!!!!!!!!!!!!!!
      * Potential problem here:

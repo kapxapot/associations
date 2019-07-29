@@ -2,11 +2,10 @@
 
 namespace App\Services;
 
-use Plasticode\Contained;
-
 use App\Models\Language;
 use App\Models\Word;
 use App\Models\YandexDictWord;
+use Plasticode\Contained;
 
 class YandexDictService extends Contained
 {

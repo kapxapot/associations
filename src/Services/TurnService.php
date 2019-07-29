@@ -2,15 +2,13 @@
 
 namespace App\Services;
 
-use Plasticode\Contained;
-use Plasticode\Util\Date;
-
 use App\Events\NewTurnEvent;
-use App\Models\Association;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
+use Plasticode\Contained;
+use Plasticode\Util\Date;
 
 class TurnService extends Contained
 {

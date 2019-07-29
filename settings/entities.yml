@@ -15,7 +15,7 @@ menus:
       name: Ссылка
       type: site_url
       template: >
-        '<a href="' + row.link + '">' + row.text + '</a>'
+        '<a href="' + row.url + '">' + row.text + '</a>'
 
     text:
       name: Текст
@@ -53,7 +53,7 @@ menu_items:
       name: Ссылка
       type: site_url
       template: >
-        '<a href="' + row.link + '">' + row.text + '</a>'
+        '<a href="' + row.url + '">' + row.text + '</a>'
 
     text:
       name: Текст
