@@ -17,7 +17,16 @@ use Plasticode\Middleware\GuestMiddleware;
 use Plasticode\Middleware\AccessMiddleware;
 use Plasticode\Middleware\TokenAuthMiddleware;
 
-$access = function ($entity, $action, $redirect = null) use ($container) {
+/**
+ * Creates AccessMiddleware
+ * 
+ * @var \Closure
+ */
+$access = function (
+    string $entity,
+    string $action,
+    string $redirect = null
+) use ($container) {
     return new AccessMiddleware($container, $entity, $action, $redirect);
 };
 
@@ -25,7 +34,8 @@ $root = $settings['root'];
 $trueRoot = (strlen($root) == 0);
 
 $app->group($root, function () use ($trueRoot, $settings, $access, $container) {
-    // api
+
+    // public api
     
     $this->group('/api/v1', function () use ($settings) {
         $this->get('/captcha', function ($request, $response, $args) use ($settings) {
@@ -36,6 +46,8 @@ $app->group($root, function () use ($trueRoot, $settings, $access, $container) {
         $this->get('/public/words', WordController::class . ':publicWords')
             ->setName('api.public.words');
     });
+
+    // private api
     
     $this->group('/api/v1', function () use ($settings, $access, $container) {
         foreach ($settings['tables'] as $alias => $table) {

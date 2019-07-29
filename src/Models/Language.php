@@ -39,7 +39,7 @@ class Language extends DbModel
             ->limit($limit ?? 10);
     }
     
-    public function serialize()
+    public function serialize() : ?array
     {
         return [
             'id' => $this->getId(),

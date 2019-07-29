@@ -14,7 +14,7 @@ class User extends UserBase
         return Game::getByUser($this);
     }
     
-    public function currentGame()
+    public function currentGame() : ?Game
     {
         return $this->games()
             ->whereNull('finished_at')
@@ -22,7 +22,7 @@ class User extends UserBase
             ->one();
     }
     
-    public function lastGame()
+    public function lastGame() : ?Game
     {
         return $this->games()
             ->orderByDesc('id')
@@ -44,13 +44,15 @@ class User extends UserBase
         return $this
             ->turns($language)
             ->all()
-            ->map(function ($turn) {
-                return $turn->word();
-            })
+            ->map(
+                function ($turn) {
+                    return $turn->word();
+                }
+            )
             ->distinct();
     }
     
-    public function serialize()
+    public function serialize() : ?array
     {
         return [
             'id' => $this->getId(),
@@ -67,10 +69,12 @@ class User extends UserBase
     
     public function isMature() : bool
     {
-        return $this->lazy(function () {
-            $matureAge = self::getSettings('users.mature_age', 16);
+        return $this->lazy(
+            function () {
+                $matureAge = self::getSettings('users.mature_age', 16);
         
-            return $this->ageNow >= $matureAge;
-        });
+                return $this->ageNow >= $matureAge;
+            }
+        );
     }
 }
