@@ -59,7 +59,7 @@ class Word extends Element
         return $this->filterInvisibleForMe($assocs);
     }
 
-    private function countStr(int $count) : ?string
+    private function invisibleCountStr(int $count) : ?string
     {
         if ($count <= 0) {
             return null;
@@ -75,7 +75,7 @@ class Word extends Element
     public function approvedInvisibleAssociationsStr() : ?string
     {
         $count = $this->approvedInvisibleAssociations()->count();
-        return $this->countStr($count);
+        return $this->invisibleCountStr($count);
     }
     
     public function unapprovedAssociations() : Collection
@@ -102,7 +102,7 @@ class Word extends Element
     public function unapprovedInvisibleAssociationsStr() : ?string
     {
         $count = $this->unapprovedInvisibleAssociations()->count();
-        return $this->countStr($count);
+        return $this->invisibleCountStr($count);
     }
 
     public function associationsForUser(User $user) : Collection
