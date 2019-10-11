@@ -1,6 +1,6 @@
 # Игра в ассоциации
 
-[Играть!](https://warcry.ru/assoc)
+[Играть!](https://associ.ru)
 
 ## Описание
 
