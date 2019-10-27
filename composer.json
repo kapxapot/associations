@@ -13,7 +13,8 @@
     ],
     "require": {
         "kapxapot/plasticode": "dev-master",
-        "robmorgan/phinx": "^0.10.7"
+        "robmorgan/phinx": "^0.10.7",
+        "webmozart/assert": "^1.5"
     },
     "repositories": [
         {
