@@ -2,9 +2,6 @@
 
 namespace App\Services;
 
-use Plasticode\Events\EventProcessor;
-use Plasticode\Util\Date;
-
 use App\Events\AssociationApprovedEvent;
 use App\Events\AssociationFeedbackEvent;
 use App\Events\AssociationMatureEvent;
@@ -12,6 +9,8 @@ use App\Events\AssociationOutOfDateEvent;
 use App\Events\NewTurnEvent;
 use App\Events\WordMatureEvent;
 use App\Models\Association;
+use Plasticode\Events\EventProcessor;
+use Plasticode\Util\Date;
 
 class AssociationRecountService extends EventProcessor
 {

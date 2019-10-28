@@ -2,12 +2,11 @@
 
 namespace App\Core;
 
-use Plasticode\Core\Linker as LinkerBase;
-use Plasticode\Models\DbModel;
-
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Word;
+use Plasticode\Core\Linker as LinkerBase;
+use Plasticode\Models\DbModel;
 
 class Linker extends LinkerBase
 {
