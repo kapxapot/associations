@@ -91,7 +91,7 @@ class Bootstrap extends BootstrapBase
                 },
 
                 'dictionaryService' => function (ContainerInterface $container) {
-                    return new \App\Services\DictionaryService($container);
+                    return new \App\Services\DictionaryService($container->yandexDictService);
                 },
 
                 // external

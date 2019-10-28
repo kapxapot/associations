@@ -4,10 +4,19 @@ namespace App\Services;
 
 use App\Models\Language;
 use App\Models\Word;
-use Plasticode\Contained;
 
-class DictionaryService extends Contained
+class DictionaryService
 {
+    /**
+     * @var \App\Services\YandexDictService
+     */
+    private $yandexDictService;
+
+    public function __construct(YandexDictService $yandexDictService)
+    {
+        $this->yandexDictService = $yandexDictService;
+    }
+
     public function isWordKnown(Word $word) : bool
     {
         $dictWord = $this->yandexDictService->getWord($word);
