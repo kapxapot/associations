@@ -622,12 +622,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kapxapot/plasticode.git",
-                "reference": "912d6cfd063b5183e2a995ac0a7cf86cb2b74567"
+                "reference": "b3a7eae9ef1bfeaaab0118b6f77e657baf8c8df9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/912d6cfd063b5183e2a995ac0a7cf86cb2b74567",
-                "reference": "912d6cfd063b5183e2a995ac0a7cf86cb2b74567",
+                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/b3a7eae9ef1bfeaaab0118b6f77e657baf8c8df9",
+                "reference": "b3a7eae9ef1bfeaaab0118b6f77e657baf8c8df9",
                 "shasum": ""
             },
             "require": {
@@ -675,7 +675,7 @@
                 "source": "https://github.com/kapxapot/plasticode/tree/master",
                 "issues": "https://github.com/kapxapot/plasticode/issues"
             },
-            "time": "2019-10-27T17:46:35+00:00"
+            "time": "2019-10-28T14:24:32+00:00"
         },
         {
             "name": "monolog/monolog",
@@ -2631,16 +2631,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "8.4.1",
+            "version": "8.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "366a4a0f2b971fd43b7c351d621e8dd7d7131869"
+                "reference": "a142a7e66c0ea7b5b6c04ee27f08d10d1137cd9b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/366a4a0f2b971fd43b7c351d621e8dd7d7131869",
-                "reference": "366a4a0f2b971fd43b7c351d621e8dd7d7131869",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/a142a7e66c0ea7b5b6c04ee27f08d10d1137cd9b",
+                "reference": "a142a7e66c0ea7b5b6c04ee27f08d10d1137cd9b",
                 "shasum": ""
             },
             "require": {
@@ -2710,7 +2710,7 @@
                 "testing",
                 "xunit"
             ],
-            "time": "2019-10-07T12:57:41+00:00"
+            "time": "2019-10-28T10:39:51+00:00"
         },
         {
             "name": "sebastian/code-unit-reverse-lookup",

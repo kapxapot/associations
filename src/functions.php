@@ -1,6 +1,9 @@
 <?php
 
-function dd($var) {
-    var_dump($var);
-    die();
+if (!function_exists('dd')) {
+    function dd($var)
+    {
+        var_dump($var);
+        die();
+    }
 }
