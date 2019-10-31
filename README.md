@@ -1,14 +1,12 @@
 # Игра в ассоциации
 
-Классическая игра в ассоциации, но с самообучающейся системой!
-
 ![](https://travis-ci.com/kapxapot/associations.svg?branch=master)
 
-[Играть!](https://associ.ru)
+Классическая игра в ассоциации, но с самообучающейся системой!
 
-## Описание
+Live: https://associ.ru
 
-Тут будет описание!
+Built on [Plasticode](https://github.com/kapxapot/plasticode).
 
 ## Вопросы и предложения
 
