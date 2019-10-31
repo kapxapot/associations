@@ -204,18 +204,4 @@ class TestController extends Controller
         
         return $approvedByAssoc->extract('word');
     }
-    
-    private function collectionFlattenTest()
-    {
-        $coll = Collection::make([
-            'element',
-            Collection::make(['one', 'two']),
-            'another',
-            1,
-            [1, 2, 'hi'],
-            'the end',
-        ]);
-        
-        return [$coll, $coll->flatten()];
-    }
 }
