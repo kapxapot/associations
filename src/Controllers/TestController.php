@@ -41,22 +41,6 @@ class TestController extends Controller
         var_dump($this->dictionaryService->isWordKnown($word));
     }
 
-    private function yandexDictTest(string $word)
-    {
-        $language = Language::get(Language::RUSSIAN);
-        $result = $this->yandexDict->request($language->yandexDictCode, $word);
-        $data = json_decode($result, true);
-
-        $def = $data['def'][0] ?? null;
-
-        if ($def) {
-            $text = $def['text'] ?? null;
-            $pos = $def['pos'] ?? null;
-        }
-
-        var_dump([$text, $pos, $data]);
-    }
-
     private function hasPlayerTest()
     {
         $game = Game::get(43);
