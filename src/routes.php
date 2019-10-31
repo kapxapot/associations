@@ -22,11 +22,7 @@ use Plasticode\Middleware\TokenAuthMiddleware;
  * 
  * @var \Closure
  */
-$access = function (
-    string $entity,
-    string $action,
-    string $redirect = null
-) use ($container) {
+$access = function (string $entity, string $action, string $redirect = null) use ($container) {
     return new AccessMiddleware($container, $entity, $action, $redirect);
 };
 
