@@ -124,7 +124,8 @@ abstract class BaseTestCase extends TestCase
         Core::bootstrap(
             $container,
             $bootstrap->getMappings(),
-            ['App\\Validation\\Rules\\']
+            ['App\\Validation\\Rules\\'],
+            false
         );
         
         // middleware
