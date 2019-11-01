@@ -622,12 +622,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kapxapot/plasticode.git",
-                "reference": "b3a7eae9ef1bfeaaab0118b6f77e657baf8c8df9"
+                "reference": "3e9d889f0947967789ea273f4d278d714afc18cf"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/b3a7eae9ef1bfeaaab0118b6f77e657baf8c8df9",
-                "reference": "b3a7eae9ef1bfeaaab0118b6f77e657baf8c8df9",
+                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/3e9d889f0947967789ea273f4d278d714afc18cf",
+                "reference": "3e9d889f0947967789ea273f4d278d714afc18cf",
                 "shasum": ""
             },
             "require": {
@@ -651,6 +651,11 @@
                     "Plasticode\\": "src"
                 }
             },
+            "autoload-dev": {
+                "psr-4": {
+                    "Plasticode\\Tests\\": "tests"
+                }
+            },
             "license": [
                 "MIT"
             ],
@@ -662,7 +667,7 @@
                 }
             ],
             "description": "PHP framework based on Slim framework",
-            "homepage": "http://github.com/kapxapot/plasticode",
+            "homepage": "https://github.com/kapxapot/plasticode",
             "keywords": [
                 "API",
                 "Bootstrap",
@@ -675,7 +680,7 @@
                 "source": "https://github.com/kapxapot/plasticode/tree/master",
                 "issues": "https://github.com/kapxapot/plasticode/issues"
             },
-            "time": "2019-10-28T14:24:32+00:00"
+            "time": "2019-10-31T08:47:08+00:00"
         },
         {
             "name": "monolog/monolog",
