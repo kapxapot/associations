@@ -8,7 +8,6 @@ use App\Models\Game;
 use App\Models\Language;
 use App\Models\Word;
 use App\Models\WordFeedback;
-use Plasticode\Collection;
 use Plasticode\Exceptions\ValidationException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
