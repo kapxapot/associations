@@ -55,7 +55,9 @@ class Bootstrap extends BootstrapBase
                 },
 
                 'associationRecountService' => function (ContainerInterface $container) {
-                    return new \App\Services\AssociationRecountService($container);
+                    return new \App\Services\AssociationRecountService(
+                        $container
+                    );
                 },
                 
                 'associationService' => function (ContainerInterface $container) {
@@ -63,7 +65,9 @@ class Bootstrap extends BootstrapBase
                 },
                 
                 'associationFeedbackService' => function (ContainerInterface $container) {
-                    return new \App\Services\AssociationFeedbackService($container);
+                    return new \App\Services\AssociationFeedbackService(
+                        $container
+                    );
                 },
                 
                 'languageService' => function (ContainerInterface $container) {
@@ -91,7 +95,9 @@ class Bootstrap extends BootstrapBase
                 },
 
                 'dictionaryService' => function (ContainerInterface $container) {
-                    return new \App\Services\DictionaryService($container->yandexDictService);
+                    return new \App\Services\DictionaryService(
+                        $container->yandexDictService
+                    );
                 },
 
                 // external
