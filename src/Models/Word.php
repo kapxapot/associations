@@ -9,8 +9,6 @@ use Plasticode\Util\Cases;
 class Word extends Element
 {
     protected static $sortField = 'word';
-
-    // getters - one
     
     /**
      * Finds the word by string in the specified language.
@@ -24,8 +22,6 @@ class Word extends Element
             ->one();
     }
     
-    // properties
-    
     public function associations() : Query
     {
         return Association::getByWord($this);
@@ -34,17 +30,22 @@ class Word extends Element
     private function compareByOtherWord() : \Closure
     {
         return function ($assocA, $assocB) {
-            return strcmp($assocA->otherWord($this)->word, $assocB->otherWord($this)->word);
+            return strcmp(
+                $assocA->otherWord($this)->word,
+                $assocB->otherWord($this)->word
+            );
         };
     }
     
     public function approvedAssociations() : Collection
     {
-        return $this->lazy(function () {
-            return Association::filterApproved($this->associations())
-                ->all()
-                ->orderByFunc($this->compareByOtherWord());
-        });
+        return $this->lazy(
+            function () {
+                return Association::filterApproved($this->associations())
+                    ->all()
+                    ->orderByFunc($this->compareByOtherWord());
+            }
+        );
     }
 
     public function approvedVisibleAssociations() : Collection
@@ -80,11 +81,13 @@ class Word extends Element
     
     public function unapprovedAssociations() : Collection
     {
-        return $this->lazy(function () {
-            return Association::filterUnapproved($this->associations())
-                ->all()
-                ->orderByFunc($this->compareByOtherWord());
-        });
+        return $this->lazy(
+            function () {
+                return Association::filterUnapproved($this->associations())
+                    ->all()
+                    ->orderByFunc($this->compareByOtherWord());
+            }
+        );
     }
 
     public function unapprovedVisibleAssociations() : Collection
@@ -107,21 +110,27 @@ class Word extends Element
 
     public function associationsForUser(User $user) : Collection
     {
-        return $this->lazy(function () use ($user) {
-            return $this->associations()
-                ->all()
-                ->where(function ($assoc) use ($user) {
-                    return $assoc->isPlayableAgainstUser($user);
-                });
-        });
+        return $this->lazy(
+            function () use ($user) {
+                return $this->associations()
+                    ->all()
+                    ->where(
+                        function ($assoc) use ($user) {
+                            return $assoc->isPlayableAgainstUser($user);
+                        }
+                    );
+            }
+        );
     }
 
     public function associatedWords(User $user) : Collection
     {
         return $this->associationsForUser($user)
-            ->map(function ($assoc) {
-                return $assoc->otherWord($this);
-            });
+            ->map(
+                function ($assoc) {
+                    return $assoc->otherWord($this);
+                }
+            );
     }
     
     public function url() : ?string
@@ -179,7 +188,8 @@ class Word extends Element
     {
         // 1. non-mature words are visible for everyone
         // 2. mature words are invisible for non-authed users ($user == null)
-        // 3. mature words are visible for non-mature users only if they used the word
+        // 3. mature words are visible for non-mature users
+        //    only if they used the word
 
         return 
             !$this->isMature() ||
@@ -216,7 +226,7 @@ class Word extends Element
     }
 
     /**
-     * Returns word or current typo with '*' (if any)
+     * Returns word or current typo with '*' (if any).
      *
      * @return string
      */
@@ -230,7 +240,7 @@ class Word extends Element
     }
 
     /**
-     * Returns the original word + current typo
+     * Returns the original word + current typo.
      *
      * @return string
      */

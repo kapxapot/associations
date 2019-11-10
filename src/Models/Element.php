@@ -12,11 +12,9 @@ abstract class Element extends DbModel
 {
     use Created;
     
-    // queries
-    
     public static function getByLanguage(Language $language) : Query
     {
-        return self::baseQuery()
+        return self::query()
             ->where('language_id', $language->getId());
     }
     
@@ -39,14 +37,14 @@ abstract class Element extends DbModel
     }
 
     /**
-     * Returns elements out of date
+     * Returns elements out of date.
      *
      * @param integer $ttlMin Time to live in minutes
      * @return Query
      */
     public static function getOutOfDate(int $ttlMin) : Query
     {
-        return self::baseQuery()
+        return self::query()
             ->whereRaw('(updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))')
             ->orderByAsc('updated_at');
     }
@@ -88,20 +86,22 @@ abstract class Element extends DbModel
     protected function filterVisibleForMe(Collection $elements) : Collection
     {
         return $elements
-            ->where(function ($element) {
-                return $element->isVisibleForMe();
-            });
+            ->where(
+                function ($element) {
+                    return $element->isVisibleForMe();
+                }
+            );
     }
 
     protected function filterInvisibleForMe(Collection $elements) : Collection
     {
         return $elements
-            ->where(function ($element) {
-                return !$element->isVisibleForMe();
-            });
+            ->where(
+                function ($element) {
+                    return !$element->isVisibleForMe();
+                }
+            );
     }
-    
-    // properties
     
     public function language() : Language
     {
@@ -183,8 +183,6 @@ abstract class Element extends DbModel
         $me = self::getCurrentUser();
         return $this->isPlayableAgainstUser($me);
     }
-    
-    // timestamps
 
     public function updatedAtIso() : string
     {

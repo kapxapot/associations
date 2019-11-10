@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use Plasticode\Collection;
 use Plasticode\Query;
 use Plasticode\Models\DbModel;
 
@@ -14,8 +13,7 @@ class Language extends DbModel
     
     public function words() : Query
     {
-        return Word::getByLanguage($this)
-            ->orderByAsc('word');
+        return Word::getByLanguage($this);
     }
     
     public function lastAddedWords(int $limit = null) : Query
