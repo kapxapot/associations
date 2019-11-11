@@ -8,7 +8,7 @@ class AssociationFeedback extends Feedback
 {
     public static function getByAssociation(Association $association) : Query
     {
-        return self::baseQuery()
+        return self::query()
             ->where('association_id', $association->getId());
     }
 

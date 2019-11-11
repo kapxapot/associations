@@ -8,7 +8,7 @@ class WordFeedback extends Feedback
 {
     public static function getByWord(Word $word) : Query
     {
-        return self::baseQuery()
+        return self::query()
             ->where('word_id', $word->getId());
     }
     

@@ -11,7 +11,7 @@ class Association extends Element
     
     public static function getByWord(Word $word) : Query
     {
-        return self::baseQuery()
+        return self::query()
             ->whereAnyIs([
                 ['first_word_id' => $word->getId()],
                 ['second_word_id' => $word->getId()],
@@ -22,7 +22,7 @@ class Association extends Element
     
     public static function getByPair(Word $first, Word $second) : ?self
     {
-        return self::baseQuery()
+        return self::query()
             ->where('first_word_id', $first->getId())
             ->where('second_word_id', $second->getId())
             ->one();
@@ -61,9 +61,9 @@ class Association extends Element
     }
     
     /**
-     * Turns with this association
+     * Turns with this association.
      *
-     * @return Query
+     * @return \Plasticode\Query
      */
     public function turns() : Query
     {
@@ -71,9 +71,9 @@ class Association extends Element
     }
 
     /**
-     * Users that used this association
+     * Users that used this association.
      *
-     * @return Collection
+     * @return \Plasticode\Collection
      */
     public function users() : Collection
     {

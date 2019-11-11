@@ -13,7 +13,7 @@ class Game extends DbModel
     
     public static function getByUser(User $user) : Query
     {
-        return self::baseQuery()
+        return self::query()
             ->where('user_id', $user->getId());
     }
     
