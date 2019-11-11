@@ -1,6 +1,6 @@
 # Игра в ассоциации
 
-![](https://travis-ci.com/kapxapot/associations.svg?branch=master)
+[//]: # ![](https://travis-ci.com/kapxapot/associations.svg?branch=master)
 
 Классическая игра в ассоциации, но с самообучающейся системой!
 
