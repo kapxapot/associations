@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Interfaces\DictWordInterface;
 use Plasticode\Models\DbModel;
 
-class YandexDictWord extends DbModel
+class YandexDictWord extends DbModel implements DictWordInterface
 {
     public static function getByWord(Word $word) : ?self
     {

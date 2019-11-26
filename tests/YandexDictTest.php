@@ -9,11 +9,11 @@ final class YandexDictTest extends BaseTestCase
     /** @dataProvider existingWordsProvider */
     public function testExistingWords(string $word): void
     {
-        $dict = $this->container->yandexDict;
         $language = Language::get(Language::RUSSIAN);
-        
+        $dict = $this->container->yandexDict;
+
         $result = $dict->request($language->yandexDictCode, $word);
-        
+
         $data = json_decode($result, true);
 
         $def = $data['def'][0] ?? null;
@@ -35,14 +35,15 @@ final class YandexDictTest extends BaseTestCase
             ['таблица'],
         ];
     }
+
     /** @dataProvider notExistingWordsProvider */
     public function testNotExistingWords(string $word): void
     {
-        $dict = $this->container->yandexDict;
         $language = Language::get(Language::RUSSIAN);
-        
+        $dict = $this->container->yandexDict;
+
         $result = $dict->request($language->yandexDictCode, $word);
-        
+
         $data = json_decode($result, true);
 
         $def = $data['def'][0] ?? null;

@@ -4,29 +4,30 @@ namespace App\Services;
 
 use App\Models\Language;
 use App\Models\Word;
+use App\Services\Interfaces\ExternalDictServiceInterface;
 
 class DictionaryService
 {
     /**
-     * @var \App\Services\YandexDictService
+     * @var \App\Services\Interfaces\ExternalDictServiceInterface
      */
-    private $yandexDictService;
+    private $externalDictService;
 
-    public function __construct(YandexDictService $yandexDictService)
+    public function __construct(ExternalDictServiceInterface $externalDictService)
     {
-        $this->yandexDictService = $yandexDictService;
+        $this->externalDictService = $externalDictService;
     }
 
     public function isWordKnown(Word $word) : bool
     {
-        $dictWord = $this->yandexDictService->getWord($word);
+        $dictWord = $this->externalDictService->getWord($word);
 
         return !is_null($dictWord) && $dictWord->isValid();
     }
 
     public function isWordStrKnown(Language $language, string $wordStr) : bool
     {
-        $dictWord = $this->yandexDictService->getWordStr($language, $wordStr);
+        $dictWord = $this->externalDictService->getWordStr($language, $wordStr);
 
         return !is_null($dictWord) && $dictWord->isValid();
     }

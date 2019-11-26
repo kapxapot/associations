@@ -16,28 +16,9 @@ class TestController extends Controller
 {
     public function index(ServerRequestInterface $request, ResponseInterface $response)
     {
-        $this->dictionaryWordStrTest('чучундрик');
-        $this->dictionaryWordStrTest('самолет');
-        $this->dictionaryWordStrTest('таблица');
-        $this->dictionaryWordTest(1);
-
         die('done');
 
         //return $response;
-    }
-
-    private function dictionaryWordStrTest(string $wordStr)
-    {
-        $language = Language::get(Language::RUSSIAN);
-        var_dump($wordStr);
-        var_dump($this->dictionaryService->isWordStrKnown($language, $wordStr));
-    }
-
-    private function dictionaryWordTest(int $id)
-    {
-        $word = Word::get($id);
-        var_dump($word->word);
-        var_dump($this->dictionaryService->isWordKnown($word));
     }
 
     private function hasPlayerTest()

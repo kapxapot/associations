@@ -5,16 +5,18 @@ namespace App\Services;
 use App\Models\Language;
 use App\Models\Word;
 use App\Models\YandexDictWord;
+use App\Models\Interfaces\DictWordInterface;
+use App\Services\Interfaces\ExternalDictServiceInterface;
 use Plasticode\Contained;
 
-class YandexDictService extends Contained
+class YandexDictService extends Contained implements ExternalDictServiceInterface
 {
-    public function getWord(Word $word) : ?YandexDictWord
+    public function getWord(Word $word) : ?DictWordInterface
     {
         return $this->get($word->language(), $word->word, $word);
     }
 
-    public function getWordStr(Language $language, string $wordStr) : ?YandexDictWord
+    public function getWordStr(Language $language, string $wordStr) : ?DictWordInterface
     {
         $word = Word::findInLanguage($language, $wordStr);
 
@@ -59,18 +61,25 @@ class YandexDictService extends Contained
 
     private function loadFromDictionary(Language $language, string $wordStr, Word $word = null) : ?YandexDictWord
     {
-        $dictWord = YandexDictWord::create([
-            'word' => $wordStr,
-            'language_id' => $language->getId(),
-        ]);
+        $result = $this->yandexDict->request(
+            $language->yandexDictCode, $wordStr
+        );
+
+        if (strlen($result) == 0) {
+            return null;
+        }
+
+        $dictWord = YandexDictWord::create(
+            [
+                'word' => $wordStr,
+                'language_id' => $language->getId(),
+                'response' => $result,
+            ]
+        );
 
         if (!is_null($word)) {
             $dictWord->wordId = $word->getId();
         }
-
-        $result = $this->yandexDict->request($language->yandexDictCode, $wordStr);
-
-        $dictWord->response = $result;
 
         $data = $this->parseApiResult($result);
         $dictWord = $this->applyParsedData($dictWord, $data);
