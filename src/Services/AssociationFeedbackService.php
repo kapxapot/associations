@@ -28,13 +28,15 @@ class AssociationFeedbackService extends Contained
         $model =
             AssociationFeedback::getByAssociationAndUser($association, $user)
             ??
-            AssociationFeedback::create([
-                'association_id' => $association->getId(),
-                'created_by' => $user->getId(),
-            ]);
+            AssociationFeedback::create(
+                [
+                    'association_id' => $association->getId(),
+                    'created_by' => $user->getId(),
+                ]
+            );
 
-        $model->dislike = (($data['dislike'] ?? null) === true) ? 1 : 0;
-        $model->mature = (($data['mature'] ?? null) === true) ? 1 : 0;
+        $model->dislike = toBit($data['dislike'] ?? null);
+        $model->mature = toBit($data['mature'] ?? null);
 
         if ($model->isPersisted()) {
             $model->updatedAt = Date::dbNow();

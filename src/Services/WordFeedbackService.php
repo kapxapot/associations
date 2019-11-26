@@ -30,21 +30,26 @@ class WordFeedbackService extends Contained
         $model =
             WordFeedback::getByWordAndUser($word, $user)
             ??
-            WordFeedback::create([
-                'word_id' => $word->getId(),
-                'created_by' => $user->getId(),
-            ]);
+            WordFeedback::create(
+                [
+                    'word_id' => $word->getId(),
+                    'created_by' => $user->getId(),
+                ]
+            );
         
-        $model->dislike = (($data['dislike'] ?? null) === true) ? 1 : 0;
+        $model->dislike = toBit($data['dislike'] ?? null);
         
         $typo = Strings::normalize($data['typo'] ?? null);
         $model->typo = (strlen($typo) > 0) ? $typo : null;
         
         $duplicate = Strings::normalize($data['duplicate'] ?? null);
         $duplicateWord = Word::findInLanguage($word->language(), $duplicate);
-        $model->duplicateId = ($duplicateWord !== null) ? $duplicateWord->getId() : null;
         
-        $model->mature = (($data['mature'] ?? null) === true) ? 1 : 0;
+        $model->duplicateId = ($duplicateWord !== null)
+            ? $duplicateWord->getId()
+            : null;
+        
+        $model->mature = toBit($data['mature'] ?? null);
 
         if ($model->isPersisted()) {
             $model->updatedAt = Date::dbNow();
@@ -80,7 +85,8 @@ class WordFeedbackService extends Contained
             $word = Word::get($data['word_id'] ?? null);
             
             if ($word !== null) {
-                $result['duplicate'] = Validator::mainWordExists($word->language(), $word);
+                $result['duplicate'] =
+                    Validator::mainWordExists($word->language(), $word);
             }
         }
         

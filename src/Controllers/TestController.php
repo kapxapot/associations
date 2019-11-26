@@ -48,18 +48,6 @@ class TestController extends Controller
     {
         $this->eventLog->info('Test');
     }
-
-    private function runFeedbackTests()
-    {
-        $results = [
-            'empty word array' => $this->wordFeedbackEmptyTest(),
-            'full word array' => $this->wordFeedbackFullTest(),
-            'empty association array' => $this->associationFeedbackEmptyTest(),
-            'full association array' => $this->associationFeedbackFullTest(),
-        ];
-        
-        var_dump($results);
-    }
     
     /*
     {
