@@ -493,6 +493,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
+            "abandoned": "psr/container",
             "time": "2017-02-14T19:40:03+00:00"
         },
         {
@@ -622,12 +623,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kapxapot/plasticode.git",
-                "reference": "8970641585461113274c983ec7ad3700cf6ee31d"
+                "reference": "eae1101b4a02871d36409e0198195cceffbf7d94"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/8970641585461113274c983ec7ad3700cf6ee31d",
-                "reference": "8970641585461113274c983ec7ad3700cf6ee31d",
+                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/eae1101b4a02871d36409e0198195cceffbf7d94",
+                "reference": "eae1101b4a02871d36409e0198195cceffbf7d94",
                 "shasum": ""
             },
             "require": {
@@ -680,7 +681,7 @@
                 "source": "https://github.com/kapxapot/plasticode/tree/master",
                 "issues": "https://github.com/kapxapot/plasticode/issues"
             },
-            "time": "2019-11-13T13:50:21+00:00"
+            "time": "2019-11-30T12:04:29+00:00"
         },
         {
             "name": "monolog/monolog",

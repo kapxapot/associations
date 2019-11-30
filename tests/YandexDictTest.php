@@ -7,7 +7,7 @@ use App\Models\Language;
 final class YandexDictTest extends BaseTestCase
 {
     /** @dataProvider existingWordsProvider */
-    public function testExistingWords(string $word): void
+    public function testExistingWords(string $word) : void
     {
         $language = Language::get(Language::RUSSIAN);
         $dict = $this->container->yandexDict;
@@ -37,7 +37,7 @@ final class YandexDictTest extends BaseTestCase
     }
 
     /** @dataProvider notExistingWordsProvider */
-    public function testNotExistingWords(string $word): void
+    public function testNotExistingWords(string $word) : void
     {
         $language = Language::get(Language::RUSSIAN);
         $dict = $this->container->yandexDict;

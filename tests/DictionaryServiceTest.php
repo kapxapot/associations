@@ -8,7 +8,7 @@ use App\Models\Word;
 final class DictionaryServiceTest extends BaseTestCase
 {
     /** @dataProvider isWordStrKnownProvider */
-    public function testIsWordStrKnown(string $word, bool $expected): void
+    public function testIsWordStrKnown(string $word, bool $expected) : void
     {
         $language = Language::get(Language::RUSSIAN);
         $service = $this->container->dictionaryService;
@@ -30,7 +30,7 @@ final class DictionaryServiceTest extends BaseTestCase
     }
 
     /** @dataProvider isWordKnownProvider */
-    public function testIsWordKnown(int $wordId, bool $expected): void
+    public function testIsWordKnown(int $wordId, bool $expected) : void
     {
         $service = $this->container->dictionaryService;
         $word = Word::get($wordId);

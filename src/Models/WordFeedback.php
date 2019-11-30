@@ -28,7 +28,7 @@ class WordFeedback extends Feedback
         return strlen($this->typo) > 0;
     }
     
-    public function duplicate()
+    public function duplicate() : ?Word
     {
         return Word::get($this->duplicateId);
     }

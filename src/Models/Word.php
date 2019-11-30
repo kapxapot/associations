@@ -15,7 +15,7 @@ class Word extends Element
      * 
      * Normalized word string expected.
      */
-    public static function findInLanguage(Language $language, string $wordStr) : ?Word
+    public static function findInLanguage(Language $language, ?string $wordStr) : ?Word
     {
         return self::getByLanguage($language)
             ->where('word_bin', $wordStr)

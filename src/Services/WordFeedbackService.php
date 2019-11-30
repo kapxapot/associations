@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use App\Models\Word;
 use App\Models\WordFeedback;
 use Plasticode\Contained;
 use Plasticode\Exceptions\ValidationException;
+use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\ValidationRules;
@@ -13,19 +15,17 @@ use Respect\Validation\Validator;
 
 class WordFeedbackService extends Contained
 {
-    public function toModel(array $data) : WordFeedback
+    public function toModel(array $data, User $user) : WordFeedback
     {
         $this->validate($data);
         
-        return $this->convertToModel($data);
+        return $this->convertToModel($data, $user);
     }
 
-    private function convertToModel(array $data) : WordFeedback
+    private function convertToModel(array $data, User $user) : WordFeedback
     {
         $wordId = $data['word_id'];
         $word = Word::get($wordId);
-        
-        $user = $this->auth->getUser();
         
         $model =
             WordFeedback::getByWordAndUser($word, $user)
@@ -37,7 +37,7 @@ class WordFeedbackService extends Contained
                 ]
             );
         
-        $model->dislike = toBit($data['dislike'] ?? null);
+        $model->dislike = Convert::toBit($data['dislike'] ?? null);
         
         $typo = Strings::normalize($data['typo'] ?? null);
         $model->typo = (strlen($typo) > 0) ? $typo : null;
@@ -49,7 +49,7 @@ class WordFeedbackService extends Contained
             ? $duplicateWord->getId()
             : null;
         
-        $model->mature = toBit($data['mature'] ?? null);
+        $model->mature = Convert::toBit($data['mature'] ?? null);
 
         if ($model->isPersisted()) {
             $model->updatedAt = Date::dbNow();

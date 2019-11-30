@@ -7,8 +7,3 @@ if (!function_exists('dd')) {
         die();
     }
 }
-
-function toBit($value) : int
-{
-    return ($value === true) ? 1 : 0;
-}

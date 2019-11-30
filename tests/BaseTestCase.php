@@ -3,6 +3,7 @@
 namespace App\Tests;
 
 use App\Config\Bootstrap;
+use App\Models\User;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Core\App;
 use Plasticode\Core\Core;
@@ -14,6 +15,8 @@ use Slim\Http\Response;
 
 abstract class BaseTestCase extends TestCase
 {
+    const DEFAULT_USER_ID = 1;
+
     /** @var \Slim\App */
     protected $app;
 
@@ -30,14 +33,14 @@ abstract class BaseTestCase extends TestCase
      */
     protected $withMiddleware = true;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         parent::setUp();
 
         $this->createApplication();
     }
 
-    protected function tearDown(): void
+    protected function tearDown() : void
     {
         unset($this->app);
 
@@ -140,5 +143,10 @@ abstract class BaseTestCase extends TestCase
         }
         
         require $root . '/src/routes.php';
+    }
+
+    protected function getDefaultUser() : User
+    {
+        return $this->container->userRepository->get(self::DEFAULT_USER_ID);
     }
 }

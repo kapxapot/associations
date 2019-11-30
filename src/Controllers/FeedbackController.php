@@ -22,9 +22,11 @@ class FeedbackController extends Controller
             throw new BadRequestException('No word or association feedback provided.');
         }
 
+        $user = $this->auth->getUser();
+
         if (!empty($wordData)) {
             $wordFeedback = $this->wordFeedbackService
-                ->toModel($wordData)
+                ->toModel($wordData, $user)
                 ->save();
 
             $event = new WordFeedbackEvent($wordFeedback);
@@ -33,15 +35,16 @@ class FeedbackController extends Controller
 
         if (!empty($associationData)) {
             $assocFeedback = $this->associationFeedbackService
-                ->toModel($associationData)
+                ->toModel($associationData, $user)
                 ->save();
 
             $event = new AssociationFeedbackEvent($assocFeedback);
             $this->dispatcher->dispatch($event);
         }
 
-        return Response::json($response, [
-            'message' => $this->translate('Feedback saved successfully.'),
-        ]);
+        return Response::json(
+            $response,
+            ['message' => $this->translate('Feedback saved successfully.')]
+        );
     }
 }
