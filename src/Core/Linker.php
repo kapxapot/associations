@@ -21,7 +21,10 @@ class Linker extends LinkerBase
             return null;
         }
 
-        return $this->router->pathFor('main.association', ['id' => $association->getId()]);
+        return $this->router->pathFor(
+            'main.association',
+            ['id' => $association->getId()]
+        );
     }
 
     public function game(Game $game) : ?string
