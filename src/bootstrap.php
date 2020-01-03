@@ -6,7 +6,7 @@ $root = $dir . '/..';
 require $root . '/vendor/autoload.php';
 require $root . '/src/functions.php';
 
-\Plasticode\Core\Env::load($root);
+$env = \Plasticode\Core\Env::load($root);
 
 $appSettings = \Plasticode\Core\Settings::load($root . '/settings');
 

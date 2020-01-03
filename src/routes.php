@@ -29,7 +29,7 @@ $access = function (string $entity, string $action, string $redirect = null) use
 $root = $settings['root'];
 $trueRoot = (strlen($root) == 0);
 
-$app->group($root, function () use ($trueRoot, $settings, $access, $container) {
+$app->group($root, function () use ($trueRoot, $settings, $access, $container, $env) {
 
     // public api
     
@@ -86,7 +86,9 @@ $app->group($root, function () use ($trueRoot, $settings, $access, $container) {
     $this->get('/words/{id:\d+}', WordController::class . ':get')->setName('main.word');
     $this->get('/words', WordController::class . ':index')->setName('main.words');
     
-    $this->get('/test', TestController::class . ':index')->setName('main.test');
+    if ($env->isDev()) {
+        $this->get('/test', TestController::class . ':index')->setName('main.test');
+    }
 
     $this->get($trueRoot ? '/' : '', IndexController::class . ':index')->setName('main.index');
 
