@@ -2,7 +2,9 @@
 
 namespace App\Config;
 
-class Captcha
+use Plasticode\Config\Interfaces\CaptchaConfigInterface;
+
+class CaptchaConfig implements CaptchaConfigInterface
 {
     public function getReplaces() : array
     {

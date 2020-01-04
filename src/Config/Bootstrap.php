@@ -19,14 +19,12 @@ class Bootstrap extends BootstrapBase
         return array_merge(
             $mappings,
             [
-                // $c == $container
-                
                 'userClass' => function (ContainerInterface $container) {
                     return \App\Models\User::class;
                 },
 
-                'localization' => function (ContainerInterface $container) {
-                    return new \App\Config\Localization();
+                'localizationConfig' => function (ContainerInterface $container) {
+                    return new \App\Config\LocalizationConfig();
                 },
 
                 'linker' => function (ContainerInterface $container) {
@@ -38,7 +36,7 @@ class Bootstrap extends BootstrapBase
                 },
             
                 'captchaConfig' => function (ContainerInterface $container) {
-                    return new \App\Config\Captcha();  
+                    return new \App\Config\CaptchaConfig();
                 },
         
                 'eventProcessors' => function (ContainerInterface $container) {

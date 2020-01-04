@@ -2,9 +2,9 @@
 
 namespace App\Config;
 
-use Plasticode\Config\Localization as LocalizationBase;
+use Plasticode\Config\LocalizationConfig as BaseConfig;
 
-class Localization extends LocalizationBase
+class LocalizationConfig extends BaseConfig
 {
     protected function ru() : array
     {
