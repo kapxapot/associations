@@ -2,10 +2,9 @@
 
 namespace App\Events;
 
+use App\Models\Feedback;
 use Plasticode\Events\Event;
 use Plasticode\Models\DbModel;
-
-use App\Models\Feedback;
 
 abstract class FeedbackEvent extends Event
 {

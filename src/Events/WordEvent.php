@@ -2,10 +2,9 @@
 
 namespace App\Events;
 
+use App\Models\Word;
 use Plasticode\Events\Event;
 use Plasticode\Models\DbModel;
-
-use App\Models\Word;
 
 abstract class WordEvent extends Event
 {

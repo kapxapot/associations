@@ -9,7 +9,9 @@ use App\Events\AssociationOutOfDateEvent;
 use App\Events\NewTurnEvent;
 use App\Events\WordMatureEvent;
 use App\Models\Association;
+use App\Models\AssociationFeedback;
 use Plasticode\Events\EventProcessor;
+use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 
 class AssociationRecountService extends EventProcessor
@@ -49,7 +51,10 @@ class AssociationRecountService extends EventProcessor
      */
     public function processAssociationFeedbackEvent(AssociationFeedbackEvent $event) : iterable
     {
-        $assoc = $event->getFeedback()->association();
+        /** @var AssociationFeedback */
+        $feedback = $event->getFeedback();
+        $assoc = $feedback->association();
+
         return $this->recountAll($assoc);
     }
 
@@ -89,7 +94,7 @@ class AssociationRecountService extends EventProcessor
         $now = Date::dbNow();
 
         if ($assoc->isApproved() !== $approved || is_null($assoc->approvedUpdatedAt)) {
-            $assoc->approved = $approved ? 1 : 0;
+            $assoc->approved = Convert::toBit($approved);
             $assoc->approvedUpdatedAt = $now;
         }
 
@@ -102,8 +107,7 @@ class AssociationRecountService extends EventProcessor
     {
         if ($assoc->firstWord()->isMature() || $assoc->secondWord()->isMature()) {
             $mature = true;
-        }
-        else {
+        } else {
             $threshold = self::getSettings('associations.mature_threshold');
 
             $maturesCount = $assoc->matures()->count();
@@ -114,7 +118,7 @@ class AssociationRecountService extends EventProcessor
         $now = Date::dbNow();
 
         if ($assoc->isMature() !== $mature || is_null($assoc->matureUpdateAt)) {
-            $assoc->mature = $mature ? 1 : 0;
+            $assoc->mature = Convert::toBit($mature);
             $assoc->matureUpdatedAt = $now;
         }
 

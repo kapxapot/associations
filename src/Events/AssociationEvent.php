@@ -2,10 +2,9 @@
 
 namespace App\Events;
 
+use App\Models\Association;
 use Plasticode\Events\Event;
 use Plasticode\Models\DbModel;
-
-use App\Models\Association;
 
 abstract class AssociationEvent extends Event
 {

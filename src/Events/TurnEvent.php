@@ -2,10 +2,9 @@
 
 namespace App\Events;
 
+use App\Models\Turn;
 use Plasticode\Events\Event;
 use Plasticode\Models\DbModel;
-
-use App\Models\Turn;
 
 abstract class TurnEvent extends Event
 {

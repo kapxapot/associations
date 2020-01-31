@@ -35,12 +35,12 @@ class Association extends Element
         return Collection::make([$this->firstWord(), $this->secondWord()]);
     }
 
-    public function firstWord()
+    public function firstWord() : Word
     {
         return Word::get($this->firstWordId);
     }
     
-    public function secondWord()
+    public function secondWord() : Word
     {
         return Word::get($this->secondWordId);
     }

@@ -8,7 +8,9 @@ use App\Events\WordFeedbackEvent;
 use App\Events\WordMatureEvent;
 use App\Events\WordOutOfDateEvent;
 use App\Models\Word;
+use App\Models\WordFeedback;
 use Plasticode\Events\EventProcessor;
+use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 
 class WordRecountService extends EventProcessor
@@ -33,7 +35,10 @@ class WordRecountService extends EventProcessor
      */
     public function processWordFeedbackEvent(WordFeedbackEvent $event) : iterable
     {
-        $word = $event->getFeedback()->word();
+        /** @var WordFeedback */
+        $feedback = $event->getFeedback();
+        $word = $feedback->word();
+
         return $this->recountAll($word);
     }
 
@@ -71,7 +76,7 @@ class WordRecountService extends EventProcessor
         $now = Date::dbNow();
 
         if ($word->isApproved() !== $approved || is_null($word->approvedUpdatedAt)) {
-            $word->approved = $approved ? 1 : 0;
+            $word->approved = Convert::toBit($approved);
             $word->approvedUpdatedAt = $now;
         }
 
@@ -90,7 +95,7 @@ class WordRecountService extends EventProcessor
         $now = Date::dbNow();
 
         if ($word->isMature() !== $mature || is_null($word->matureUpdatedAt)) {
-            $word->mature = $mature ? 1 : 0;
+            $word->mature = Convert::toBit($mature);
             $word->matureUpdatedAt = $now;
         }
 
