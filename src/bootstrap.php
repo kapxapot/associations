@@ -33,6 +33,8 @@ $bootstrap = new \App\Config\Bootstrap($settings, $dir);
     ['App\\Validation\\Rules\\']
 );
 
+$container['env'] = $env;
+
 // middleware
 
 $app->add(new \Plasticode\Middleware\SlashMiddleware($container));
