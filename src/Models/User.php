@@ -52,7 +52,7 @@ class User extends UserBase
             ->distinct();
     }
     
-    public function serialize() : ?array
+    public function serialize() : array
     {
         return [
             'id' => $this->getId(),
