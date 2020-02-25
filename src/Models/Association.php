@@ -63,7 +63,7 @@ class Association extends Element
     /**
      * Turns with this association.
      *
-     * @return \Plasticode\Query
+     * @return Query
      */
     public function turns() : Query
     {
@@ -73,7 +73,7 @@ class Association extends Element
     /**
      * Users that used this association.
      *
-     * @return \Plasticode\Collection
+     * @return Collection
      */
     public function users() : Collection
     {
@@ -81,7 +81,7 @@ class Association extends Element
 
         return Collection::make($userIds)
             ->map(function ($userId) {
-                return self::getUser($userId);
+                return self::$userRepository->get($userId);
             });
     }
     

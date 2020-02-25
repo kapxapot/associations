@@ -65,7 +65,7 @@ class Turn extends DbModel
     
     public function user() : ?User
     {
-        return self::getUser($this->userId);
+        return self::$userRepository->get($this->userId);
     }
     
     public function association() : ?Association
