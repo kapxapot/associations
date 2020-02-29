@@ -4,7 +4,6 @@ $dir = __DIR__;
 $root = $dir . '/..';
 
 require $root . '/vendor/autoload.php';
-require $root . '/src/functions.php';
 
 $env = \Plasticode\Core\Env::load($root);
 
