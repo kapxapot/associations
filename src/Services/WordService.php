@@ -2,20 +2,41 @@
 
 namespace App\Services;
 
+use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
-use Plasticode\Contained;
-use Plasticode\Exceptions\InvalidArgumentException;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
-use Plasticode\Exceptions\ValidationException;
 use Plasticode\Util\Strings;
+use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
+use Psr\Container\ContainerInterface;
 use Respect\Validation\Validator;
+use Webmozart\Assert\Assert;
 
-class WordService extends Contained
+class WordService
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var WordConfigInterface */
+    private $config;
+
+    /** @var ValidatorInterface */
+    private $validator;
+
+    public function __construct(
+        ContainerInterface $container,
+        WordConfigInterface $config,
+        ValidatorInterface $validator
+    )
+    {
+        $this->container = $container;
+        $this->config = $config;
+        $this->validator = $validator;
+    }
+
     /**
      * Normalized word string expected
      */
@@ -50,18 +71,10 @@ class WordService extends Contained
      */
     public function create(Language $language, string $wordStr, User $user) : Word
     {
-        if ($language === null) {
-            throw new InvalidArgumentException('Language must be non-null.');
-        }
-        
-        if (strlen($wordStr) === 0) {
-            throw new InvalidArgumentException('Word can\'t be empty.');
-        }
+        Assert::notNull($language, 'Language must be non-null.');
+        Assert::notEmpty($wordStr, 'Word can\'t be empty.');
+        Assert::notNull($user, 'User must be non-null.');
 
-        if ($user === null) {
-            throw new InvalidArgumentException('User must be non-null.');
-        }
-        
         if (Word::findInLanguage($language, $wordStr) !== null) {
             throw new InvalidOperationException('Word already exists.');
         }
@@ -77,7 +90,7 @@ class WordService extends Contained
     }
 
     /**
-     * Returns validation rules chain for word
+     * Returns validation rules chain for word.
      */
     public function getRule() : Validator
     {
@@ -91,13 +104,12 @@ class WordService extends Contained
 
     public function validateWord(string $wordStr) : void
     {
-        $validation = $this->validator->validateArray(
-            ['word' => $wordStr],
-            ['word' => $this->getRule()]
-        );
-        
-        if ($validation->failed()) {
-            throw new ValidationException($validation->errors);
-        }
+        $this
+            ->validator
+            ->validateArray(
+                ['word' => $wordStr],
+                ['word' => $this->getRule()]
+            )
+            ->throwOnFail();
     }
 }

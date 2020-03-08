@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Config\Interfaces\WordConfigInterface;
 use App\Events\AssociationApprovedEvent;
 use App\Events\WordApprovedEvent;
 use App\Events\WordFeedbackEvent;
@@ -15,6 +16,14 @@ use Plasticode\Util\Date;
 
 class WordRecountService extends EventProcessor
 {
+    /** @var WordConfigInterface */
+    private $config;
+
+    public function __construct(WordConfigInterface $config)
+    {
+        $this->config = $config;
+    }
+
     /**
      * AssociationApprovedEvent event processing
      */
@@ -63,9 +72,9 @@ class WordRecountService extends EventProcessor
 
     private function recountApproved(Word $word) : Word
     {
-        $assocCoeff = $this->getSettings('words.coeffs.approved_association');
-        $dislikeCoeff = $this->getSettings('words.coeffs.dislike');
-        $threshold = $this->getSettings('words.approval_threshold');
+        $assocCoeff = $this->config->wordApprovedAssociationCoeff();
+        $dislikeCoeff = $this->config->wordDislikeCoeff();
+        $threshold = $this->config->wordApprovalThreshold();
         
         $approvedAssocsCount = $word->approvedAssociations()->count();
         $dislikeCount = $word->dislikes()->count();
@@ -87,7 +96,7 @@ class WordRecountService extends EventProcessor
 
     private function recountMature(Word $word) : Word
     {
-        $threshold = $this->getSettings('words.mature_threshold');
+        $threshold = $this->config->wordMatureThreshold();
         
         $score = $word->matures()->count();
         $mature = ($score >= $threshold);

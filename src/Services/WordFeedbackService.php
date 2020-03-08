@@ -5,16 +5,31 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Word;
 use App\Models\WordFeedback;
-use Plasticode\Contained;
-use Plasticode\Exceptions\ValidationException;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 use Plasticode\Util\Strings;
+use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
+use Psr\Container\ContainerInterface;
 use Respect\Validation\Validator;
 
-class WordFeedbackService extends Contained
+class WordFeedbackService
 {
+    /** @var ContainerInterface */
+    private $container;
+
+    /** @var ValidatorInterface */
+    private $validator;
+
+    public function __construct(
+        ContainerInterface $container,
+        ValidatorInterface $validator
+    )
+    {
+        $this->container = $container;
+        $this->validator = $validator;
+    }
+
     public function toModel(array $data, User $user) : WordFeedback
     {
         $this->validate($data);
@@ -61,11 +76,11 @@ class WordFeedbackService extends Contained
     private function validate(array $data)
     {
         $rules = $this->getRules($data);
-        $validation = $this->validator->validateArray($data, $rules);
         
-        if ($validation->failed()) {
-            throw new ValidationException($validation->errors);
-        }
+        $this
+            ->validator
+            ->validateArray($data, $rules)
+            ->throwOnFail();
     }
 
     private function getRules(array $data) : array
@@ -73,7 +88,8 @@ class WordFeedbackService extends Contained
         $rules = new ValidationRules($this->container);
 
         $result = [
-            'word_id' => $rules->get('posInt')
+            'word_id' => $rules
+                ->get('posInt')
                 ->wordExists(),
         ];
         

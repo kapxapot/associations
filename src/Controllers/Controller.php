@@ -17,11 +17,11 @@ class Controller extends BaseController
     {
         $params = $settings['params'] ?? [];
         
-        $game = $params['game'] ?? null;            
+        $game = $params['game'] ?? null;
         $language = $params['language'] ?? null;
 
-        if ($language === null) {
-            $language = ($game !== null)
+        if (is_null($language)) {
+            $language = $game
                 ? $game->language()
                 : $this->languageService->getDefaultLanguage();
         }
@@ -29,25 +29,34 @@ class Controller extends BaseController
         // todo: move this to SidebarPartsProviderService
         if ($language !== null) {
             $wordCount = $language->words()->count();
-            $wordCountStr = $this->cases->caseForNumber('слово', $wordCount);
+            $wordCountStr = $this->cases->caseForNumber(
+                'слово',
+                $wordCount
+            );
 
             $associationCount = $language->associations()->count();
-            $associationCountStr = $this->cases->caseForNumber('ассоциация', $associationCount);
+            $associationCountStr = $this->cases->caseForNumber(
+                'ассоциация',
+                $associationCount
+            );
             
             $params['language'] = $language;
             
-            $params = array_merge($params, [
-                'word_count' => $wordCount,
-                'word_count_str' => $wordCountStr,
-                'word_anniversary' => $this->isAnniversary($wordCount)
-                    ? $this->toAnniversaryNumber($wordCount)
-                    : null,
-                'association_count' => $associationCount,
-                'association_count_str' => $associationCountStr,
-                'association_anniversary' => $this->isAnniversary($associationCount)
-                    ? $this->toAnniversaryNumber($associationCount)
-                    : null,
-            ]);
+            $params = array_merge(
+                $params,
+                [
+                    'word_count' => $wordCount,
+                    'word_count_str' => $wordCountStr,
+                    'word_anniversary' => $this->isAnniversary($wordCount)
+                        ? $this->toAnniversaryNumber($wordCount)
+                        : null,
+                    'association_count' => $associationCount,
+                    'association_count_str' => $associationCountStr,
+                    'association_anniversary' => $this->isAnniversary($associationCount)
+                        ? $this->toAnniversaryNumber($associationCount)
+                        : null,
+                ]
+            );
         }
         
         return parent::buildParams(['params' => $params]);

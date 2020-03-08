@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "37fe83e1ddc39ae0278a28a4e4a5a609",
+    "content-hash": "8fbdb84406d90c20b5c5f4ea4ea718e9",
     "packages": [
         {
             "name": "cakephp/cache",
@@ -593,12 +593,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/kapxapot/plasticode.git",
-                "reference": "9b27de4d5e39a636e7c34e6ec2e41e4a71f3cbb7"
+                "reference": "683b4dd393dd5aaf394faf2f498a574c3b34c7e9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/9b27de4d5e39a636e7c34e6ec2e41e4a71f3cbb7",
-                "reference": "9b27de4d5e39a636e7c34e6ec2e41e4a71f3cbb7",
+                "url": "https://api.github.com/repos/kapxapot/plasticode/zipball/683b4dd393dd5aaf394faf2f498a574c3b34c7e9",
+                "reference": "683b4dd393dd5aaf394faf2f498a574c3b34c7e9",
                 "shasum": ""
             },
             "require": {
@@ -620,12 +620,16 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Plasticode\\": "src",
-                    "Plasticode\\Tests\\": "tests"
+                    "Plasticode\\": "src"
                 },
                 "files": [
                     "functions/functions.php"
                 ]
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "Plasticode\\Tests\\": "tests"
+                }
             },
             "scripts": {
                 "test": [
@@ -656,7 +660,7 @@
                 "source": "https://github.com/kapxapot/plasticode/tree/master",
                 "issues": "https://github.com/kapxapot/plasticode/issues"
             },
-            "time": "2020-02-29T15:30:41+00:00"
+            "time": "2020-03-08T20:18:18+00:00"
         },
         {
             "name": "monolog/monolog",

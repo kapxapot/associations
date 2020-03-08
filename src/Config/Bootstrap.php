@@ -2,6 +2,9 @@
 
 namespace App\Config;
 
+use App\Services\AssociationFeedbackService;
+use App\Services\WordFeedbackService;
+use App\Services\WordService;
 use Plasticode\Config\Bootstrap as BootstrapBase;
 use Psr\Container\ContainerInterface;
 
@@ -32,7 +35,9 @@ class Bootstrap extends BootstrapBase
                 },
                 
                 'config' => function (ContainerInterface $container) {
-                    return new \App\Config\Config($container);
+                    return new Config(
+                        $container->settingsProvider
+                    );
                 },
             
                 'captchaConfig' => function (ContainerInterface $container) {
@@ -63,8 +68,9 @@ class Bootstrap extends BootstrapBase
                 },
                 
                 'associationFeedbackService' => function (ContainerInterface $container) {
-                    return new \App\Services\AssociationFeedbackService(
-                        $container
+                    return new AssociationFeedbackService(
+                        $container,
+                        $container->validator
                     );
                 },
                 
@@ -81,11 +87,18 @@ class Bootstrap extends BootstrapBase
                 },
                 
                 'wordService' => function (ContainerInterface $container) {
-                    return new \App\Services\WordService($container);
+                    return new WordService(
+                        $container,
+                        $container->config,
+                        $container->validator
+                    );
                 },
                 
                 'wordFeedbackService' => function (ContainerInterface $container) {
-                    return new \App\Services\WordFeedbackService($container);
+                    return new WordFeedbackService(
+                        $container,
+                        $container->validator
+                    );
                 },
 
                 'yandexDictService' => function (ContainerInterface $container) {

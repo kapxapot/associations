@@ -9,6 +9,20 @@ use Plasticode\Util\Date;
 
 class User extends UserBase
 {
+    /** @var boolean */
+    private $mature = false;
+    
+    public function isMature() : bool
+    {
+        return $this->mature;
+    }
+
+    public function withMature(bool $mature) : self
+    {
+        $this->mature = $mature;
+        return $this;
+    }
+
     public function games() : Query
     {
         return Game::getByUser($this);
@@ -65,16 +79,5 @@ class User extends UserBase
         $yearsPassed = Date::age($this->createdAt)->y;
         
         return $this->age + $yearsPassed;
-    }
-    
-    public function isMature() : bool
-    {
-        return $this->lazy(
-            function () {
-                $matureAge = self::getSettings('users.mature_age', 16);
-        
-                return $this->ageNow >= $matureAge;
-            }
-        );
     }
 }

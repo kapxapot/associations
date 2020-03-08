@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Config\Interfaces\AssociationConfigInterface;
 use App\Events\AssociationApprovedEvent;
 use App\Events\AssociationFeedbackEvent;
 use App\Events\AssociationMatureEvent;
@@ -16,6 +17,14 @@ use Plasticode\Util\Date;
 
 class AssociationRecountService extends EventProcessor
 {
+    /** @var AssociationConfigInterface */
+    private $config;
+
+    public function __construct(AssociationConfigInterface $config)
+    {
+        $this->config = $config;
+    }
+
     /**
      * NewTurnEvent event processing
      */
@@ -79,9 +88,9 @@ class AssociationRecountService extends EventProcessor
 
     private function recountApproved(Association $assoc) : Association
     {
-        $usageCoeff = self::getSettings('associations.coeffs.usage');
-        $dislikeCoeff = self::getSettings('associations.coeffs.dislike');
-        $threshold = self::getSettings('associations.approval_threshold');
+        $usageCoeff = $this->config->associationUsageCoeff();
+        $dislikeCoeff = $this->config->associationDislikeCoeff();
+        $threshold = $this->config->associationApprovalThreshold();
         
         $turnsByUsers = $assoc->turnsByUsers();
         $turnCount = count($turnsByUsers);
@@ -108,7 +117,7 @@ class AssociationRecountService extends EventProcessor
         if ($assoc->firstWord()->isMature() || $assoc->secondWord()->isMature()) {
             $mature = true;
         } else {
-            $threshold = self::getSettings('associations.mature_threshold');
+            $threshold = $this->config->associationMatureThreshold();
 
             $maturesCount = $assoc->matures()->count();
 

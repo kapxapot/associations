@@ -12,10 +12,12 @@ class Association extends Element
     public static function getByWord(Word $word) : Query
     {
         return self::query()
-            ->whereAnyIs([
-                ['first_word_id' => $word->getId()],
-                ['second_word_id' => $word->getId()],
-            ]);
+            ->whereAnyIs(
+                [
+                    ['first_word_id' => $word->getId()],
+                    ['second_word_id' => $word->getId()],
+                ]
+            );
     }
     
     // getters - one
@@ -57,7 +59,7 @@ class Association extends Element
     
     public function url() : ?string
     {
-        return self::$linker->association($this);
+        return self::$container->linker->association($this);
     }
     
     /**
@@ -80,9 +82,11 @@ class Association extends Element
         $userIds = array_keys($this->turnsByUsers());
 
         return Collection::make($userIds)
-            ->map(function ($userId) {
-                return self::$userRepository->get($userId);
-            });
+            ->map(
+                function ($userId) {
+                    return self::$container->userRepository->get($userId);
+                }
+            );
     }
     
     public function feedbacks() : Query

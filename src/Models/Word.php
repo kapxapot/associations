@@ -66,9 +66,11 @@ class Word extends Element
             return null;
         }
 
-        $isPlural = (self::$cases->numberForNumber($count) == Cases::PLURAL);
+        $cases = self::$container->cases;
 
-        $str = $count . ' ' . self::$cases->caseForNumber('ассоциация', $count) . ' ' . ($isPlural ? 'скрыто' : 'скрыта') . '.';
+        $isPlural = ($cases->numberForNumber($count) == Cases::PLURAL);
+
+        $str = $count . ' ' . $cases->caseForNumber('ассоциация', $count) . ' ' . ($isPlural ? 'скрыто' : 'скрыта') . '.';
 
         return $str;
     }
@@ -135,7 +137,7 @@ class Word extends Element
     
     public function url() : ?string
     {
-        return self::$linker->word($this);
+        return self::$container->linker->word($this);
     }
     
     public function turns() : Query

@@ -114,7 +114,7 @@ abstract class Element extends DbModel
     
     public function currentFeedback() : ?Feedback
     {
-        $user = self::getCurrentUser();
+        $user = self::$container->auth->getUser();
         
         return !is_null($user)
             ? $this->feedbackByUser($user)

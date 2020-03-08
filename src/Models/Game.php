@@ -26,7 +26,7 @@ class Game extends DbModel
     
     public function turnsCountStr() : string
     {
-        return self::$cases->caseForNumber('ход', $this->turns()->count());
+        return self::$container->cases->caseForNumber('ход', $this->turns()->count());
     }
     
     public function lastTurn() : ?Turn
@@ -69,7 +69,7 @@ class Game extends DbModel
     
     public function user() : User
     {
-        return self::$userRepository->get($this->userId);
+        return self::$container->userRepository->get($this->userId);
     }
 
     public function creator() : User
@@ -140,7 +140,7 @@ class Game extends DbModel
     
     public function url() : ?string
     {
-        return self::$linker->game($this);
+        return self::$container->linker->game($this);
     }
     
     public function displayName() : string
