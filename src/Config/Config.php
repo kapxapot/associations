@@ -5,30 +5,10 @@ namespace App\Config;
 use App\Config\Interfaces\AssociationConfigInterface;
 use App\Config\Interfaces\UserConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
-use Plasticode\Interfaces\SettingsProviderInterface;
+use Plasticode\Config\Config as ConfigBase;
 
-class Config implements AssociationConfigInterface, UserConfigInterface, WordConfigInterface
+class Config extends ConfigBase implements AssociationConfigInterface, UserConfigInterface, WordConfigInterface
 {
-    /** @var SettingsProviderInterface */
-    private $settingsProvider;
-
-    public function __construct(SettingsProviderInterface $settingsProvider)
-    {
-        $this->settingsProvider = $settingsProvider;
-    }
-
-    /**
-     * Get settings value.
-     *
-     * @param string $var
-     * @param mixed $def
-     * @return mixed
-     */
-    private function get(string $var, $def = null)
-    {
-        return $this->settingsProvider->getSettings($var, $def);
-    }
-
     public function associationUsageCoeff() : float
     {
         return $this->get('associations.coeffs.usage', 1);
