@@ -5,14 +5,31 @@ namespace App\Services;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
-use Plasticode\Contained;
 use Plasticode\Collection;
+use Plasticode\Interfaces\SettingsProviderInterface;
 
-class LanguageService extends Contained
+class LanguageService
 {
+    /** @var SettingsProviderInterface */
+    private $settingsProvider;
+
+    /** @var WordService */
+    private $wordService;
+
+    public function __construct(
+        SettingsProviderInterface $settingsProvider,
+        WordService $wordService
+    )
+    {
+        $this->settingsProvider = $settingsProvider;
+        $this->wordService = $wordService;
+    }
+
     public function getDefaultLanguage()
     {
-        return Language::get($this->getSettings('languages.default_id'));
+        $defaultId = $this->settingsProvider->getSettings('languages.default_id')
+
+        return Language::get($defaultId);
     }
     
     public function getRandomWord(Language $language, Collection $exclude = null)

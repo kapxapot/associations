@@ -5,28 +5,28 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Word;
 use App\Models\WordFeedback;
+use Plasticode\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
-use Psr\Container\ContainerInterface;
 use Respect\Validation\Validator;
 
 class WordFeedbackService
 {
-    /** @var ContainerInterface */
-    private $container;
+    /** @var SettingsProviderInterface */
+    private $settingsProvider;
 
     /** @var ValidatorInterface */
     private $validator;
 
     public function __construct(
-        ContainerInterface $container,
+        SettingsProviderInterface $settingsProvider,
         ValidatorInterface $validator
     )
     {
-        $this->container = $container;
+        $this->settingsProvider = $settingsProvider;
         $this->validator = $validator;
     }
 
@@ -85,7 +85,7 @@ class WordFeedbackService
 
     private function getRules(array $data) : array
     {
-        $rules = new ValidationRules($this->container);
+        $rules = new ValidationRules($this->settingsProvider);
 
         $result = [
             'word_id' => $rules

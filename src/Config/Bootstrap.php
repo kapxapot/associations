@@ -2,8 +2,13 @@
 
 namespace App\Config;
 
+use App\Core\Linker;
 use App\Services\AssociationFeedbackService;
+use App\Services\AssociationRecountService;
+use App\Services\AssociationService;
+use App\Services\LanguageService;
 use App\Services\WordFeedbackService;
+use App\Services\WordRecountService;
 use App\Services\WordService;
 use Plasticode\Config\Bootstrap as BootstrapBase;
 use Psr\Container\ContainerInterface;
@@ -22,16 +27,15 @@ class Bootstrap extends BootstrapBase
         return array_merge(
             $mappings,
             [
-                'userClass' => function (ContainerInterface $container) {
-                    return \App\Models\User::class;
-                },
-
                 'localizationConfig' => function (ContainerInterface $container) {
                     return new \App\Config\LocalizationConfig();
                 },
 
                 'linker' => function (ContainerInterface $container) {
-                    return new \App\Core\Linker($container);
+                    return new Linker(
+                        $container->settingsProvider,
+                        $container->router
+                    );
                 },
                 
                 'config' => function (ContainerInterface $container) {
@@ -54,28 +58,33 @@ class Bootstrap extends BootstrapBase
                 // services
 
                 'wordRecountService' => function (ContainerInterface $container) {
-                    return new \App\Services\WordRecountService($container);
+                    return new WordRecountService(
+                        $container->config
+                    );
                 },
 
                 'associationRecountService' => function (ContainerInterface $container) {
-                    return new \App\Services\AssociationRecountService(
-                        $container
+                    return new AssociationRecountService(
+                        $container->config
                     );
                 },
                 
                 'associationService' => function (ContainerInterface $container) {
-                    return new \App\Services\AssociationService($container);
+                    return new AssociationService($container);
                 },
                 
                 'associationFeedbackService' => function (ContainerInterface $container) {
                     return new AssociationFeedbackService(
-                        $container,
+                        $container->settingsProvider,
                         $container->validator
                     );
                 },
                 
                 'languageService' => function (ContainerInterface $container) {
-                    return new \App\Services\LanguageService($container);
+                    return new LanguageService(
+                        $container->settingsProvider,
+                        $container->wordService
+                    );
                 },
 
                 'gameService' => function (ContainerInterface $container) {
@@ -88,7 +97,7 @@ class Bootstrap extends BootstrapBase
                 
                 'wordService' => function (ContainerInterface $container) {
                     return new WordService(
-                        $container,
+                        $container->settingsProvider,
                         $container->config,
                         $container->validator
                     );
@@ -96,7 +105,7 @@ class Bootstrap extends BootstrapBase
                 
                 'wordFeedbackService' => function (ContainerInterface $container) {
                     return new WordFeedbackService(
-                        $container,
+                        $container->settingsProvider,
                         $container->validator
                     );
                 },

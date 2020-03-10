@@ -8,17 +8,17 @@ use App\Models\User;
 use App\Models\Word;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
+use Plasticode\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
-use Psr\Container\ContainerInterface;
 use Respect\Validation\Validator;
 use Webmozart\Assert\Assert;
 
 class WordService
 {
-    /** @var ContainerInterface */
-    private $container;
+    /** @var SettingsProviderInterface */
+    private $settingsProvider;
 
     /** @var WordConfigInterface */
     private $config;
@@ -27,12 +27,12 @@ class WordService
     private $validator;
 
     public function __construct(
-        ContainerInterface $container,
+        SettingsProviderInterface $settingsProvider,
         WordConfigInterface $config,
         ValidatorInterface $validator
     )
     {
-        $this->container = $container;
+        $this->settingsProvider = $settingsProvider;
         $this->config = $config;
         $this->validator = $validator;
     }
@@ -47,7 +47,7 @@ class WordService
             ??
             $this->create($language, $wordStr, $user);
 
-        if ($word === null) {
+        if (is_null($word)) {
             throw new InvalidResultException('Word can\'t be found or added.');
         }
     
@@ -94,7 +94,7 @@ class WordService
      */
     public function getRule() : Validator
     {
-        $rules = new ValidationRules($this->container);
+        $rules = new ValidationRules($this->settingsProvider);
 
         return $rules
             ->get('text')
