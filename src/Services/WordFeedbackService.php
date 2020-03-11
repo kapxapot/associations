@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Word;
 use App\Models\WordFeedback;
-use Plasticode\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 use Plasticode\Util\Strings;
@@ -15,19 +14,24 @@ use Respect\Validation\Validator;
 
 class WordFeedbackService
 {
-    /** @var SettingsProviderInterface */
-    private $settingsProvider;
-
     /** @var ValidatorInterface */
     private $validator;
 
+    /** @var ValidationRules */
+    private $validationRules;
+
+    /** @var WordService */
+    private $wordService;
+
     public function __construct(
-        SettingsProviderInterface $settingsProvider,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        ValidationRules $validationRules,
+        WordService $wordService
     )
     {
-        $this->settingsProvider = $settingsProvider;
         $this->validator = $validator;
+        $this->validationRules = $validationRules;
+        $this->wordService = $wordService;
     }
 
     public function toModel(array $data, User $user) : WordFeedback
@@ -85,12 +89,11 @@ class WordFeedbackService
 
     private function getRules(array $data) : array
     {
-        $rules = new ValidationRules($this->settingsProvider);
-
         $result = [
-            'word_id' => $rules
+            'word_id' => $this
+                ->validationRules
                 ->get('posInt')
-                ->wordExists(),
+                ->wordExists()
         ];
         
         if (($data['typo'] ?? null) !== null) {

@@ -6,9 +6,9 @@ use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
-use Plasticode\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
@@ -17,24 +17,29 @@ use Webmozart\Assert\Assert;
 
 class WordService
 {
-    /** @var SettingsProviderInterface */
-    private $settingsProvider;
-
     /** @var WordConfigInterface */
     private $config;
 
     /** @var ValidatorInterface */
     private $validator;
 
+    /** @var ValidationRules */
+    private $validationRules;
+
+    /** @var WordRepositoryInterface */
+    private $wordRepository;
+
     public function __construct(
-        SettingsProviderInterface $settingsProvider,
         WordConfigInterface $config,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        ValidationRules $validationRules,
+        WordRepositoryInterface $wordRepository
     )
     {
-        $this->settingsProvider = $settingsProvider;
         $this->config = $config;
         $this->validator = $validator;
+        $this->validationRules = $validationRules;
+        $this->wordRepository = $wordRepository;
     }
 
     /**
@@ -86,7 +91,7 @@ class WordService
         $word->wordBin = $wordStr;
         $word->createdBy = $user->getId();
 
-        return $word->save();
+        return $this->wordRepository->save($word);
     }
 
     /**
@@ -94,11 +99,13 @@ class WordService
      */
     public function getRule() : Validator
     {
-        $rules = new ValidationRules($this->settingsProvider);
-
-        return $rules
+        return $this
+            ->validationRules
             ->get('text')
-            ->length($this->config->wordMinLength(), $this->config->wordMaxLength())
+            ->length(
+                $this->config->wordMinLength(),
+                $this->config->wordMaxLength()
+            )
             ->wordIsValid();
     }
 

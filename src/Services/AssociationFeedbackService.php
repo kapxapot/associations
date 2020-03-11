@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Models\Association;
 use App\Models\AssociationFeedback;
 use App\Models\User;
-use Plasticode\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
@@ -13,19 +12,19 @@ use Plasticode\Validation\ValidationRules;
 
 class AssociationFeedbackService
 {
-    /** @var SettingsProviderInterface */
-    private $settingsProvider;
-
     /** @var ValidatorInterface */
     private $validator;
 
+    /** @var ValidationRules */
+    private $validationRules;
+
     public function __construct(
-        SettingsProviderInterface $settingsProvider,
-        ValidatorInterface $validator
+        ValidatorInterface $validator,
+        ValidationRules $validationRules
     )
     {
-        $this->settingsProvider = $settingsProvider;
         $this->validator = $validator;
+        $this->validationRules = $validationRules;
     }
 
     public function toModel(array $data, User $user) : AssociationFeedback
@@ -72,11 +71,11 @@ class AssociationFeedbackService
     
     private function getRules(array $data) : array
     {
-        $rules = new ValidationRules($this->settingsProvider);
-
         return [
-            'association_id' => $rules->get('posInt')
-                ->associationExists(),
+            'association_id' => $this
+                ->validationRules
+                ->get('posInt')
+                ->associationExists()
         ];
     }
 }

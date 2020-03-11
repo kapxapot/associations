@@ -3,6 +3,7 @@
 namespace App\Config;
 
 use App\Core\Linker;
+use App\Repositories\WordRepository;
 use App\Services\AssociationFeedbackService;
 use App\Services\AssociationRecountService;
 use App\Services\AssociationService;
@@ -27,6 +28,12 @@ class Bootstrap extends BootstrapBase
         return array_merge(
             $mappings,
             [
+                'wordRepository' => function (ContainerInterface $container) {
+                    return new WordRepository(
+                        $container->db
+                    );
+                },
+
                 'localizationConfig' => function (ContainerInterface $container) {
                     return new \App\Config\LocalizationConfig();
                 },
@@ -75,8 +82,8 @@ class Bootstrap extends BootstrapBase
                 
                 'associationFeedbackService' => function (ContainerInterface $container) {
                     return new AssociationFeedbackService(
-                        $container->settingsProvider,
-                        $container->validator
+                        $container->validator,
+                        $container->validationRules
                     );
                 },
                 
@@ -99,14 +106,16 @@ class Bootstrap extends BootstrapBase
                     return new WordService(
                         $container->settingsProvider,
                         $container->config,
-                        $container->validator
+                        $container->validator,
+                        $container->wordRepository
                     );
                 },
                 
                 'wordFeedbackService' => function (ContainerInterface $container) {
                     return new WordFeedbackService(
-                        $container->settingsProvider,
-                        $container->validator
+                        $container->validator,
+                        $container->validationRules,
+                        $container->wordService
                     );
                 },
 
