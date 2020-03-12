@@ -36,7 +36,9 @@ $container['env'] = $env;
 
 // middleware
 
-$app->add(new \Plasticode\Middleware\SlashMiddleware());
+$app->add(
+    new \Plasticode\Middleware\SlashMiddleware()
+);
 
 $app->add(
     new \Plasticode\Middleware\CookieAuthMiddleware(

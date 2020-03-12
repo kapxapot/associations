@@ -133,7 +133,9 @@ abstract class BaseTestCase extends TestCase
         // middleware
  
         if ($this->withMiddleware) {
-            $app->add(new \Plasticode\Middleware\SlashMiddleware($container));
+            $app->add(
+                new \Plasticode\Middleware\SlashMiddleware()
+            );
             
             $app->add(
                 new \Plasticode\Middleware\CookieAuthMiddleware(
