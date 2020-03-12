@@ -6,13 +6,28 @@ use App\Models\Game;
 use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
-use Plasticode\Contained;
 use Plasticode\Util\Date;
+use Webmozart\Assert\Assert;
 
-class GameService extends Contained
+class GameService
 {
+    /** @var LanguageService */
+    private $languageService;
+
+    /** @var TurnService */
+    private $turnService;
+
+    public function __construct(
+        LanguageService $languageService,
+        TurnService $turnService
+    )
+    {
+        $this->languageService = $languageService;
+        $this->turnService = $turnService;
+    }
+
     /**
-     * Creates and starts new game
+     * Creates and starts a new game.
      */
     public function newGame(Language $language, User $user) : Game
     {
@@ -24,7 +39,7 @@ class GameService extends Contained
 
     public function createGame(Language $language, User $user) : Game
     {
-        // potentially can create several games in parallel
+        // todo: potentially can create several games in parallel
         $game = Game::create();
 
         $game->languageId = $language->getId();
@@ -35,9 +50,7 @@ class GameService extends Contained
 
     public function startGame(Game $game) : ?Turn
     {
-        if ($game === null) {
-            throw new \InvalidArgumentException('Game can\'t be null.');
-        }
+        Assert::notNull($game, 'Game can\'t be null.');
         
         // already started
         if ($game->isStarted()) {
@@ -57,27 +70,8 @@ class GameService extends Contained
     }
 
     /**
-     * Returns true on success
-     */
-    public function finishGame(Game $game) : bool
-    {
-        if ($game->isFinished()) {
-            return false;
-        }
-
-        $game->finishedAt = Date::dbNow();
-        $game->save();
-
-        if ($game->lastTurn() !== null) {
-            return $this->turnService->finishTurn($game->lastTurn(), $game->finishedAt);
-        }
-
-        return true;
-    }
-
-    /**
      * Returns true, if the provided turn is the last turn of the game
-     * OR turn is null and game contains no turns
+     * OR turn is null and game contains no turns.
      */
     public function validateLastTurn(Game $game, Turn $turn) : bool
     {

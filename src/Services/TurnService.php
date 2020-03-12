@@ -7,11 +7,31 @@ use App\Models\Game;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
-use Plasticode\Contained;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Date;
 
-class TurnService extends Contained
+class TurnService
 {
+    /** @var EventDispatcher */
+    private $dispatcher;
+
+    /** @var AssociationService */
+    private $associationService;
+
+    /** @var GameService */
+    private $gameService;
+
+    public function __construct(
+        EventDispatcher $dispatcher,
+        AssociationService $associationService,
+        GameService $gameService
+    )
+    {
+        $this->dispatcher = $dispatcher;
+        $this->associationService = $associationService;
+        $this->gameService = $gameService;
+    }
+
     /**
      * Returns true on success.
      */
@@ -79,7 +99,10 @@ class TurnService extends Contained
     {
         // finish prev turn
         if ($turn->prev() !== null) {
-            $this->finishTurn($turn->prev(), $turn->createdAt);
+            $this->finishTurn(
+                $turn->prev(),
+                $turn->createdAt
+            );
         }
     }
     
@@ -87,7 +110,10 @@ class TurnService extends Contained
     {
         // finish prev turn
         if ($turn->prev() !== null) {
-            $this->finishTurn($turn->prev(), $turn->createdAt);
+            $this->finishTurn(
+                $turn->prev(),
+                $turn->createdAt
+            );
         }
         
         // AI next turn
@@ -96,12 +122,35 @@ class TurnService extends Contained
 
         if ($word !== null) {
             $this->newAiTurn($game, $word);
-        }
-        else {
-            $this->gameService->finishGame($game);
+        } else {
+            $this->finishGame($game);
         }
     }
-    
+
+    /**
+     * Returns true on success.
+     * 
+     * Todo: this should belong to GameService, but creates a circular dependency
+     */
+    private function finishGame(Game $game) : bool
+    {
+        if ($game->isFinished()) {
+            return false;
+        }
+
+        $game->finishedAt = Date::dbNow();
+        $game->save();
+
+        if ($game->lastTurn() !== null) {
+            return $this->finishTurn(
+                $game->lastTurn(),
+                $game->finishedAt
+            );
+        }
+
+        return true;
+    }
+
     public function validatePlayerTurn(Game $game, string $wordStr) : bool
     {
         return !$game->containsWordStr($wordStr);
@@ -115,9 +164,11 @@ class TurnService extends Contained
         return $turn
             ->word()
             ->associatedWords($user)
-            ->where(function ($word) use ($game) {
-                return !$game->containsWord($word);
-            })
+            ->where(
+                function (Word $word) use ($game) {
+                    return !$game->containsWord($word);
+                }
+            )
             ->random();
     }
 }

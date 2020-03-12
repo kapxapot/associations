@@ -7,10 +7,14 @@ use App\Repositories\WordRepository;
 use App\Services\AssociationFeedbackService;
 use App\Services\AssociationRecountService;
 use App\Services\AssociationService;
+use App\Services\DictionaryService;
+use App\Services\GameService;
 use App\Services\LanguageService;
+use App\Services\TurnService;
 use App\Services\WordFeedbackService;
 use App\Services\WordRecountService;
 use App\Services\WordService;
+use App\Services\YandexDictService;
 use Plasticode\Config\Bootstrap as BootstrapBase;
 use Psr\Container\ContainerInterface;
 
@@ -95,11 +99,18 @@ class Bootstrap extends BootstrapBase
                 },
 
                 'gameService' => function (ContainerInterface $container) {
-                    return new \App\Services\GameService($container);
+                    return new GameService(
+                        $container->languageService,
+                        $container->turnService
+                    );
                 },
 
                 'turnService' => function (ContainerInterface $container) {
-                    return new \App\Services\TurnService($container);
+                    return new TurnService(
+                        $container->dispatcher,
+                        $container->associationService,
+                        $container->gameService
+                    );
                 },
                 
                 'wordService' => function (ContainerInterface $container) {
@@ -120,11 +131,13 @@ class Bootstrap extends BootstrapBase
                 },
 
                 'yandexDictService' => function (ContainerInterface $container) {
-                    return new \App\Services\YandexDictService($container);
+                    return new YandexDictService(
+                        $container->yandexDict
+                    );
                 },
 
                 'dictionaryService' => function (ContainerInterface $container) {
-                    return new \App\Services\DictionaryService(
+                    return new DictionaryService(
                         $container->yandexDictService
                     );
                 },

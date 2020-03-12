@@ -6,22 +6,28 @@ use App\Models\Association;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
-use Plasticode\Contained;
-use Plasticode\Exceptions\InvalidArgumentException;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
+use Webmozart\Assert\Assert;
 
-class AssociationService extends Contained
+class AssociationService
 {
-    public function getOrCreate(Word $first, Word $second, User $user = null, Language $language = null) : Association
+    public function getOrCreate(
+        Word $first,
+        Word $second,
+        User $user = null,
+        Language $language = null
+    ) : Association
     {
         $association =
             $this->getByPair($first, $second, $language)
             ??
             $this->create($first, $second, $user, $language);
 
-        if ($association === null) {
-            throw new InvalidResultException('Association can\'t be found or added.');
+        if (is_null($association)) {
+            throw new InvalidResultException(
+                'Association can\'t be found or added.'
+            );
         }
 
         return $association;
@@ -36,15 +42,20 @@ class AssociationService extends Contained
      *  at the same time.
      * !!!!!!!!!!!!!!!!!!!!!!!
      */
-    public function create(Word $first, Word $second, User $user, Language $language = null) : Association
+    public function create(
+        Word $first,
+        Word $second,
+        User $user,
+        Language $language = null
+    ) : Association
     {
         if ($this->getByPair($first, $second, $language) !== null) {
             throw new InvalidOperationException('Association already exists.');
         }
         
-        self::checkPair($first, $second);
+        $this->checkPair($first, $second);
         
-        list($first, $second) = self::orderPair($first, $second);
+        [$first, $second] = $this->orderPair($first, $second);
 
         $association = Association::create();
         
@@ -59,40 +70,52 @@ class AssociationService extends Contained
         return $association->save();
     }
 
-    public function checkPair(Word $first, Word $second, Language $language = null) : void
+    public function checkPair(
+        Word $first,
+        Word $second,
+        Language $language = null
+    ) : void
     {
-        if ($first === null || $second === null) {
-            throw new InvalidArgumentException('Both word must be non-null.');
-        }
-        
-        if ($first->getId() == $second->getId()) {
-            throw new InvalidArgumentException('Words can\'t be the same.');
-        }
+        Assert::allNotNull(
+            [$first, $second],
+            'Both word must be non-null.'
+        );
+
+        Assert::false(
+            $first->equals($second),
+            'Words can\'t be the same.'
+        );
 
         $firstLanguage = $first->language();
         $secondLanguage = $second->language();
 
-        if (!$firstLanguage->equals($secondLanguage)) {
-            throw new InvalidArgumentException('Words must be of the same language.');
-        }
+        Assert::true(
+            $firstLanguage->equals($secondLanguage),
+            'Words must be of the same language.'
+        );
         
-        if ($language !== null && !$firstLanguage->equals($language)) {
-            throw new InvalidArgumentException('Words must be of the specified language.');
-        }
+        Assert::false(
+            $language !== null && !$firstLanguage->equals($language),
+            'Words must be of the specified language.'
+        );
     }
     
     public function orderPair(Word $first, Word $second) : array
     {
         return $first->getId() < $second->getId()
-            ? [ $first, $second ]
-            : [ $second, $first ];
+            ? [$first, $second]
+            : [$second, $first];
     }
     
-    public function getByPair(Word $first, Word $second, Language $language = null) : ?Association
+    public function getByPair(
+        Word $first,
+        Word $second,
+        Language $language = null
+    ) : ?Association
     {
         $this->checkPair($first, $second, $language);
         
-        list($first, $second) = $this->orderPair($first, $second);
+        [$first, $second] = $this->orderPair($first, $second);
         
         return Association::getByPair($first, $second);
     }

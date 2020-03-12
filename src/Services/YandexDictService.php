@@ -2,21 +2,36 @@
 
 namespace App\Services;
 
+use App\External\YandexDict;
 use App\Models\Language;
 use App\Models\Word;
 use App\Models\YandexDictWord;
 use App\Models\Interfaces\DictWordInterface;
 use App\Services\Interfaces\ExternalDictServiceInterface;
-use Plasticode\Contained;
 
-class YandexDictService extends Contained implements ExternalDictServiceInterface
+class YandexDictService implements ExternalDictServiceInterface
 {
-    public function getWord(Word $word) : ?DictWordInterface
+    /** @var YandexDict */
+    private $yandexDict;
+
+    public function __construct(YandexDict $yandexDict)
     {
-        return $this->get($word->language(), $word->word, $word);
+        $this->yandexDict = $yandexDict;
     }
 
-    public function getWordStr(Language $language, string $wordStr) : ?DictWordInterface
+    public function getWord(Word $word) : ?DictWordInterface
+    {
+        return $this->get(
+            $word->language(),
+            $word->word,
+            $word
+        );
+    }
+
+    public function getWordStr(
+        Language $language,
+        string $wordStr
+    ) : ?DictWordInterface
     {
         $word = Word::findInLanguage($language, $wordStr);
 
@@ -27,7 +42,11 @@ class YandexDictService extends Contained implements ExternalDictServiceInterfac
         return $this->get($language, $wordStr);
     }
 
-    private function get(Language $language, string $wordStr, Word $word = null) : ?YandexDictWord
+    private function get(
+        Language $language,
+        string $wordStr,
+        Word $word = null
+    ) : ?YandexDictWord
     {
         if (!$this->isLanguageSupported($language)) {
             return null;
@@ -59,10 +78,15 @@ class YandexDictService extends Contained implements ExternalDictServiceInterfac
         return !is_null($language->yandexDictCode);
     }
 
-    private function loadFromDictionary(Language $language, string $wordStr, Word $word = null) : ?YandexDictWord
+    private function loadFromDictionary(
+        Language $language,
+        string $wordStr,
+        Word $word = null
+    ) : ?YandexDictWord
     {
         $result = $this->yandexDict->request(
-            $language->yandexDictCode, $wordStr
+            $language->yandexDictCode,
+            $wordStr
         );
 
         if (strlen($result) == 0) {
@@ -94,7 +118,10 @@ class YandexDictService extends Contained implements ExternalDictServiceInterfac
             : json_decode($result, true);
     }
 
-    private function applyParsedData(YandexDictWord $dictWord, ?array $data) : YandexDictWord
+    private function applyParsedData(
+        YandexDictWord $dictWord,
+        ?array $data
+    ) : YandexDictWord
     {
         if (is_array($data)) {
             $def = $data['def'][0] ?? null;
