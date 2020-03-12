@@ -5,8 +5,8 @@ namespace App\Jobs;
 use App\Events\AssociationOutOfDateEvent;
 use App\Models\Association;
 use Plasticode\Collection;
+use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
-use Plasticode\Interfaces\SettingsProviderInterface;
 
 class UpdateAssociationsJob
 {
@@ -28,10 +28,10 @@ class UpdateAssociationsJob
     public function run() : Collection
     {
         $limit = $this->settingsProvider
-            ->getSettings('associations.update.limit');
+            ->get('associations.update.limit');
         
         $ttl = $this->settingsProvider
-            ->getSettings('associations.update.ttl_min');
+            ->get('associations.update.ttl_min');
 
         $outOfDate = Association::getOutOfDate($ttl)
             ->limit($limit)

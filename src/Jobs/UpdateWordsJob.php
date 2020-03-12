@@ -5,8 +5,8 @@ namespace App\Jobs;
 use App\Events\WordOutOfDateEvent;
 use App\Models\Word;
 use Plasticode\Collection;
+use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
-use Plasticode\Interfaces\SettingsProviderInterface;
 
 class UpdateWordsJob
 {
@@ -27,11 +27,8 @@ class UpdateWordsJob
 
     public function run() : Collection
     {
-        $limit = $this->settingsProvider
-            ->getSettings('words.update.limit');
-        
-        $ttl = $this->settingsProvider
-            ->getSettings('words.update.ttl_min');
+        $limit = $this->settingsProvider->get('words.update.limit');
+        $ttl = $this->settingsProvider->get('words.update.ttl_min');
 
         $outOfDate = Word::getOutOfDate($ttl)
             ->limit($limit)

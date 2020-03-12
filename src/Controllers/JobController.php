@@ -4,8 +4,8 @@ namespace App\Controllers;
 
 use App\Jobs\UpdateAssociationsJob;
 use App\Jobs\UpdateWordsJob;
+use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
-use Plasticode\Interfaces\SettingsProviderInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -15,7 +15,10 @@ use Psr\Http\Message\ServerRequestInterface;
  */
 class JobController extends Controller
 {
-    public function updateAssociations(ServerRequestInterface $request, ResponseInterface $response)
+    public function updateAssociations(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    )
     {
         $start = microtime(true);
 
@@ -35,7 +38,10 @@ class JobController extends Controller
         );
     }
 
-    public function updateWords(ServerRequestInterface $request, ResponseInterface $response)
+    public function updateWords(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    )
     {
         $start = microtime(true);
 

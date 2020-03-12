@@ -6,7 +6,7 @@ use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use Plasticode\Collection;
-use Plasticode\Interfaces\SettingsProviderInterface;
+use Plasticode\Core\Interfaces\SettingsProviderInterface;
 
 class LanguageService
 {
@@ -27,7 +27,8 @@ class LanguageService
 
     public function getDefaultLanguage()
     {
-        $defaultId = $this->settingsProvider->getSettings('languages.default_id')
+        $defaultId = $this->settingsProvider
+            ->get('languages.default_id');
 
         return Language::get($defaultId);
     }
@@ -54,9 +55,11 @@ class LanguageService
         // union them & distinct
         $words = Collection::merge($approvedWords, $userWords)
             ->distinct()
-            ->where(function ($word) use ($user) {
-                return $word->isPlayableAgainstUser($user);
-            });
+            ->where(
+                function ($word) use ($user) {
+                    return $word->isPlayableAgainstUser($user);
+                }
+            );
 
         if ($exclude !== null && $exclude->any()) {
             $words = $words->whereNotIn('id', $exclude->ids());
