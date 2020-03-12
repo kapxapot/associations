@@ -14,21 +14,24 @@ class UpdateAssociationsJob
     private $settingsProvider;
 
     /** @var EventDispatcher */
-    private $eventDispatcher;
+    private $dispatcher;
 
     public function __construct(
         SettingsProviderInterface $settingsProvider,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $dispatcher
     )
     {
         $this->settingsProvider = $settingsProvider;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     public function run() : Collection
     {
-        $limit = $this->settingsProvider->getSettings('associations.update.limit');
-        $ttl = $this->settingsProvider->getSettings('associations.update.ttl_min');
+        $limit = $this->settingsProvider
+            ->getSettings('associations.update.limit');
+        
+        $ttl = $this->settingsProvider
+            ->getSettings('associations.update.ttl_min');
 
         $outOfDate = Association::getOutOfDate($ttl)
             ->limit($limit)
@@ -36,7 +39,7 @@ class UpdateAssociationsJob
 
         foreach ($outOfDate as $assoc) {
             $event = new AssociationOutOfDateEvent($assoc);
-            $this->eventDispatcher->dispatch($event);
+            $this->dispatcher->dispatch($event);
         }
 
         return $outOfDate;

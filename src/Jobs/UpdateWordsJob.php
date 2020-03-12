@@ -14,21 +14,24 @@ class UpdateWordsJob
     private $settingsProvider;
 
     /** @var EventDispatcher */
-    private $eventDispatcher;
+    private $dispatcher;
 
     public function __construct(
         SettingsProviderInterface $settingsProvider,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $dispatcher
     )
     {
         $this->settingsProvider = $settingsProvider;
-        $this->eventDispatcher = $eventDispatcher;
+        $this->dispatcher = $dispatcher;
     }
 
     public function run() : Collection
     {
-        $limit = $this->settingsProvider->getSettings('words.update.limit');
-        $ttl = $this->settingsProvider->getSettings('words.update.ttl_min');
+        $limit = $this->settingsProvider
+            ->getSettings('words.update.limit');
+        
+        $ttl = $this->settingsProvider
+            ->getSettings('words.update.ttl_min');
 
         $outOfDate = Word::getOutOfDate($ttl)
             ->limit($limit)
@@ -36,7 +39,7 @@ class UpdateWordsJob
 
         foreach ($outOfDate as $word) {
             $event = new WordOutOfDateEvent($word);
-            $this->eventDispatcher->dispatch($event);
+            $this->dispatcher->dispatch($event);
         }
 
         return $outOfDate;

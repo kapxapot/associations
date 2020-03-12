@@ -23,7 +23,13 @@ use Plasticode\Middleware\TokenAuthMiddleware;
  * @var \Closure
  */
 $access = function (string $entity, string $action, string $redirect = null) use ($container) {
-    return new AccessMiddleware($container, $entity, $action, $redirect);
+    return new AccessMiddleware(
+        $container->access,
+        $container->router,
+        $entity,
+        $action,
+        $redirect
+    );
 };
 
 $root = $settings['root'];
@@ -55,7 +61,7 @@ $app->group($root, function () use ($trueRoot, $settings, $access, $container, $
     
         $this->post('/parser/parse', ParserController::class . ':parse')
             ->setName('api.parser.parse');
-    })->add(new TokenAuthMiddleware($container));
+    })->add(new TokenAuthMiddleware($container->auth));
     
     // admin
     
@@ -68,7 +74,7 @@ $app->group($root, function () use ($trueRoot, $settings, $access, $container, $
             $gen = $container->generatorResolver->resolveEntity($entity);
             $gen->generateAdminPageRoute($this, $access);
         }
-    })->add(new AuthMiddleware($container, 'admin.index'));
+    })->add(new AuthMiddleware($container->router, $container->auth, 'admin.index'));
 
     // site
     
@@ -77,7 +83,7 @@ $app->group($root, function () use ($trueRoot, $settings, $access, $container, $
         $this->post('/game/finish', GameController::class . ':finish')->setName('actions.game.finish');
         $this->post('/turn/create', TurnController::class . ':create')->setName('actions.turn.create');
         $this->post('/feedback', FeedbackController::class . ':save')->setName('actions.feedback');
-    })->add(new TokenAuthMiddleware($container));
+    })->add(new TokenAuthMiddleware($container->auth));
 
     $this->get('/associations/{id:\d+}', AssociationController::class . ':get')->setName('main.association');
 
@@ -104,10 +110,10 @@ $app->group($root, function () use ($trueRoot, $settings, $access, $container, $
     $this->group('/auth', function () {
         $this->post('/signup', AuthController::class . ':postSignUp')->setName('auth.signup');
         $this->post('/signin', AuthController::class . ':postSignIn')->setName('auth.signin');
-    })->add(new GuestMiddleware($container, 'main.index'));
+    })->add(new GuestMiddleware($container->router, $container->auth, 'main.index'));
         
     $this->group('/auth', function () {
         $this->post('/signout', AuthController::class . ':postSignOut')->setName('auth.signout');
         $this->post('/password/change', PasswordController::class . ':postChangePassword')->setName('auth.password.change');
-    })->add(new AuthMiddleware($container, 'main.index'));
+    })->add(new AuthMiddleware($container->router, $container->auth, 'main.index'));
 });
