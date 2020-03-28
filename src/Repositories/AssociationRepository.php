@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Core\Interfaces\LinkerInterface;
 use App\Models\Association;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
@@ -15,15 +16,18 @@ class AssociationRepository extends LanguageElementRepository implements Associa
     protected string $entityClass = Association::class;
 
     private WordRepositoryInterface $wordRepository;
+    private LinkerInterface $linker;
 
     public function __construct(
         Db $db,
-        WordRepositoryInterface $wordRepository
+        WordRepositoryInterface $wordRepository,
+        LinkerInterface $linker
     )
     {
         parent::__construct($db);
 
         $this->wordRepository = $wordRepository;
+        $this->linker = $linker;
     }
 
     /**
@@ -37,7 +41,18 @@ class AssociationRepository extends LanguageElementRepository implements Associa
             )
             ->withSecondWord(
                 $this->wordRepository->get($entity->secondWordId)
+            )
+            ->withUrl(
+                $this->linker->association($entity)
+            )
+            ->withTurns(
+                Turn::getByAssociation($this);
             );
+    }
+
+    public function get(?int $id) : ?Association
+    {
+        return $this->getEntity($id);
     }
 
     public function getAllByWord(Word $word) : Collection

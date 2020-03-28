@@ -3,7 +3,6 @@
 namespace App\Models;
 
 use Plasticode\Collection;
-use Plasticode\Query;
 
 /**
  * @property int $firstWordId
@@ -13,6 +12,7 @@ class Association extends LanguageElement
 {
     private ?Word $firstWord = null;
     private ?Word $secondWord = null;
+    private ?string $url = null;
 
     public function words() : Collection
     {
@@ -58,13 +58,19 @@ class Association extends LanguageElement
     
     public function url() : ?string
     {
-        return self::$container->linker->association($this);
+        return $this->url;
+    }
+
+    public function withUrl(string $url) : self
+    {
+        $this->url = $url;
+        return $this;
     }
     
     /**
      * Turns with this association.
      */
-    public function turns() : Query
+    public function turns() : Collection
     {
         return Turn::getByAssociation($this);
     }
@@ -82,12 +88,12 @@ class Association extends LanguageElement
             );
     }
     
-    public function feedbacks() : Query
+    public function feedbacks() : Collection
     {
         return AssociationFeedback::getByAssociation($this);
     }
     
-    public function feedbackByUser(User $user) : ?Feedback
+    public function feedbackBy(User $user) : ?Feedback
     {
         return AssociationFeedback::getByAssociationAndUser($this, $user);
     }
@@ -95,7 +101,7 @@ class Association extends LanguageElement
     /**
      * Maturity check.
      */
-    public function isVisibleForUser(User $user = null) : bool
+    public function isVisibleFor(User $user = null) : bool
     {
         // 1. non-mature words are visible for everyone
         // 2. mature words are invisible for non-authed users ($user == null)
@@ -104,20 +110,20 @@ class Association extends LanguageElement
         return 
             !$this->isMature() ||
             ($user !== null &&
-                ($user->isMature() || $this->isUsedByUser($user))
+                ($user->isMature() || $this->isUsedBy($user))
             );
     }
 
-    public function isPlayableAgainstUser(User $user) : bool
+    public function isPlayableAgainst(User $user) : bool
     {
         // word can't be played against user, if
         //
         // 1. word is mature, user is not mature (maturity check)
         // 2. word is not approved, user disliked the word
 
-        return $this->isVisibleForUser($user) &&
+        return $this->isVisibleFor($user) &&
             ($this->isApproved() ||
-                ($this->isUsedByUser($user) && !$this->isDislikedByUser($user))
+                ($this->isUsedBy($user) && !$this->isDislikedBy($user))
             );
     }
 }

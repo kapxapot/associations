@@ -2,103 +2,115 @@
 
 namespace App\Models;
 
-use Plasticode\Query;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
+use Webmozart\Assert\Assert;
 
+/**
+ * @property integer $gameId
+ * @property integer $wordId
+ * @property integer|null $userId
+ * @property integer|null $associationId
+ * @property integer|null $prevTurnId
+ */
 class Turn extends DbModel
 {
     use CreatedAt;
 
-    protected static $sortField = 'id';
-    protected static $sortReverse = true;
-
+    private Game $game;
+    private Word $word;
     private ?User $user = null;
-    
-    // queries
-    
-    public static function getByGame(Game $game) : Query
-    {
-        return self::query()
-            ->where('game_id', $game->getId());
-    }
-    
-    public static function getByAssociation(Association $association) : Query
-    {
-        return self::query()
-            ->where('association_id', $association->getId());
-    }
-    
-    public static function getByLanguage(Language $language) : Query
-    {
-        return self::query()
-            ->where('language_id', $language->getId());
-    }
+    private ?Association $association = null;
+    private ?self $prev = null;
 
-    public static function filterByUser(Query $query, User $user) : Query
-    {
-        return $query->where('user_id', $user->getId());
-    }
-    
-    public static function getByUser(User $user, Language $language = null) : Query
-    {
-        $query = ($language !== null)
-            ? self::getByLanguage($language)
-            : self::query();
-            
-        return self::filterByUser($query, $user);
-    }
-    
-    public static function getByWord(Word $word) : Query
-    {
-        return self::query()
-            ->where('word_id', $word->getId());
-    }
-    
-    // properties
-    
+    private bool $userInitialized = false;
+    private bool $associationInitialized = false;
+    private bool $prevInitialized = false;
+
     public function game() : Game
     {
-        return Game::get($this->gameId);
+        return $this->game;
     }
-    
+
+    public function withGame(Game $game) : self
+    {
+        $this->game = $game;
+        return $this;
+    }
+
     public function word() : Word
     {
-        return Word::get($this->wordId);
+        return $this->word;
+    }
+
+    public function withWord(Word $word) : self
+    {
+        $this->word = $word;
+        return $this;
     }
     
     public function user() : ?User
     {
-        return self::$container->userRepository->get($this->userId);
+        return $this->user;
+    }
+
+    public function withUser(?User $user) : self
+    {
+        $this->user = $user;
+        $this->userInitialized = true;
+
+        return $this;
     }
 
     public function isBy(User $user) : bool
     {
         return $this->user->equals($user);
     }
-    
+
     public function association() : ?Association
     {
-        return Association::get($this->associationId);
+        Assert::true($this->associationInitialized);
+
+        return $this->association;
     }
-    
+
+    public function withAssociation(?Association $association) : self
+    {
+        $this->association = $association;
+        $this->associationInitialized = true;
+
+        return $this;
+    }
+
     public function isPlayerTurn() : bool
     {
-        return $this->user() !== null;
+        Assert::true($this->userInitialized);
+
+        return !is_null($this->user());
     }
-    
+
     public function isAiTurn() : bool
     {
         return !$this->isPlayerTurn();
     }
-    
+
     public function prev() : ?Turn
     {
-        return self::get($this->prevTurnId);
+        Assert::true($this->prevInitialized);
+
+        return $this->prev;
     }
-    
+
+    public function withPrev(?self $prev) : self
+    {
+        $this->prev = $prev;
+        $this->prevInitialized = true;
+
+        return $this;
+    }
+
     public function isFinished() : bool
     {
-        return $this->finishedAt != null;
+        return !is_null($this->finishedAt);
     }
 }

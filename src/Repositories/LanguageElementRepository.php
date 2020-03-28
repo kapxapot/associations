@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Language;
 use App\Models\User;
 use App\Repositories\Interfaces\LanguageElementRepositoryInterface;
+use App\Repositories\Traits\WithLanguageRepository;
 use Plasticode\Collection;
 use Plasticode\Query;
 use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
@@ -13,19 +14,7 @@ use Plasticode\Util\Convert;
 
 abstract class LanguageElementRepository extends IdiormRepository implements LanguageElementRepositoryInterface
 {
-    use CreatedRepository;
-
-    protected function getByLanguageQuery(?Language $language) : Query
-    {
-        return $this->filterByLanguage($this->query(), $language);
-    }
-
-    public function getAllByLanguage(Language $language) : Collection
-    {
-        return $this
-            ->getByLanguageQuery($language)
-            ->all();
-    }
+    use CreatedRepository, WithLanguageRepository;
 
     public function getAllCreatedByUser(
         User $user,
@@ -72,13 +61,6 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
             ->filterApproved($query)
             ->orderByDesc('approved_updated_at')
             ->all();
-    }
-
-    protected function filterByLanguage(Query $query, ?Language $language) : Query
-    {
-        return $language
-            ? $query->where('language_id', $language->getId())
-            : $query;
     }
 
     protected function filterApproved(Query $query, bool $approved = true) : Query
