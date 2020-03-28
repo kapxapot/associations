@@ -4,12 +4,16 @@ namespace App\Models;
 
 use Plasticode\Query;
 use Plasticode\Models\DbModel;
-use Plasticode\Util\Date;
+use Plasticode\Models\Traits\CreatedAt;
 
 class Turn extends DbModel
 {
+    use CreatedAt;
+
     protected static $sortField = 'id';
     protected static $sortReverse = true;
+
+    private ?User $user = null;
     
     // queries
     
@@ -67,6 +71,11 @@ class Turn extends DbModel
     {
         return self::$container->userRepository->get($this->userId);
     }
+
+    public function isBy(User $user) : bool
+    {
+        return $this->user->equals($user);
+    }
     
     public function association() : ?Association
     {
@@ -91,19 +100,5 @@ class Turn extends DbModel
     public function isFinished() : bool
     {
         return $this->finishedAt != null;
-    }
-    
-    public function createdAtIso() : string
-    {
-        return Date::iso($this->createdAt);
-    }
-
-    public static function groupByUsers(Query $query) : array
-    {
-        return $query
-            ->whereNotNull('user_id')
-            ->orderByAsc('created_at')
-            ->all()
-            ->group('user_id');
     }
 }

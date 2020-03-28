@@ -5,50 +5,49 @@ namespace App\Models;
 use Plasticode\Collection;
 use Plasticode\Query;
 
-class Association extends Element
+/**
+ * @property int $firstWordId
+ * @property int $secondWordId
+ */
+class Association extends LanguageElement
 {
-    // queries
-    
-    public static function getByWord(Word $word) : Query
-    {
-        return self::query()
-            ->whereAnyIs(
-                [
-                    ['first_word_id' => $word->getId()],
-                    ['second_word_id' => $word->getId()],
-                ]
-            );
-    }
-    
-    // getters - one
-    
-    public static function getByPair(Word $first, Word $second) : ?self
-    {
-        return self::query()
-            ->where('first_word_id', $first->getId())
-            ->where('second_word_id', $second->getId())
-            ->one();
-    }
+    private ?Word $firstWord = null;
+    private ?Word $secondWord = null;
 
-    // properties
-    
     public function words() : Collection
     {
-        return Collection::make([$this->firstWord(), $this->secondWord()]);
+        return Collection::make(
+            [
+                $this->firstWord,
+                $this->secondWord
+            ]
+        );
     }
 
     public function firstWord() : Word
     {
-        return Word::get($this->firstWordId);
+        return $this->firstWord;
     }
-    
+
+    public function withFirstWord(Word $firstWord) : self
+    {
+        $this->firstWord = $firstWord;
+        return $this;
+    }
+
     public function secondWord() : Word
     {
-        return Word::get($this->secondWordId);
+        return $this->secondWord;
+    }
+
+    public function withSecondWord(Word $secondWord) : self
+    {
+        $this->secondWord = $secondWord;
+        return $this;
     }
 
     /**
-     * Returns one of the association's word different from the provided one
+     * Returns one of the association's words different from the provided one.
      */
     public function otherWord(Word $word) : Word
     {
@@ -64,8 +63,6 @@ class Association extends Element
     
     /**
      * Turns with this association.
-     *
-     * @return Query
      */
     public function turns() : Query
     {
@@ -74,8 +71,6 @@ class Association extends Element
 
     /**
      * Users that used this association.
-     *
-     * @return Collection
      */
     public function users() : Collection
     {
@@ -83,9 +78,7 @@ class Association extends Element
 
         return Collection::make($userIds)
             ->map(
-                function ($userId) {
-                    return self::$container->userRepository->get($userId);
-                }
+                fn ($id) => self::$container->userRepository->get($id)
             );
     }
     
@@ -100,7 +93,7 @@ class Association extends Element
     }
 
     /**
-     * Maturity check
+     * Maturity check.
      */
     public function isVisibleForUser(User $user = null) : bool
     {

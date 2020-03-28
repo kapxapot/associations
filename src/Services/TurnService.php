@@ -4,9 +4,11 @@ namespace App\Services;
 
 use App\Events\NewTurnEvent;
 use App\Models\Game;
+use App\Models\LanguageElement;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
+use Plasticode\Collection;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Date;
 
@@ -18,18 +20,13 @@ class TurnService
     /** @var AssociationService */
     private $associationService;
 
-    /** @var GameService */
-    private $gameService;
-
     public function __construct(
         EventDispatcher $dispatcher,
-        AssociationService $associationService,
-        GameService $gameService
+        AssociationService $associationService
     )
     {
         $this->dispatcher = $dispatcher;
         $this->associationService = $associationService;
-        $this->gameService = $gameService;
     }
 
     /**
@@ -165,10 +162,27 @@ class TurnService
             ->word()
             ->associatedWords($user)
             ->where(
-                function (Word $word) use ($game) {
-                    return !$game->containsWord($word);
-                }
+                fn (Word $w) => !$game->containsWord($w)
             )
             ->random();
+    }
+
+    public function turnsByUsers(LanguageElement $element) : array
+    {
+        return $this->groupByUsers($element->turns());
+    }
+
+    private function groupByUsers(Collection $turns) : array
+    {
+        return $turns
+            ->where(
+                fn (Turn $t) => $t->user()
+            )
+            ->ascStr(
+                fn (Turn $t) => $t->createdAt
+            )
+            ->group(
+                fn (Turn $t) => $t->user()->getId()
+            );
     }
 }

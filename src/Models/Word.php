@@ -6,7 +6,7 @@ use Plasticode\Collection;
 use Plasticode\Query;
 use Plasticode\Util\Cases;
 
-class Word extends Element
+class Word extends LanguageElement
 {
     protected static $sortField = 'word';
     
