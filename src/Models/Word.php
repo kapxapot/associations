@@ -2,62 +2,69 @@
 
 namespace App\Models;
 
+use App\Collections\AssociationCollection;
+use App\Collections\WordCollection;
 use Plasticode\Collection;
+use Plasticode\Models\Traits\WithUrl;
 use Plasticode\Query;
 use Plasticode\Util\Cases;
+use Webmozart\Assert\Assert;
 
+/**
+ * @property string $word
+ */
 class Word extends LanguageElement
 {
-    protected static $sortField = 'word';
-    
-    /**
-     * Finds the word by string in the specified language.
-     * 
-     * Normalized word string expected.
-     */
-    public static function findInLanguage(Language $language, ?string $wordStr) : ?Word
+    use WithUrl;
+
+    protected ?AssociationCollection $associations = null;
+
+    private bool $associationsInitialized = false;
+
+    public function associations(): AssociationCollection
     {
-        return self::getByLanguage($language)
-            ->where('word_bin', $wordStr)
-            ->one();
+        Assert::true($this->associationsInitialized);
+
+        return $this->associations;
     }
-    
-    public function associations() : Query
+
+    public function withAssociations(AssociationCollection $associations): self
     {
-        return Association::getByWord($this);
+        $this->associations = $associations;
+        $this->associationsInitialized = true;
+
+        return $this;
     }
 
     private function compareByOtherWord() : \Closure
     {
-        return function ($assocA, $assocB) {
-            return strcmp(
+        return fn (Association $assocA, Association $assocB): int =>
+            strcmp(
                 $assocA->otherWord($this)->word,
                 $assocB->otherWord($this)->word
             );
-        };
     }
     
-    public function approvedAssociations() : Collection
+    public function approvedAssociations() : AssociationCollection
     {
-        return $this->lazy(
-            function () {
-                return Association::filterApproved($this->associations())
-                    ->all()
-                    ->orderByFunc($this->compareByOtherWord());
-            }
-        );
+        return $this
+            ->associations()
+            ->approved()
+            ->orderByFunc($this->compareByOtherWord());
     }
 
-    public function approvedVisibleAssociations() : Collection
+    public function approvedVisibleAssociations() : AssociationCollection
     {
-        $assocs = $this->approvedAssociations();
-        return $this->filterVisibleForMe($assocs);
+        return $this
+            ->approvedAssociations()
+            ->visibleFor($this->me());
     }
 
-    public function approvedInvisibleAssociations() : Collection
+    public function approvedInvisibleAssociations() : AssociationCollection
     {
-        $assocs = $this->approvedAssociations();
-        return $this->filterInvisibleForMe($assocs);
+        return $this
+            ->approvedAssociations()
+            ->invisibleFor($this->me());
     }
 
     private function invisibleCountStr(int $count) : ?string
@@ -81,27 +88,26 @@ class Word extends LanguageElement
         return $this->invisibleCountStr($count);
     }
     
-    public function unapprovedAssociations() : Collection
+    public function unapprovedAssociations() : AssociationCollection
     {
-        return $this->lazy(
-            function () {
-                return Association::filterUnapproved($this->associations())
-                    ->all()
-                    ->orderByFunc($this->compareByOtherWord());
-            }
-        );
+        return $this
+            ->associations()
+            ->notApproved()
+            ->orderByFunc($this->compareByOtherWord());
     }
 
-    public function unapprovedVisibleAssociations() : Collection
+    public function unapprovedVisibleAssociations() : AssociationCollection
     {
-        $assocs = $this->unapprovedAssociations();
-        return $this->filterVisibleForMe($assocs);
+        return $this
+            ->unapprovedAssociations()
+            ->visibleFor($this->me());
     }
 
     public function unapprovedInvisibleAssociations() : Collection
     {
-        $assocs = $this->unapprovedAssociations();
-        return $this->filterInvisibleForMe($assocs);
+        return $this
+            ->unapprovedAssociations()
+            ->invisibleFor($this->me());
     }
 
     public function unapprovedInvisibleAssociationsStr() : ?string
@@ -110,22 +116,18 @@ class Word extends LanguageElement
         return $this->invisibleCountStr($count);
     }
 
-    public function associationsForUser(User $user) : Collection
+    public function associationsForUser(User $user) : AssociationCollection
     {
-        return $this->lazy(
-            function () use ($user) {
-                return $this->associations()
-                    ->all()
-                    ->where(
-                        function ($assoc) use ($user) {
-                            return $assoc->isPlayableAgainstUser($user);
-                        }
-                    );
-            }
-        );
+        return $this->associations()
+            ->all()
+            ->where(
+                function ($assoc) use ($user) {
+                    return $assoc->isPlayableAgainstUser($user);
+                }
+            );
     }
 
-    public function associatedWords(User $user) : Collection
+    public function associatedWords(User $user) : WordCollection
     {
         return $this->associationsForUser($user)
             ->map(
@@ -134,17 +136,7 @@ class Word extends LanguageElement
                 }
             );
     }
-    
-    public function url() : ?string
-    {
-        return self::$container->linker->word($this);
-    }
-    
-    public function turns() : Query
-    {
-        return Turn::getByWord($this);
-    }
-    
+
     public function serialize() : array
     {
         return [
@@ -156,17 +148,12 @@ class Word extends LanguageElement
             'created_at' => $this->createdAtIso(),
         ];
     }
-    
-    public function feedbacks() : Query
-    {
-        return WordFeedback::getByWord($this);
-    }
-    
+
     public function feedbackByUser(User $user) : ?Feedback
     {
         return WordFeedback::getByWordAndUser($this, $user);
     }
-    
+
     public function proposedTypos() : array
     {
         return $this->feedbacks()
@@ -186,7 +173,7 @@ class Word extends LanguageElement
     /**
      * Maturity check.
      */
-    public function isVisibleForUser(User $user = null) : bool
+    public function isVisibleFor(User $user = null) : bool
     {
         // 1. non-mature words are visible for everyone
         // 2. mature words are invisible for non-authed users ($user == null)
@@ -196,31 +183,30 @@ class Word extends LanguageElement
         return 
             !$this->isMature() ||
             ($user !== null &&
-                ($user->isMature() || $this->isUsedByUser($user))
+                ($user->isMature() || $this->isUsedBy($user))
             );
     }
 
-    public function isPlayableAgainstUser(User $user) : bool
+    public function isPlayableAgainst(User $user) : bool
     {
         // word can't be played against user, if
         //
         // 1. word is mature, user is not mature (maturity check)
         // 2. word is not approved, user disliked the word
         
-        return $this->isVisibleForUser($user) &&
+        return $this->isVisibleFor($user) &&
             ($this->isApproved() ||
-                ($this->isUsedByUser($user) && !$this->isDislikedByUser($user))
+                ($this->isUsedBy($user) && !$this->isDislikedBy($user))
             );
     }
 
     /**
-     * Returns the typo provided by current user.
-     *
-     * @return string|null
+     * Returns the typo provided by the current user.
      */
-    public function currentTypo() : ?string
+    public function typoByMe() : ?string
     {
-        $feedback = $this->currentFeedback();
+        /** @var WordFeedback */
+        $feedback = $this->feedbackByMe();
 
         return (!is_null($feedback) && strlen($feedback->typo) > 0)
             ? $feedback->typo
@@ -228,13 +214,11 @@ class Word extends LanguageElement
     }
 
     /**
-     * Returns word or current typo with '*' (if any).
-     *
-     * @return string
+     * Returns word or typo by the current user with '*' (if any).
      */
     public function displayName() : string
     {
-        $typo = $this->currentTypo();
+        $typo = $this->typoByMe();
 
         return is_null($typo)
             ? $this->word
@@ -242,15 +226,13 @@ class Word extends LanguageElement
     }
 
     /**
-     * Returns the original word + current typo.
-     *
-     * @return string
+     * Returns the original word + typo by the current user.
      */
     public function fullDisplayName() : string
     {
         $name = $this->displayName();
 
-        if ($this->currentTypo() !== null) {
+        if ($this->typoByMe() !== null) {
             $name .= ' (' . $this->word . ')';
         }
 

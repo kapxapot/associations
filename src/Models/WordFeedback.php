@@ -2,16 +2,11 @@
 
 namespace App\Models;
 
-use Plasticode\Query;
-
+/**
+ * @property string|null $typo
+ */
 class WordFeedback extends Feedback
 {
-    public static function getByWord(Word $word) : Query
-    {
-        return self::query()
-            ->where('word_id', $word->getId());
-    }
-    
     public static function getByWordAndUser(Word $word, User $user) : ?self
     {
         $query = self::getByWord($word);

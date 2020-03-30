@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
-use Plasticode\Collection;
+use App\Collections\UserCollection;
+use App\Collections\WordCollection;
+use Plasticode\Models\Traits\WithUrl;
+use Webmozart\Assert\Assert;
 
 /**
  * @property int $firstWordId
@@ -10,39 +13,51 @@ use Plasticode\Collection;
  */
 class Association extends LanguageElement
 {
-    private ?Word $firstWord = null;
-    private ?Word $secondWord = null;
-    private ?string $url = null;
+    use WithUrl;
 
-    public function words() : Collection
+    protected ?Word $firstWord = null;
+    protected ?Word $secondWord = null;
+
+    private bool $firstWordInitialized = false;
+    private bool $secondWordInitialized = false;
+
+    public function words(): WordCollection
     {
-        return Collection::make(
+        return WordCollection::make(
             [
-                $this->firstWord,
-                $this->secondWord
+                $this->firstWord(),
+                $this->secondWord()
             ]
         );
     }
 
     public function firstWord() : Word
     {
+        Assert::true($this->firstWordInitialized);
+
         return $this->firstWord;
     }
 
     public function withFirstWord(Word $firstWord) : self
     {
         $this->firstWord = $firstWord;
+        $this->firstWordInitialized = true;
+
         return $this;
     }
 
     public function secondWord() : Word
     {
+        Assert::true($this->secondWordInitialized);
+
         return $this->secondWord;
     }
 
     public function withSecondWord(Word $secondWord) : self
     {
         $this->secondWord = $secondWord;
+        $this->secondWordInitialized = true;
+
         return $this;
     }
 
@@ -55,47 +70,13 @@ class Association extends LanguageElement
             ? $this->secondWord()
             : $this->firstWord();
     }
-    
-    public function url() : ?string
-    {
-        return $this->url;
-    }
-
-    public function withUrl(string $url) : self
-    {
-        $this->url = $url;
-        return $this;
-    }
-    
-    /**
-     * Turns with this association.
-     */
-    public function turns() : Collection
-    {
-        return Turn::getByAssociation($this);
-    }
 
     /**
      * Users that used this association.
      */
-    public function users() : Collection
+    public function users() : UserCollection
     {
-        $userIds = array_keys($this->turnsByUsers());
-
-        return Collection::make($userIds)
-            ->map(
-                fn ($id) => self::$container->userRepository->get($id)
-            );
-    }
-    
-    public function feedbacks() : Collection
-    {
-        return AssociationFeedback::getByAssociation($this);
-    }
-    
-    public function feedbackBy(User $user) : ?Feedback
-    {
-        return AssociationFeedback::getByAssociationAndUser($this, $user);
+        return $this->turns()->users();
     }
 
     /**

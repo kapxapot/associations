@@ -1,7 +1,7 @@
 $scope.model = {};
 
 {% if word %}
-    {% set word_feedback = word.current_feedback %}
+    {% set word_feedback = word.feedback_by_me %}
 
     $scope.model.word = {
         word_id: {{ word.id }},
@@ -15,7 +15,7 @@ $scope.model = {};
 {% endif %}
 
 {% if association %}
-    {% set association_feedback = association.current_feedback %}
+    {% set association_feedback = association.feedback_by_me %}
 
     $scope.model.association = {
         association_id: {{ association.id }},

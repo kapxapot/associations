@@ -6,5 +6,5 @@ use App\Models\Game;
 
 interface GameRepositoryInterface
 {
-    function get(?int $id) : ?Game;
+    function get(?int $id): ?Game;
 }

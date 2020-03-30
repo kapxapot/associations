@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
-use Plasticode\Collection;
+use App\Collections\FeedbackCollection;
+use App\Collections\TurnCollection;
+use App\Models\Traits\WithLanguage;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\Created;
-use Plasticode\Util\Convert;
-use Plasticode\Util\Date;
+use Plasticode\Models\Traits\UpdatedAt;
+use Webmozart\Assert\Assert;
 
 /**
- * @property integer $languageId
  * @property integer $approved
  * @property string|null $approvedUpdatedAt
  * @property integer $mature
@@ -17,92 +18,83 @@ use Plasticode\Util\Date;
  */
 abstract class LanguageElement extends DbModel
 {
-    use Created;
+    use Created, UpdatedAt, WithLanguage;
 
-    private Language $language;
-    private Collection $turns;
-    private Collection $feedbacks;
+    protected ?TurnCollection $turns = null;
+    protected ?FeedbackCollection $feedbacks = null;
 
     /**
      * Current user
      */
-    private ?User $me = null;
+    protected ?User $me = null;
 
-    public function language() : Language
-    {
-        return $this->language;
-    }
+    private bool $turnsInitialized = false;
+    private bool $feedbacksInitialized = false;
+    private bool $meInitialized = false;
 
-    public function withLanguage(Language $language) : self
+    public function turns() : TurnCollection
     {
-        $this->language = $language;
-        return $this;
-    }
+        Assert::true($this->turnsInitialized);
 
-    public function turns() : Collection
-    {
         return $this->turns;
     }
 
-    public function withTurns(Collection $turns) : self
+    public function withTurns(TurnCollection $turns) : self
     {
         $this->turns = $turns;
+        $this->turnsInitialized = true;
+
         return $this;
     }
 
-    public function feedbacks() : Collection
+    public function feedbacks() : FeedbackCollection
     {
+        Assert::true($this->feedbacksInitialized);
+
         return $this->feedbacks;
     }
 
-    public function withFeedbacks(Collection $feedbacks) : self
+    public function withFeedbacks(FeedbackCollection $feedbacks) : self
     {
         $this->feedbacks = $feedbacks;
+        $this->feedbacksInitialized = true;
+
         return $this;
+    }
+
+    protected function me() : User
+    {
+        Assert::true($this->meInitialized);
+
+        return $this->me;
     }
 
     public function withMe(User $me) : self
     {
         $this->me = $me;
+        $this->meInitialized = true;
+
         return $this;
     }
 
-    public function dislikes() : Collection
+    public function dislikes() : FeedbackCollection
     {
-        return $this
-            ->feedbacks()
-            ->where(
-                fn (Feedback $f) => $f->isDisliked()
-            );
+        return $this->feedbacks()->dislikes();
     }
-    
-    public function matures() : Collection
+
+    public function matures() : FeedbackCollection
     {
-        return $this
-            ->feedbacks()
-            ->where(
-                fn (Feedback $f) => $f->isMature()
-            );
+        return $this->feedbacks()->matures();
     }
 
     public function isDislikedBy(User $user) : bool
     {
-        return $this
-            ->dislikes()
-            ->where(
-                fn (Feedback $f) => $f->isCreatedBy($user)
-            )
-            ->any();
+        return $this->dislikes()->anyBy($user);
     }
 
     public function isUsedBy(User $user) : bool
     {
-        return $this
-            ->turns()
-            ->where(
-                fn (Turn $t) => $t->isBy($user)
-            )
-            ->any();
+        return $this->turns()->anyBy($user);
     }
 
     public abstract function isVisibleFor(User $user = null) : bool;
@@ -111,67 +103,41 @@ abstract class LanguageElement extends DbModel
 
     public function isVisibleForMe() : bool
     {
-        return $this->isVisibleFor($this->me);
+        return $this->isVisibleFor($this->me());
     }
 
     public function isPlayableAgainstMe() : bool
     {
-        return $this->isPlayableAgainst($this->me);
+        return $this->isPlayableAgainst($this->me());
     }
 
-    public abstract function feedbackBy(User $user) : ?Feedback;
-
-    public function currentFeedback() : ?Feedback
+    public function feedbackBy(User $user) : ?Feedback
     {
-        return $this->me
-            ? $this->feedbackBy($this->me)
-            : null;
+        return $this->feedbacks()->firstBy($user);
+    }
+
+    public function feedbackByMe() : ?Feedback
+    {
+        return $this->feedbackBy($this->me());
     }
 
     public function isApproved() : bool
     {
-        return Convert::fromBit($this->approved);
+        return self::toBool($this->approved);
     }
 
     public function isMature() : bool
     {
-        return Convert::fromBit($this->mature);
-    }
-
-    public function updatedAtIso() : string
-    {
-        return Date::iso($this->updatedAt);
+        return self::toBool($this->mature);
     }
 
     public function approvedUpdatedAtIso() : ?string
     {
-        return $this->approvedUpdatedAt
-            ? Date::iso($this->approvedUpdatedAt)
-            : null;
+        return self::toIso($this->approvedUpdatedAt);
     }
 
     public function matureUpdatedAtIso() : ?string
     {
-        return $this->matureUpdatedAt
-            ? Date::iso($this->matureUpdatedAt)
-            : null;
-    }
-
-    // filtered collections
-
-    protected function filterVisibleForMe(Collection $elements) : Collection
-    {
-        return $elements
-            ->where(
-                fn (self $el) => $el->isVisibleForMe()
-            );
-    }
-
-    protected function filterInvisibleForMe(Collection $elements) : Collection
-    {
-        return $elements
-            ->where(
-                fn (self $el) => !$el->isVisibleForMe()
-            );
+        return self::toIso($this->matureUpdatedAt);
     }
 }

@@ -36,10 +36,10 @@
                 {% endif %}
             </p>
 
-            {% if word.current_typo %}
+            {% if word.typo_by_me %}
                 <div class="quote">
                     <div class="quote-body">
-                        <p>Оригинальное слово <strong>{{ word.word }}</strong> исправлено вами на слово <strong>{{ word.current_typo }}</strong>.</p>
+                        <p>Оригинальное слово <strong>{{ word.word }}</strong> исправлено вами на слово <strong>{{ word.typo_by_me }}</strong>.</p>
                         <p>Это исправление видите <strong>только вы</strong>.</p>
                     </div>
                 </div>

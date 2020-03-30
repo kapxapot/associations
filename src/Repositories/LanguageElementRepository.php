@@ -2,11 +2,11 @@
 
 namespace App\Repositories;
 
+use App\Collections\LanguageElementCollection;
 use App\Models\Language;
 use App\Models\User;
 use App\Repositories\Interfaces\LanguageElementRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
-use Plasticode\Collection;
 use Plasticode\Query;
 use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
@@ -19,22 +19,24 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     public function getAllCreatedByUser(
         User $user,
         ?Language $language = null
-    ) : Collection
+    ): LanguageElementCollection
     {
         $query = $this->getByLanguageQuery($language);
 
-        return $this
-            ->filterByCreator($query, $user)
-            ->all();
+        return LanguageElementCollection::from(
+            $this->filterByCreator($query, $user)
+        );
     }
 
-    public function getAllPublic(?Language $language = null) : Collection
+    public function getAllPublic(
+        ?Language $language = null
+    ): LanguageElementCollection
     {
         $query = $this->getByLanguageQuery($language);
         
-        return $this
-            ->filterNotMature($query)
-            ->all();
+        return LanguageElementCollection::from(
+            $this->filterNotMature($query)
+        );
     }
 
     /**
@@ -42,43 +44,47 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
      *
      * @param integer $ttlMin Time to live in minutes
      */
-    public function getAllOutOfDate(int $ttlMin) : Collection
+    public function getAllOutOfDate(int $ttlMin): LanguageElementCollection
     {
-        return $this
-            ->query()
-            ->whereRaw(
-                '(updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))'
-            )
-            ->orderByAsc('updated_at')
-            ->all();
+        return LanguageElementCollection::from(
+            $this
+                ->query()
+                ->whereRaw(
+                    '(updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))'
+                )
+                ->orderByAsc('updated_at')
+        );
     }
 
-    public function getAllApproved(?Language $language = null) : Collection
+    public function getAllApproved(
+        ?Language $language = null
+    ): LanguageElementCollection
     {
         $query = $this->getByLanguageQuery($language);
         
-        return $this
-            ->filterApproved($query)
-            ->orderByDesc('approved_updated_at')
-            ->all();
+        return LanguageElementCollection::from(
+            $this
+                ->filterApproved($query)
+                ->orderByDesc('approved_updated_at')
+        );
     }
 
-    protected function filterApproved(Query $query, bool $approved = true) : Query
+    protected function filterApproved(Query $query, bool $approved = true): Query
     {
         return $query->where('approved', Convert::toBit($approved));
     }
 
-    protected function filterNotApproved(Query $query) : Query
+    protected function filterNotApproved(Query $query): Query
     {
         return $this->filterApproved($query, false);
     }
 
-    protected function filterMature(Query $query, bool $mature = true) : Query
+    protected function filterMature(Query $query, bool $mature = true): Query
     {
         return $query->where('mature', Convert::toBit($mature));
     }
 
-    protected function filterNotMature(Query $query) : Query
+    protected function filterNotMature(Query $query): Query
     {
         return $this->filterMature($query, false);
     }

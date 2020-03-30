@@ -10,7 +10,7 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
 {
     protected string $entityClass = Game::class;
 
-    public function get(?int $id) : ?Game
+    public function get(?int $id): ?Game
     {
         return $this->getEntity($id);
     }
