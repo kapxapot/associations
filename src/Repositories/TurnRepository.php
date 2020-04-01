@@ -28,7 +28,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         return $this->getEntity($id);
     }
 
-    public function getAllByGame(Game $game): TurnCollection
+    public function getAllByGame(Game $game) : TurnCollection
     {
         return TurnCollection::from(
             $this
@@ -37,7 +37,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         );
     }
 
-    public function getAllByAssociation(Association $association): TurnCollection
+    public function getAllByAssociation(Association $association) : TurnCollection
     {
         return TurnCollection::from(
             $this
@@ -46,7 +46,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         );
     }
 
-    protected function filterByUser(Query $query, User $user): Query
+    protected function filterByUser(Query $query, User $user) : Query
     {
         return $query->where('user_id', $user->getId());
     }
@@ -54,7 +54,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
     public function getAllByUser(
         User $user,
         Language $language = null
-    ): TurnCollection
+    ) : TurnCollection
     {
         $query = $this->getByLanguageQuery($language);
 
@@ -63,7 +63,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         );
     }
 
-    public function getAllByWord(Word $word): TurnCollection
+    public function getAllByWord(Word $word) : TurnCollection
     {
         return TurnCollection::from(
             $this

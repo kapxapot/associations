@@ -5,7 +5,6 @@ namespace App\Models;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\Created;
 use Plasticode\Models\Traits\UpdatedAt;
-use Plasticode\Util\Convert;
 
 /**
  * @property integer $dislike
@@ -14,14 +13,14 @@ use Plasticode\Util\Convert;
 abstract class Feedback extends DbModel
 {
     use Created, UpdatedAt;
-    
+
     public function isDisliked() : bool
     {
-        return Convert::fromBit($this->dislike);
+        return self::toBool($this->dislike);
     }
 
     public function isMature() : bool
     {
-        return Convert::fromBit($this->mature);
+        return self::toBool($this->mature);
     }
 }

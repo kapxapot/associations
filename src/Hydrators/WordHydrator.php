@@ -43,6 +43,9 @@ class WordHydrator implements HydratorInterface
             ->withAssociations(
                 $this->associationRepository->getAllByWord($entity)
             )
+            ->withFeedbacks(
+                $this->wordFeedbackRepository->getAllByWord($entity)
+            )
             ->withUrl(
                 $this->linker->word($entity)
             )
@@ -51,9 +54,6 @@ class WordHydrator implements HydratorInterface
             )
             ->withTurns(
                 $this->turnRepository->getAllByWord($entity)
-            )
-            ->withFeedbacks(
-                $this->wordFeedbackRepository->getAllByWord($entity)
             );
     }
 }

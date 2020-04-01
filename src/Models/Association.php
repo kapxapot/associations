@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Collections\AssociationFeedbackCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
 use Plasticode\Models\Traits\WithUrl;
@@ -17,11 +18,13 @@ class Association extends LanguageElement
 
     protected ?Word $firstWord = null;
     protected ?Word $secondWord = null;
+    protected ?AssociationFeedbackCollection $feedbacks = null;
 
     private bool $firstWordInitialized = false;
     private bool $secondWordInitialized = false;
+    private bool $feedbacksInitialized = false;
 
-    public function words(): WordCollection
+    public function words() : WordCollection
     {
         return WordCollection::make(
             [
@@ -59,6 +62,41 @@ class Association extends LanguageElement
         $this->secondWordInitialized = true;
 
         return $this;
+    }
+
+    public function feedbacks() : AssociationFeedbackCollection
+    {
+        Assert::true($this->feedbacksInitialized);
+
+        return $this->feedbacks;
+    }
+
+    public function withFeedbacks(AssociationFeedbackCollection $feedbacks) : self
+    {
+        $this->feedbacks = $feedbacks;
+        $this->feedbacksInitialized = true;
+
+        return $this;
+    }
+
+    public function dislikes() : AssociationFeedbackCollection
+    {
+        return $this->feedbacks()->dislikes();
+    }
+
+    public function matures() : AssociationFeedbackCollection
+    {
+        return $this->feedbacks()->matures();
+    }
+
+    public function feedbackBy(User $user) : ?AssociationFeedback
+    {
+        return $this->feedbacks()->firstBy($user);
+    }
+
+    public function feedbackByMe() : ?AssociationFeedback
+    {
+        return $this->feedbackBy($this->me());
     }
 
     /**

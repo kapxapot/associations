@@ -7,5 +7,5 @@ use App\Models\Word;
 
 interface WordFeedbackRepositoryInterface
 {
-    function getAllByWord(Word $word): WordFeedbackCollection;
+    function getAllByWord(Word $word) : WordFeedbackCollection;
 }

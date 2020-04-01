@@ -49,7 +49,7 @@ final class AssociationFeedbackTest extends BaseTestCase
         ];
     }
 
-    public function testInvalidData(): void
+    public function testInvalidData() : void
     {
         $this->expectException(ValidationException::class);
 

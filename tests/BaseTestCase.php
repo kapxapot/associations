@@ -108,8 +108,6 @@ abstract class BaseTestCase extends TestCase
         $root = __DIR__ . '/..';
         $dir = $root . '/src';
         
-        require $root . '/src/functions.php';
-        
         $env = Env::load($root);
         
         $appSettings = Settings::load($root . '/settings');

@@ -19,7 +19,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     public function getAllCreatedByUser(
         User $user,
         ?Language $language = null
-    ): LanguageElementCollection
+    ) : LanguageElementCollection
     {
         $query = $this->getByLanguageQuery($language);
 
@@ -30,7 +30,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     public function getAllPublic(
         ?Language $language = null
-    ): LanguageElementCollection
+    ) : LanguageElementCollection
     {
         $query = $this->getByLanguageQuery($language);
         
@@ -44,7 +44,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
      *
      * @param integer $ttlMin Time to live in minutes
      */
-    public function getAllOutOfDate(int $ttlMin): LanguageElementCollection
+    public function getAllOutOfDate(int $ttlMin) : LanguageElementCollection
     {
         return LanguageElementCollection::from(
             $this
@@ -58,7 +58,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     public function getAllApproved(
         ?Language $language = null
-    ): LanguageElementCollection
+    ) : LanguageElementCollection
     {
         $query = $this->getByLanguageQuery($language);
         
@@ -69,22 +69,22 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         );
     }
 
-    protected function filterApproved(Query $query, bool $approved = true): Query
+    protected function filterApproved(Query $query, bool $approved = true) : Query
     {
         return $query->where('approved', Convert::toBit($approved));
     }
 
-    protected function filterNotApproved(Query $query): Query
+    protected function filterNotApproved(Query $query) : Query
     {
         return $this->filterApproved($query, false);
     }
 
-    protected function filterMature(Query $query, bool $mature = true): Query
+    protected function filterMature(Query $query, bool $mature = true) : Query
     {
         return $query->where('mature', Convert::toBit($mature));
     }
 
-    protected function filterNotMature(Query $query): Query
+    protected function filterNotMature(Query $query) : Query
     {
         return $this->filterMature($query, false);
     }

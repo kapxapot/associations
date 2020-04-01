@@ -9,5 +9,5 @@ interface AssociationFeedbackRepositoryInterface
 {
     function getAllByAssociation(
         Association $association
-    ): AssociationFeedbackCollection;
+    ) : AssociationFeedbackCollection;
 }

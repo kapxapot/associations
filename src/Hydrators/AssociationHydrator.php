@@ -37,7 +37,7 @@ class AssociationHydrator implements HydratorInterface
     /**
      * @param Association $entity
      */
-    protected function hydrate(DbModel $entity): Association
+    protected function hydrate(DbModel $entity) : Association
     {
         return $entity
             ->withFirstWord(

@@ -16,7 +16,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
         return $this->getEntity($id);
     }
 
-    public function getAllByWord(Word $word): AssociationCollection
+    public function getAllByWord(Word $word) : AssociationCollection
     {
         return AssociationCollection::from(
             $this

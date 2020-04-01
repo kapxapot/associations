@@ -21,7 +21,6 @@ abstract class LanguageElement extends DbModel
     use Created, UpdatedAt, WithLanguage;
 
     protected ?TurnCollection $turns = null;
-    protected ?FeedbackCollection $feedbacks = null;
 
     /**
      * Current user
@@ -29,7 +28,6 @@ abstract class LanguageElement extends DbModel
     protected ?User $me = null;
 
     private bool $turnsInitialized = false;
-    private bool $feedbacksInitialized = false;
     private bool $meInitialized = false;
 
     public function turns() : TurnCollection
@@ -47,20 +45,7 @@ abstract class LanguageElement extends DbModel
         return $this;
     }
 
-    public function feedbacks() : FeedbackCollection
-    {
-        Assert::true($this->feedbacksInitialized);
-
-        return $this->feedbacks;
-    }
-
-    public function withFeedbacks(FeedbackCollection $feedbacks) : self
-    {
-        $this->feedbacks = $feedbacks;
-        $this->feedbacksInitialized = true;
-
-        return $this;
-    }
+    abstract public function feedbacks() : FeedbackCollection;
 
     protected function me() : User
     {
@@ -77,15 +62,9 @@ abstract class LanguageElement extends DbModel
         return $this;
     }
 
-    public function dislikes() : FeedbackCollection
-    {
-        return $this->feedbacks()->dislikes();
-    }
+    abstract public function dislikes() : FeedbackCollection;
 
-    public function matures() : FeedbackCollection
-    {
-        return $this->feedbacks()->matures();
-    }
+    abstract public function matures() : FeedbackCollection;
 
     public function isDislikedBy(User $user) : bool
     {
@@ -111,15 +90,9 @@ abstract class LanguageElement extends DbModel
         return $this->isPlayableAgainst($this->me());
     }
 
-    public function feedbackBy(User $user) : ?Feedback
-    {
-        return $this->feedbacks()->firstBy($user);
-    }
+    abstract public function feedbackBy(User $user) : ?Feedback;
 
-    public function feedbackByMe() : ?Feedback
-    {
-        return $this->feedbackBy($this->me());
-    }
+    abstract public function feedbackByMe() : ?Feedback;
 
     public function isApproved() : bool
     {

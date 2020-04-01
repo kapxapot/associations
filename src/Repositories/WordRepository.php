@@ -12,12 +12,12 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 
     protected string $sortField = 'word';
 
-    public function get(?int $id): ?Word
+    public function get(?int $id) : ?Word
     {
         return $this->getEntity($id);
     }
 
-    public function save(Word $word): Word
+    public function save(Word $word) : Word
     {
         return $this->saveEntity($word);
     }
@@ -27,7 +27,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
      * 
      * Normalized word string expected.
      */
-    public function findInLanguage(Language $language, ?string $wordStr): ?Word
+    public function findInLanguage(Language $language, ?string $wordStr) : ?Word
     {
         return $this
             ->getByLanguageQuery($language)

@@ -9,6 +9,7 @@ use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
+use Plasticode\Util\Cases;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
@@ -17,29 +18,25 @@ use Webmozart\Assert\Assert;
 
 class WordService
 {
-    /** @var WordConfigInterface */
-    private $config;
-
-    /** @var ValidatorInterface */
-    private $validator;
-
-    /** @var ValidationRules */
-    private $validationRules;
-
-    /** @var WordRepositoryInterface */
-    private $wordRepository;
+    private WordConfigInterface $config;
+    private ValidatorInterface $validator;
+    private ValidationRules $validationRules;
+    private WordRepositoryInterface $wordRepository;
+    private Cases $cases;
 
     public function __construct(
         WordConfigInterface $config,
         ValidatorInterface $validator,
         ValidationRules $validationRules,
-        WordRepositoryInterface $wordRepository
+        WordRepositoryInterface $wordRepository,
+        Cases $cases
     )
     {
         $this->config = $config;
         $this->validator = $validator;
         $this->validationRules = $validationRules;
         $this->wordRepository = $wordRepository;
+        $this->cases = $cases;
     }
 
     /**
@@ -118,5 +115,32 @@ class WordService
                 ['word' => $this->getRule()]
             )
             ->throwOnFail();
+    }
+
+    public function approvedInvisibleAssociationsStr(Word $word) : ?string
+    {
+        $count = $word->approvedInvisibleAssociations()->count();
+
+        return $this->invisibleCountStr($count);
+    }
+
+    public function notApprovedInvisibleAssociationsStr(Word $word) : ?string
+    {
+        $count = $word->notApprovedInvisibleAssociations()->count();
+
+        return $this->invisibleCountStr($count);
+    }
+
+    private function invisibleCountStr(int $count) : ?string
+    {
+        if ($count <= 0) {
+            return null;
+        }
+
+        $isPlural = ($this->cases->numberForNumber($count) == Cases::PLURAL);
+
+        $str = $count . ' ' . $this->cases->caseForNumber('ассоциация', $count) . ' ' . ($isPlural ? 'скрыто' : 'скрыта') . '.';
+
+        return $str;
     }
 }

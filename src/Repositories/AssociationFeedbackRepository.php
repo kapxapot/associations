@@ -11,7 +11,7 @@ class AssociationFeedbackRepository extends IdiormRepository implements Associat
 {
     public function getAllByAssociation(
         Association $association
-    ): AssociationFeedbackCollection
+    ) : AssociationFeedbackCollection
     {
         return AssociationFeedbackCollection::from(
             $this

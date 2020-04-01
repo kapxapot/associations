@@ -12,7 +12,7 @@ class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRep
 {
     protected string $entityClass = WordFeedback::class;
 
-    public function getAllByWord(Word $word): WordFeedbackCollection
+    public function getAllByWord(Word $word) : WordFeedbackCollection
     {
         return WordFeedbackCollection::from(
             $this

@@ -4,10 +4,9 @@ namespace App\Models;
 
 use App\Collections\AssociationCollection;
 use App\Collections\WordCollection;
+use App\Collections\WordFeedbackCollection;
 use Plasticode\Collection;
 use Plasticode\Models\Traits\WithUrl;
-use Plasticode\Query;
-use Plasticode\Util\Cases;
 use Webmozart\Assert\Assert;
 
 /**
@@ -18,17 +17,19 @@ class Word extends LanguageElement
     use WithUrl;
 
     protected ?AssociationCollection $associations = null;
+    protected ?WordFeedbackCollection $feedbacks = null;
 
     private bool $associationsInitialized = false;
+    private bool $feedbacksInitialized = false;
 
-    public function associations(): AssociationCollection
+    public function associations() : AssociationCollection
     {
         Assert::true($this->associationsInitialized);
 
         return $this->associations;
     }
 
-    public function withAssociations(AssociationCollection $associations): self
+    public function withAssociations(AssociationCollection $associations) : self
     {
         $this->associations = $associations;
         $this->associationsInitialized = true;
@@ -36,9 +37,44 @@ class Word extends LanguageElement
         return $this;
     }
 
+    public function feedbacks() : WordFeedbackCollection
+    {
+        Assert::true($this->feedbacksInitialized);
+
+        return $this->feedbacks;
+    }
+
+    public function withFeedbacks(WordFeedbackCollection $feedbacks) : self
+    {
+        $this->feedbacks = $feedbacks;
+        $this->feedbacksInitialized = true;
+
+        return $this;
+    }
+
+    public function dislikes() : WordFeedbackCollection
+    {
+        return $this->feedbacks()->dislikes();
+    }
+
+    public function matures() : WordFeedbackCollection
+    {
+        return $this->feedbacks()->matures();
+    }
+
+    public function feedbackBy(User $user) : ?WordFeedback
+    {
+        return $this->feedbacks()->firstBy($user);
+    }
+
+    public function feedbackByMe() : ?WordFeedback
+    {
+        return $this->feedbackBy($this->me());
+    }
+
     private function compareByOtherWord() : \Closure
     {
-        return fn (Association $assocA, Association $assocB): int =>
+        return fn (Association $assocA, Association $assocB) : int =>
             strcmp(
                 $assocA->otherWord($this)->word,
                 $assocB->otherWord($this)->word
@@ -67,28 +103,7 @@ class Word extends LanguageElement
             ->invisibleFor($this->me());
     }
 
-    private function invisibleCountStr(int $count) : ?string
-    {
-        if ($count <= 0) {
-            return null;
-        }
-
-        $cases = self::$container->cases;
-
-        $isPlural = ($cases->numberForNumber($count) == Cases::PLURAL);
-
-        $str = $count . ' ' . $cases->caseForNumber('ассоциация', $count) . ' ' . ($isPlural ? 'скрыто' : 'скрыта') . '.';
-
-        return $str;
-    }
-
-    public function approvedInvisibleAssociationsStr() : ?string
-    {
-        $count = $this->approvedInvisibleAssociations()->count();
-        return $this->invisibleCountStr($count);
-    }
-    
-    public function unapprovedAssociations() : AssociationCollection
+    public function notApprovedAssociations() : AssociationCollection
     {
         return $this
             ->associations()
@@ -96,44 +111,27 @@ class Word extends LanguageElement
             ->orderByFunc($this->compareByOtherWord());
     }
 
-    public function unapprovedVisibleAssociations() : AssociationCollection
+    public function notApprovedVisibleAssociations() : AssociationCollection
     {
         return $this
-            ->unapprovedAssociations()
+            ->notApprovedAssociations()
             ->visibleFor($this->me());
     }
 
-    public function unapprovedInvisibleAssociations() : Collection
+    public function notApprovedInvisibleAssociations() : Collection
     {
         return $this
-            ->unapprovedAssociations()
+            ->notApprovedAssociations()
             ->invisibleFor($this->me());
-    }
-
-    public function unapprovedInvisibleAssociationsStr() : ?string
-    {
-        $count = $this->unapprovedInvisibleAssociations()->count();
-        return $this->invisibleCountStr($count);
-    }
-
-    public function associationsForUser(User $user) : AssociationCollection
-    {
-        return $this->associations()
-            ->all()
-            ->where(
-                function ($assoc) use ($user) {
-                    return $assoc->isPlayableAgainstUser($user);
-                }
-            );
     }
 
     public function associatedWords(User $user) : WordCollection
     {
-        return $this->associationsForUser($user)
+        return $this
+            ->associations()
+            ->playableAgainst($user)
             ->map(
-                function ($assoc) {
-                    return $assoc->otherWord($this);
-                }
+                fn (Association $a) => $a->otherWord($this)
             );
     }
 
@@ -149,25 +147,24 @@ class Word extends LanguageElement
         ];
     }
 
-    public function feedbackByUser(User $user) : ?Feedback
-    {
-        return WordFeedback::getByWordAndUser($this, $user);
-    }
-
     public function proposedTypos() : array
     {
-        return $this->feedbacks()
-            ->whereNotNull('typo')
-            ->all()
-            ->group('typo');
+        return $this
+            ->feedbacks()
+            ->typos()
+            ->group(
+                fn (WordFeedback $f) => $f->typo
+            );
     }
     
     public function proposedDuplicates() : array
     {
-        return $this->feedbacks()
-            ->whereNotNull('duplicate_id')
-            ->all()
-            ->group('duplicate_id');
+        return $this
+            ->feedbacks()
+            ->duplicates()
+            ->group(
+                fn (WordFeedback $f) => $f->duplicateId
+            );
     }
     
     /**
@@ -205,7 +202,6 @@ class Word extends LanguageElement
      */
     public function typoByMe() : ?string
     {
-        /** @var WordFeedback */
         $feedback = $this->feedbackByMe();
 
         return (!is_null($feedback) && strlen($feedback->typo) > 0)

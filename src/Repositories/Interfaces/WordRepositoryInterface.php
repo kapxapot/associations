@@ -6,6 +6,6 @@ use App\Models\Word;
 
 interface WordRepositoryInterface extends LanguageElementRepositoryInterface
 {
-    function get(?int $id): ?Word;
-    function save(Word $word): Word;
+    function get(?int $id) : ?Word;
+    function save(Word $word) : Word;
 }

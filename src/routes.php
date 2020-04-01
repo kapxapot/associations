@@ -17,20 +17,22 @@ use Plasticode\Middleware\GuestMiddleware;
 use Plasticode\Middleware\AccessMiddleware;
 use Plasticode\Middleware\TokenAuthMiddleware;
 
+/** @var ContainerInterface $container */
+
 /**
- * Creates AccessMiddleware
+ * Creates AccessMiddleware.
  * 
  * @var \Closure
  */
-$access = function (string $entity, string $action, string $redirect = null) use ($container) {
-    return new AccessMiddleware(
+$access = fn (string $entity, string $action, ?string $redirect = null)
+    => new AccessMiddleware(
         $container->access,
+        $container->auth,
         $container->router,
         $entity,
         $action,
         $redirect
     );
-};
 
 $root = $settings['root'];
 $trueRoot = (strlen($root) == 0);

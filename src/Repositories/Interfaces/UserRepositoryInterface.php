@@ -7,5 +7,5 @@ use Plasticode\Repositories\Interfaces\UserRepositoryInterface as BaseUserReposi
 
 interface UserRepositoryInterface extends BaseUserRepositoryInterface
 {
-    function get(?int $id): User;
+    function get(?int $id) : ?User;
 }

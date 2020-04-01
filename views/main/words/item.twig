@@ -62,16 +62,16 @@
                     {% endfor %}
                 </ul>
 
-                {% if word.approved_invisible_associations_str %}
-                    <p>{{ word.approved_invisbile_associations_str }}</p>
+                {% if approved_invisible_associations_str %}
+                    <p>{{ approved_invisbile_associations_str }}</p>
                 {% endif %}
             {% endif %}
 
-            {% if word.unapproved_associations.any %}
-                <p><strong>Личные ассоциации ({{ word.unapproved_associations.count }}):</strong></p>
+            {% if word.not_approved_associations.any %}
+                <p><strong>Личные ассоциации ({{ word.not_approved_associations.count }}):</strong></p>
 
                 <ul class="vgap-2">
-                    {% for assoc in word.unapproved_visible_associations %}
+                    {% for assoc in word.not_approved_visible_associations %}
                         <li>
                             {{ lm.association(assoc, word) }}
                             
@@ -82,8 +82,8 @@
                     {% endfor %}
                 </ul>
 
-                {% if word.unapproved_invisible_associations_str %}
-                    <p>{{ word.unapproved_invisible_associations_str }}</p>
+                {% if not_approved_invisible_associations_str %}
+                    <p>{{ not_approved_invisible_associations_str }}</p>
                 {% endif %}
             {% endif %}
 

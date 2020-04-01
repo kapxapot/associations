@@ -37,7 +37,7 @@ class TurnHydrator implements HydratorInterface
     /**
      * @param Turn $entity
      */
-    protected function hydrate(DbModel $entity): Turn
+    protected function hydrate(DbModel $entity) : Turn
     {
         return $entity
             ->withGame(
