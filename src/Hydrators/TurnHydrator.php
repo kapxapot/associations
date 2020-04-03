@@ -13,31 +13,31 @@ use Plasticode\Models\DbModel;
 
 class TurnHydrator implements HydratorInterface
 {
-    private GameRepositoryInterface $gameRepository;
-    private WordRepositoryInterface $wordRepository;
-    private UserRepositoryInterface $userRepository;
     private AssociationRepositoryInterface $associationRepository;
+    private GameRepositoryInterface $gameRepository;
     private TurnRepositoryInterface $turnRepository;
+    private UserRepositoryInterface $userRepository;
+    private WordRepositoryInterface $wordRepository;
 
     public function __construct(
-        GameRepositoryInterface $gameRepository,
-        WordRepositoryInterface $wordRepository,
-        UserRepositoryInterface $userRepository,
         AssociationRepositoryInterface $associationRepository,
-        TurnRepositoryInterface $turnRepository
+        GameRepositoryInterface $gameRepository,
+        TurnRepositoryInterface $turnRepository,
+        UserRepositoryInterface $userRepository,
+        WordRepositoryInterface $wordRepository
     )
     {
-        $this->gameRepository = $gameRepository;
-        $this->wordRepository = $wordRepository;
-        $this->userRepository = $userRepository;
         $this->associationRepository = $associationRepository;
+        $this->gameRepository = $gameRepository;
         $this->turnRepository = $turnRepository;
+        $this->userRepository = $userRepository;
+        $this->wordRepository = $wordRepository;
     }
 
     /**
      * @param Turn $entity
      */
-    protected function hydrate(DbModel $entity) : Turn
+    public function hydrate(DbModel $entity) : Turn
     {
         return $entity
             ->withGame(

@@ -8,11 +8,9 @@ class Controller extends BaseController
 {
     /**
      * Auto-switch to one-column layout?
-     * 
-     * @var boolean
      */
-    protected $autoOneColumn = false;
-    
+    protected bool $autoOneColumn = false;
+
     protected function buildParams(array $settings) : array
     {
         $params = $settings['params'] ?? [];
@@ -61,7 +59,7 @@ class Controller extends BaseController
         
         return parent::buildParams(['params' => $params]);
     }
-    
+
     // todo: move this to SidebarPartsProviderService
     private function isAnniversary(int $num) : bool
     {
@@ -77,7 +75,7 @@ class Controller extends BaseController
         
         return $rem < 2;
     }
-    
+
     // todo: move this to SidebarPartsProviderService
     private function toAnniversaryNumber(int $num) : int
     {

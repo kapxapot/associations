@@ -16,6 +16,13 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 {
     use CreatedRepository, WithLanguageRepository;
 
+    public function getAllByLanguage(Language $language) : LanguageElementCollection
+    {
+        return LanguageElementCollection::from(
+            $this->getByLanguageQuery($language)
+        );
+    }
+
     public function getAllCreatedByUser(
         User $user,
         ?Language $language = null

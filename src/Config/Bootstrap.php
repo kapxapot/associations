@@ -3,6 +3,19 @@
 namespace App\Config;
 
 use App\Core\Linker;
+use App\External\YandexDict;
+use App\Handlers\NotFoundHandler;
+use App\Hydrators\AssociationFeedbackHydrator;
+use App\Hydrators\AssociationHydrator;
+use App\Hydrators\TurnHydrator;
+use App\Hydrators\WordFeedbackHydrator;
+use App\Hydrators\WordHydrator;
+use App\Repositories\AssociationFeedbackRepository;
+use App\Repositories\AssociationRepository;
+use App\Repositories\GameRepository;
+use App\Repositories\LanguageRepository;
+use App\Repositories\TurnRepository;
+use App\Repositories\WordFeedbackRepository;
 use App\Repositories\WordRepository;
 use App\Services\AssociationFeedbackService;
 use App\Services\AssociationRecountService;
@@ -11,150 +24,193 @@ use App\Services\DictionaryService;
 use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
+use App\Services\UserService;
 use App\Services\WordFeedbackService;
 use App\Services\WordRecountService;
 use App\Services\WordService;
 use App\Services\YandexDictService;
 use Plasticode\Config\Bootstrap as BootstrapBase;
-use Psr\Container\ContainerInterface;
+use Psr\Container\ContainerInterface as CI;
 
 class Bootstrap extends BootstrapBase
 {
     /**
      * Get mappings for DI container.
-     *
-     * @return array
      */
     public function getMappings() : array
     {
-        $mappings = parent::getMappings();
-        
-        return array_merge(
-            $mappings,
+        $map = parent::getMappings();
+
+        $map['associationFeedbackRepository'] = fn (CI $c) =>
+            new AssociationFeedbackRepository(
+                $c->repositoryContext,
+                new AssociationFeedbackHydrator(
+                    $c->associationRepository,
+                    $c->userRepository
+                )
+            );
+
+        $map['associationRepository'] = fn (CI $c) =>
+            new AssociationRepository(
+                $c->repositoryContext,
+                new AssociationHydrator(
+                    $c->associationFeedbackRepository,
+                    $c->languageRepository,
+                    $c->turnRepository,
+                    $c->wordRepository,
+                    $c->linker
+                )
+            );
+
+        $map['gameRepository'] = fn (CI $c) =>
+            new GameRepository(
+                $c->repositoryContext
+            );
+
+        $map['languageRepository'] = fn (CI $c) =>
+            new LanguageRepository(
+                $c->repositoryContext
+            );
+
+        $map['turnRepository'] = fn (CI $c) =>
+            new TurnRepository(
+                $c->repositoryContext,
+                new TurnHydrator(
+                    $c->associationRepository,
+                    $c->gameRepository,
+                    $c->turnRepository,
+                    $c->userRepository,
+                    $c->wordRepository
+                )
+            );
+
+        $map['wordFeedbackRepository'] = fn (CI $c) =>
+            new WordFeedbackRepository(
+                $c->repositoryContext,
+                new WordFeedbackHydrator(
+                    $c->userRepository,
+                    $c->wordRepository
+                )
+            );
+
+        $map['wordRepository'] = fn (CI $c) =>
+            new WordRepository(
+                $c->repositoryContext,
+                new WordHydrator(
+                    $c->aassociationRepository,
+                    $c->languageRepository,
+                    $c->turnRepository,
+                    $c->wordFeedbackRepository,
+                    $c->linker
+                )
+            );
+
+        $map['localizationConfig'] = fn (CI $c) =>
+            new LocalizationConfig();
+
+        $map['linker'] = fn (CI $c) =>
+            new Linker(
+                $c->settingsProvider,
+                $c->router
+            );
+
+        $map['config'] = fn (CI $c) =>
+            new Config(
+                $c->settingsProvider
+            );
+
+        $map['captchaConfig'] = fn (CI $c) =>
+            new CaptchaConfig();
+
+        $map['eventProcessors'] = fn (CI $c) =>
             [
-                'wordRepository' => function (ContainerInterface $container) {
-                    return new WordRepository(
-                        $container->db
-                    );
-                },
+                $c->wordRecountService,
+                $c->associationRecountService,
+            ];
 
-                'localizationConfig' => function (ContainerInterface $container) {
-                    return new \App\Config\LocalizationConfig();
-                },
+        $map['associationFeedbackService'] = fn (CI $c) =>
+            new AssociationFeedbackService(
+                $c->validator,
+                $c->validationRules
+            );
 
-                'linker' => function (ContainerInterface $container) {
-                    return new Linker(
-                        $container->settingsProvider,
-                        $container->router
-                    );
-                },
-                
-                'config' => function (ContainerInterface $container) {
-                    return new Config(
-                        $container->settingsProvider
-                    );
-                },
-            
-                'captchaConfig' => function (ContainerInterface $container) {
-                    return new \App\Config\CaptchaConfig();
-                },
-        
-                'eventProcessors' => function (ContainerInterface $container) {
-                    return [
-                        $container->wordRecountService,
-                        $container->associationRecountService,
-                    ];
-                },
-                
-                // services
+        $map['associationRecountService'] = fn (CI $c) =>
+            new AssociationRecountService(
+                $c->config
+            );
 
-                'wordRecountService' => function (ContainerInterface $container) {
-                    return new WordRecountService(
-                        $container->config
-                    );
-                },
+        $map['associationService'] = fn (CI $c) =>
+            new AssociationService(
+                $c
+            );
 
-                'associationRecountService' => function (ContainerInterface $container) {
-                    return new AssociationRecountService(
-                        $container->config
-                    );
-                },
-                
-                'associationService' => function (ContainerInterface $container) {
-                    return new AssociationService($container);
-                },
-                
-                'associationFeedbackService' => function (ContainerInterface $container) {
-                    return new AssociationFeedbackService(
-                        $container->validator,
-                        $container->validationRules
-                    );
-                },
-                
-                'languageService' => function (ContainerInterface $container) {
-                    return new LanguageService(
-                        $container->settingsProvider,
-                        $container->wordService
-                    );
-                },
+        $map['dictionaryService'] = fn (CI $c) =>
+            new DictionaryService(
+                $c->yandexDictService
+            );
 
-                'gameService' => function (ContainerInterface $container) {
-                    return new GameService(
-                        $container->languageService,
-                        $container->turnService
-                    );
-                },
+        $map['gameService'] = fn (CI $c) =>
+            new GameService(
+                $c->config
+            );
 
-                'turnService' => function (ContainerInterface $container) {
-                    return new TurnService(
-                        $container->dispatcher,
-                        $container->associationService,
-                        $container->gameService
-                    );
-                },
-                
-                'wordService' => function (ContainerInterface $container) {
-                    return new WordService(
-                        $container->settingsProvider,
-                        $container->config,
-                        $container->validator,
-                        $container->wordRepository
-                    );
-                },
-                
-                'wordFeedbackService' => function (ContainerInterface $container) {
-                    return new WordFeedbackService(
-                        $container->validator,
-                        $container->validationRules,
-                        $container->wordService
-                    );
-                },
+        $map['languageService'] = fn (CI $c) =>
+            new LanguageService(
+                $c->settingsProvider,
+                $c->wordService
+            );
 
-                'yandexDictService' => function (ContainerInterface $container) {
-                    return new YandexDictService(
-                        $container->yandexDict
-                    );
-                },
+        $map['turnService'] = fn (CI $c) =>
+            new TurnService(
+                $c->dispatcher,
+                $c->associationService
+            );
 
-                'dictionaryService' => function (ContainerInterface $container) {
-                    return new DictionaryService(
-                        $container->yandexDictService
-                    );
-                },
+        $map['userService'] = fn (CI $c) =>
+            new UserService(
+                $c->config
+            );
 
-                // external
+        $map['wordFeedbackService'] = fn (CI $c) =>
+            new WordFeedbackService(
+                $c->validator,
+                $c->validationRules,
+                $c->wordService
+            );
 
-                'yandexDict' => function (ContainerInterface $container) {
-                    $key = $this->settings['yandex_dict']['key'];
-                    return new \App\External\YandexDict($key);
-                },
+        $map['wordRecountService'] = fn (CI $c) =>
+            new WordRecountService(
+                $c->config
+            );
 
-                // handlers
-                
-                'notFoundHandler' => function (ContainerInterface $container) {
-                    return new \App\Handlers\NotFoundHandler($container);
-                },
-            ]
-        );
+        $map['wordService'] = fn (CI $c) =>
+            new WordService(
+                $c->config,
+                $c->validator,
+                $c->validationRules,
+                $c->wordRepository,
+                $c->cases
+            );
+
+        $map['yandexDictService'] = fn (CI $c) =>
+            new YandexDictService(
+                $c->yandexDict
+            );
+
+        // external
+
+        $map['yandexDict'] = fn (CI $c) =>
+            new YandexDict(
+                $this->settings['yandex_dict']['key']
+            );
+
+        // handlers
+
+        $map['notFoundHandler'] = fn (CI $c) =>
+            new NotFoundHandler(
+                $c->appContext
+            );
+
+        return $map;
     }
 }

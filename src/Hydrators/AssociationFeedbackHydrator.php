@@ -25,7 +25,7 @@ class AssociationFeedbackHydrator implements HydratorInterface
     /**
      * @param AssociationFeedback $entity
      */
-    protected function hydrate(DbModel $entity) : AssociationFeedback
+    public function hydrate(DbModel $entity) : AssociationFeedback
     {
         return $entity
             ->withAssociation(

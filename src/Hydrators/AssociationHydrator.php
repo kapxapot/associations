@@ -37,7 +37,7 @@ class AssociationHydrator implements HydratorInterface
     /**
      * @param Association $entity
      */
-    protected function hydrate(DbModel $entity) : Association
+    public function hydrate(DbModel $entity) : Association
     {
         return $entity
             ->withFirstWord(
@@ -45,6 +45,9 @@ class AssociationHydrator implements HydratorInterface
             )
             ->withSecondWord(
                 $this->wordRepository->get($entity->secondWordId)
+            )
+            ->withFeedbacks(
+                $this->associationFeedbackRepository->getAllByAssociation($entity)
             )
             ->withUrl(
                 $this->linker->association($entity)
@@ -54,9 +57,6 @@ class AssociationHydrator implements HydratorInterface
             )
             ->withTurns(
                 $this->turnRepository->getAllByAssociation($entity)
-            )
-            ->withFeedbacks(
-                $this->associationFeedbackRepository->getAllByAssociation($entity)
             );
     }
 }

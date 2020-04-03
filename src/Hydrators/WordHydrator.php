@@ -37,7 +37,7 @@ class WordHydrator implements HydratorInterface
     /**
      * @param Word $entity
      */
-    protected function hydrate(DbModel $entity) : Word
+    public function hydrate(DbModel $entity) : Word
     {
         return $entity
             ->withAssociations(

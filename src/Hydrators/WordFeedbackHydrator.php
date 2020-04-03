@@ -10,16 +10,16 @@ use Plasticode\Models\DbModel;
 
 class WordFeedbackHydrator implements HydratorInterface
 {
-    private WordRepositoryInterface $wordRepository;
     private UserRepositoryInterface $userRepository;
+    private WordRepositoryInterface $wordRepository;
 
     public function __construct(
-        WordRepositoryInterface $wordRepository,
-        UserRepositoryInterface $userRepository
+        UserRepositoryInterface $userRepository,
+        WordRepositoryInterface $wordRepository
     )
     {
-        $this->wordRepository = $wordRepository;
         $this->userRepository = $userRepository;
+        $this->wordRepository = $wordRepository;
     }
 
     /**

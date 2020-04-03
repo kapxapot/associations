@@ -46,6 +46,13 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         );
     }
 
+    public function getAllByLanguage(Language $language) : TurnCollection
+    {
+        return TurnCollection::from(
+            $this->getByLanguageQuery($language)
+        );
+    }
+
     protected function filterByUser(Query $query, User $user) : Query
     {
         return $query->where('user_id', $user->getId());

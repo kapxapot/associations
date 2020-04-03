@@ -137,7 +137,7 @@ abstract class BaseTestCase extends TestCase
             
             $app->add(
                 new \Plasticode\Middleware\CookieAuthMiddleware(
-                    $container->auth,
+                    $container->authService,
                     $settings['auth_token_key']
                 )
             );
