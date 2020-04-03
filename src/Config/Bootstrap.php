@@ -15,6 +15,7 @@ use App\Repositories\AssociationRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\LanguageRepository;
 use App\Repositories\TurnRepository;
+use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
 use App\Repositories\WordRepository;
 use App\Services\AssociationFeedbackService;
@@ -30,6 +31,7 @@ use App\Services\WordRecountService;
 use App\Services\WordService;
 use App\Services\YandexDictService;
 use Plasticode\Config\Bootstrap as BootstrapBase;
+use Plasticode\Hydrators\UserHydrator;
 use Psr\Container\ContainerInterface as CI;
 
 class Bootstrap extends BootstrapBase
@@ -84,6 +86,15 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
+        $map['userRepository'] = fn (CI $c) =>
+            new UserRepository(
+                $c->repositoryContext,
+                new UserHydrator(
+                    $c->roleRepository,
+                    $c->linker
+                )
+            );
+
         $map['wordFeedbackRepository'] = fn (CI $c) =>
             new WordFeedbackRepository(
                 $c->repositoryContext,
@@ -130,6 +141,7 @@ class Bootstrap extends BootstrapBase
 
         $map['associationFeedbackService'] = fn (CI $c) =>
             new AssociationFeedbackService(
+                $c->associationRepository,
                 $c->validator,
                 $c->validationRules
             );
@@ -175,6 +187,7 @@ class Bootstrap extends BootstrapBase
             new WordFeedbackService(
                 $c->validator,
                 $c->validationRules,
+                $c->wordRepository,
                 $c->wordService
             );
 

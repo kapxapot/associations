@@ -2,13 +2,24 @@
 
 namespace App\Validation\Rules;
 
-use App\Models\Association;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Respect\Validation\Rules\AbstractRule;
 
 class AssociationExists extends AbstractRule
 {
+    private AssociationRepositoryInterface $associationRepository;
+
+    public function __construct(
+        AssociationRepositoryInterface $associationRepository
+    )
+    {
+        $this->associationRepository = $associationRepository;
+    }
+
     public function validate($input)
     {
-        return Association::get($input) !== null;
+        $association = $this->associationRepository->get($input);
+
+        return $association !== null;
     }
 }

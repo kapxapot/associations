@@ -4,25 +4,38 @@ namespace App\Validation\Rules;
 
 use App\Models\Language;
 use App\Models\Word;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Util\Strings;
 use Respect\Validation\Rules\AbstractRule;
 
 class MainWordExists extends AbstractRule
 {
-    private $language;
-    private $dependentWord;
-    
-    public function __construct(Language $language, Word $dependentWord = null)
+    private WordRepositoryInterface $wordRepository;
+    private Language $language;
+    private ?Word $dependentWord = null;
+
+    public function __construct(
+        WordRepositoryInterface $wordRepository,
+        Language $language,
+        Word $dependentWord = null
+    )
     {
+        $this->wordRepository = $wordRepository;
         $this->language = $language;
         $this->dependentWord = $dependentWord;
     }
-    
+
     public function validate($input)
     {
         $mainWordStr = Strings::normalize($input);
-        $mainWord = Word::findInLanguage($this->language, $mainWordStr);
+
+        $mainWord = $this
+            ->wordRepository
+            ->findInLanguage(
+                $this->language,
+                $mainWordStr
+            );
         
-        return $mainWord !== null && !$mainWord->equals($this->dependentWord);
+        return $mainWord && !$mainWord->equals($this->dependentWord);
     }
 }

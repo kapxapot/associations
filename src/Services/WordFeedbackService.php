@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\User;
 use App\Models\Word;
 use App\Models\WordFeedback;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 use Plasticode\Util\Strings;
@@ -14,23 +15,21 @@ use Respect\Validation\Validator;
 
 class WordFeedbackService
 {
-    /** @var ValidatorInterface */
-    private $validator;
-
-    /** @var ValidationRules */
-    private $validationRules;
-
-    /** @var WordService */
-    private $wordService;
+    private ValidatorInterface $validator;
+    private ValidationRules $validationRules;
+    private WordRepositoryInterface $wordRepository;
+    private WordService $wordService;
 
     public function __construct(
         ValidatorInterface $validator,
         ValidationRules $validationRules,
+        WordRepositoryInterface $wordRepository,
         WordService $wordService
     )
     {
         $this->validator = $validator;
         $this->validationRules = $validationRules;
+        $this->wordRepository = $wordRepository;
         $this->wordService = $wordService;
     }
 
@@ -44,10 +43,10 @@ class WordFeedbackService
     private function convertToModel(array $data, User $user) : WordFeedback
     {
         $wordId = $data['word_id'];
-        $word = Word::get($wordId);
+        $word = $this->wordRepository->get($wordId);
         
         $model =
-            WordFeedback::getByWordAndUser($word, $user)
+            $word->feedbackBy($user)
             ??
             WordFeedback::create(
                 [
@@ -62,7 +61,13 @@ class WordFeedbackService
         $model->typo = (strlen($typo) > 0) ? $typo : null;
         
         $duplicate = Strings::normalize($data['duplicate'] ?? null);
-        $duplicateWord = Word::findInLanguage($word->language(), $duplicate);
+        
+        $duplicateWord = $this
+            ->wordRepository
+            ->findInLanguage(
+                $word->language(),
+                $duplicate
+            );
         
         $model->duplicateId = ($duplicateWord !== null)
             ? $duplicateWord->getId()
@@ -101,11 +106,17 @@ class WordFeedbackService
         }
         
         if (($data['duplicate'] ?? null) !== null) {
-            $word = Word::get($data['word_id'] ?? null);
+            $word = $this
+                ->wordRepository
+                ->get($data['word_id'] ?? null);
             
             if ($word !== null) {
                 $result['duplicate'] =
-                    Validator::mainWordExists($word->language(), $word);
+                    Validator::mainWordExists(
+                        $this->wordRepository,
+                        $word->language(),
+                        $word
+                    );
             }
         }
         

@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Models\Association;
 use App\Models\AssociationFeedback;
 use App\Models\User;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
@@ -12,17 +13,17 @@ use Plasticode\Validation\ValidationRules;
 
 class AssociationFeedbackService
 {
-    /** @var ValidatorInterface */
-    private $validator;
-
-    /** @var ValidationRules */
-    private $validationRules;
+    private AssociationRepositoryInterface $associationRepository;
+    private ValidatorInterface $validator;
+    private ValidationRules $validationRules;
 
     public function __construct(
+        AssociationRepositoryInterface $associationRepository,
         ValidatorInterface $validator,
         ValidationRules $validationRules
     )
     {
+        $this->associationRepository = $associationRepository;
         $this->validator = $validator;
         $this->validationRules = $validationRules;
     }
@@ -37,11 +38,13 @@ class AssociationFeedbackService
     private function convertToModel(array $data, User $user) : AssociationFeedback
     {
         $associationId = $data['association_id'];
-        $association = Association::get($associationId);
+
+        $association = $this
+            ->associationRepository
+            ->get($associationId);
         
         $model =
-            AssociationFeedback::getByAssociationAndUser($association, $user)
-            ??
+            $association->feedbackBy($user)             ??
             AssociationFeedback::create(
                 [
                     'association_id' => $association->getId(),
@@ -58,7 +61,7 @@ class AssociationFeedbackService
         
         return $model;
     }
-    
+
     private function validate(array $data)
     {
         $rules = $this->getRules($data);
@@ -68,14 +71,14 @@ class AssociationFeedbackService
             ->validateArray($data, $rules)
             ->throwOnFail();
     }
-    
+
     private function getRules(array $data) : array
     {
         return [
             'association_id' => $this
                 ->validationRules
                 ->get('posInt')
-                ->associationExists()
+                ->associationExists($this->associationRepository)
         ];
     }
 }

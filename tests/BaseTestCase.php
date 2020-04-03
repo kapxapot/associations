@@ -9,6 +9,10 @@ use Plasticode\Core\App;
 use Plasticode\Core\Core;
 use Plasticode\Core\Env;
 use Plasticode\Core\Settings;
+use Plasticode\Middleware\CookieAuthMiddleware;
+use Plasticode\Middleware\SlashMiddleware;
+use Psr\Container\ContainerInterface;
+use Slim\App as SlimApp;
 use Slim\Http\Environment;
 use Slim\Http\Request;
 use Slim\Http\Response;
@@ -17,21 +21,14 @@ abstract class BaseTestCase extends TestCase
 {
     const DEFAULT_USER_ID = 1;
 
-    /** @var \Slim\App */
-    protected $app;
-
-    /** @var \Psr\Container\ContainerInterface */
-    protected $container;
-
-    /** @var array */
-    protected $settings;
+    protected SlimApp $app;
+    protected ContainerInterface $container;
+    protected \ArrayAccess $settings;
 
     /**
      * Use middleware when running application?
-     *
-     * @var bool
      */
-    protected $withMiddleware = true;
+    protected bool $withMiddleware = true;
 
     protected function setUp() : void
     {
@@ -48,7 +45,7 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * Process the application given a request method and URI
+     * Process the application given a request method and URI.
      *
      * @param string            $requestMethod the request method (e.g. GET, POST, etc.)
      * @param string            $requestUri    the request URI
@@ -89,7 +86,7 @@ abstract class BaseTestCase extends TestCase
     }
 
     /**
-     * Make a request to the Api
+     * Make a request to the Api.
      *
      * @param       $requestMethod
      * @param       $requestUri
@@ -107,42 +104,42 @@ abstract class BaseTestCase extends TestCase
     {
         $root = __DIR__ . '/..';
         $dir = $root . '/src';
-        
+
         $env = Env::load($root);
-        
+
         $appSettings = Settings::load($root . '/settings');
-        
+
         $this->app = $app = App::get($appSettings);
         $this->container = $container = $this->app->getContainer();
         $this->settings = $settings = $this->container->get('settings');
-        
+
         error_reporting(E_ALL & ~E_NOTICE);
         ini_set("display_errors", 1);
         ini_set("log_errors_max_len", 0);
-        
+
         $bootstrap = new Bootstrap($settings, $dir);
-        
+
         Core::bootstrap(
             $container,
             $bootstrap->getMappings(),
             ['App\\Validation\\Rules\\']
         );
-        
+
         // middleware
- 
+
         if ($this->withMiddleware) {
             $app->add(
-                new \Plasticode\Middleware\SlashMiddleware()
+                new SlashMiddleware()
             );
-            
+
             $app->add(
-                new \Plasticode\Middleware\CookieAuthMiddleware(
+                new CookieAuthMiddleware(
                     $container->authService,
                     $settings['auth_token_key']
                 )
             );
         }
-        
+
         require $root . '/src/routes.php';
     }
 
