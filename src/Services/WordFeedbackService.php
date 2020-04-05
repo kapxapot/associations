@@ -3,8 +3,8 @@
 namespace App\Services;
 
 use App\Models\User;
-use App\Models\Word;
 use App\Models\WordFeedback;
+use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
@@ -17,18 +17,21 @@ class WordFeedbackService
 {
     private ValidatorInterface $validator;
     private ValidationRules $validationRules;
+    private WordFeedbackRepositoryInterface $wordFeedbackRepository;
     private WordRepositoryInterface $wordRepository;
     private WordService $wordService;
 
     public function __construct(
         ValidatorInterface $validator,
         ValidationRules $validationRules,
+        WordFeedbackRepositoryInterface $wordFeedbackRepository,
         WordRepositoryInterface $wordRepository,
         WordService $wordService
     )
     {
         $this->validator = $validator;
         $this->validationRules = $validationRules;
+        $this->wordFeedbackRepository = $wordFeedbackRepository;
         $this->wordRepository = $wordRepository;
         $this->wordService = $wordService;
     }
@@ -48,7 +51,7 @@ class WordFeedbackService
         $model =
             $word->feedbackBy($user)
             ??
-            WordFeedback::create(
+            $this->wordFeedbackRepository->create(
                 [
                     'word_id' => $word->getId(),
                     'created_by' => $user->getId(),
@@ -56,23 +59,23 @@ class WordFeedbackService
             );
         
         $model->dislike = Convert::toBit($data['dislike'] ?? null);
-        
+
         $typo = Strings::normalize($data['typo'] ?? null);
         $model->typo = (strlen($typo) > 0) ? $typo : null;
-        
+
         $duplicate = Strings::normalize($data['duplicate'] ?? null);
-        
+
         $duplicateWord = $this
             ->wordRepository
             ->findInLanguage(
                 $word->language(),
                 $duplicate
             );
-        
+
         $model->duplicateId = ($duplicateWord !== null)
             ? $duplicateWord->getId()
             : null;
-        
+
         $model->mature = Convert::toBit($data['mature'] ?? null);
 
         if ($model->isPersisted()) {
@@ -85,7 +88,7 @@ class WordFeedbackService
     private function validate(array $data)
     {
         $rules = $this->getRules($data);
-        
+
         $this
             ->validator
             ->validateArray($data, $rules)
@@ -98,7 +101,7 @@ class WordFeedbackService
             'word_id' => $this
                 ->validationRules
                 ->get('posInt')
-                ->wordExists()
+                ->wordExists($this->wordRepository)
         ];
         
         if (($data['typo'] ?? null) !== null) {

@@ -2,13 +2,24 @@
 
 namespace App\Validation\Rules;
 
-use App\Models\Word;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use Respect\Validation\Rules\AbstractRule;
 
 class WordExists extends AbstractRule
 {
+    private WordRepositoryInterface $wordRepository;
+
+    public function __construct(
+        WordRepositoryInterface $wordRepository
+    )
+    {
+        $this->wordRepository = $wordRepository;
+    }
+
     public function validate($input)
     {
-        return Word::get($input) !== null;
+        $word = $this->wordRepository->get($input);
+        
+        return $word !== null;
     }
 }
