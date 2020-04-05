@@ -9,7 +9,9 @@ final class YandexDictTest extends BaseTestCase
     /** @dataProvider existingWordsProvider */
     public function testExistingWords(string $word) : void
     {
-        $language = Language::get(Language::RUSSIAN);
+        $languageRepository = $this->container->languageRepository;
+        $language = $languageRepository->get(Language::RUSSIAN);
+
         $dict = $this->container->yandexDict;
 
         $result = $dict->request($language->yandexDictCode, $word);
@@ -39,7 +41,9 @@ final class YandexDictTest extends BaseTestCase
     /** @dataProvider notExistingWordsProvider */
     public function testNotExistingWords(string $word) : void
     {
-        $language = Language::get(Language::RUSSIAN);
+        $languageRepository = $this->container->languageRepository;
+        $language = $languageRepository->get(Language::RUSSIAN);
+
         $dict = $this->container->yandexDict;
 
         $result = $dict->request($language->yandexDictCode, $word);

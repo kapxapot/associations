@@ -221,6 +221,7 @@ class Bootstrap extends BootstrapBase
             new WordFeedbackService(
                 $c->validator,
                 $c->validationRules,
+                $c->wordFeedbackRepository,
                 $c->wordRepository,
                 $c->wordService
             );
