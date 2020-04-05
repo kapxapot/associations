@@ -113,7 +113,7 @@ class WordFeedbackService
                 ->wordRepository
                 ->get($data['word_id'] ?? null);
             
-            if ($word !== null) {
+            if ($word) {
                 $result['duplicate'] =
                     Validator::mainWordExists(
                         $this->wordRepository,

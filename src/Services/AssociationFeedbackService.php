@@ -69,7 +69,7 @@ class AssociationFeedbackService
     private function validate(array $data)
     {
         $rules = $this->getRules($data);
-        
+
         $this
             ->validator
             ->validateArray($data, $rules)
