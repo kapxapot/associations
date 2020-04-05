@@ -14,6 +14,7 @@ final class WordFeedbackTest extends BaseTestCase
         $service = $this->container->wordFeedbackService;
         $user = $this->getDefaultUser();
 
+        /** @var WordFeedback */
         $model = $service->toModel($data, $user);
 
         $this->assertInstanceOf(WordFeedback::class, $model);

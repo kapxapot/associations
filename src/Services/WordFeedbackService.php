@@ -76,6 +76,8 @@ class WordFeedbackService
             ? $duplicateWord->getId()
             : null;
 
+        $model->withDuplicate($duplicateWord);
+
         $model->mature = Convert::toBit($data['mature'] ?? null);
 
         if ($model->isPersisted()) {
