@@ -3,23 +3,40 @@
 namespace App\Models;
 
 use App\Models\Interfaces\DictWordInterface;
+use App\Models\Traits\WithLanguage;
 use Plasticode\Models\DbModel;
+use Plasticode\Models\Traits\CreatedAt;
+use Plasticode\Models\Traits\UpdatedAt;
+use Webmozart\Assert\Assert;
 
+/**
+ * @property string $word
+ * @property integer|null $wordId
+ * @property integer $languageId
+ * @property string|null $response
+ * @property string|null $pos
+ */
 class YandexDictWord extends DbModel implements DictWordInterface
 {
-    public static function getByWord(Word $word) : ?self
+    use CreatedAt, UpdatedAt, WithLanguage;
+
+    protected ?Word $wordEntity = null;
+
+    private bool $wordEntityInitialized = false;
+
+    public function wordEntity() : ?Word
     {
-        return self::query()
-            ->where('word_id', $word->getId())
-            ->one();
+        Assert::true($this->wordEntityInitialized);
+
+        return $this->wordEntity;
     }
 
-    public static function getByWordStr(Language $language, string $wordStr) : ?self
+    public function withWordEntity(?Word $wordEntity) : self
     {
-        return self::query()
-            ->where('language_id', $language->getId())
-            ->where('word', $wordStr)
-            ->one();
+        $this->wordEntity = $wordEntity;
+        $this->wordEntityInitialized = true;
+
+        return $this;
     }
 
     public function isValid() : bool

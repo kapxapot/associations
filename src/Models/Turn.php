@@ -17,40 +17,52 @@ class Turn extends DbModel
 {
     use CreatedAt;
 
-    private Game $game;
-    private Word $word;
-    private ?User $user = null;
-    private ?Association $association = null;
-    private ?self $prev = null;
+    protected Game $game;
+    protected Word $word;
+    protected ?User $user = null;
+    protected ?Association $association = null;
+    protected ?self $prev = null;
 
+    private bool $gameInitialized = false;
+    private bool $wordInitialized = false;
     private bool $userInitialized = false;
     private bool $associationInitialized = false;
     private bool $prevInitialized = false;
 
     public function game() : Game
     {
+        Assert::true($this->gameInitialized);
+
         return $this->game;
     }
 
     public function withGame(Game $game) : self
     {
         $this->game = $game;
+        $this->gameInitialized = true;
+
         return $this;
     }
 
     public function word() : Word
     {
+        Assert::true($this->wordInitialized);
+
         return $this->word;
     }
 
     public function withWord(Word $word) : self
     {
         $this->word = $word;
+        $this->wordInitialized = true;
+
         return $this;
     }
-    
+
     public function user() : ?User
     {
+        Assert::true($this->userInitialized);
+
         return $this->user;
     }
 
@@ -64,7 +76,7 @@ class Turn extends DbModel
 
     public function isBy(User $user) : bool
     {
-        return $this->user->equals($user);
+        return $this->user()->equals($user);
     }
 
     public function association() : ?Association
@@ -84,8 +96,6 @@ class Turn extends DbModel
 
     public function isPlayerTurn() : bool
     {
-        Assert::true($this->userInitialized);
-
         return !is_null($this->user());
     }
 

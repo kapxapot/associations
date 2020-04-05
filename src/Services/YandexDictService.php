@@ -8,19 +8,23 @@ use App\Models\Word;
 use App\Models\YandexDictWord;
 use App\Models\Interfaces\DictWordInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Repositories\Interfaces\YandexDictWordRepositoryInterface;
 use App\Services\Interfaces\ExternalDictServiceInterface;
 
 class YandexDictService implements ExternalDictServiceInterface
 {
     private WordRepositoryInterface $wordRepository;
+    private YandexDictWordRepositoryInterface $yandexDictWordRepository;
     private YandexDict $yandexDict;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
+        YandexDictWordRepositoryInterface $yandexDictWordRepository,
         YandexDict $yandexDict
     )
     {
         $this->wordRepository = $wordRepository;
+        $this->yandexDictWordRepository = $yandexDictWordRepository;
         $this->yandexDict = $yandexDict;
     }
 
@@ -62,19 +66,19 @@ class YandexDictService implements ExternalDictServiceInterface
 
         // searching by word
         $dictWord = !is_null($word)
-            ? YandexDictWord::getByWord($word)
+            ? $this->yandexDictWordRepository->getByWord($word)
             : null;
         
         // searching by language & wordStr
         $dictWord = $dictWord ??
-            YandexDictWord::getByWordStr($language, $wordStr);
+            $this->yandexDictWordRepository->getByWordStr($language, $wordStr);
 
         if (is_null($dictWord)) {
             // no word found, loading from dictionary
             $dictWord = $this->loadFromDictionary($language, $wordStr, $word);
 
-            if (!is_null($dictWord)) {
-                $dictWord->save();
+            if ($dictWord) {
+                $dictWord = $this->yandexDictWordRepository->save($dictWord);
             }
         }
 
@@ -101,7 +105,7 @@ class YandexDictService implements ExternalDictServiceInterface
             return null;
         }
 
-        $dictWord = YandexDictWord::create(
+        $dictWord = $this->yandexDictWordRepository->create(
             [
                 'word' => $wordStr,
                 'language_id' => $language->getId(),

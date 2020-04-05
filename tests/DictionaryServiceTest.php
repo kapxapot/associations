@@ -3,7 +3,6 @@
 namespace App\Tests;
 
 use App\Models\Language;
-use App\Models\Word;
 
 final class DictionaryServiceTest extends BaseTestCase
 {

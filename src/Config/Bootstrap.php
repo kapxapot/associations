@@ -10,6 +10,7 @@ use App\Hydrators\AssociationHydrator;
 use App\Hydrators\TurnHydrator;
 use App\Hydrators\WordFeedbackHydrator;
 use App\Hydrators\WordHydrator;
+use App\Hydrators\YandexDictWordHydrator;
 use App\Repositories\AssociationFeedbackRepository;
 use App\Repositories\AssociationRepository;
 use App\Repositories\GameRepository;
@@ -18,6 +19,7 @@ use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
 use App\Repositories\WordRepository;
+use App\Repositories\YandexDictWordRepository;
 use App\Services\AssociationFeedbackService;
 use App\Services\AssociationRecountService;
 use App\Services\AssociationService;
@@ -134,6 +136,18 @@ class Bootstrap extends BootstrapBase
                     )
                 )
             );
+        
+        $map['yandexDictWordRepository'] = fn (CI $c) =>
+            new YandexDictWordRepository(
+                $c->repositoryContext,
+                new ObjectProxy(
+                    fn () =>
+                    new YandexDictWordHydrator(
+                        $c->languageRepository,
+                        $c->wordRepository
+                    )
+                )
+            );
 
         $map['localizationConfig'] = fn (CI $c) =>
             new LocalizationConfig();
@@ -228,6 +242,7 @@ class Bootstrap extends BootstrapBase
         $map['yandexDictService'] = fn (CI $c) =>
             new YandexDictService(
                 $c->wordRepository,
+                $c->yandexDictWordRepository,
                 $c->yandexDict
             );
 
