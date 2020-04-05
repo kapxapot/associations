@@ -32,7 +32,7 @@ class AssociationFeedbackHydrator implements HydratorInterface
                 $this->associationRepository->get($entity->associationId)
             )
             ->withCreator(
-                $this->userRepository->get($entity->createdBy())
+                $this->userRepository->get($entity->createdBy)
             );
     }
 }

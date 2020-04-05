@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Association;
 use App\Models\AssociationFeedback;
 use App\Models\User;
+use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
@@ -14,16 +14,19 @@ use Plasticode\Validation\ValidationRules;
 class AssociationFeedbackService
 {
     private AssociationRepositoryInterface $associationRepository;
+    private AssociationFeedbackRepositoryInterface $associationFeedbackRepository;
     private ValidatorInterface $validator;
     private ValidationRules $validationRules;
 
     public function __construct(
         AssociationRepositoryInterface $associationRepository,
+        AssociationFeedbackRepositoryInterface $associationFeedbackRepository,
         ValidatorInterface $validator,
         ValidationRules $validationRules
     )
     {
         $this->associationRepository = $associationRepository;
+        $this->associationFeedbackRepository = $associationFeedbackRepository;
         $this->validator = $validator;
         $this->validationRules = $validationRules;
     }
@@ -42,10 +45,11 @@ class AssociationFeedbackService
         $association = $this
             ->associationRepository
             ->get($associationId);
-        
+
         $model =
-            $association->feedbackBy($user)             ??
-            AssociationFeedback::create(
+            $association->feedbackBy($user)
+            ??
+            $this->associationFeedbackRepository->create(
                 [
                     'association_id' => $association->getId(),
                     'created_by' => $user->getId(),

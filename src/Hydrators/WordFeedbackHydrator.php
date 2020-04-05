@@ -35,7 +35,7 @@ class WordFeedbackHydrator implements HydratorInterface
                 $this->wordRepository->get($entity->duplicateId)
             )
             ->withCreator(
-                $this->userRepository->get($entity->createdBy())
+                $this->userRepository->get($entity->createdBy)
             );
     }
 }

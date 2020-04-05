@@ -32,6 +32,7 @@ use App\Services\WordService;
 use App\Services\YandexDictService;
 use Plasticode\Config\Bootstrap as BootstrapBase;
 use Plasticode\Hydrators\UserHydrator;
+use Plasticode\ObjectProxy;
 use Psr\Container\ContainerInterface as CI;
 
 class Bootstrap extends BootstrapBase
@@ -46,21 +47,27 @@ class Bootstrap extends BootstrapBase
         $map['associationFeedbackRepository'] = fn (CI $c) =>
             new AssociationFeedbackRepository(
                 $c->repositoryContext,
-                new AssociationFeedbackHydrator(
-                    $c->associationRepository,
-                    $c->userRepository
+                new ObjectProxy(
+                    fn () =>
+                    new AssociationFeedbackHydrator(
+                        $c->associationRepository,
+                        $c->userRepository
+                    )
                 )
             );
 
         $map['associationRepository'] = fn (CI $c) =>
             new AssociationRepository(
                 $c->repositoryContext,
-                new AssociationHydrator(
-                    $c->associationFeedbackRepository,
-                    $c->languageRepository,
-                    $c->turnRepository,
-                    $c->wordRepository,
-                    $c->linker
+                new ObjectProxy(
+                    fn () =>
+                    new AssociationHydrator(
+                        $c->associationFeedbackRepository,
+                        $c->languageRepository,
+                        $c->turnRepository,
+                        $c->wordRepository,
+                        $c->linker
+                    )
                 )
             );
 
@@ -77,42 +84,54 @@ class Bootstrap extends BootstrapBase
         $map['turnRepository'] = fn (CI $c) =>
             new TurnRepository(
                 $c->repositoryContext,
-                new TurnHydrator(
-                    $c->associationRepository,
-                    $c->gameRepository,
-                    $c->turnRepository,
-                    $c->userRepository,
-                    $c->wordRepository
+                new ObjectProxy(
+                    fn () =>
+                    new TurnHydrator(
+                        $c->associationRepository,
+                        $c->gameRepository,
+                        $c->turnRepository,
+                        $c->userRepository,
+                        $c->wordRepository
+                    )
                 )
             );
 
         $map['userRepository'] = fn (CI $c) =>
             new UserRepository(
                 $c->repositoryContext,
-                new UserHydrator(
-                    $c->roleRepository,
-                    $c->linker
+                new ObjectProxy(
+                    fn () =>
+                    new UserHydrator(
+                        $c->roleRepository,
+                        $c->linker
+                    )
                 )
             );
 
         $map['wordFeedbackRepository'] = fn (CI $c) =>
             new WordFeedbackRepository(
                 $c->repositoryContext,
-                new WordFeedbackHydrator(
-                    $c->userRepository,
-                    $c->wordRepository
+                new ObjectProxy(
+                    fn () =>
+                    new WordFeedbackHydrator(
+                        $c->userRepository,
+                        $c->wordRepository
+                    )
                 )
             );
 
         $map['wordRepository'] = fn (CI $c) =>
             new WordRepository(
                 $c->repositoryContext,
-                new WordHydrator(
-                    $c->aassociationRepository,
-                    $c->languageRepository,
-                    $c->turnRepository,
-                    $c->wordFeedbackRepository,
-                    $c->linker
+                new ObjectProxy(
+                    fn () =>
+                    new WordHydrator(
+                        $c->associationRepository,
+                        $c->languageRepository,
+                        $c->turnRepository,
+                        $c->wordFeedbackRepository,
+                        $c->linker
+                    )
                 )
             );
 
@@ -142,6 +161,7 @@ class Bootstrap extends BootstrapBase
         $map['associationFeedbackService'] = fn (CI $c) =>
             new AssociationFeedbackService(
                 $c->associationRepository,
+                $c->associationFeedbackRepository,
                 $c->validator,
                 $c->validationRules
             );
@@ -207,6 +227,7 @@ class Bootstrap extends BootstrapBase
 
         $map['yandexDictService'] = fn (CI $c) =>
             new YandexDictService(
+                $c->wordRepository,
                 $c->yandexDict
             );
 

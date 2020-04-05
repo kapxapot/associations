@@ -12,7 +12,6 @@ class InitAssociations extends AbstractMigration
             ->addColumn('language_id', 'integer')
             ->addColumn('first_word_id', 'integer')
             ->addColumn('second_word_id', 'integer')
-            ->addColumn('word_bin', 'string', ['limit' => 250, 'collation' => 'utf8_bin'])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('created_by', 'integer', ['null' => true])
             ->addColumn('deleted_at', 'timestamp', ['null' => true])

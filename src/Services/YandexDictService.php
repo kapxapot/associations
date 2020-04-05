@@ -7,15 +7,20 @@ use App\Models\Language;
 use App\Models\Word;
 use App\Models\YandexDictWord;
 use App\Models\Interfaces\DictWordInterface;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\Interfaces\ExternalDictServiceInterface;
 
 class YandexDictService implements ExternalDictServiceInterface
 {
-    /** @var YandexDict */
-    private $yandexDict;
+    private WordRepositoryInterface $wordRepository;
+    private YandexDict $yandexDict;
 
-    public function __construct(YandexDict $yandexDict)
+    public function __construct(
+        WordRepositoryInterface $wordRepository,
+        YandexDict $yandexDict
+    )
     {
+        $this->wordRepository = $wordRepository;
         $this->yandexDict = $yandexDict;
     }
 
@@ -33,7 +38,10 @@ class YandexDictService implements ExternalDictServiceInterface
         string $wordStr
     ) : ?DictWordInterface
     {
-        $word = Word::findInLanguage($language, $wordStr);
+        $word = $this->wordRepository->findInLanguage(
+            $language,
+            $wordStr
+        );
 
         if (!is_null($word)) {
             return $this->getWord($word);

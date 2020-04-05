@@ -2,19 +2,20 @@
 
 namespace App\Core;
 
+use App\Core\Interfaces\LinkerInterface;
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Word;
 use Plasticode\Core\Linker as LinkerBase;
 use Plasticode\Models\DbModel;
 
-class Linker extends LinkerBase
+class Linker extends LinkerBase implements LinkerInterface
 {
     private function check(DbModel $model) : bool
     {
         return $model !== null && $model->isPersisted();
     }
-    
+
     public function association(Association $association) : ?string
     {
         if (!$this->check($association)) {

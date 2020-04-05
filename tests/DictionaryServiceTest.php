@@ -10,7 +10,9 @@ final class DictionaryServiceTest extends BaseTestCase
     /** @dataProvider isWordStrKnownProvider */
     public function testIsWordStrKnown(string $word, bool $expected) : void
     {
-        $language = Language::get(Language::RUSSIAN);
+        $languageRepository = $this->container->languageRepository;
+        $language = $languageRepository->get(Language::RUSSIAN);
+
         $service = $this->container->dictionaryService;
         
         $actual = $service->isWordStrKnown($language, $word);
@@ -33,7 +35,9 @@ final class DictionaryServiceTest extends BaseTestCase
     public function testIsWordKnown(int $wordId, bool $expected) : void
     {
         $service = $this->container->dictionaryService;
-        $word = Word::get($wordId);
+
+        $wordRepository = $this->container->wordRepository;
+        $word = $wordRepository->get($wordId);
 
         $actual = $service->isWordKnown($word);
 

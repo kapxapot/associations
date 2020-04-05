@@ -8,7 +8,9 @@ use Plasticode\Exceptions\ValidationException;
 
 final class AssociationFeedbackTest extends BaseTestCase
 {
-    /** @dataProvider toModelProvider */
+    /**
+     * @dataProvider toModelProvider
+     */
     public function testToModel(array $data, array $expected) : void
     {
         $service = $this->container->associationFeedbackService;

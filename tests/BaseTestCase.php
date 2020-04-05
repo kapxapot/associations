@@ -113,7 +113,7 @@ abstract class BaseTestCase extends TestCase
         $this->container = $container = $this->app->getContainer();
         $this->settings = $settings = $this->container->get('settings');
 
-        error_reporting(E_ALL & ~E_NOTICE);
+        error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
         ini_set("display_errors", 1);
         ini_set("log_errors_max_len", 0);
 
