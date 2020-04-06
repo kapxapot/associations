@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Services;
 
 use App\Models\Language;
+use App\Tests\BaseTestCase;
 
 final class DictionaryServiceTest extends BaseTestCase
 {

@@ -3,9 +3,15 @@
 namespace App\Controllers;
 
 use Plasticode\Controllers\Controller as BaseController;
+use Psr\Container\ContainerInterface;
 
 class Controller extends BaseController
 {
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct($container->appContext);
+    }
+
     /**
      * Auto-switch to one-column layout?
      */

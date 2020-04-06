@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Repositories;
 
 use App\Models\User;
+use App\Tests\BaseTestCase;
 
 final class UserRepositoryTest extends BaseTestCase
 {

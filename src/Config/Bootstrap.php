@@ -2,6 +2,7 @@
 
 namespace App\Config;
 
+use App\Auth\Auth;
 use App\Core\Linker;
 use App\External\YandexDict;
 use App\Handlers\NotFoundHandler;
@@ -45,6 +46,11 @@ class Bootstrap extends BootstrapBase
     public function getMappings() : array
     {
         $map = parent::getMappings();
+
+        $map['auth'] = fn (CI $c) =>
+            new Auth(
+                $c->session
+            );
 
         $map['associationFeedbackRepository'] = fn (CI $c) =>
             new AssociationFeedbackRepository(
@@ -258,7 +264,7 @@ class Bootstrap extends BootstrapBase
 
         $map['notFoundHandler'] = fn (CI $c) =>
             new NotFoundHandler(
-                $c->appContext
+                $c
             );
 
         return $map;

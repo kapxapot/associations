@@ -2,21 +2,33 @@
 
 namespace App\Controllers;
 
+use App\Auth\Interfaces\AuthInterface;
+use App\Handlers\NotFoundHandler;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\WordService;
-use Plasticode\Auth\Auth;
 use Plasticode\Core\Response;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request as SlimRequest;
 
-/**
- * @property Auth $auth
- * @property WordRepositoryInterface $wordRepository
- * @property WordService $wordService
- */
 class WordController extends Controller
 {
+    private AuthInterface $auth;
+    private WordRepositoryInterface $wordRepository;
+    private WordService $wordService;
+    private NotFoundHandler $notFoundHandler;
+
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct($container);
+
+        $this->auth = $container->auth;
+        $this->wordRepository = $container->wordRepository;
+        $this->wordService = $container->wordService;
+        $this->notFoundHandler = $container->notFoundHandler;
+    }
+
     public function index(
         SlimRequest $request,
         ResponseInterface $response
@@ -66,18 +78,19 @@ class WordController extends Controller
         $debug = $request->getQueryParam('debug', null) !== null;
 
         $word = $this->wordRepository->get($id);
-        
         $user = $this->auth->getUser();
 
         if (is_null($word) || !$word->isVisibleFor($user)) {
-            return $this->notFound($request, $response);
+            return ($this->notFoundHandler)($request, $response);
         }
 
-        $approvedStr =
-            $this->wordService->approvedInvisibleAssociationsStr($word);
+        $approvedStr = $this
+            ->wordService
+            ->approvedInvisibleAssociationsStr($word);
 
-        $notApprovedStr =
-            $this->wordService->notApprovedInvisibleAssociationsStr($word);
+        $notApprovedStr = $this
+            ->wordService
+            ->notApprovedInvisibleAssociationsStr($word);
 
         $params = $this->buildParams(
             [

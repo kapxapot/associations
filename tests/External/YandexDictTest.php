@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\External;
 
 use App\Models\Language;
+use App\Tests\BaseTestCase;
 
 final class YandexDictTest extends BaseTestCase
 {

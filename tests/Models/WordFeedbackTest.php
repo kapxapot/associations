@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Models;
 
 use App\Models\Word;
 use App\Models\WordFeedback;
+use App\Tests\BaseTestCase;
 use Plasticode\Exceptions\ValidationException;
 
 final class WordFeedbackTest extends BaseTestCase

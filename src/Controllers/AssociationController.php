@@ -2,33 +2,55 @@
 
 namespace App\Controllers;
 
-use App\Models\Association;
+use App\Auth\Interfaces\AuthInterface;
+use App\Handlers\NotFoundHandler;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
+use Slim\Http\Request as SlimRequest;
 
 class AssociationController extends Controller
 {
-    public function get(ServerRequestInterface $request, ResponseInterface $response, array $args) : ResponseInterface
+    private AuthInterface $auth;
+    private AssociationRepositoryInterface $associationRepository;
+    private NotFoundHandler $notFoundHandler;
+
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct($container);
+
+        $this->auth = $container->auth;
+        $this->associationRepository = $container->associationRepository;
+        $this->notFoundHandler = $container->notFoundHandler;
+    }
+
+    public function get(
+        SlimRequest $request,
+        ResponseInterface $response,
+        array $args
+    ) : ResponseInterface
     {
         $id = $args['id'];
         
         $debug = $request->getQueryParam('debug', null) !== null;
 
-        $association = Association::get($id);
+        $association = $this->associationRepository->get($id);
         
         $user = $this->auth->getUser();
 
-        if ($association === null || !$association->isVisibleForUser($user)) {
-            return $this->notFound($request, $response);
+        if (is_null($association) || !$association->isVisibleFor($user)) {
+            return ($this->notFoundHandler)($request, $response);
         }
 
-        $params = $this->buildParams([
-            'params' => [
-                'association' => $association,
-                'disqus_id' => 'association' . $association->getId(),
-                'debug' => $debug,
-            ],
-        ]);
+        $params = $this->buildParams(
+            [
+                'params' => [
+                    'association' => $association,
+                    'disqus_id' => 'association' . $association->getId(),
+                    'debug' => $debug,
+                ],
+            ]
+        );
         
         return $this->render($response, 'main/associations/item.twig', $params);
     }

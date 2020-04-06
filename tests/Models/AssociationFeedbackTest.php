@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Tests;
+namespace App\Tests\Models;
 
 use App\Models\Association;
 use App\Models\AssociationFeedback;
+use App\Tests\BaseTestCase;
 use Plasticode\Exceptions\ValidationException;
 
 final class AssociationFeedbackTest extends BaseTestCase
