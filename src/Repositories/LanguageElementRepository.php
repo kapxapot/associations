@@ -23,6 +23,13 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         );
     }
 
+    public function getByLanguageCount(Language $language): int
+    {
+        return $this
+            ->getByLanguageQuery($language)
+            ->count();
+    }
+
     public function getAllCreatedByUser(
         User $user,
         ?Language $language = null
@@ -73,6 +80,21 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
             $this
                 ->filterApproved($query)
                 ->orderByDesc('approved_updated_at')
+        );
+    }
+
+    public function getLastAddedByLanguage(
+        ?Language $language = null,
+        int $limit = null
+    ) : LanguageElementCollection
+    {
+        $byLanguageQuery = $this->getByLanguageQuery($language);
+        $approvedQuery = $this->filterApproved($byLanguageQuery);
+
+        return LanguageElementCollection::from(
+            $this
+                ->filterNotMature($approvedQuery)
+                ->limit($limit)
         );
     }
 

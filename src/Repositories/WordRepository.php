@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Collections\WordCollection;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
@@ -22,6 +23,13 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         return $this->saveEntity($word);
     }
 
+    public function getAllByLanguage(Language $language) : WordCollection
+    {
+        return WordCollection::from(
+            parent::getAllByLanguage($language)
+        );
+    }
+
     /**
      * Finds the word by string in the specified language.
      * 
@@ -33,5 +41,15 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             ->getByLanguageQuery($language)
             ->where('word_bin', $wordStr)
             ->one();
+    }
+
+    public function getLastAddedByLanguage(
+        ?Language $language = null,
+        int $limit = null
+    ) : WordCollection
+    {
+        return WordCollection::from(
+            parent::getLastAddedByLanguage($language, $limit)
+        );
     }
 }

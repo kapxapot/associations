@@ -7,8 +7,7 @@ use App\Models\User;
 
 class UserService
 {
-    /** @var UserConfigInterface */
-    private $config;
+    private UserConfigInterface $config;
 
     public function __construct(UserConfigInterface $config)
     {

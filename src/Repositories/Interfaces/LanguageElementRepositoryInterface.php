@@ -10,6 +10,8 @@ interface LanguageElementRepositoryInterface
 {
     function getAllByLanguage(Language $language) : LanguageElementCollection;
 
+    function getByLanguageCount(Language $language) : int;
+
     function getAllCreatedByUser(
         User $user,
         ?Language $language = null
@@ -26,5 +28,10 @@ interface LanguageElementRepositoryInterface
 
     function getAllApproved(
         ?Language $language = null
+    ) : LanguageElementCollection;
+
+    function getLastAddedByLanguage(
+        ?Language $language = null,
+        int $limit = null
     ) : LanguageElementCollection;
 }

@@ -17,8 +17,7 @@ use Plasticode\Util\Date;
 
 class AssociationRecountService extends EventProcessor
 {
-    /** @var AssociationConfigInterface */
-    private $config;
+    private AssociationConfigInterface $config;
 
     public function __construct(AssociationConfigInterface $config)
     {

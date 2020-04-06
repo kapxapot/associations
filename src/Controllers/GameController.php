@@ -6,6 +6,8 @@ use App\Auth\Interfaces\AuthInterface;
 use App\Handlers\NotFoundHandler;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
+use App\Services\GameService;
+use App\Services\TurnService;
 use Plasticode\Auth\Access;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
@@ -19,9 +21,12 @@ class GameController extends Controller
 {
     private GameRepositoryInterface $gameRepository;
     private LanguageRepositoryInterface $languageRepository;
+
     private NotFoundHandler $notFoundHandler;
     private AuthInterface $auth;
     private Access $access;
+    private GameService $gameService;
+    private TurnService $turnService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -29,9 +34,12 @@ class GameController extends Controller
 
         $this->gameRepository = $container->gameRepository;
         $this->languageRepository = $container->languageRepository;
+
         $this->notFoundHandler = $container->notFoundHandler;
         $this->auth = $container->auth;
         $this->access = $container->access;
+        $this->gameService = $container->gameService;
+        $this->turnService = $container->turnService;
     }
 
     public function get(
@@ -82,7 +90,7 @@ class GameController extends Controller
         $languageId = $request->getParam('language_id');
         $language = $this->languageRepository->get($languageId);
 
-        if ($language === null) {
+        if (is_null($language)) {
             throw new NotFoundException('Language not found.');
         }
 
@@ -98,7 +106,10 @@ class GameController extends Controller
         );
     }
 
-    public function finish(ServerRequestInterface $request, ResponseInterface $response) : ResponseInterface
+    public function finish(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    ) : ResponseInterface
     {
         $user = $this->auth->getUser();
         
@@ -106,7 +117,7 @@ class GameController extends Controller
             $game = $user->currentGame();
             
             if ($game !== null) {
-                $this->gameService->finishGame($game);
+                $this->turnService->finishGame($game);
             }
         }
         

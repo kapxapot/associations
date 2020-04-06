@@ -9,6 +9,7 @@ use App\Models\AssociationFeedback;
 interface AssociationFeedbackRepositoryInterface
 {
     function create(array $data) : AssociationFeedback;
+    function save(AssociationFeedback $feedback) : AssociationFeedback;
 
     function getAllByAssociation(
         Association $association

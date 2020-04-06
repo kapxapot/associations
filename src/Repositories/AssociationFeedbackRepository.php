@@ -17,6 +17,11 @@ class AssociationFeedbackRepository extends IdiormRepository implements Associat
         return $this->createEntity($data);
     }
 
+    public function save(AssociationFeedback $feedback) : AssociationFeedback
+    {
+        return $this->saveEntity($feedback);
+    }
+
     public function getAllByAssociation(
         Association $association
     ) : AssociationFeedbackCollection

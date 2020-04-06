@@ -17,6 +17,11 @@ class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRep
         return $this->createEntity($data);
     }
 
+    public function save(WordFeedback $feedback) : WordFeedback
+    {
+        return $this->saveEntity($feedback);
+    }
+
     public function getAllByWord(Word $word) : WordFeedbackCollection
     {
         return WordFeedbackCollection::from(

@@ -29,6 +29,11 @@ class Config extends ConfigBase implements AssociationConfigInterface, UserConfi
         return $this->get('associations.mature_threshold', 2);
     }
 
+    public function associationLastAddedLimit() : int
+    {
+        return $this->get('associations.last_added_limit', 10);
+    }
+
     public function userMatureAge() : int
     {
         return $this->get('users.mature_age', 16);
@@ -62,5 +67,10 @@ class Config extends ConfigBase implements AssociationConfigInterface, UserConfi
     public function wordMatureThreshold() : float
     {
         return $this->get('words.mature_threshold', 2);
+    }
+
+    public function wordLastAddedLimit() : int
+    {
+        return $this->get('words.last_added_limit', 10);
     }
 }

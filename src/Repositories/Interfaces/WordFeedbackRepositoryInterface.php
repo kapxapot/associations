@@ -9,5 +9,6 @@ use App\Models\WordFeedback;
 interface WordFeedbackRepositoryInterface
 {
     function create(array $data) : WordFeedback;
+    function save(WordFeedback $feedback) : WordFeedback;
     function getAllByWord(Word $word) : WordFeedbackCollection;
 }

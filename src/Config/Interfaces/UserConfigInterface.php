@@ -4,5 +4,5 @@ namespace App\Config\Interfaces;
 
 interface UserConfigInterface
 {
-    public function userMatureAge() : int;
+    function userMatureAge() : int;
 }

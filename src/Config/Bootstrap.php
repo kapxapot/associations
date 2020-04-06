@@ -21,6 +21,7 @@ use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
+use App\Services\AnniversaryService;
 use App\Services\AssociationFeedbackService;
 use App\Services\AssociationRecountService;
 use App\Services\AssociationService;
@@ -177,6 +178,9 @@ class Bootstrap extends BootstrapBase
                 $c->wordRecountService,
                 $c->associationRecountService,
             ];
+
+        $map['anniversaryService'] = fn (CI $c) =>
+            new AnniversaryService();
 
         $map['associationFeedbackService'] = fn (CI $c) =>
             new AssociationFeedbackService(

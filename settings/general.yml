@@ -51,6 +51,7 @@ associations:
   update:
     ttl_min: 1440
     limit: 500
+  last_added_limit: 10
 
 languages:
   default_id: 1
@@ -67,6 +68,7 @@ words:
   update:
     ttl_min: 1440
     limit: 500
+  last_added_limit: 10
 
 yandex_dict:
   key: {YANDEX_DICT_KEY}

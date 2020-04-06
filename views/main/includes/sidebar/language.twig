@@ -21,12 +21,12 @@
     </div>
 </div>
 
-{% if language.last_added_words.any %}
+{% if last_added_words.any %}
     <div class="panel-secondary-heading">Новые слова</div>
     <div class="panel panel-secondary">
         <div class="panel-body">
             <ul class="mb-0 pl-3">
-                {% for word in language.last_added_words.all %}
+                {% for word in last_added_words %}
                     <li>{% include "components/word.twig" with { 'word': word } only %}{% if word.creator %} <span class="nowrap">{{ lm.user(word.creator) }}</span>{% endif %}</li>
                 {% endfor %}
             </ul>
@@ -34,12 +34,12 @@
     </div>
 {% endif %}
 
-{% if language.last_added_associations.any %}
+{% if last_added_associations.any %}
     <div class="panel-secondary-heading">Новые ассоциации</div>
     <div class="panel panel-secondary">
         <div class="panel-body">
             <ul class="mb-0 pl-3">
-                {% for assoc in language.last_added_associations.all %}
+                {% for assoc in last_added_associations %}
                     <li>{{ lm.association(assoc) }}{% if assoc.creator %} <span class="nowrap">{{ lm.user(assoc.creator) }}</span>{% endif %}</li>
                 {% endfor %}
             </ul>

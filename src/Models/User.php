@@ -9,9 +9,8 @@ use Plasticode\Util\Date;
 
 class User extends UserBase
 {
-    /** @var boolean */
-    private $mature = false;
-    
+    private bool $mature = false;
+
     public function isMature() : bool
     {
         return $this->mature;

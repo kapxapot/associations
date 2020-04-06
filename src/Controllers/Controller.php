@@ -2,14 +2,43 @@
 
 namespace App\Controllers;
 
+use App\Config\Interfaces\AssociationConfigInterface;
+use App\Config\Interfaces\WordConfigInterface;
+use App\Models\Game;
+use App\Models\Language;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\AnniversaryService;
+use App\Services\LanguageService;
 use Plasticode\Controllers\Controller as BaseController;
+use Plasticode\Util\Cases;
 use Psr\Container\ContainerInterface;
 
 class Controller extends BaseController
 {
+    protected AssociationRepositoryInterface $associationRepository;
+    protected WordRepositoryInterface $wordRepository;
+
+    protected Cases $cases;
+    protected AnniversaryService $anniversaryService;
+    protected LanguageService $languageService;
+
+    protected AssociationConfigInterface $associationConfig;
+    protected WordConfigInterface $wordConfig;
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container->appContext);
+
+        $this->associationRepository = $container->associationRepository;
+        $this->wordRepository = $container->wordRepository;
+
+        $this->cases = $container->cases;
+        $this->anniversaryService = $container->anniversaryService;
+        $this->languageService = $container->languageService;
+
+        $this->associationConfig = $container->config;
+        $this->wordConfig = $container->config;
     }
 
     /**
@@ -21,7 +50,10 @@ class Controller extends BaseController
     {
         $params = $settings['params'] ?? [];
         
+        /** @var Game|null */
         $game = $params['game'] ?? null;
+
+        /** @var Language|null */
         $language = $params['language'] ?? null;
 
         if (is_null($language)) {
@@ -32,13 +64,19 @@ class Controller extends BaseController
         
         // todo: move this to SidebarPartsProviderService
         if ($language !== null) {
-            $wordCount = $language->words()->count();
+            $wordCount = $this
+                ->wordRepository
+                ->getByLanguageCount($language);
+
             $wordCountStr = $this->cases->caseForNumber(
                 'слово',
                 $wordCount
             );
 
-            $associationCount = $language->associations()->count();
+            $associationCount = $this
+                ->associationRepository
+                ->getByLanguageCount($language);
+
             $associationCountStr = $this->cases->caseForNumber(
                 'ассоциация',
                 $associationCount
@@ -51,47 +89,35 @@ class Controller extends BaseController
                 [
                     'word_count' => $wordCount,
                     'word_count_str' => $wordCountStr,
-                    'word_anniversary' => $this->isAnniversary($wordCount)
-                        ? $this->toAnniversaryNumber($wordCount)
-                        : null,
+
+                    'word_anniversary' => $this
+                        ->anniversaryService
+                        ->toAnniversary($wordCount),
+
+                    'last_added_words' => $this
+                        ->wordRepository
+                        ->getLastAddedByLanguage(
+                            $language,
+                            $this->wordConfig->wordLastAddedLimit()
+                        ),
+                    
                     'association_count' => $associationCount,
                     'association_count_str' => $associationCountStr,
-                    'association_anniversary' => $this->isAnniversary($associationCount)
-                        ? $this->toAnniversaryNumber($associationCount)
-                        : null,
+
+                    'association_anniversary' => $this
+                        ->anniversaryService
+                        ->toAnniversary($associationCount),
+
+                    'last_added_associations' => $this
+                        ->associationRepository
+                        ->getLastAddedByLanguage(
+                            $language,
+                            $this->associationConfig->associationLastAddedLimit()
+                        ),
                 ]
             );
         }
         
         return parent::buildParams(['params' => $params]);
-    }
-
-    // todo: move this to SidebarPartsProviderService
-    private function isAnniversary(int $num) : bool
-    {
-        if ($num < 1000) {
-            return false;
-        }
-        
-        while ($num >= 100) {
-            $num = intdiv($num, 10);
-        }
-        
-        $rem = $num % 10;
-        
-        return $rem < 2;
-    }
-
-    // todo: move this to SidebarPartsProviderService
-    private function toAnniversaryNumber(int $num) : int
-    {
-        $mult = 1;
-        
-        while ($num >= 10) {
-            $num = intdiv($num, 10);
-            $mult *= 10;
-        }
-        
-        return $num * $mult;
     }
 }
