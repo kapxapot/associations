@@ -2,10 +2,13 @@
 
 namespace App\Services;
 
+use App\Collections\WordCollection;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Language;
+use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
+use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
@@ -21,15 +24,18 @@ class WordService
     private WordConfigInterface $config;
     private ValidatorInterface $validator;
     private ValidationRules $validationRules;
-    private WordRepositoryInterface $wordRepository;
     private Cases $cases;
+
+    private TurnRepositoryInterface $turnRepository;
+    private WordRepositoryInterface $wordRepository;
 
     public function __construct(
         WordConfigInterface $config,
         ValidatorInterface $validator,
         ValidationRules $validationRules,
-        WordRepositoryInterface $wordRepository,
-        Cases $cases
+        Cases $cases,
+        TurnRepositoryInterface $turnRepository,
+        WordRepositoryInterface $wordRepository
     )
     {
         $this->config = $config;
@@ -37,6 +43,9 @@ class WordService
         $this->validationRules = $validationRules;
         $this->wordRepository = $wordRepository;
         $this->cases = $cases;
+
+        $this->turnRepository = $turnRepository;
+        $this->wordRepository = $wordRepository;
     }
 
     /**
@@ -142,5 +151,21 @@ class WordService
         $str = $count . ' ' . $this->cases->caseForNumber('ассоциация', $count) . ' ' . ($isPlural ? 'скрыто' : 'скрыта') . '.';
 
         return $str;
+    }
+
+    public function getAllUsedBy(
+        User $user,
+        Language $language = null
+    ) : WordCollection
+    {
+        return WordCollection::from(
+            $this
+                ->turnRepository
+                ->getAllByUser($user, $language)
+                ->map(
+                    fn (Turn $t) => $t->word()
+                )
+                ->distinct()
+        );
     }
 }

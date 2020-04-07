@@ -10,12 +10,13 @@ use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
+use App\Repositories\Traits\ByUserRepository;
 use App\Repositories\Traits\WithLanguageRepository;
-use Plasticode\Query;
 use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 
 class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
 {
+    use ByUserRepository;
     use WithLanguageRepository;
 
     protected string $entityClass = Turn::class;
@@ -51,11 +52,6 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         return TurnCollection::from(
             $this->getByLanguageQuery($language)
         );
-    }
-
-    protected function filterByUser(Query $query, User $user) : Query
-    {
-        return $query->where('user_id', $user->getId());
     }
 
     public function getAllByUser(

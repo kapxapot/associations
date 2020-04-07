@@ -10,11 +10,8 @@ use Plasticode\Core\Interfaces\SettingsProviderInterface;
 
 class LanguageService
 {
-    /** @var SettingsProviderInterface */
-    private $settingsProvider;
-
-    /** @var WordService */
-    private $wordService;
+    private SettingsProviderInterface $settingsProvider;
+    private WordService $wordService;
 
     public function __construct(
         SettingsProviderInterface $settingsProvider,
@@ -50,7 +47,7 @@ class LanguageService
         $approvedWords = Word::getApproved($language)->all();
 
         // get user's words
-        $userWords = $user->usedWords($language);
+        $userWords = $this->wordService->getAllUsedBy($user, $language);
         
         // union them & distinct
         $words = Collection::merge($approvedWords, $userWords)

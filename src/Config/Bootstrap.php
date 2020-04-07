@@ -9,6 +9,7 @@ use App\Handlers\NotFoundHandler;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
 use App\Hydrators\TurnHydrator;
+use App\Hydrators\UserHydrator;
 use App\Hydrators\WordFeedbackHydrator;
 use App\Hydrators\WordHydrator;
 use App\Hydrators\YandexDictWordHydrator;
@@ -35,7 +36,6 @@ use App\Services\WordRecountService;
 use App\Services\WordService;
 use App\Services\YandexDictService;
 use Plasticode\Config\Bootstrap as BootstrapBase;
-use Plasticode\Hydrators\UserHydrator;
 use Plasticode\ObjectProxy;
 use Psr\Container\ContainerInterface as CI;
 
@@ -111,8 +111,10 @@ class Bootstrap extends BootstrapBase
                 new ObjectProxy(
                     fn () =>
                     new UserHydrator(
+                        $c->gameRepository,
                         $c->roleRepository,
-                        $c->linker
+                        $c->linker,
+                        $c->userService
                     )
                 )
             );
@@ -246,8 +248,9 @@ class Bootstrap extends BootstrapBase
                 $c->config,
                 $c->validator,
                 $c->validationRules,
+                $c->cases,
+                $c->turnRepository,
                 $c->wordRepository,
-                $c->cases
             );
 
         $map['yandexDictService'] = fn (CI $c) =>

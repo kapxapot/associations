@@ -11,14 +11,12 @@ use App\Models\Word;
 use Plasticode\Collection;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Date;
+use Plasticode\Util\Sort;
 
 class TurnService
 {
-    /** @var EventDispatcher */
-    private $dispatcher;
-
-    /** @var AssociationService */
-    private $associationService;
+    private EventDispatcher $dispatcher;
+    private AssociationService $associationService;
 
     public function __construct(
         EventDispatcher $dispatcher,
@@ -160,7 +158,7 @@ class TurnService
 
         return $turn
             ->word()
-            ->associatedWords($user)
+            ->associatedWordsFor($user)
             ->where(
                 fn (Word $w) => !$game->containsWord($w)
             )
@@ -169,17 +167,20 @@ class TurnService
 
     public function turnsByUsers(LanguageElement $element) : array
     {
-        return $this->groupByUsers($element->turns());
+        return $this->groupByUsers(
+            $element->turns()
+        );
     }
 
     private function groupByUsers(Collection $turns) : array
     {
         return $turns
             ->where(
-                fn (Turn $t) => $t->user()
+                fn (Turn $t) => !is_null($t->user())
             )
-            ->ascStr(
-                fn (Turn $t) => $t->createdAt
+            ->asc(
+                fn (Turn $t) => $t->createdAt,
+                Sort::DATE
             )
             ->group(
                 fn (Turn $t) => $t->user()->getId()

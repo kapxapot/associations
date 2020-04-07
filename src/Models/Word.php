@@ -125,7 +125,7 @@ class Word extends LanguageElement
             ->invisibleFor($this->me());
     }
 
-    public function associatedWords(User $user) : WordCollection
+    public function associatedWordsFor(User $user) : WordCollection
     {
         return $this
             ->associations()
