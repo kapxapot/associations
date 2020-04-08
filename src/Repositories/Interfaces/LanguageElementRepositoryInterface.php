@@ -24,7 +24,10 @@ interface LanguageElementRepositoryInterface
      *
      * @param integer $ttlMin Time to live in minutes
      */
-    function getAllOutOfDate(int $ttlMin) : LanguageElementCollection;
+    function getAllOutOfDate(
+        int $ttlMin,
+        int $limit = 0
+    ) : LanguageElementCollection;
 
     function getAllApproved(
         ?Language $language = null

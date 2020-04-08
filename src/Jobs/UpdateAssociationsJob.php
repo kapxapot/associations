@@ -3,39 +3,41 @@
 namespace App\Jobs;
 
 use App\Events\AssociationOutOfDateEvent;
-use App\Models\Association;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
 class UpdateAssociationsJob
 {
-    /** @var SettingsProviderInterface */
-    private $settingsProvider;
+    private AssociationRepositoryInterface $associationRepository;
 
-    /** @var EventDispatcher */
-    private $dispatcher;
+    private SettingsProviderInterface $settingsProvider;
+    private EventDispatcher $dispatcher;
 
     public function __construct(
+        AssociationRepositoryInterface $associationRepository,
         SettingsProviderInterface $settingsProvider,
         EventDispatcher $dispatcher
     )
     {
+        $this->associationRepository = $associationRepository;
+
         $this->settingsProvider = $settingsProvider;
         $this->dispatcher = $dispatcher;
     }
 
     public function run() : Collection
     {
-        $limit = $this->settingsProvider
-            ->get('associations.update.limit');
-        
         $ttl = $this->settingsProvider
             ->get('associations.update.ttl_min');
 
-        $outOfDate = Association::getOutOfDate($ttl)
-            ->limit($limit)
-            ->all();
+        $limit = $this->settingsProvider
+            ->get('associations.update.limit');
+        
+        $outOfDate = $this
+            ->associationRepository
+            ->getAllOutOfDate($ttl, $limit);
 
         foreach ($outOfDate as $assoc) {
             $event = new AssociationOutOfDateEvent($assoc);

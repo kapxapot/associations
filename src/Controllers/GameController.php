@@ -16,6 +16,7 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request as SlimRequest;
+use Webmozart\Assert\Assert;
 
 class GameController extends Controller
 {
@@ -60,9 +61,9 @@ class GameController extends Controller
         }
 
         $canSeeAllGames = $this->access->checkRights('games', 'edit', $user);
-        $hasPlayer = $game->hasPlayer($user);
+        $isPlayer = $game->hasPlayer($user);
 
-        if (!$canSeeAllGames && !$hasPlayer) {
+        if (!$canSeeAllGames && !$isPlayer) {
             return ($this->notFoundHandler)($request, $response);
         }
 
@@ -112,18 +113,24 @@ class GameController extends Controller
     ) : ResponseInterface
     {
         $user = $this->auth->getUser();
+
+        Assert::notNull($user);
         
-        if ($user) {
-            $game = $user->currentGame();
-            
-            if ($game !== null) {
-                $this->turnService->finishGame($game);
-            }
+        $game = $user->currentGame();
+
+        /** @var string */
+        $msg = null;
+        
+        if ($game !== null) {
+            $this->turnService->finishGame($game);
+            $msg = 'Game finished.';
+        } else {
+            $msg = 'No current game found.';
         }
         
         return Response::json(
             $response,
-            ['message' => $this->translate('Game finished.')]
+            ['message' => $this->translate($msg)]
         );
     }
 }

@@ -13,6 +13,18 @@ interface WordRepositoryInterface extends LanguageElementRepositoryInterface
     function getAllByLanguage(Language $language) : WordCollection;
     function findInLanguage(Language $language, ?string $wordStr) : ?Word;
 
+    /**
+     * Returns out of date language elements.
+     *
+     * @param integer $ttlMin Time to live in minutes
+     */
+    function getAllOutOfDate(
+        int $ttlMin,
+        int $limit = 0
+    ) : WordCollection;
+
+    function getAllApproved(?Language $language = null) : WordCollection;
+
     function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = null

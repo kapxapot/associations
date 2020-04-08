@@ -20,6 +20,11 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
         return $this->getEntity($id);
     }
 
+    public function store(array $data) : Game
+    {
+        return $this->storeEntity($data);
+    }
+
     protected function getAllByUserQuery(User $user) : Query
     {
         return $this->filterByUser(

@@ -13,20 +13,22 @@ use Plasticode\Validation\ValidationRules;
 
 class AssociationFeedbackService
 {
-    private AssociationRepositoryInterface $associationRepository;
     private AssociationFeedbackRepositoryInterface $associationFeedbackRepository;
+    private AssociationRepositoryInterface $associationRepository;
+
     private ValidatorInterface $validator;
     private ValidationRules $validationRules;
 
     public function __construct(
-        AssociationRepositoryInterface $associationRepository,
         AssociationFeedbackRepositoryInterface $associationFeedbackRepository,
+        AssociationRepositoryInterface $associationRepository,
         ValidatorInterface $validator,
         ValidationRules $validationRules
     )
     {
-        $this->associationRepository = $associationRepository;
         $this->associationFeedbackRepository = $associationFeedbackRepository;
+        $this->associationRepository = $associationRepository;
+
         $this->validator = $validator;
         $this->validationRules = $validationRules;
     }

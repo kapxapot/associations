@@ -47,14 +47,14 @@ abstract class LanguageElement extends DbModel
 
     abstract public function feedbacks() : FeedbackCollection;
 
-    protected function me() : User
+    protected function me() : ?User
     {
         Assert::true($this->meInitialized);
 
         return $this->me;
     }
 
-    public function withMe(User $me) : self
+    public function withMe(?User $me) : self
     {
         $this->me = $me;
         $this->meInitialized = true;
@@ -76,9 +76,36 @@ abstract class LanguageElement extends DbModel
         return $this->turns()->anyBy($user);
     }
 
-    public abstract function isVisibleFor(User $user = null) : bool;
+    /**
+     * Maturity check.
+     */
+    public function isVisibleFor(?User $user) : bool
+    {
+        // 1. non-mature elements are visible for everyone
+        // 2. mature elements are invisible for non-authed users ($user == null)
+        // 3. mature elements are visible for non-mature users only if they used it
 
-    public abstract function isPlayableAgainst(User $user) : bool;
+        return 
+            !$this->isMature()
+            || (
+                $user
+                && ($user->isMature() || $this->isUsedBy($user))
+            );
+    }
+
+    public function isPlayableAgainst(User $user) : bool
+    {
+        // element can't be played against user, if
+        //
+        // 1. element is mature, user is not mature (maturity check)
+        // 2. eleemnt is not approved, user disliked it
+
+        return $this->isVisibleFor($user)
+            && (
+                $this->isApproved()
+                || ($this->isUsedBy($user) && !$this->isDislikedBy($user))
+            );
+    }
 
     public function isVisibleForMe() : bool
     {
@@ -87,7 +114,9 @@ abstract class LanguageElement extends DbModel
 
     public function isPlayableAgainstMe() : bool
     {
-        return $this->isPlayableAgainst($this->me());
+        return $this->me()
+            ? $this->isPlayableAgainst($this->me())
+            : false;
     }
 
     abstract public function feedbackBy(User $user) : ?Feedback;

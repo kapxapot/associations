@@ -14,6 +14,16 @@ interface AssociationRepositoryInterface extends LanguageElementRepositoryInterf
     function getAllByWord(Word $word) : AssociationCollection;
     function getByPair(Word $first, Word $second) : ?Association;
 
+    /**
+     * Returns out of date language elements.
+     *
+     * @param integer $ttlMin Time to live in minutes
+     */
+    function getAllOutOfDate(
+        int $ttlMin,
+        int $limit = 0
+    ) : AssociationCollection;
+
     function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = null

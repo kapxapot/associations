@@ -54,7 +54,7 @@ class TestController extends Controller
         $user = $this->auth->getUser();
         $language = $this->languageService->getDefaultLanguage();
         
-        $word = $this->languageService->getRandomWordForUser($language, $user);
+        $word = $this->languageService->getRandomWordFor($user, $language);
         
         $end = microtime(true);
         

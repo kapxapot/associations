@@ -96,7 +96,9 @@ class Association extends LanguageElement
 
     public function feedbackByMe() : ?AssociationFeedback
     {
-        return $this->feedbackBy($this->me());
+        return $this->me()
+            ? $this->feedbackBy($this->me())
+            : null;
     }
 
     /**
@@ -115,34 +117,5 @@ class Association extends LanguageElement
     public function users() : UserCollection
     {
         return $this->turns()->users();
-    }
-
-    /**
-     * Maturity check.
-     */
-    public function isVisibleFor(User $user = null) : bool
-    {
-        // 1. non-mature words are visible for everyone
-        // 2. mature words are invisible for non-authed users ($user == null)
-        // 3. mature words are visible for non-mature users only if they used the word
-
-        return 
-            !$this->isMature() ||
-            ($user !== null &&
-                ($user->isMature() || $this->isUsedBy($user))
-            );
-    }
-
-    public function isPlayableAgainst(User $user) : bool
-    {
-        // word can't be played against user, if
-        //
-        // 1. word is mature, user is not mature (maturity check)
-        // 2. word is not approved, user disliked the word
-
-        return $this->isVisibleFor($user) &&
-            ($this->isApproved() ||
-                ($this->isUsedBy($user) && !$this->isDislikedBy($user))
-            );
     }
 }

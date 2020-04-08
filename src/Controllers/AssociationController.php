@@ -38,7 +38,11 @@ class AssociationController extends Controller
         
         $user = $this->auth->getUser();
 
-        if (is_null($association) || !$association->isVisibleFor($user)) {
+        if (
+            is_null($association)
+            || is_null($user)
+            || !$association->isVisibleFor($user)
+        ) {
             return ($this->notFoundHandler)($request, $response);
         }
 

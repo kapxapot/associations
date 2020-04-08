@@ -47,6 +47,21 @@ class AssociationRepository extends LanguageElementRepository implements Associa
             ->one();
     }
 
+    /**
+     * Returns out of date language elements.
+     *
+     * @param integer $ttlMin Time to live in minutes
+     */
+    public function getAllOutOfDate(
+        int $ttlMin,
+        int $limit = 0
+    ) : AssociationCollection
+    {
+        return AssociationCollection::from(
+            parent::getAllOutOfDate($ttlMin, $limit)
+        );
+    }
+
     public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = null

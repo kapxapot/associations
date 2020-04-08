@@ -69,7 +69,9 @@ class Word extends LanguageElement
 
     public function feedbackByMe() : ?WordFeedback
     {
-        return $this->feedbackBy($this->me());
+        return $this->me()
+            ? $this->feedbackBy($this->me())
+            : null;
     }
 
     private function compareByOtherWord() : \Closure
@@ -164,36 +166,6 @@ class Word extends LanguageElement
             ->duplicates()
             ->group(
                 fn (WordFeedback $f) => $f->duplicateId
-            );
-    }
-    
-    /**
-     * Maturity check.
-     */
-    public function isVisibleFor(User $user = null) : bool
-    {
-        // 1. non-mature words are visible for everyone
-        // 2. mature words are invisible for non-authed users ($user == null)
-        // 3. mature words are visible for non-mature users
-        //    only if they used the word
-
-        return 
-            !$this->isMature() ||
-            ($user !== null &&
-                ($user->isMature() || $this->isUsedBy($user))
-            );
-    }
-
-    public function isPlayableAgainst(User $user) : bool
-    {
-        // word can't be played against user, if
-        //
-        // 1. word is mature, user is not mature (maturity check)
-        // 2. word is not approved, user disliked the word
-        
-        return $this->isVisibleFor($user) &&
-            ($this->isApproved() ||
-                ($this->isUsedBy($user) && !$this->isDislikedBy($user))
             );
     }
 

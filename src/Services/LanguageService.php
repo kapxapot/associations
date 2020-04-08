@@ -5,66 +5,76 @@ namespace App\Services;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
+use App\Repositories\Interfaces\LanguageRepositoryInterface;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
+use Webmozart\Assert\Assert;
 
 class LanguageService
 {
+    private LanguageRepositoryInterface $languageRepository;
+    private WordRepositoryInterface $wordRepository;
+
     private SettingsProviderInterface $settingsProvider;
     private WordService $wordService;
 
     public function __construct(
+        LanguageRepositoryInterface $languageRepository,
+        WordRepositoryInterface $wordRepository,
         SettingsProviderInterface $settingsProvider,
         WordService $wordService
     )
     {
+        $this->languageRepository = $languageRepository;
+        $this->wordRepository = $wordRepository;
+
         $this->settingsProvider = $settingsProvider;
         $this->wordService = $wordService;
     }
 
-    public function getDefaultLanguage()
+    public function getDefaultLanguage() : Language
     {
         $defaultId = $this->settingsProvider
             ->get('languages.default_id');
 
-        return Language::get($defaultId);
+        $language = $this->languageRepository->get($defaultId);
+
+        Assert::notNull(
+            $language,
+            'No default language specified.'
+        );
+
+        return $language;
     }
-    
-    public function getRandomWord(Language $language, Collection $exclude = null)
-    {
-        $words = $language->words();
-        
-        if ($exclude !== null && $exclude->any()) {
-            $words = $words->whereNotIn('id', $exclude->ids());
-        }
-        
-        return $words->random();
-    }
-    
-    public function getRandomWordForUser(Language $language, User $user, Collection $exclude = null)
+
+    public function getRandomWordFor(
+        User $user,
+        ?Language $language = null,
+        ?Collection $exclude = null
+    ) : ?Word
     {
         // get common words
-        $approvedWords = Word::getApproved($language)->all();
+        $approvedWords = $this->wordRepository->getAllApproved($language);
 
         // get user's words
         $userWords = $this->wordService->getAllUsedBy($user, $language);
         
         // union them & distinct
-        $words = Collection::merge($approvedWords, $userWords)
+        $words = $approvedWords
+            ->concat($userWords)
             ->distinct()
             ->where(
-                function ($word) use ($user) {
-                    return $word->isPlayableAgainstUser($user);
-                }
+                fn (Word $w) => $w->isPlayableAgainst($user)
             );
 
-        if ($exclude !== null && $exclude->any()) {
+        if ($exclude && $exclude->any()) {
             $words = $words->whereNotIn('id', $exclude->ids());
         }
         
         return $words->random();
     }
-    
+
     public function normalizeWord(Language $language, string $word) : string
     {
         $word = $this->wordService->normalize($word);

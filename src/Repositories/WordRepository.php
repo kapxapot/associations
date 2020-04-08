@@ -43,6 +43,28 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             ->one();
     }
 
+    /**
+     * Returns out of date language elements.
+     *
+     * @param integer $ttlMin Time to live in minutes
+     */
+    public function getAllOutOfDate(
+        int $ttlMin,
+        int $limit = 0
+    ) : WordCollection
+    {
+        return WordCollection::from(
+            parent::getAllOutOfDate($ttlMin, $limit)
+        );
+    }
+
+    public function getAllApproved(?Language $language = null) : WordCollection
+    {
+        return WordCollection::from(
+            parent::getAllApproved($language)
+        );
+    }
+
     public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = null

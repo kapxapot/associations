@@ -58,7 +58,10 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
      *
      * @param integer $ttlMin Time to live in minutes
      */
-    public function getAllOutOfDate(int $ttlMin) : LanguageElementCollection
+    public function getAllOutOfDate(
+        int $ttlMin,
+        int $limit = 0
+    ) : LanguageElementCollection
     {
         return LanguageElementCollection::from(
             $this
@@ -66,6 +69,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
                 ->whereRaw(
                     '(updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))'
                 )
+                ->limit($limit)
                 ->orderByAsc('updated_at')
         );
     }

@@ -8,12 +8,11 @@ use App\Services\Interfaces\ExternalDictServiceInterface;
 
 class DictionaryService
 {
-    /**
-     * @var \App\Services\Interfaces\ExternalDictServiceInterface
-     */
-    private $externalDictService;
+    private ExternalDictServiceInterface $externalDictService;
 
-    public function __construct(ExternalDictServiceInterface $externalDictService)
+    public function __construct(
+        ExternalDictServiceInterface $externalDictService
+    )
     {
         $this->externalDictService = $externalDictService;
     }

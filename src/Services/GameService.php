@@ -6,21 +6,24 @@ use App\Models\Game;
 use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
+use App\Repositories\Interfaces\GameRepositoryInterface;
 use Webmozart\Assert\Assert;
 
 class GameService
 {
-    /** @var LanguageService */
-    private $languageService;
+    private GameRepositoryInterface $gameRepository;
 
-    /** @var TurnService */
-    private $turnService;
+    private LanguageService $languageService;
+    private TurnService $turnService;
 
     public function __construct(
+        GameRepositoryInterface $gameRepository,
         LanguageService $languageService,
         TurnService $turnService
     )
     {
+        $this->gameRepository = $gameRepository;
+
         $this->languageService = $languageService;
         $this->turnService = $turnService;
     }
@@ -39,12 +42,12 @@ class GameService
     public function createGame(Language $language, User $user) : Game
     {
         // todo: potentially can create several games in parallel
-        $game = Game::create();
-
-        $game->languageId = $language->getId();
-        $game->userId = $user->getId();
-
-        return $game->save();
+        return $this->gameRepository->store(
+            [
+                'language_id' => $language->getId(),
+                'user_id' => $user->getId(),
+            ]
+        );
     }
 
     public function startGame(Game $game) : ?Turn
@@ -61,9 +64,9 @@ class GameService
         
         // if language has words, AI goes first
         // otherwise player goes first
-        $word = $this->languageService->getRandomWordForUser($language, $user);
+        $word = $this->languageService->getRandomWordFor($user, $language);
         
-        return ($word !== null)
+        return $word
             ? $this->turnService->newAiTurn($game, $word)
             : null;
     }
@@ -77,7 +80,7 @@ class GameService
         $lastTurn = $game->lastTurn();
 
         return
-            ($lastTurn !== null && $turn !== null && $lastTurn->getId() === $turn->getId()) ||
-            ($lastTurn === null && $turn === null);
+            ($lastTurn && $lastTurn->equals($turn))
+            || (is_null($lastTurn) && is_null($turn));
     }
 }

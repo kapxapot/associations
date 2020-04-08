@@ -80,7 +80,11 @@ class WordController extends Controller
         $word = $this->wordRepository->get($id);
         $user = $this->auth->getUser();
 
-        if (is_null($word) || !$word->isVisibleFor($user)) {
+        if (
+            is_null($word)
+            || is_null($user)
+            || !$word->isVisibleFor($user)
+        ) {
             return ($this->notFoundHandler)($request, $response);
         }
 

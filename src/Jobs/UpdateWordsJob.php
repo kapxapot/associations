@@ -4,35 +4,41 @@ namespace App\Jobs;
 
 use App\Events\WordOutOfDateEvent;
 use App\Models\Word;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
 class UpdateWordsJob
 {
-    /** @var SettingsProviderInterface */
-    private $settingsProvider;
+    private WordRepositoryInterface $wordRepository;
 
-    /** @var EventDispatcher */
-    private $dispatcher;
+    private SettingsProviderInterface $settingsProvider;
+    private EventDispatcher $dispatcher;
 
     public function __construct(
+        WordRepositoryInterface $wordRepository,
         SettingsProviderInterface $settingsProvider,
         EventDispatcher $dispatcher
     )
     {
+        $this->wordRepository = $wordRepository;
+
         $this->settingsProvider = $settingsProvider;
         $this->dispatcher = $dispatcher;
     }
 
     public function run() : Collection
     {
-        $limit = $this->settingsProvider->get('words.update.limit');
-        $ttl = $this->settingsProvider->get('words.update.ttl_min');
+        $ttl = $this->settingsProvider
+            ->get('words.update.ttl_min');
 
-        $outOfDate = Word::getOutOfDate($ttl)
-            ->limit($limit)
-            ->all();
+        $limit = $this->settingsProvider
+            ->get('words.update.limit');
+        
+        $outOfDate = $this
+            ->wordRepository
+            ->getAllOutOfDate($ttl, $limit);
 
         foreach ($outOfDate as $word) {
             $event = new WordOutOfDateEvent($word);

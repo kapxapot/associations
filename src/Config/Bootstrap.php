@@ -74,7 +74,9 @@ class Bootstrap extends BootstrapBase
                         $c->associationFeedbackRepository,
                         $c->languageRepository,
                         $c->turnRepository,
+                        $c->userRepository,
                         $c->wordRepository,
+                        $c->auth,
                         $c->linker
                     )
                 )
@@ -140,7 +142,9 @@ class Bootstrap extends BootstrapBase
                         $c->associationRepository,
                         $c->languageRepository,
                         $c->turnRepository,
+                        $c->userRepository,
                         $c->wordFeedbackRepository,
+                        $c->auth,
                         $c->linker
                     )
                 )
@@ -186,8 +190,8 @@ class Bootstrap extends BootstrapBase
 
         $map['associationFeedbackService'] = fn (CI $c) =>
             new AssociationFeedbackService(
-                $c->associationRepository,
                 $c->associationFeedbackRepository,
+                $c->associationRepository,
                 $c->validator,
                 $c->validationRules
             );
@@ -198,9 +202,7 @@ class Bootstrap extends BootstrapBase
             );
 
         $map['associationService'] = fn (CI $c) =>
-            new AssociationService(
-                $c
-            );
+            new AssociationService();
 
         $map['dictionaryService'] = fn (CI $c) =>
             new DictionaryService(
@@ -209,11 +211,15 @@ class Bootstrap extends BootstrapBase
 
         $map['gameService'] = fn (CI $c) =>
             new GameService(
-                $c->config
+                $c->gameRepository,
+                $c->languageService,
+                $c->turnService
             );
 
         $map['languageService'] = fn (CI $c) =>
             new LanguageService(
+                $c->languageRepository,
+                $c->wordRepository,
                 $c->settingsProvider,
                 $c->wordService
             );
