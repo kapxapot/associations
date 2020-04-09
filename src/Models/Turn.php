@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Traits\WithUser;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 use Webmozart\Assert\Assert;
@@ -15,7 +16,7 @@ use Webmozart\Assert\Assert;
  */
 class Turn extends DbModel
 {
-    use CreatedAt;
+    use CreatedAt, WithUser;
 
     protected Game $game;
     protected Word $word;
@@ -55,21 +56,6 @@ class Turn extends DbModel
     {
         $this->word = $word;
         $this->wordInitialized = true;
-
-        return $this;
-    }
-
-    public function user() : ?User
-    {
-        Assert::true($this->userInitialized);
-
-        return $this->user;
-    }
-
-    public function withUser(?User $user) : self
-    {
-        $this->user = $user;
-        $this->userInitialized = true;
 
         return $this;
     }

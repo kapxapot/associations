@@ -12,7 +12,6 @@ use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
-use Plasticode\Util\Cases;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
@@ -21,45 +20,54 @@ use Webmozart\Assert\Assert;
 
 class WordService
 {
-    private WordConfigInterface $config;
-    private ValidatorInterface $validator;
-    private ValidationRules $validationRules;
-    private Cases $cases;
-
     private TurnRepositoryInterface $turnRepository;
     private WordRepositoryInterface $wordRepository;
 
+    private CasesService $casesService;
+    private ValidatorInterface $validator;
+    private ValidationRules $validationRules;
+
+    private WordConfigInterface $config;
+
     public function __construct(
-        WordConfigInterface $config,
+        TurnRepositoryInterface $turnRepository,
+        WordRepositoryInterface $wordRepository,
+        CasesService $casesService,
         ValidatorInterface $validator,
         ValidationRules $validationRules,
-        Cases $cases,
-        TurnRepositoryInterface $turnRepository,
-        WordRepositoryInterface $wordRepository
+        WordConfigInterface $config
     )
     {
-        $this->config = $config;
-        $this->validator = $validator;
-        $this->validationRules = $validationRules;
-        $this->wordRepository = $wordRepository;
-        $this->cases = $cases;
-
         $this->turnRepository = $turnRepository;
         $this->wordRepository = $wordRepository;
+
+        $this->casesService = $casesService;
+        $this->validator = $validator;
+        $this->validationRules = $validationRules;
+
+        $this->config = $config;
     }
 
     /**
-     * Normalized word string expected
+     * Normalized word string expected.
      */
-    public function getOrCreate(Language $language, string $wordStr, User $user) : Word
+    public function getOrCreate(
+        Language $language,
+        string $wordStr,
+        User $user
+    ) : Word
     {
         $word =
-            Word::findInLanguage($language, $wordStr)
-            ??
-            $this->create($language, $wordStr, $user);
+            $this->wordRepository->findInLanguage(
+                $language,
+                $wordStr
+            )
+            ?? $this->create($language, $wordStr, $user);
 
         if (is_null($word)) {
-            throw new InvalidResultException('Word can\'t be found or added.');
+            throw new InvalidResultException(
+                'Word can\'t be found or added.'
+            );
         }
     
         return $word;
@@ -86,18 +94,25 @@ class WordService
         Assert::notEmpty($wordStr, 'Word can\'t be empty.');
         Assert::notNull($user, 'User must be non-null.');
 
-        if (Word::findInLanguage($language, $wordStr) !== null) {
+        $word = $this->wordRepository->findInLanguage(
+            $language,
+            $wordStr
+        );
+
+        if ($word) {
             throw new InvalidOperationException('Word already exists.');
         }
-        
-        $word = Word::create();
-        
-        $word->languageId = $language->getId();
-        $word->word = $wordStr;
-        $word->wordBin = $wordStr;
-        $word->createdBy = $user->getId();
 
-        return $this->wordRepository->save($word);
+        return $this
+            ->wordRepository
+            ->store(
+                [
+                    'language_id' => $language->getId(),
+                    'word' => $wordStr,
+                    'word_bin' => $wordStr,
+                    'created_by' => $user->getId(),
+                ]
+            );
     }
 
     /**
@@ -130,29 +145,23 @@ class WordService
     {
         $count = $word->approvedInvisibleAssociations()->count();
 
-        return $this->invisibleCountStr($count);
+        return $this
+            ->casesService
+            ->invisibleAssociationCountStr($count);
     }
 
     public function notApprovedInvisibleAssociationsStr(Word $word) : ?string
     {
         $count = $word->notApprovedInvisibleAssociations()->count();
 
-        return $this->invisibleCountStr($count);
+        return $this
+            ->casesService
+            ->invisibleAssociationCountStr($count);
     }
 
-    private function invisibleCountStr(int $count) : ?string
-    {
-        if ($count <= 0) {
-            return null;
-        }
-
-        $isPlural = ($this->cases->numberForNumber($count) == Cases::PLURAL);
-
-        $str = $count . ' ' . $this->cases->caseForNumber('ассоциация', $count) . ' ' . ($isPlural ? 'скрыто' : 'скрыта') . '.';
-
-        return $str;
-    }
-
+    /**
+     * Returns all words of specified language used by the user.
+     */
     public function getAllUsedBy(
         User $user,
         Language $language = null

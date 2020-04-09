@@ -4,24 +4,24 @@ namespace App\Controllers;
 
 use App\Events\WordFeedbackEvent;
 use App\Models\Association;
-use App\Models\Game;
 use App\Models\Word;
-use App\Models\WordFeedback;
+use App\Services\WordService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class TestController extends Controller
 {
-    public function index(ServerRequestInterface $request, ResponseInterface $response)
+    public function index(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    )
     {
         die('done');
-
-        //return $response;
     }
 
     private function hasPlayerTest()
     {
-        $game = Game::get(43);
+        $game = $this->gameRepository->get(43);
         $user = $this->userRepository->get(3);
 
         var_dump($game->hasPlayer($user));
@@ -29,14 +29,29 @@ class TestController extends Controller
 
     private function invisibleCountTest()
     {
-        $word = Word::get(2);
-        var_dump(['approved', $word->approvedInvisibleAssociationsStr()]);
-        var_dump(['unapproved', $word->unapprovedInvisibleAssociationsStr()]);
+        $word = $this->wordRepository->get(2);
+
+        /** @var WordService */
+        $wordService = $this->wordService;
+
+        var_dump(
+            [
+                'approved',
+                $wordService->approvedInvisibleAssociationsStr($word)
+            ]
+        );
+
+        var_dump(
+            [
+                'unapproved',
+                $wordService->notApprovedInvisibleAssociationsStr($word)
+            ]
+        );
     }
 
     private function eventTest()
     {
-        $wordFeedback = WordFeedback::get(2);
+        $wordFeedback = $this->wordFeedbackRepository->get(2);
         $event = new WordFeedbackEvent($wordFeedback);
 
         $this->dispatcher->dispatch($event);
@@ -46,7 +61,7 @@ class TestController extends Controller
     {
         $this->eventLog->info('Test');
     }
-    
+
     private function randomWordTest()
     {
         $start = microtime(true);
@@ -58,22 +73,32 @@ class TestController extends Controller
         
         $end = microtime(true);
         
-        return [$word->id, $word->word, $word->creator()->displayName(), $end - $start];
+        return [
+            $word->getId(),
+            $word->word,
+            $word->creator()->displayName(),
+            $end - $start
+        ];
     }
-    
+
     private function wordsApprovedTest()
     {
-        $words = Word::getAll();
+        $language = $this->languageService->getDefaultLanguage();
+        $words = $this->wordRepository->getAllByLanguage($language);
         $wordsCount = $words->count();
-        $approvedCount = $words->where(function ($w) {
-            return $w->isApproved();
-        })
-        ->count();
+
+        $approvedCount = $words
+            ->where(
+                fn (Word $w) => $w->isApproved()
+            )
+            ->count();
         
-        $approvedByAssoc = Association::getApproved()
-            ->map(function ($assoc) {
-                return $assoc->words();
-            })
+        $approvedByAssoc = $this
+            ->associationRepository
+            ->getAllApproved($language)
+            ->map(
+                fn (Association $assoc) => $assoc->words()
+            )
             ->flatten()
             ->distinct();
         

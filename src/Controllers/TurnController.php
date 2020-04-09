@@ -2,40 +2,59 @@
 
 namespace App\Controllers;
 
-use App\Models\Game;
-use App\Models\Turn;
+use App\Repositories\Interfaces\GameRepositoryInterface;
+use App\Repositories\Interfaces\TurnRepositoryInterface;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\Http\NotFoundException;
-use Psr\Http\Message\ServerRequestInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Slim\Http\Request as SlimRequest;
 
 class TurnController extends Controller
 {
-    public function create(ServerRequestInterface $request, ResponseInterface $response) : ResponseInterface
+    private GameRepositoryInterface $gameRepository;
+    private TurnRepositoryInterface $turnRepository;
+
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct($container);
+
+        $this->gameRepository = $container->gameRepository;
+        $this->turnRepository = $container->turnRepository;
+    }
+
+    public function create(
+        SlimRequest $request,
+        ResponseInterface $response
+    ) : ResponseInterface
     {
         $user = $this->auth->getUser();
 
         // validate game
         $gameId = $request->getParam('game_id');
-        $game = Game::get($gameId);
+        $game = $this->gameRepository->get($gameId);
 
-        if ($game === null) {
+        if (is_null($game)) {
             throw new NotFoundException('Game not found.');
         }
 
         if ($game->getId() !== $user->currentGame()->getId()) {
-            throw new BadRequestException('Game is finished. Please, reload the page.');
+            throw new BadRequestException(
+                'Game is finished. Please, reload the page.'
+            );
         }
 
         $language = $game->language();
 
         // validate prev turn
         $prevTurnId = $request->getParam('prev_turn_id');
-        $prevTurn = Turn::get($prevTurnId);
+        $prevTurn = $this->turnRepository->get($prevTurnId);
 
         if (!$this->gameService->validateLastTurn($game, $prevTurn)) {
-            throw new BadRequestException('Game turn is not correct. Please, reload the page.');
+            throw new BadRequestException(
+                'Game turn is not correct. Please, reload the page.'
+            );
         }
 
         // validate word
@@ -45,17 +64,20 @@ class TurnController extends Controller
         $this->wordService->validateWord($wordStr);
 
         if (!$this->turnService->validatePlayerTurn($game, $wordStr)) {
-            throw new BadRequestException('Word is already used in this game.');
+            throw new BadRequestException(
+                'Word is already used in this game.'
+            );
         }
-        
+
         // get word
         $word = $this->wordService->getOrCreate($language, $wordStr, $user);
 
         // new turn
         $this->turnService->newPlayerTurn($game, $word, $user);
         
-        return Response::json($response, [
-            'message' => $this->translate('Turn successfully done.'),
-        ]);
+        return Response::json(
+            $response,
+            ['message' => $this->translate('Turn successfully done.')]
+        );
     }
 }

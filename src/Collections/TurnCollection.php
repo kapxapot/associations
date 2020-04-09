@@ -27,4 +27,15 @@ class TurnCollection extends TypedCollection
                 ->distinct()
         );
     }
+
+    public function words() : WordCollection
+    {
+        return WordCollection::from(
+            $this
+                ->map(
+                    fn (Turn $t) => $t->word()
+                )
+                ->distinct()
+        );
+    }
 }

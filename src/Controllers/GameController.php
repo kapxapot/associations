@@ -23,10 +23,10 @@ class GameController extends Controller
     private GameRepositoryInterface $gameRepository;
     private LanguageRepositoryInterface $languageRepository;
 
-    private NotFoundHandler $notFoundHandler;
-    private AuthInterface $auth;
     private Access $access;
+    private AuthInterface $auth;
     private GameService $gameService;
+    private NotFoundHandler $notFoundHandler;
     private TurnService $turnService;
 
     public function __construct(ContainerInterface $container)
@@ -36,10 +36,10 @@ class GameController extends Controller
         $this->gameRepository = $container->gameRepository;
         $this->languageRepository = $container->languageRepository;
 
-        $this->notFoundHandler = $container->notFoundHandler;
-        $this->auth = $container->auth;
         $this->access = $container->access;
+        $this->auth = $container->auth;
         $this->gameService = $container->gameService;
+        $this->notFoundHandler = $container->notFoundHandler;
         $this->turnService = $container->turnService;
     }
 

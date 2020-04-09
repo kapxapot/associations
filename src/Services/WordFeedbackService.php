@@ -15,24 +15,26 @@ use Respect\Validation\Validator;
 
 class WordFeedbackService
 {
-    private ValidatorInterface $validator;
-    private ValidationRules $validationRules;
     private WordFeedbackRepositoryInterface $wordFeedbackRepository;
     private WordRepositoryInterface $wordRepository;
+
+    private ValidatorInterface $validator;
+    private ValidationRules $validationRules;
     private WordService $wordService;
 
     public function __construct(
-        ValidatorInterface $validator,
-        ValidationRules $validationRules,
         WordFeedbackRepositoryInterface $wordFeedbackRepository,
         WordRepositoryInterface $wordRepository,
+        ValidatorInterface $validator,
+        ValidationRules $validationRules,
         WordService $wordService
     )
     {
-        $this->validator = $validator;
-        $this->validationRules = $validationRules;
         $this->wordFeedbackRepository = $wordFeedbackRepository;
         $this->wordRepository = $wordRepository;
+
+        $this->validator = $validator;
+        $this->validationRules = $validationRules;
         $this->wordService = $wordService;
     }
 

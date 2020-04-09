@@ -9,9 +9,9 @@ use App\Models\Language;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\AnniversaryService;
+use App\Services\CasesService;
 use App\Services\LanguageService;
 use Plasticode\Controllers\Controller as BaseController;
-use Plasticode\Util\Cases;
 use Psr\Container\ContainerInterface;
 
 class Controller extends BaseController
@@ -19,8 +19,8 @@ class Controller extends BaseController
     protected AssociationRepositoryInterface $associationRepository;
     protected WordRepositoryInterface $wordRepository;
 
-    protected Cases $cases;
     protected AnniversaryService $anniversaryService;
+    protected CasesService $casesService;
     protected LanguageService $languageService;
 
     protected AssociationConfigInterface $associationConfig;
@@ -33,8 +33,8 @@ class Controller extends BaseController
         $this->associationRepository = $container->associationRepository;
         $this->wordRepository = $container->wordRepository;
 
-        $this->cases = $container->cases;
         $this->anniversaryService = $container->anniversaryService;
+        $this->casesService = $container->casesService;
         $this->languageService = $container->languageService;
 
         $this->associationConfig = $container->config;
@@ -63,24 +63,22 @@ class Controller extends BaseController
         }
         
         // todo: move this to SidebarPartsProviderService
-        if ($language !== null) {
+        if ($language) {
             $wordCount = $this
                 ->wordRepository
                 ->getByLanguageCount($language);
 
-            $wordCountStr = $this->cases->caseForNumber(
-                'слово',
-                $wordCount
-            );
+            $wordCountStr = $this
+                ->casesService
+                ->wordCount($wordCount);
 
             $associationCount = $this
                 ->associationRepository
                 ->getByLanguageCount($language);
 
-            $associationCountStr = $this->cases->caseForNumber(
-                'ассоциация',
-                $associationCount
-            );
+            $associationCountStr = $this
+                ->casesService
+                ->associationCount($associationCount);
             
             $params['language'] = $language;
             

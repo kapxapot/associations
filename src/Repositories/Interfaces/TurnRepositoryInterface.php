@@ -13,6 +13,7 @@ use App\Models\Word;
 interface TurnRepositoryInterface
 {
     function get(?int $id) : ?Turn;
+    function save(Turn $turn) : Turn;
     function getAllByGame(Game $game) : TurnCollection;
     function getAllByAssociation(Association $association) : TurnCollection;
     function getAllByLanguage(Language $language) : TurnCollection;

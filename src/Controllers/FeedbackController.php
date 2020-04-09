@@ -23,8 +23,8 @@ class FeedbackController extends Controller
 
     private AuthInterface $auth;
     private AssociationFeedbackService $associationFeedbackService;
-    private WordFeedbackService $wordFeedbackService;
     private EventDispatcher $dispatcher;
+    private WordFeedbackService $wordFeedbackService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -40,8 +40,8 @@ class FeedbackController extends Controller
         $this->associationFeedbackService =
             $container->associationFeedbackService;
 
-        $this->wordFeedbackService = $container->wordFeedbackService;
         $this->dispatcher = $container->dispatcher;
+        $this->wordFeedbackService = $container->wordFeedbackService;
     }
 
     public function save(

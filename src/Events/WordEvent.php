@@ -4,11 +4,10 @@ namespace App\Events;
 
 use App\Models\Word;
 use Plasticode\Events\Event;
-use Plasticode\Models\DbModel;
 
 abstract class WordEvent extends Event
 {
-    private $word;
+    private Word $word;
 
     public function __construct(Word $word, Event $parent = null)
     {
@@ -22,7 +21,7 @@ abstract class WordEvent extends Event
         return $this->word;
     }
 
-    public function getEntity() : DbModel
+    public function getEntity() : Word
     {
         return $this->getWord();
     }

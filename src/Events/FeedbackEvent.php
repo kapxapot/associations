@@ -4,16 +4,15 @@ namespace App\Events;
 
 use App\Models\Feedback;
 use Plasticode\Events\Event;
-use Plasticode\Models\DbModel;
 
 abstract class FeedbackEvent extends Event
 {
-    private $feedback;
+    private Feedback $feedback;
 
-    public function __construct(Feedback $feedback, Event $parent = null)
+    public function __construct(Feedback $feedback, ?Event $parent = null)
     {
         parent::__construct($parent);
-        
+
         $this->feedback = $feedback;
     }
 
@@ -22,7 +21,7 @@ abstract class FeedbackEvent extends Event
         return $this->feedback;
     }
 
-    public function getEntity() : DbModel
+    public function getEntity() : Feedback
     {
         return $this->getFeedback();
     }

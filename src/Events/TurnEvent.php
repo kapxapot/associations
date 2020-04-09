@@ -4,11 +4,10 @@ namespace App\Events;
 
 use App\Models\Turn;
 use Plasticode\Events\Event;
-use Plasticode\Models\DbModel;
 
 abstract class TurnEvent extends Event
 {
-    private $turn;
+    private Turn $turn;
 
     public function __construct(Turn $turn, Event $parent = null)
     {
@@ -22,7 +21,7 @@ abstract class TurnEvent extends Event
         return $this->turn;
     }
 
-    public function getEntity() : DbModel
+    public function getEntity() : Turn
     {
         return $this->getTurn();
     }

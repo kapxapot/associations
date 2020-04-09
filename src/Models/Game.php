@@ -2,74 +2,79 @@
 
 namespace App\Models;
 
-use Plasticode\Collection;
-use Plasticode\Query;
+use App\Collections\TurnCollection;
+use App\Collections\UserCollection;
+use App\Collections\WordCollection;
+use App\Models\Traits\WithLanguage;
+use App\Models\Traits\WithUser;
 use Plasticode\Models\DbModel;
+use Plasticode\Models\Traits\CreatedAt;
+use Plasticode\Models\Traits\WithUrl;
 use Plasticode\Util\Date;
+use Webmozart\Assert\Assert;
 
+/**
+ * @property string|null $finishedAt
+ */
 class Game extends DbModel
 {
-    // queries
-    
-    public static function getByUser(User $user) : Query
+    use CreatedAt;
+    use WithLanguage;
+    use WithUrl;
+    use WithUser;
+
+    protected TurnCollection $turns;
+
+    private bool $turnsInitialized = false;
+
+    /**
+     * Sorted backwards.
+     */
+    public function turns() : TurnCollection
     {
-        return self::query()
-            ->where('user_id', $user->getId());
+        Assert::true($this->turnsInitialized);
+
+        return $this->turns;
     }
-    
-    // properties
-    
-    public function turns() : Query
+
+    public function withTurns(TurnCollection $turns) : self
     {
-        return Turn::getByGame($this);
+        $this->turns = $turns;
+        $this->turnsInitialized = true;
+
+        return $this;
     }
-    
-    public function turnsCountStr() : string
-    {
-        return self::$container->cases->caseForNumber('ход', $this->turns()->count());
-    }
-    
+
     public function lastTurn() : ?Turn
     {
-        return $this->turns()->one();
+        // turns are sorted backwards, so first
+        return $this->turns()->first();
     }
 
     public function beforeLastTurn() : ?Turn
     {
-        return $this->lastTurn() !== null
+        return $this->lastTurn()
             ? $this->lastTurn()->prev()
             : null;
     }
-    
-    public function words() : Collection
+
+    public function words() : WordCollection
     {
-        return $this->turns()->all()->map(function ($turn) {
-            return $turn->word(); 
-        });
+        return $this->turns()->words();
     }
     
     public function lastTurnWord() : ?Word
     {
-        return $this->lastTurn() !== null
+        return $this->lastTurn()
             ? $this->lastTurn()->word()
             : null;
     }
     
     public function beforeLastTurnWord() : ?Word
     {
-        return $this->beforeLastTurn() !== null
+        return $this->beforeLastTurn()
             ? $this->beforeLastTurn()->word()
             : null;
-    }
-    
-    public function language() : Language
-    {
-        return Language::get($this->languageId);
-    }
-    
-    public function user() : User
-    {
-        return self::$container->userRepository->get($this->userId);
     }
 
     public function creator() : User
@@ -81,31 +86,31 @@ class Game extends DbModel
     {
         return $this->turns()->any();
     }
-    
+
     public function isFinished() : bool
     {
         return $this->finishedAt !== null;
     }
-    
+
     public function isWonByPlayer() : bool
     {
-        return $this->isFinished() && $this->lastTurn() != null && $this->lastTurn()->isPlayerTurn();
+        return
+            $this->isFinished()
+            && $this->lastTurn()
+            && $this->lastTurn()->isPlayerTurn();
     }
-    
+
     public function isWonByAi() : bool
     {
-        return $this->isFinished() && $this->lastTurn() != null && $this->lastTurn()->isAiTurn();
+        return
+            $this->isFinished()
+            && $this->lastTurn()
+            && $this->lastTurn()->isAiTurn();
     }
-    
-    public function players() : Collection
+
+    public function players() : UserCollection
     {
-        return $this
-            ->turns()
-            ->all()
-            ->map(function ($turn) {
-                return $turn->user();
-            })
-            ->distinct();
+        return $this->turns()->users();
     }
 
     public function hasPlayer(User $user) : bool
@@ -116,43 +121,18 @@ class Game extends DbModel
             ->contains($user->getId());
     }
 
-    /**
-     * Normalized word string expected.
-     */
-    public function containsWordStr(string $wordStr) : bool
-    {
-        $word = Word::findInLanguage($this->language, $wordStr);
-
-        // new word
-        if ($word === null) {
-            return false;
-        }
-
-        return $this->containsWord($word);
-    }
-
     public function containsWord(Word $word) : bool
     {
         return $this
             ->words()
             ->any('id', $word->getId());
     }
-    
-    public function url() : ?string
-    {
-        return self::$container->linker->game($this);
-    }
-    
+
     public function displayName() : string
     {
         return 'Игра #' . $this->getId();
     }
-    
-    public function createdAtIso() : string
-    {
-        return Date::iso($this->createdAt);
-    }
-    
+
     public function finishedAtIso() : string
     {
         return Date::iso($this->finishedAt);

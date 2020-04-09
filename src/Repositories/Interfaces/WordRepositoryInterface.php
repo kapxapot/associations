@@ -10,6 +10,7 @@ interface WordRepositoryInterface extends LanguageElementRepositoryInterface
 {
     function get(?int $id) : ?Word;
     function save(Word $word) : Word;
+    function store(array $data) : Word;
     function getAllByLanguage(Language $language) : WordCollection;
     function findInLanguage(Language $language, ?string $wordStr) : ?Word;
 

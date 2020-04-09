@@ -23,6 +23,11 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         return $this->saveEntity($word);
     }
 
+    public function store(array $data) : Word
+    {
+        return $this->storeEntity($data);
+    }
+
     public function getAllByLanguage(Language $language) : WordCollection
     {
         return WordCollection::from(

@@ -17,6 +17,16 @@ class AssociationRepository extends LanguageElementRepository implements Associa
         return $this->getEntity($id);
     }
 
+    public function save(Association $association) : Association
+    {
+        return $this->saveEntity($association);
+    }
+
+    public function store(array $data) : Association
+    {
+        return $this->storeEntity($data);
+    }
+
     public function getAllByLanguage(Language $language) : AssociationCollection
     {
         return AssociationCollection::from(

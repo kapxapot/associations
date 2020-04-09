@@ -20,6 +20,11 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
         return $this->getEntity($id);
     }
 
+    public function save(Game $game) : Game
+    {
+        return $this->saveEntity($game);
+    }
+
     public function store(array $data) : Game
     {
         return $this->storeEntity($data);

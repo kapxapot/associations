@@ -29,6 +29,11 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         return $this->getEntity($id);
     }
 
+    public function save(Turn $turn) : Turn
+    {
+        return $this->saveEntity($turn);
+    }
+
     public function getAllByGame(Game $game) : TurnCollection
     {
         return TurnCollection::from(

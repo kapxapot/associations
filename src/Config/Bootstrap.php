@@ -26,6 +26,7 @@ use App\Services\AnniversaryService;
 use App\Services\AssociationFeedbackService;
 use App\Services\AssociationRecountService;
 use App\Services\AssociationService;
+use App\Services\CasesService;
 use App\Services\DictionaryService;
 use App\Services\GameService;
 use App\Services\LanguageService;
@@ -198,11 +199,20 @@ class Bootstrap extends BootstrapBase
 
         $map['associationRecountService'] = fn (CI $c) =>
             new AssociationRecountService(
+                $c->associationRepository,
+                $c->turnService,
                 $c->config
             );
 
         $map['associationService'] = fn (CI $c) =>
-            new AssociationService();
+            new AssociationService(
+                $c->associationRepository
+            );
+
+        $map['casesService'] = fn (CI $c) =>
+            new CasesService(
+                $c->cases
+            );
 
         $map['dictionaryService'] = fn (CI $c) =>
             new DictionaryService(
@@ -226,8 +236,11 @@ class Bootstrap extends BootstrapBase
 
         $map['turnService'] = fn (CI $c) =>
             new TurnService(
-                $c->dispatcher,
-                $c->associationService
+                $c->gameRepository,
+                $c->turnRepository,
+                $c->wordRepository,
+                $c->associationService,
+                $c->dispatcher
             );
 
         $map['userService'] = fn (CI $c) =>
@@ -237,26 +250,27 @@ class Bootstrap extends BootstrapBase
 
         $map['wordFeedbackService'] = fn (CI $c) =>
             new WordFeedbackService(
-                $c->validator,
-                $c->validationRules,
                 $c->wordFeedbackRepository,
                 $c->wordRepository,
+                $c->validator,
+                $c->validationRules,
                 $c->wordService
             );
 
         $map['wordRecountService'] = fn (CI $c) =>
             new WordRecountService(
+                $c->wordRepository,
                 $c->config
             );
 
         $map['wordService'] = fn (CI $c) =>
             new WordService(
-                $c->config,
-                $c->validator,
-                $c->validationRules,
-                $c->cases,
                 $c->turnRepository,
                 $c->wordRepository,
+                $c->casesService,
+                $c->validator,
+                $c->validationRules,
+                $c->config
             );
 
         $map['yandexDictService'] = fn (CI $c) =>

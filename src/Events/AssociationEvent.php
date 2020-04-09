@@ -4,11 +4,10 @@ namespace App\Events;
 
 use App\Models\Association;
 use Plasticode\Events\Event;
-use Plasticode\Models\DbModel;
 
 abstract class AssociationEvent extends Event
 {
-    private $association;
+    private Association $association;
 
     public function __construct(Association $association, Event $parent = null)
     {
@@ -22,7 +21,7 @@ abstract class AssociationEvent extends Event
         return $this->association;
     }
 
-    public function getEntity() : DbModel
+    public function getEntity() : Association
     {
         return $this->getAssociation();
     }

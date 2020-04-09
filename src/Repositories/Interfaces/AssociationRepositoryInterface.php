@@ -10,6 +10,8 @@ use App\Models\Word;
 interface AssociationRepositoryInterface extends LanguageElementRepositoryInterface
 {
     function get(?int $id) : ?Association;
+    function save(Association $association) : Association;
+    function store(array $data) : Association;
     function getAllByLanguage(Language $language) : AssociationCollection;
     function getAllByWord(Word $word) : AssociationCollection;
     function getByPair(Word $first, Word $second) : ?Association;

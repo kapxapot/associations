@@ -6,12 +6,22 @@ use App\Models\Association;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
 use Webmozart\Assert\Assert;
 
 class AssociationService
 {
+    private AssociationRepositoryInterface $associationRepository;
+
+    public function __construct(
+        AssociationRepositoryInterface $associationRepository
+    )
+    {
+        $this->associationRepository = $associationRepository;
+    }
+
     public function getOrCreate(
         Word $first,
         Word $second,
@@ -21,8 +31,7 @@ class AssociationService
     {
         $association =
             $this->getByPair($first, $second, $language)
-            ??
-            $this->create($first, $second, $user, $language);
+            ?? $this->create($first, $second, $user, $language);
 
         if (is_null($association)) {
             throw new InvalidResultException(
@@ -49,25 +58,26 @@ class AssociationService
         Language $language = null
     ) : Association
     {
-        if ($this->getByPair($first, $second, $language) !== null) {
+        $association = $this->getByPair($first, $second, $language);
+
+        if ($association) {
             throw new InvalidOperationException('Association already exists.');
         }
-        
+
         $this->checkPair($first, $second);
-        
+
         [$first, $second] = $this->orderPair($first, $second);
 
-        $association = Association::create();
-        
-        $association->firstWordId = $first->getId();
-        $association->secondWordId = $second->getId();
-        $association->createdBy = $user->getId();
-        
-        if ($language !== null) {
-            $association->languageId = $language->getId();
-        }
-
-        return $association->save();
+        return $this
+            ->associationRepository
+            ->store(
+                [
+                    'first_word_id' => $first->getId(),
+                    'second_word_id' => $second->getId(),
+                    'created_by' => $user->getId(),
+                    'language_id' => $language ? $language->getId() : null
+                ]
+            );
     }
 
     public function checkPair(
@@ -99,24 +109,24 @@ class AssociationService
             'Words must be of the specified language.'
         );
     }
-    
+
     public function orderPair(Word $first, Word $second) : array
     {
         return $first->getId() < $second->getId()
             ? [$first, $second]
             : [$second, $first];
     }
-    
-    public function getByPair(
+
+    private function getByPair(
         Word $first,
         Word $second,
         Language $language = null
     ) : ?Association
     {
         $this->checkPair($first, $second, $language);
-        
+
         [$first, $second] = $this->orderPair($first, $second);
-        
-        return Association::getByPair($first, $second);
+
+        return $this->associationRepository->getByPair($first, $second);
     }
 }

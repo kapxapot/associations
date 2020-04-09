@@ -17,16 +17,18 @@ class JobController extends Controller
     private AssociationRepositoryInterface $associationRepository;
     private WordRepositoryInterface $wordRepository;
 
-    private SettingsProviderInterface $settingsProvider;
     private EventDispatcher $dispatcher;
+    private SettingsProviderInterface $settingsProvider;
 
     public function __construct(ContainerInterface $container)
     {
+        parent::__construct($container);
+
         $this->associationRepository = $container->associationRepository;
         $this->wordRepository = $container->wordRepository;
 
-        $this->settingsProvider = $container->settingsProvider;
         $this->dispatcher = $container->dispatcher;
+        $this->settingsProvider = $container->settingsProvider;
     }
 
     public function updateAssociations(

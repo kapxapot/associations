@@ -14,19 +14,21 @@ use Slim\Http\Request as SlimRequest;
 
 class WordController extends Controller
 {
-    private AuthInterface $auth;
     private WordRepositoryInterface $wordRepository;
-    private WordService $wordService;
+
+    private AuthInterface $auth;
     private NotFoundHandler $notFoundHandler;
+    private WordService $wordService;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
-        $this->auth = $container->auth;
         $this->wordRepository = $container->wordRepository;
-        $this->wordService = $container->wordService;
+
+        $this->auth = $container->auth;
         $this->notFoundHandler = $container->notFoundHandler;
+        $this->wordService = $container->wordService;
     }
 
     public function index(

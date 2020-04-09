@@ -10,56 +10,67 @@ use App\Events\AssociationOutOfDateEvent;
 use App\Events\NewTurnEvent;
 use App\Events\WordMatureEvent;
 use App\Models\Association;
-use App\Models\AssociationFeedback;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Events\EventProcessor;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 
 class AssociationRecountService extends EventProcessor
 {
+    private AssociationRepositoryInterface $associationRepository;
+    private TurnService $turnService;
     private AssociationConfigInterface $config;
 
-    public function __construct(AssociationConfigInterface $config)
+    public function __construct(
+        AssociationRepositoryInterface $associationRepository,
+        TurnService $turnService,
+        AssociationConfigInterface $config
+    )
     {
+        $this->associationRepository = $associationRepository;
+        $this->turnService = $turnService;
         $this->config = $config;
     }
 
     /**
-     * NewTurnEvent event processing
+     * NewTurnEvent event processing.
      */
     public function processNewTurnEvent(NewTurnEvent $event) : iterable
     {
         $assoc = $event->getTurn()->association();
 
-        $assoc = $this->recountApproved($assoc);
-        $assoc = $assoc->save();
+        if ($assoc) {
+            $assoc = $this->recountApproved($assoc);
 
-        yield new AssociationApprovedEvent($assoc);
+            $assoc = $this->associationRepository->save($assoc);
+
+            yield new AssociationApprovedEvent($assoc);
+        }
     }
 
     /**
-     * WordMatureEvent event processing
+     * WordMatureEvent event processing.
      */
     public function processWordMatureEvent(WordMatureEvent $event) : iterable
     {
         $word = $event->getWord();
 
-        $assocs = $word->associations()->all();
-
-        foreach ($assocs as $assoc) {
+        foreach ($word->associations() as $assoc) {
             $assoc = $this->recountMature($assoc);
-            $assoc = $assoc->save();
-    
+
+            $assoc = $this->associationRepository->save($assoc);
+
             yield new AssociationMatureEvent($assoc);
         }
     }
 
     /**
-     * AssociationFeedbackEvent event processing
+     * AssociationFeedbackEvent event processing.
      */
-    public function processAssociationFeedbackEvent(AssociationFeedbackEvent $event) : iterable
+    public function processAssociationFeedbackEvent(
+        AssociationFeedbackEvent $event
+    ) : iterable
     {
-        /** @var AssociationFeedback */
         $feedback = $event->getFeedback();
         $assoc = $feedback->association();
 
@@ -67,9 +78,11 @@ class AssociationRecountService extends EventProcessor
     }
 
     /**
-     * AssociationOutOfDateEvent event processing
+     * AssociationOutOfDateEvent event processing.
      */
-    public function processAssociationOutOfDateEvent(AssociationOutOfDateEvent $event) : iterable
+    public function processAssociationOutOfDateEvent(
+        AssociationOutOfDateEvent $event
+    ) : iterable
     {
         $assoc = $event->getAssociation();
         return $this->recountAll($assoc);
@@ -79,7 +92,8 @@ class AssociationRecountService extends EventProcessor
     {
         $assoc = $this->recountApproved($assoc);
         $assoc = $this->recountMature($assoc);
-        $assoc = $assoc->save();
+
+        $assoc = $this->associationRepository->save($assoc);
 
         yield new AssociationApprovedEvent($assoc);
         yield new AssociationMatureEvent($assoc);
@@ -90,18 +104,22 @@ class AssociationRecountService extends EventProcessor
         $usageCoeff = $this->config->associationUsageCoeff();
         $dislikeCoeff = $this->config->associationDislikeCoeff();
         $threshold = $this->config->associationApprovalThreshold();
-        
-        $turnsByUsers = $assoc->turnsByUsers();
+
+        $turnsByUsers = $this->turnService->turnsByUsers($assoc);
+
         $turnCount = count($turnsByUsers);
-        
+
         $dislikeCount = $assoc->dislikes()->count();
-        
+
         $score = $turnCount * $usageCoeff - $dislikeCount * $dislikeCoeff;
         $approved = ($score >= $threshold);
 
         $now = Date::dbNow();
 
-        if ($assoc->isApproved() !== $approved || is_null($assoc->approvedUpdatedAt)) {
+        if (
+            $assoc->isApproved() !== $approved
+            || is_null($assoc->approvedUpdatedAt)
+        ) {
             $assoc->approved = Convert::toBit($approved);
             $assoc->approvedUpdatedAt = $now;
         }
@@ -113,7 +131,10 @@ class AssociationRecountService extends EventProcessor
 
     private function recountMature(Association $assoc) : Association
     {
-        if ($assoc->firstWord()->isMature() || $assoc->secondWord()->isMature()) {
+        if (
+            $assoc->firstWord()->isMature()
+            || $assoc->secondWord()->isMature()
+        ) {
             $mature = true;
         } else {
             $threshold = $this->config->associationMatureThreshold();
@@ -125,7 +146,10 @@ class AssociationRecountService extends EventProcessor
 
         $now = Date::dbNow();
 
-        if ($assoc->isMature() !== $mature || is_null($assoc->matureUpdateAt)) {
+        if (
+            $assoc->isMature() !== $mature
+            || is_null($assoc->matureUpdateAt)
+        ) {
             $assoc->mature = Convert::toBit($mature);
             $assoc->matureUpdatedAt = $now;
         }

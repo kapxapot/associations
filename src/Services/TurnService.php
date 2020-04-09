@@ -8,6 +8,9 @@ use App\Models\LanguageElement;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
+use App\Repositories\Interfaces\GameRepositoryInterface;
+use App\Repositories\Interfaces\TurnRepositoryInterface;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Collection;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Date;
@@ -15,66 +18,78 @@ use Plasticode\Util\Sort;
 
 class TurnService
 {
-    private EventDispatcher $dispatcher;
+    private GameRepositoryInterface $gameRepository;
+    private TurnRepositoryInterface $turnRepository;
+    private WordRepositoryInterface $wordRepository;
+
     private AssociationService $associationService;
+    private EventDispatcher $dispatcher;
 
     public function __construct(
-        EventDispatcher $dispatcher,
-        AssociationService $associationService
+        GameRepositoryInterface $gameRepository,
+        TurnRepositoryInterface $turnRepository,
+        WordRepositoryInterface $wordRepository,
+        AssociationService $associationService,
+        EventDispatcher $dispatcher
     )
     {
-        $this->dispatcher = $dispatcher;
+        $this->gameRepository = $gameRepository;
+        $this->turnRepository = $turnRepository;
+        $this->wordRepository = $wordRepository;
         $this->associationService = $associationService;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
      * Returns true on success.
      */
-    public function finishTurn(Turn $turn, $finishDate = null) : bool
+    public function finishTurn(Turn $turn, ?string $finishDate = null) : bool
     {
         if ($turn->isFinished()) {
-            return false;
+            return true;
         }
-        
+
         $turn->finishedAt = $finishDate ?? Date::dbNow();
-        $turn->save();
+
+        $this->turnRepository->save($turn);
 
         return true;
     }
-    
+
     public function newPlayerTurn(Game $game, Word $word, User $user) : Turn
     {
         $turn = $this->newTurn($game, $word, $user);
 
         $event = new NewTurnEvent($turn);
         $this->dispatcher->dispatch($event);
-        
+
         $this->processPlayerTurn($turn);
-        
+
         return $turn;
     }
-    
+
     public function newAiTurn(Game $game, Word $word) : Turn
     {
         $turn = $this->newTurn($game, $word);
-        
+
         $this->processAiTurn($turn);
 
         return $turn;
     }
-    
-    private function newTurn(Game $game, Word $word, User $user = null) : Turn
+
+    private function newTurn(Game $game, Word $word, ?User $user = null) : Turn
     {
         $language = $game->language();
 
         $turn = Turn::create();
+
         $turn->gameId = $game->getId();
         $turn->languageId = $language->getId();
-        
-        if ($user !== null) {
+
+        if ($user) {
             $turn->userId = $user->getId();
         }
-        
+
         $turn->wordId = $word->getId();
         $prevTurn = $game->lastTurn();
 
@@ -82,40 +97,47 @@ class TurnService
             $turn->prevTurnId = $prevTurn->getId();
 
             $prevWord = $prevTurn->word();
-            $association = $this->associationService->getOrCreate($prevWord, $word, $user, $language);
+
+            $association = $this->associationService->getOrCreate(
+                $prevWord,
+                $word,
+                $user,
+                $language
+            );
 
             $turn->associationId = $association->getId();
         }
-        
-        return $turn->save();
+
+        return $this->turnRepository->save($turn);
     }
-    
+
     public function processAiTurn(Turn $turn) : void
     {
-        // finish prev turn
-        if ($turn->prev() !== null) {
+        $this->finishPrevTurn($turn);
+    }
+
+    private function finishPrevTurn(Turn $turn) : void
+    {
+        if ($turn->prev()) {
             $this->finishTurn(
                 $turn->prev(),
                 $turn->createdAt
             );
         }
     }
-    
+
     public function processPlayerTurn(Turn $turn) : void
     {
-        // finish prev turn
-        if ($turn->prev() !== null) {
-            $this->finishTurn(
-                $turn->prev(),
-                $turn->createdAt
-            );
-        }
-        
-        // AI next turn
+        $this->finishPrevTurn($turn);
+        $this->nextAiTurn($turn);
+    }
+
+    private function nextAiTurn(Turn $turn) : void
+    {
         $game = $turn->game();
         $word = $this->findAnswer($turn);
 
-        if ($word !== null) {
+        if ($word) {
             $this->newAiTurn($game, $word);
         } else {
             $this->finishGame($game);
@@ -134,9 +156,10 @@ class TurnService
         }
 
         $game->finishedAt = Date::dbNow();
-        $game->save();
 
-        if ($game->lastTurn() !== null) {
+        $this->gameRepository->save($game);
+
+        if ($game->lastTurn()) {
             return $this->finishTurn(
                 $game->lastTurn(),
                 $game->finishedAt
@@ -146,9 +169,21 @@ class TurnService
         return true;
     }
 
+    /**
+     * Normalized word string expected.
+     */
     public function validatePlayerTurn(Game $game, string $wordStr) : bool
     {
-        return !$game->containsWordStr($wordStr);
+        $word = $this
+            ->wordRepository
+            ->findInLanguage($this->language, $wordStr);
+
+        // unknown yet word
+        if (is_null($word)) {
+            return true;
+        }
+
+        return !$game->containsWord($word);
     }
 
     public function findAnswer(Turn $turn) : ?Word

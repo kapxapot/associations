@@ -75,7 +75,7 @@
                                 {% endif %}
                             </strong>
                         </div>
-                        <div class="mb-2">Запись игры ({{ last_game.turns.count }} {{ last_game.turns_count_str }}):</div>
+                        <div class="mb-2">Запись игры ({{ last_game_turn_count_str }}):</div>
                         <div class="mb-2">
                             {% include 'components/game_log_inline.twig' with { 'game': last_game } only %}
                         </div>
