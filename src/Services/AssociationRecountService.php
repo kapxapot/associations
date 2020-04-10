@@ -18,17 +18,14 @@ use Plasticode\Util\Date;
 class AssociationRecountService extends EventProcessor
 {
     private AssociationRepositoryInterface $associationRepository;
-    private TurnService $turnService;
     private AssociationConfigInterface $config;
 
     public function __construct(
         AssociationRepositoryInterface $associationRepository,
-        TurnService $turnService,
         AssociationConfigInterface $config
     )
     {
         $this->associationRepository = $associationRepository;
-        $this->turnService = $turnService;
         $this->config = $config;
     }
 
@@ -105,7 +102,7 @@ class AssociationRecountService extends EventProcessor
         $dislikeCoeff = $this->config->associationDislikeCoeff();
         $threshold = $this->config->associationApprovalThreshold();
 
-        $turnsByUsers = $this->turnService->turnsByUsers($assoc);
+        $turnsByUsers = $assoc->turns()->groupByUser();
 
         $turnCount = count($turnsByUsers);
 

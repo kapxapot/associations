@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
 use App\Handlers\NotFoundHandler;
-use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\WordService;
 use Plasticode\Core\Response;
 use Psr\Container\ContainerInterface;
@@ -14,8 +13,6 @@ use Slim\Http\Request as SlimRequest;
 
 class WordController extends Controller
 {
-    private WordRepositoryInterface $wordRepository;
-
     private AuthInterface $auth;
     private NotFoundHandler $notFoundHandler;
     private WordService $wordService;
@@ -23,8 +20,6 @@ class WordController extends Controller
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
-
-        $this->wordRepository = $container->wordRepository;
 
         $this->auth = $container->auth;
         $this->notFoundHandler = $container->notFoundHandler;
@@ -76,7 +71,7 @@ class WordController extends Controller
     ) : ResponseInterface
     {
         $id = $args['id'];
-        
+
         $debug = $request->getQueryParam('debug', null) !== null;
 
         $word = $this->wordRepository->get($id);
@@ -84,7 +79,6 @@ class WordController extends Controller
 
         if (
             is_null($word)
-            || is_null($user)
             || !$word->isVisibleFor($user)
         ) {
             return ($this->notFoundHandler)($request, $response);
@@ -109,7 +103,7 @@ class WordController extends Controller
                 ],
             ]
         );
-        
+
         return $this->render($response, 'main/words/item.twig', $params);
     }
 }

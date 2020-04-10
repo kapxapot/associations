@@ -6,7 +6,7 @@
 {% set can_see_all_games = can('games', 'edit') %}
 {% set is_moderator = can('associations', 'edit') %}
 
-{% set title  = lm.association(association, null, true)|upper %}
+{% set title = lm.association(association, null, true)|upper %}
 
 {% block content %}
     <div class="panel panel-primary">
@@ -23,8 +23,8 @@
                 {% if association.is_mature %}
                     <span class="label label-danger" title="Не для детей" data-toggle="tooltip">16+</span>
                 {% endif %}
-                {% if association.turns_by_users|length > 0 %}
-                    <span class="label label-success" title="Использования" data-toggle="tooltip"><i class="fas fa-thumbs-up"></i> {{ association.turns_by_users|length }}</span>
+                {% if turns_by_user|length > 0 %}
+                    <span class="label label-success" title="Использования" data-toggle="tooltip"><i class="fas fa-thumbs-up"></i> {{ turns_by_user|length }}</span>
                 {% endif %}
                 {% if association.dislikes.any %}
                     <span class="label label-danger" title="Не нравится" data-toggle="tooltip"><i class="fas fa-thumbs-down"></i> {{ association.dislikes.count }}</span>
@@ -40,10 +40,10 @@
             <p>Добавил/а {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
 
             <p><strong>Использована игроками:</strong></p>
-            
+
             <ul>
                 {% for user in association.users %}
-                    {% set turns = association.turns_by_users[user.id] %}
+                    {% set turns = turns_by_user[user.id] %}
                     <li class="vgap-1">
                         {% set full_access = can_see_all_games or user.id == auth.user.id %}
                         <div>{{ lm.user_full(user) }}{% if not full_access %} ({{ turns.count }}){% endif %}</div>
@@ -57,7 +57,7 @@
                     </li>
                 {% endfor %}
             </ul>
-            
+
             {% if auth.user %}
                 <div>
                     <a role="button" ng-click="problemsDialog()" class="btn btn-default problems" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>

@@ -14,12 +14,12 @@ $container = $app->getContainer();
 $settings = $container->get('settings');
 
 if ($settings['debug']) {
-    error_reporting(E_ALL & ~E_NOTICE);
+    error_reporting(E_ALL);
     ini_set("display_errors", 1);
     ini_set("log_errors_max_len", 0);
 } else {
     $errorLevel = error_reporting();
-    error_reporting($errorLevel & ~E_NOTICE);
+    error_reporting($errorLevel & ~E_NOTICE & ~E_DEPRECATED);
 }
 
 session_start();

@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
 use App\Handlers\NotFoundHandler;
-use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request as SlimRequest;
@@ -12,7 +11,6 @@ use Slim\Http\Request as SlimRequest;
 class AssociationController extends Controller
 {
     private AuthInterface $auth;
-    private AssociationRepositoryInterface $associationRepository;
     private NotFoundHandler $notFoundHandler;
 
     public function __construct(ContainerInterface $container)
@@ -20,7 +18,6 @@ class AssociationController extends Controller
         parent::__construct($container);
 
         $this->auth = $container->auth;
-        $this->associationRepository = $container->associationRepository;
         $this->notFoundHandler = $container->notFoundHandler;
     }
 
@@ -40,16 +37,18 @@ class AssociationController extends Controller
 
         if (
             is_null($association)
-            || is_null($user)
             || !$association->isVisibleFor($user)
         ) {
             return ($this->notFoundHandler)($request, $response);
         }
 
+        $turnsByUser = $association->turns()->groupByUser();
+
         $params = $this->buildParams(
             [
                 'params' => [
                     'association' => $association,
+                    'turns_by_user' => $turnsByUser,
                     'disqus_id' => 'association' . $association->getId(),
                     'debug' => $debug,
                 ],

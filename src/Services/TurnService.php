@@ -4,17 +4,14 @@ namespace App\Services;
 
 use App\Events\NewTurnEvent;
 use App\Models\Game;
-use App\Models\LanguageElement;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Collection;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Date;
-use Plasticode\Util\Sort;
 
 class TurnService
 {
@@ -198,27 +195,5 @@ class TurnService
                 fn (Word $w) => !$game->containsWord($w)
             )
             ->random();
-    }
-
-    public function turnsByUsers(LanguageElement $element) : array
-    {
-        return $this->groupByUsers(
-            $element->turns()
-        );
-    }
-
-    private function groupByUsers(Collection $turns) : array
-    {
-        return $turns
-            ->where(
-                fn (Turn $t) => !is_null($t->user())
-            )
-            ->asc(
-                fn (Turn $t) => $t->createdAt,
-                Sort::DATE
-            )
-            ->group(
-                fn (Turn $t) => $t->user()->getId()
-            );
     }
 }

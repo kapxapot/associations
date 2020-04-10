@@ -5,7 +5,9 @@
 {% set no_social = true %}
 {% set sidebar = true %}
 
-{% set signin_onload = true %}
+{% if index %}
+    {% set signin_onload = true %}
+{% endif %}
 
 {% set more_angular %}
     {% if not debug %}

@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
-use App\Services\CasesService;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request as SlimRequest;
@@ -11,14 +10,12 @@ use Slim\Http\Request as SlimRequest;
 class IndexController extends Controller
 {
     private AuthInterface $auth;
-    private CasesService $casesService;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
         $this->auth = $container->auth;
-        $this->casesService = $container->casesService;
     }
 
     public function index(

@@ -200,7 +200,6 @@ class Bootstrap extends BootstrapBase
         $map['associationRecountService'] = fn (CI $c) =>
             new AssociationRecountService(
                 $c->associationRepository,
-                $c->turnService,
                 $c->config
             );
 

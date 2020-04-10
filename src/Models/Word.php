@@ -74,21 +74,14 @@ class Word extends LanguageElement
             : null;
     }
 
-    private function compareByOtherWord() : \Closure
-    {
-        return fn (Association $assocA, Association $assocB) : int =>
-            strcmp(
-                $assocA->otherWord($this)->word,
-                $assocB->otherWord($this)->word
-            );
-    }
-    
     public function approvedAssociations() : AssociationCollection
     {
         return $this
             ->associations()
             ->approved()
-            ->orderByFunc($this->compareByOtherWord());
+            ->ascStr(
+                fn (Association $a) => $a->otherWord($this)->word
+            );
     }
 
     public function approvedVisibleAssociations() : AssociationCollection
@@ -110,7 +103,9 @@ class Word extends LanguageElement
         return $this
             ->associations()
             ->notApproved()
-            ->orderByFunc($this->compareByOtherWord());
+            ->ascStr(
+                fn (Association $a) => $a->otherWord($this)->word
+            );
     }
 
     public function notApprovedVisibleAssociations() : AssociationCollection

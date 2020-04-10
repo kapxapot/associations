@@ -38,14 +38,14 @@ class LanguageElementCollection extends TypedCollection
         );
     }
 
-    public function visibleFor(User $user) : self
+    public function visibleFor(?User $user) : self
     {
         return $this->where(
             fn (LanguageElement $el) => $el->isVisibleFor($user)
         );
     }
 
-    public function invisibleFor(User $user) : self
+    public function invisibleFor(?User $user) : self
     {
         return $this->where(
             fn (LanguageElement $el) => !$el->isVisibleFor($user)
