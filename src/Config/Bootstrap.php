@@ -8,6 +8,7 @@ use App\External\YandexDict;
 use App\Handlers\NotFoundHandler;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
+use App\Hydrators\GameHydrator;
 use App\Hydrators\TurnHydrator;
 use App\Hydrators\UserHydrator;
 use App\Hydrators\WordFeedbackHydrator;
@@ -85,7 +86,16 @@ class Bootstrap extends BootstrapBase
 
         $map['gameRepository'] = fn (CI $c) =>
             new GameRepository(
-                $c->repositoryContext
+                $c->repositoryContext,
+                new ObjectProxy(
+                    fn () =>
+                    new GameHydrator(
+                        $c->languageRepository,
+                        $c->turnRepository,
+                        $c->userRepository,
+                        $c->linker
+                    )
+                )
             );
 
         $map['languageRepository'] = fn (CI $c) =>

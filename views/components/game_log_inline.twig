@@ -1,4 +1,4 @@
-{% for turn in game.turns.all.reverse %}
+{% for turn in game.turns.reverse %}
     {% if not loop.first %}
         {% include 'components/association.twig' with { 'association': turn.association, 'short': true } only %}
     {% endif %}
