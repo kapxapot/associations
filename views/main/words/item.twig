@@ -37,7 +37,7 @@
             </p>
 
             {% if word.typo_by_me %}
-                <div class="quote">
+                <div class="quote break-all">
                     <div class="quote-body">
                         <p>Оригинальное слово <strong>{{ word.word }}</strong> исправлено вами на слово <strong>{{ word.typo_by_me }}</strong>.</p>
                         <p>Это исправление видите <strong>только вы</strong>.</p>
@@ -50,7 +50,7 @@
             {% if word.approved_associations.any %}
                 <p><strong>Общие ассоциации ({{ word.approved_associations.count }}):</strong></p>
 
-                <ul class="vgap-2">
+                <ul class="vgap-2 break-all">
                     {% for assoc in word.approved_visible_associations %}
                         <li>
                             {{ lm.association(assoc, word) }}
@@ -70,7 +70,7 @@
             {% if word.not_approved_associations.any %}
                 <p><strong>Личные ассоциации ({{ word.not_approved_associations.count }}):</strong></p>
 
-                <ul class="vgap-2">
+                <ul class="vgap-2 break-all">
                     {% for assoc in word.not_approved_visible_associations %}
                         <li>
                             {{ lm.association(assoc, word) }}

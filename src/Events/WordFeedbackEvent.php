@@ -7,7 +7,7 @@ use Plasticode\Events\Event;
 
 class WordFeedbackEvent extends FeedbackEvent
 {
-    private WordFeedback $feedback;
+    protected WordFeedback $feedback;
 
     public function __construct(
         WordFeedback $feedback,

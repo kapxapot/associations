@@ -7,7 +7,7 @@ use Plasticode\Events\Event;
 
 abstract class FeedbackEvent extends Event
 {
-    private Feedback $feedback;
+    protected Feedback $feedback;
 
     public function __construct(Feedback $feedback, ?Event $parent = null)
     {

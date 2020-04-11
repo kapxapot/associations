@@ -8,6 +8,7 @@ use App\Models\Traits\WithLanguage;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\Created;
 use Plasticode\Models\Traits\UpdatedAt;
+use Plasticode\ObjectProxy;
 use Webmozart\Assert\Assert;
 
 /**
@@ -24,8 +25,10 @@ abstract class LanguageElement extends DbModel
 
     /**
      * Current user
+     * 
+     * @var User|ObjectProxy|null
      */
-    protected ?User $me = null;
+    protected $me = null;
 
     private bool $turnsInitialized = false;
     private bool $meInitialized = false;
@@ -47,14 +50,19 @@ abstract class LanguageElement extends DbModel
 
     abstract public function feedbacks() : FeedbackCollection;
 
-    protected function me() : ?User
+    public function me() : ?User
     {
         Assert::true($this->meInitialized);
 
-        return $this->me;
+        return $this->me instanceof ObjectProxy
+            ? ($this->me)()
+            : $this->me;
     }
 
-    public function withMe(?User $me) : self
+    /**
+     * @param User|ObjectProxy|null $me
+     */
+    public function withMe($me) : self
     {
         $this->me = $me;
         $this->meInitialized = true;

@@ -7,7 +7,7 @@ use Plasticode\Events\Event;
 
 class AssociationFeedbackEvent extends FeedbackEvent
 {
-    private AssociationFeedback $feedback;
+    protected AssociationFeedback $feedback;
 
     public function __construct(
         AssociationFeedback $feedback,

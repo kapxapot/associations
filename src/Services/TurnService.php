@@ -105,7 +105,13 @@ class TurnService
             $turn->associationId = $association->getId();
         }
 
-        return $this->turnRepository->save($turn);
+        $turn = $this->turnRepository->save($turn);
+
+        // game is out of date after new turn creation
+        // and requires an update
+        $this->gameRepository->rehydrate($game);
+
+        return $turn;
     }
 
     public function processAiTurn(Turn $turn) : void
@@ -146,7 +152,7 @@ class TurnService
      * 
      * Todo: this should belong to GameService, but creates a circular dependency
      */
-    private function finishGame(Game $game) : bool
+    public function finishGame(Game $game) : bool
     {
         if ($game->isFinished()) {
             return false;
@@ -171,9 +177,11 @@ class TurnService
      */
     public function validatePlayerTurn(Game $game, string $wordStr) : bool
     {
+        $language = $game->language();
+
         $word = $this
             ->wordRepository
-            ->findInLanguage($this->language, $wordStr);
+            ->findInLanguage($language, $wordStr);
 
         // unknown yet word
         if (is_null($word)) {

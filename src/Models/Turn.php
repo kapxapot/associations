@@ -16,7 +16,8 @@ use Webmozart\Assert\Assert;
  */
 class Turn extends DbModel
 {
-    use CreatedAt, WithUser;
+    use CreatedAt;
+    use WithUser;
 
     protected Game $game;
     protected Word $word;
@@ -60,9 +61,11 @@ class Turn extends DbModel
         return $this;
     }
 
-    public function isBy(User $user) : bool
+    public function isBy(?User $user) : bool
     {
-        return $this->user()->equals($user);
+        return $this->user()
+            ? $this->user()->equals($user)
+            : is_null($user);
     }
 
     public function association() : ?Association

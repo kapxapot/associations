@@ -7,7 +7,7 @@ use Plasticode\Events\Event;
 
 abstract class WordEvent extends Event
 {
-    private Word $word;
+    protected Word $word;
 
     public function __construct(Word $word, Event $parent = null)
     {

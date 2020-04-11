@@ -31,7 +31,7 @@
                 {% endif %}
             </p>
 
-            <p class="font-xl">
+            <p class="font-xl break-all lh-1 mb-3">
                 {% include "components/word.twig" with { 'word': association.first_word } only %}
                 {% include 'components/association_sign.twig' with { 'association': association } only %}
                 {% include "components/word.twig" with { 'word': association.second_word } only %}

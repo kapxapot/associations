@@ -2,8 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Auth\Interfaces\AuthInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
+use App\Services\GameService;
+use App\Services\TurnService;
+use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\Http\NotFoundException;
@@ -16,12 +20,22 @@ class TurnController extends Controller
     private GameRepositoryInterface $gameRepository;
     private TurnRepositoryInterface $turnRepository;
 
+    private AuthInterface $auth;
+    private GameService $gameService;
+    private TurnService $turnService;
+    private WordService $wordService;
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
         $this->gameRepository = $container->gameRepository;
         $this->turnRepository = $container->turnRepository;
+
+        $this->auth = $container->auth;
+        $this->gameService = $container->gameService;
+        $this->turnService = $container->turnService;
+        $this->wordService = $container->wordService;
     }
 
     public function create(

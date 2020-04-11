@@ -1,3 +1,3 @@
 {% spaceless %}
-    <span class="label {% if turn.is_ai_turn %}label-info{% else %}label-success{% endif %} turn-label">{% include "components/word.twig" with { 'word': turn.word } only %}</span>
+    <span class="label wrap-all {% if turn.is_ai_turn %}label-info{% else %}label-success{% endif %} turn-label">{% include "components/word.twig" with { 'word': turn.word } only %}</span>
 {% endspaceless %}

@@ -124,12 +124,14 @@ class Word extends LanguageElement
 
     public function associatedWordsFor(User $user) : WordCollection
     {
-        return $this
-            ->associations()
-            ->playableAgainst($user)
-            ->map(
-                fn (Association $a) => $a->otherWord($this)
-            );
+        return WordCollection::from(
+            $this
+                ->associations()
+                ->playableAgainst($user)
+                ->map(
+                    fn (Association $a) => $a->otherWord($this)
+                )
+        );
     }
 
     public function serialize() : array
@@ -171,7 +173,7 @@ class Word extends LanguageElement
     {
         $feedback = $this->feedbackByMe();
 
-        return (!is_null($feedback) && strlen($feedback->typo) > 0)
+        return ($feedback && strlen($feedback->typo) > 0)
             ? $feedback->typo
             : null;
     }

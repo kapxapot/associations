@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use Plasticode\Hydrators\Interfaces\HydratorInterface;
 use Plasticode\Models\DbModel;
+use Plasticode\ObjectProxy;
 
 class WordHydrator implements HydratorInterface
 {
@@ -66,7 +67,9 @@ class WordHydrator implements HydratorInterface
                 $this->turnRepository->getAllByWord($entity)
             )
             ->withMe(
-                $this->auth->getUser()
+                new ObjectProxy(
+                    fn () => $this->auth->getUser()
+                )
             )
             ->withCreator(
                 $this->userRepository->get($entity->createdBy)

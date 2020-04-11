@@ -8,6 +8,7 @@ use App\Models\User;
 interface GameRepositoryInterface
 {
     function get(?int $id) : ?Game;
+    function rehydrate(Game $game) : Game;
     function save(Game $game) : Game;
     function store(array $data) : Game;
     function getCurrentByUser(User $user) : ?Game;

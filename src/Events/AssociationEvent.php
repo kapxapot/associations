@@ -7,7 +7,7 @@ use Plasticode\Events\Event;
 
 abstract class AssociationEvent extends Event
 {
-    private Association $association;
+    protected Association $association;
 
     public function __construct(Association $association, Event $parent = null)
     {

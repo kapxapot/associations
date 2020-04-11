@@ -7,7 +7,7 @@ use Plasticode\Events\Event;
 
 abstract class TurnEvent extends Event
 {
-    private Turn $turn;
+    protected Turn $turn;
 
     public function __construct(Turn $turn, Event $parent = null)
     {

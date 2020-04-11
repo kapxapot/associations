@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Hydrators\Interfaces\HydratorInterface;
 use Plasticode\Models\DbModel;
+use Plasticode\ObjectProxy;
 
 class AssociationHydrator implements HydratorInterface
 {
@@ -69,7 +70,9 @@ class AssociationHydrator implements HydratorInterface
                 $this->turnRepository->getAllByAssociation($entity)
             )
             ->withMe(
-                $this->auth->getUser()
+                new ObjectProxy(
+                    fn () => $this->auth->getUser()
+                )
             )
             ->withCreator(
                 $this->userRepository->get($entity->createdBy)
