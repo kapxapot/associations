@@ -49,6 +49,9 @@ rights:
   games:
     template: public
 
+  languages:
+    template: admin_strict
+
   menus:
     template: admin_strict
 

@@ -36,6 +36,7 @@ word_min_length: 1
 word_max_length: 100
 
 admin_menu:
+  - languages
   - group:
       title: Сайт
       items:

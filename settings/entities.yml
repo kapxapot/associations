@@ -1,3 +1,30 @@
+languages:
+
+  name_gen: языка
+  name_accus: язык
+  title: Языки
+
+  columns:
+    id:
+      name: id
+      attributes: [ readonly ]
+
+    name:
+      name: Название
+
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [ readonly ]
+
+    created_by_name:
+      name: Автор
+      attributes: [ readonly ]
+
+    yandex_dict_code:
+      name: Код Яндекс.Словаря
+      attributes: [ nullable, hidden ]
+
 menus:
 
   name_gen: меню

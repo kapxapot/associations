@@ -1,15 +1,21 @@
+languages:
+  api: full
+  name_field: name
+  sort: name
+  has: [ created_at, created_by ]
+
 menus:
   api: full
   name_field: text
   sort: created_at
   reverse: true
-  has: [ updated_at ]
+  has: [ created_at, updated_at ]
 
 menu_items:
   api: full
   name_field: text
   sort: position
-  has: [ updated_at ]
+  has: [ created_at, updated_at ]
 
 roles:
   api: full
@@ -21,4 +27,4 @@ users:
   name_field: login
   sort: created_at
   reverse: true
-  has: [ updated_at ]
+  has: [ created_at, updated_at ]
