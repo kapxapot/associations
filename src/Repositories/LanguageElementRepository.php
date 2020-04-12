@@ -99,6 +99,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
             $this
                 ->filterNotMature($approvedQuery)
                 ->limit($limit)
+                ->orderByDesc('id')
         );
     }
 
