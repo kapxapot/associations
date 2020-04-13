@@ -6,6 +6,7 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Models\User;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Services\UserService;
+use Plasticode\External\Gravatar;
 use Plasticode\Hydrators\UserHydrator as BaseUserHydrator;
 use Plasticode\Models\DbModel;
 use Plasticode\Repositories\Interfaces\RoleRepositoryInterface;
@@ -19,10 +20,11 @@ class UserHydrator extends BaseUserHydrator
         GameRepositoryInterface $gameRepository,
         RoleRepositoryInterface $roleRepository,
         LinkerInterface $linker,
+        Gravatar $gravatar,
         UserService $userService
     )
     {
-        parent::__construct($roleRepository, $linker);
+        parent::__construct($roleRepository, $linker, $gravatar);
 
         $this->gameRepository = $gameRepository;
         $this->userService = $userService;

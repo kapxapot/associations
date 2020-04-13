@@ -134,6 +134,7 @@ class Bootstrap extends BootstrapBase
                         $c->gameRepository,
                         $c->roleRepository,
                         $c->linker,
+                        $c->gravatar,
                         $c->userService
                     )
                 )
