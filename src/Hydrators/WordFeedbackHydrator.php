@@ -5,10 +5,10 @@ namespace App\Hydrators;
 use App\Models\WordFeedback;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Hydrators\Interfaces\HydratorInterface;
+use Plasticode\Hydrators\Basic\Hydrator;
 use Plasticode\Models\DbModel;
 
-class WordFeedbackHydrator implements HydratorInterface
+class WordFeedbackHydrator extends Hydrator
 {
     private UserRepositoryInterface $userRepository;
     private WordRepositoryInterface $wordRepository;
@@ -29,13 +29,13 @@ class WordFeedbackHydrator implements HydratorInterface
     {
         return $entity
             ->withWord(
-                $this->wordRepository->get($entity->wordId)
+                fn () => $this->wordRepository->get($entity->wordId)
             )
             ->withDuplicate(
-                $this->wordRepository->get($entity->duplicateId)
+                fn () => $this->wordRepository->get($entity->duplicateId)
             )
             ->withCreator(
-                $this->userRepository->get($entity->createdBy)
+                fn () => $this->userRepository->get($entity->createdBy)
             );
     }
 }

@@ -5,24 +5,30 @@ namespace App\Models;
 use App\Collections\AssociationFeedbackCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
-use Plasticode\Models\Traits\WithUrl;
-use Webmozart\Assert\Assert;
 
 /**
  * @property int $firstWordId
  * @property int $secondWordId
+ * @method Word firstWord()
+ * @method Word secondWord()
+ * @method string url()
+ * @method self withFeedbacks(AssociationFeedbackCollection|callable $feedbacks)
+ * @method self withFirstWord(Word|callable $firstWord)
+ * @method self withSecondWord(Word|callable $secondWord)
+ * @method self withUrl(string|callable $url)
  */
 class Association extends LanguageElement
 {
-    use WithUrl;
-
-    protected ?Word $firstWord = null;
-    protected ?Word $secondWord = null;
-    protected ?AssociationFeedbackCollection $feedbacks = null;
-
-    private bool $firstWordInitialized = false;
-    private bool $secondWordInitialized = false;
-    private bool $feedbacksInitialized = false;
+    protected function requiredWiths(): array
+    {
+        return [
+            ...parent::requiredWiths(),
+            'feedbacks',
+            'firstWord',
+            'secondWord',
+            'url'
+        ];
+    }
 
     public function words() : WordCollection
     {
@@ -34,49 +40,9 @@ class Association extends LanguageElement
         );
     }
 
-    public function firstWord() : Word
-    {
-        Assert::true($this->firstWordInitialized);
-
-        return $this->firstWord;
-    }
-
-    public function withFirstWord(Word $firstWord) : self
-    {
-        $this->firstWord = $firstWord;
-        $this->firstWordInitialized = true;
-
-        return $this;
-    }
-
-    public function secondWord() : Word
-    {
-        Assert::true($this->secondWordInitialized);
-
-        return $this->secondWord;
-    }
-
-    public function withSecondWord(Word $secondWord) : self
-    {
-        $this->secondWord = $secondWord;
-        $this->secondWordInitialized = true;
-
-        return $this;
-    }
-
     public function feedbacks() : AssociationFeedbackCollection
     {
-        Assert::true($this->feedbacksInitialized);
-
-        return $this->feedbacks;
-    }
-
-    public function withFeedbacks(AssociationFeedbackCollection $feedbacks) : self
-    {
-        $this->feedbacks = $feedbacks;
-        $this->feedbacksInitialized = true;
-
-        return $this;
+        return $this->getWithProperty('feedbacks');
     }
 
     public function dislikes() : AssociationFeedbackCollection

@@ -6,50 +6,25 @@ use App\Collections\AssociationCollection;
 use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
 use Plasticode\Collection;
-use Plasticode\Models\Traits\WithUrl;
-use Webmozart\Assert\Assert;
 
 /**
  * @property string $word
+ * @method AssociationCollection associations()
+ * @method string url()
+ * @method self withAssociations(AssociationCollection|callable $associations)
+ * @method self withFeedbacks(WordFeedbackCollection|callable $feedbacks)
+ * @method self withUrl(string|callable $url)
  */
 class Word extends LanguageElement
 {
-    use WithUrl;
-
-    protected ?AssociationCollection $associations = null;
-    protected ?WordFeedbackCollection $feedbacks = null;
-
-    private bool $associationsInitialized = false;
-    private bool $feedbacksInitialized = false;
-
-    public function associations() : AssociationCollection
+    protected function requiredWiths(): array
     {
-        Assert::true($this->associationsInitialized);
-
-        return $this->associations;
-    }
-
-    public function withAssociations(AssociationCollection $associations) : self
-    {
-        $this->associations = $associations;
-        $this->associationsInitialized = true;
-
-        return $this;
+        return [...parent::requiredWiths(), 'associations', 'feedbacks', 'url'];
     }
 
     public function feedbacks() : WordFeedbackCollection
     {
-        Assert::true($this->feedbacksInitialized);
-
-        return $this->feedbacks;
-    }
-
-    public function withFeedbacks(WordFeedbackCollection $feedbacks) : self
-    {
-        $this->feedbacks = $feedbacks;
-        $this->feedbacksInitialized = true;
-
-        return $this;
+        return $this->getWithProperty('feedbacks');
     }
 
     public function dislikes() : WordFeedbackCollection

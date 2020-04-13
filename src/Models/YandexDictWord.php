@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use App\Models\Interfaces\DictWordInterface;
-use App\Models\Traits\WithLanguage;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
-use Webmozart\Assert\Assert;
 
 /**
  * @property string $word
@@ -15,28 +13,19 @@ use Webmozart\Assert\Assert;
  * @property integer $languageId
  * @property string|null $response
  * @property string|null $pos
+ * @method Language language()
+ * @method Word wordEntity()
+ * @method self withLanguage(Language|callable $language)
+ * @method self withWordEntity(Word|callable|null $wordEntity)
  */
 class YandexDictWord extends DbModel implements DictWordInterface
 {
-    use CreatedAt, UpdatedAt, WithLanguage;
+    use CreatedAt;
+    use UpdatedAt;
 
-    protected ?Word $wordEntity = null;
-
-    private bool $wordEntityInitialized = false;
-
-    public function wordEntity() : ?Word
+    protected function requiredWiths(): array
     {
-        Assert::true($this->wordEntityInitialized);
-
-        return $this->wordEntity;
-    }
-
-    public function withWordEntity(?Word $wordEntity) : self
-    {
-        $this->wordEntity = $wordEntity;
-        $this->wordEntityInitialized = true;
-
-        return $this;
+        return ['language', 'wordEntity'];
     }
 
     public function isValid() : bool

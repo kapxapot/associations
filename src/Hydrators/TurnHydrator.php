@@ -8,10 +8,10 @@ use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Hydrators\Interfaces\HydratorInterface;
+use Plasticode\Hydrators\Basic\Hydrator;
 use Plasticode\Models\DbModel;
 
-class TurnHydrator implements HydratorInterface
+class TurnHydrator extends Hydrator
 {
     private AssociationRepositoryInterface $associationRepository;
     private GameRepositoryInterface $gameRepository;
@@ -41,19 +41,19 @@ class TurnHydrator implements HydratorInterface
     {
         return $entity
             ->withGame(
-                $this->gameRepository->get($entity->gameId)
+                fn () => $this->gameRepository->get($entity->gameId)
             )
             ->withWord(
-                $this->wordRepository->get($entity->wordId)
+                fn () => $this->wordRepository->get($entity->wordId)
             )
             ->withUser(
-                $this->userRepository->get($entity->userId)
+                fn () => $this->userRepository->get($entity->userId)
             )
             ->withAssociation(
-                $this->associationRepository->get($entity->associationId)
+                fn () => $this->associationRepository->get($entity->associationId)
             )
             ->withPrev(
-                $this->turnRepository->get($entity->prevTurnId)
+                fn () => $this->turnRepository->get($entity->prevTurnId)
             );
     }
 }

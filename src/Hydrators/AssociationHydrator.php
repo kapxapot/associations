@@ -10,11 +10,10 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Hydrators\Interfaces\HydratorInterface;
+use Plasticode\Hydrators\Basic\Hydrator;
 use Plasticode\Models\DbModel;
-use Plasticode\ObjectProxy;
 
-class AssociationHydrator implements HydratorInterface
+class AssociationHydrator extends Hydrator
 {
     private AssociationFeedbackRepositoryInterface $associationFeedbackRepository;
     private LanguageRepositoryInterface $languageRepository;
@@ -52,30 +51,31 @@ class AssociationHydrator implements HydratorInterface
     {
         return $entity
             ->withFirstWord(
-                $this->wordRepository->get($entity->firstWordId)
+                fn () => $this->wordRepository->get($entity->firstWordId)
             )
             ->withSecondWord(
-                $this->wordRepository->get($entity->secondWordId)
+                fn () => $this->wordRepository->get($entity->secondWordId)
             )
             ->withFeedbacks(
-                $this->associationFeedbackRepository->getAllByAssociation($entity)
+                fn () =>
+                $this
+                    ->associationFeedbackRepository
+                    ->getAllByAssociation($entity)
             )
             ->withUrl(
-                $this->linker->association($entity)
+                fn () => $this->linker->association($entity)
             )
             ->withLanguage(
-                $this->languageRepository->get($entity->languageId)
+                fn () => $this->languageRepository->get($entity->languageId)
             )
             ->withTurns(
-                $this->turnRepository->getAllByAssociation($entity)
+                fn () => $this->turnRepository->getAllByAssociation($entity)
             )
             ->withMe(
-                new ObjectProxy(
-                    fn () => $this->auth->getUser()
-                )
+                fn () => $this->auth->getUser()
             )
             ->withCreator(
-                $this->userRepository->get($entity->createdBy)
+                fn () => $this->userRepository->get($entity->createdBy)
             );
     }
 }

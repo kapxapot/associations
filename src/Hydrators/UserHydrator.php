@@ -37,14 +37,14 @@ class UserHydrator extends BaseUserHydrator
         $entity = parent::hydrate($entity);
 
         return $entity
-            ->withMature(
-                $this->userService->isMature($entity)
+            ->withIsMature(
+                fn () => $this->userService->isMature($entity)
             )
             ->withCurrentGame(
-                $this->gameRepository->getCurrentByUser($entity)
+                fn () => $this->gameRepository->getCurrentByUser($entity)
             )
             ->withLastGame(
-                $this->gameRepository->getLastByUser($entity)
+                fn () => $this->gameRepository->getLastByUser($entity)
             );
     }
 }

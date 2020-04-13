@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use App\Models\Traits\WithUser;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
-use Webmozart\Assert\Assert;
 
 /**
  * @property integer $gameId
@@ -13,52 +11,24 @@ use Webmozart\Assert\Assert;
  * @property integer|null $userId
  * @property integer|null $associationId
  * @property integer|null $prevTurnId
+ * @method Association|null association()
+ * @method Game game()
+ * @method self|null prev()
+ * @method User|null user()
+ * @method Word word()
+ * @method self withAssociation(Association|callable|null $association)
+ * @method self withGame(Game|callable $game)
+ * @method self withPrev(Turn|callable|null $prev)
+ * @method self withUser(User|callable|null $user)
+ * @method self withWord(Word|callable $word)
  */
 class Turn extends DbModel
 {
     use CreatedAt;
-    use WithUser;
 
-    protected Game $game;
-    protected Word $word;
-    protected ?User $user = null;
-    protected ?Association $association = null;
-    protected ?self $prev = null;
-
-    private bool $gameInitialized = false;
-    private bool $wordInitialized = false;
-    private bool $userInitialized = false;
-    private bool $associationInitialized = false;
-    private bool $prevInitialized = false;
-
-    public function game() : Game
+    protected function requiredWiths(): array
     {
-        Assert::true($this->gameInitialized);
-
-        return $this->game;
-    }
-
-    public function withGame(Game $game) : self
-    {
-        $this->game = $game;
-        $this->gameInitialized = true;
-
-        return $this;
-    }
-
-    public function word() : Word
-    {
-        Assert::true($this->wordInitialized);
-
-        return $this->word;
-    }
-
-    public function withWord(Word $word) : self
-    {
-        $this->word = $word;
-        $this->wordInitialized = true;
-
-        return $this;
+        return ['association', 'game', 'prev', 'user', 'word'];
     }
 
     public function isBy(?User $user) : bool
@@ -66,21 +36,6 @@ class Turn extends DbModel
         return $this->user()
             ? $this->user()->equals($user)
             : is_null($user);
-    }
-
-    public function association() : ?Association
-    {
-        Assert::true($this->associationInitialized);
-
-        return $this->association;
-    }
-
-    public function withAssociation(?Association $association) : self
-    {
-        $this->association = $association;
-        $this->associationInitialized = true;
-
-        return $this;
     }
 
     public function isPlayerTurn() : bool
@@ -91,21 +46,6 @@ class Turn extends DbModel
     public function isAiTurn() : bool
     {
         return !$this->isPlayerTurn();
-    }
-
-    public function prev() : ?Turn
-    {
-        Assert::true($this->prevInitialized);
-
-        return $this->prev;
-    }
-
-    public function withPrev(?self $prev) : self
-    {
-        $this->prev = $prev;
-        $this->prevInitialized = true;
-
-        return $this;
     }
 
     public function isFinished() : bool

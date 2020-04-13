@@ -10,11 +10,10 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
-use Plasticode\Hydrators\Interfaces\HydratorInterface;
+use Plasticode\Hydrators\Basic\Hydrator;
 use Plasticode\Models\DbModel;
-use Plasticode\ObjectProxy;
 
-class WordHydrator implements HydratorInterface
+class WordHydrator extends Hydrator
 {
     private AssociationRepositoryInterface $associationRepository;
     private LanguageRepositoryInterface $languageRepository;
@@ -52,27 +51,25 @@ class WordHydrator implements HydratorInterface
     {
         return $entity
             ->withAssociations(
-                $this->associationRepository->getAllByWord($entity)
+                fn () => $this->associationRepository->getAllByWord($entity)
             )
             ->withFeedbacks(
-                $this->wordFeedbackRepository->getAllByWord($entity)
+                fn () => $this->wordFeedbackRepository->getAllByWord($entity)
             )
             ->withUrl(
-                $this->linker->word($entity)
+                fn () => $this->linker->word($entity)
             )
             ->withLanguage(
-                $this->languageRepository->get($entity->languageId)
+                fn () => $this->languageRepository->get($entity->languageId)
             )
             ->withTurns(
-                $this->turnRepository->getAllByWord($entity)
+                fn () => $this->turnRepository->getAllByWord($entity)
             )
             ->withMe(
-                new ObjectProxy(
-                    fn () => $this->auth->getUser()
-                )
+                fn () => $this->auth->getUser()
             )
             ->withCreator(
-                $this->userRepository->get($entity->createdBy)
+                fn () => $this->userRepository->get($entity->createdBy)
             );
     }
 }

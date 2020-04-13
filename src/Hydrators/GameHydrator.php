@@ -7,10 +7,10 @@ use App\Models\Game;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Plasticode\Hydrators\Interfaces\HydratorInterface;
+use Plasticode\Hydrators\Basic\Hydrator;
 use Plasticode\Models\DbModel;
 
-class GameHydrator implements HydratorInterface
+class GameHydrator extends Hydrator
 {
     private LanguageRepositoryInterface $languageRepository;
     private TurnRepositoryInterface $turnRepository;
@@ -39,16 +39,16 @@ class GameHydrator implements HydratorInterface
     {
         return $entity
             ->withTurns(
-                $this->turnRepository->getAllByGame($entity)
+                fn () => $this->turnRepository->getAllByGame($entity)
             )
             ->withLanguage(
-                $this->languageRepository->get($entity->languageId)
+                fn () => $this->languageRepository->get($entity->languageId)
             )
             ->withUser(
-                $this->userRepository->get($entity->userId)
+                fn () => $this->userRepository->get($entity->userId)
             )
             ->withUrl(
-                $this->linker->game($entity)
+                fn () => $this->linker->game($entity)
             );
     }
 }

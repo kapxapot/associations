@@ -4,71 +4,33 @@ namespace App\Models;
 
 use App\Collections\FeedbackCollection;
 use App\Collections\TurnCollection;
-use App\Models\Traits\WithLanguage;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\Created;
 use Plasticode\Models\Traits\UpdatedAt;
-use Plasticode\ObjectProxy;
-use Webmozart\Assert\Assert;
 
 /**
  * @property integer $approved
  * @property string|null $approvedUpdatedAt
  * @property integer $mature
  * @property string|null $matureUpdatedAt
+ * @method Language language()
+ * @method User|null me()
+ * @method TurnCollection turns()
+ * @method self withLanguage(Language|callable $language)
+ * @method self withMe(User|callable|null $me)
+ * @method self withTurns(TurnCollection|callable $turns)
  */
 abstract class LanguageElement extends DbModel
 {
-    use Created, UpdatedAt, WithLanguage;
+    use Created;
+    use UpdatedAt;
 
-    protected ?TurnCollection $turns = null;
-
-    /**
-     * Current user
-     * 
-     * @var User|ObjectProxy|null
-     */
-    protected $me = null;
-
-    private bool $turnsInitialized = false;
-    private bool $meInitialized = false;
-
-    public function turns() : TurnCollection
+    protected function requiredWiths(): array
     {
-        Assert::true($this->turnsInitialized);
-
-        return $this->turns;
-    }
-
-    public function withTurns(TurnCollection $turns) : self
-    {
-        $this->turns = $turns;
-        $this->turnsInitialized = true;
-
-        return $this;
+        return ['creator', 'language', 'me', 'turns'];
     }
 
     abstract public function feedbacks() : FeedbackCollection;
-
-    public function me() : ?User
-    {
-        Assert::true($this->meInitialized);
-
-        return $this->me instanceof ObjectProxy
-            ? ($this->me)()
-            : $this->me;
-    }
-
-    /**
-     * @param User|ObjectProxy|null $me
-     */
-    public function withMe($me) : self
-    {
-        $this->me = $me;
-        $this->meInitialized = true;
-
-        return $this;
-    }
 
     abstract public function dislikes() : FeedbackCollection;
 

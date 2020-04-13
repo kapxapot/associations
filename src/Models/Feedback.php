@@ -12,7 +12,13 @@ use Plasticode\Models\Traits\UpdatedAt;
  */
 abstract class Feedback extends DbModel
 {
-    use Created, UpdatedAt;
+    use Created;
+    use UpdatedAt;
+
+    protected function requiredWiths(): array
+    {
+        return ['creator'];
+    }
 
     public function isDisliked() : bool
     {

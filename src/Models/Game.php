@@ -5,44 +5,30 @@ namespace App\Models;
 use App\Collections\TurnCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
-use App\Models\Traits\WithLanguage;
-use App\Models\Traits\WithUser;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
-use Plasticode\Models\Traits\WithUrl;
 use Plasticode\Util\Date;
-use Webmozart\Assert\Assert;
 
 /**
+ * @property integer $languageId
+ * @property integer $userId
  * @property string|null $finishedAt
+ * @method Language language()
+ * @method TurnCollection turns()
+ * @method string url()
+ * @method User user()
+ * @method self withLanguage(Language|callable $language)
+ * @method self withTurns(TurnCollection|callable $turns)
+ * @method self withUrl(string|callable $url)
+ * @method self withUser(User|callable $user)
  */
 class Game extends DbModel
 {
     use CreatedAt;
-    use WithLanguage;
-    use WithUrl;
-    use WithUser;
 
-    protected TurnCollection $turns;
-
-    private bool $turnsInitialized = false;
-
-    /**
-     * Sorted backwards.
-     */
-    public function turns() : TurnCollection
+    protected function requiredWiths(): array
     {
-        Assert::true($this->turnsInitialized);
-
-        return $this->turns;
-    }
-
-    public function withTurns(TurnCollection $turns) : self
-    {
-        $this->turns = $turns;
-        $this->turnsInitialized = true;
-
-        return $this;
+        return ['language', 'turns', 'url', 'user'];
     }
 
     public function lastTurn() : ?Turn

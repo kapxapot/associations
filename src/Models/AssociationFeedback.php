@@ -2,29 +2,15 @@
 
 namespace App\Models;
 
-use Webmozart\Assert\Assert;
-
 /**
  * @property integer $associationId
+ * @method Association association()
+ * @method self withAssociation(Association|callable $association)
  */
 class AssociationFeedback extends Feedback
 {
-    protected ?Association $association = null;
-
-    private bool $associationInitialized = false;
-
-    public function association() : Association
+    protected function requiredWiths(): array
     {
-        Assert::true($this->associationInitialized);
-
-        return $this->association;
-    }
-
-    public function withAssociation(Association $association) : self
-    {
-        $this->association = $association;
-        $this->associationInitialized = true;
-
-        return $this;
+        return [...parent::requiredWiths(), 'association'];
     }
 }

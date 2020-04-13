@@ -46,7 +46,7 @@
                     data: 'word',
                     render: function (data, type, row) {
                         if (type === 'display' || type === 'filter') {
-                            return '<a href="' + row.url + '">' + data + '</a>';
+                            return '<a class="ellipsis w-200" href="' + row.url + '">' + data + '</a>';
                         }
                  
                         return data;

@@ -5,10 +5,10 @@ namespace App\Hydrators;
 use App\Models\AssociationFeedback;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Plasticode\Hydrators\Interfaces\HydratorInterface;
+use Plasticode\Hydrators\Basic\Hydrator;
 use Plasticode\Models\DbModel;
 
-class AssociationFeedbackHydrator implements HydratorInterface
+class AssociationFeedbackHydrator extends Hydrator
 {
     protected AssociationRepositoryInterface $associationRepository;
     protected UserRepositoryInterface $userRepository;
@@ -29,10 +29,10 @@ class AssociationFeedbackHydrator implements HydratorInterface
     {
         return $entity
             ->withAssociation(
-                $this->associationRepository->get($entity->associationId)
+                fn () => $this->associationRepository->get($entity->associationId)
             )
             ->withCreator(
-                $this->userRepository->get($entity->createdBy)
+                fn () => $this->userRepository->get($entity->createdBy)
             );
     }
 }

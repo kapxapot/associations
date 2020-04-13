@@ -5,10 +5,10 @@ namespace App\Hydrators;
 use App\Models\YandexDictWord;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Hydrators\Interfaces\HydratorInterface;
+use Plasticode\Hydrators\Basic\Hydrator;
 use Plasticode\Models\DbModel;
 
-class YandexDictWordHydrator implements HydratorInterface
+class YandexDictWordHydrator extends Hydrator
 {
     private LanguageRepositoryInterface $languageRepository;
     private WordRepositoryInterface $wordRepository;
@@ -29,10 +29,10 @@ class YandexDictWordHydrator implements HydratorInterface
     {
         return $entity
             ->withWordEntity(
-                $this->wordRepository->get($entity->wordId)
+                fn () => $this->wordRepository->get($entity->wordId)
             )
             ->withLanguage(
-                $this->languageRepository->get($entity->languageId)
+                fn () => $this->languageRepository->get($entity->languageId)
             );
     }
 }
