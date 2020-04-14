@@ -12,15 +12,9 @@
         }
     ],
     "require": {
-        "kapxapot/plasticode": "dev-master",
+        "kapxapot/plasticode": "^0.6",
         "robmorgan/phinx": "^0.10.7"
     },
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/kapxapot/plasticode"
-        }
-    ],
     "require-dev": {
         "phpunit/phpunit": "^8"
     },
