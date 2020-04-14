@@ -16,25 +16,25 @@ class AnniversaryService
         if ($num < 1000) {
             return false;
         }
-        
+
         while ($num >= 100) {
             $num = intdiv($num, 10);
         }
-        
+
         $rem = $num % 10;
-        
+
         return $rem < 2;
     }
 
     public function toAnniversaryNumber(int $num) : int
     {
         $mult = 1;
-        
+
         while ($num >= 10) {
             $num = intdiv($num, 10);
             $mult *= 10;
         }
-        
+
         return $num * $mult;
     }
 }
