@@ -20,11 +20,6 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
         return $this->getEntity($id);
     }
 
-    public function rehydrate(Game $game) : Game
-    {
-        return $this->rehydrateEntity($game);
-    }
-
     public function save(Game $game) : Game
     {
         return $this->saveEntity($game);

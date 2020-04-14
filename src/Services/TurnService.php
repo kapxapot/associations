@@ -105,13 +105,7 @@ class TurnService
             $turn->associationId = $association->getId();
         }
 
-        $turn = $this->turnRepository->save($turn);
-
-        // game is out of date after new turn creation
-        // and requires an update
-        $this->gameRepository->rehydrate($game);
-
-        return $turn;
+        return $this->turnRepository->save($turn);
     }
 
     public function processAiTurn(Turn $turn) : void
