@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Jobs\UpdateAssociationsJob;
 use App\Jobs\UpdateWordsJob;
+use Plasticode\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 use Psr\Container\ContainerInterface;
@@ -38,13 +39,12 @@ class JobController extends Controller
 
         $end = microtime(true);
 
-        $this->logger->info(
-            'Updated associations.',
-            [
-                'time' => $end - $start,
-                'ids' => $job->run()->ids(),
-            ]
-        );
+        $result = $job->run();
+        $msg = 'Updated associations: ' . $result->count();
+
+        $this->logCollectionResult($result, $msg, $start, $end);
+
+        return $msg;
     }
 
     public function updateWords(
@@ -62,11 +62,26 @@ class JobController extends Controller
 
         $end = microtime(true);
 
+        $result = $job->run();
+        $msg = 'Updated words: ' . $result->count();
+
+        $this->logCollectionResult($result, $msg, $start, $end);
+
+        return $msg;
+    }
+
+    private function logCollectionResult(
+        Collection $result,
+        string $msg,
+        $start,
+        $end
+    ) : void
+    {
         $this->logger->info(
-            'Updated words.',
+            $msg,
             [
                 'time' => $end - $start,
-                'ids' => $job->run()->ids(),
+                'ids' => $result->ids()->toArray(),
             ]
         );
     }

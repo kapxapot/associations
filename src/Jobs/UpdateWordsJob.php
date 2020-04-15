@@ -3,7 +3,6 @@
 namespace App\Jobs;
 
 use App\Events\WordOutOfDateEvent;
-use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
@@ -35,7 +34,7 @@ class UpdateWordsJob
 
         $limit = $this->settingsProvider
             ->get('words.update.limit');
-        
+
         $outOfDate = $this
             ->wordRepository
             ->getAllOutOfDate($ttl, $limit);
