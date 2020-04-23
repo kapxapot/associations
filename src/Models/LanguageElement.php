@@ -16,9 +16,9 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @method Language language()
  * @method User|null me()
  * @method TurnCollection turns()
- * @method self withLanguage(Language|callable $language)
- * @method self withMe(User|callable|null $me)
- * @method self withTurns(TurnCollection|callable $turns)
+ * @method static withLanguage(Language|callable $language)
+ * @method static withMe(User|callable|null $me)
+ * @method static withTurns(TurnCollection|callable $turns)
  */
 abstract class LanguageElement extends DbModel
 {

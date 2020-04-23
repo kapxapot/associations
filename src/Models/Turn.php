@@ -13,12 +13,12 @@ use Plasticode\Models\Traits\CreatedAt;
  * @property integer|null $prevTurnId
  * @method Association|null association()
  * @method Game game()
- * @method self|null prev()
+ * @method static|null prev()
  * @method User|null user()
  * @method Word word()
  * @method self withAssociation(Association|callable|null $association)
  * @method self withGame(Game|callable $game)
- * @method self withPrev(Turn|callable|null $prev)
+ * @method self withPrev(static|callable|null $prev)
  * @method self withUser(User|callable|null $user)
  * @method self withWord(Word|callable $word)
  */
