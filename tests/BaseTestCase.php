@@ -12,10 +12,11 @@ use Plasticode\Core\Settings;
 use Plasticode\Middleware\CookieAuthMiddleware;
 use Plasticode\Middleware\SlashMiddleware;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Slim\App as SlimApp;
 use Slim\Http\Environment;
-use Slim\Http\Request;
-use Slim\Http\Response;
+use Slim\Http\Request as SlimRequest;
+use Slim\Http\Response as SlimResponse;
 
 abstract class BaseTestCase extends TestCase
 {
@@ -53,7 +54,7 @@ abstract class BaseTestCase extends TestCase
      *
      * @param array             $headers
      *
-     * @return \Psr\Http\Message\ResponseInterface|\Slim\Http\Response
+     * @return ResponseInterface|SlimResponse
      */
     public function runApp($requestMethod, $requestUri, $requestData = null, $headers = [])
     {
@@ -71,7 +72,7 @@ abstract class BaseTestCase extends TestCase
         );
 
         // Set up a request object based on the environment
-        $request = Request::createFromEnvironment($environment);
+        $request = SlimRequest::createFromEnvironment($environment);
 
         // Add request data, if it exists
         if (isset($requestData)) {
@@ -79,7 +80,7 @@ abstract class BaseTestCase extends TestCase
         }
 
         // Set up a response object
-        $response = new Response();
+        $response = new SlimResponse();
 
         // Process the application and Return the response
         return $this->app->process($request, $response);
@@ -93,7 +94,7 @@ abstract class BaseTestCase extends TestCase
      * @param null  $requestData
      * @param array $headers
      *
-     * @return \Psr\Http\Message\ResponseInterface|\Slim\Http\Response
+     * @return ResponseInterface|SlimResponse
      */
     public function request($requestMethod, $requestUri, $requestData = null, $headers = [])
     {
