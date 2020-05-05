@@ -21,9 +21,9 @@ final class WordFeedbackTest extends BaseTestCase
         $this->assertInstanceOf(WordFeedback::class, $model);
         $this->assertInstanceOf(Word::class, $model->word());
 
-        $duplicateId = is_null($model->duplicate())
-            ? null
-            : $model->duplicate()->getId();
+        $duplicateId = $model->duplicate()
+            ? $model->duplicate()->getId()
+            : null;
 
         $this->assertEquals(
             $expected,

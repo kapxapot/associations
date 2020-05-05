@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Jobs\UpdateAssociationsJob;
 use App\Jobs\UpdateWordsJob;
-use Plasticode\Collection;
+use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 use Psr\Container\ContainerInterface;

@@ -16,11 +16,11 @@
                 <h1>{{ word_upper }}</h1>
             </header>
         </div>
-        
+
         {{ m.breadcrumbs(_context, [
             { 'url': path_for('main.words'), 'text': 'Слова' }
         ], word_upper) }}
-        
+
         <div class="panel-body">
             <p>
                 <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
@@ -111,7 +111,7 @@
                         {% set duplicate = dup_items[0].duplicate %}
                         <li>
                             {{ lm.word(duplicate) }}
-                            
+
                             {% for dup_item in dup_items %}
                                 {{ lm.user(dup_item.creator) }}
                             {% endfor %}

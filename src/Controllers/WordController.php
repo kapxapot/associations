@@ -63,7 +63,7 @@ class WordController extends Controller
             ['params' => $request->getQueryParams()]
         );
     }
-    
+
     public function get(
         SlimRequest $request,
         ResponseInterface $response,

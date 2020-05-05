@@ -5,7 +5,9 @@ namespace App\Models;
 use App\Collections\FeedbackCollection;
 use App\Collections\TurnCollection;
 use Plasticode\Models\DbModel;
+use Plasticode\Models\Interfaces\LinkableInterface;
 use Plasticode\Models\Traits\Created;
+use Plasticode\Models\Traits\Linkable;
 use Plasticode\Models\Traits\UpdatedAt;
 
 /**
@@ -20,17 +22,32 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @method static withMe(User|callable|null $me)
  * @method static withTurns(TurnCollection|callable $turns)
  */
-abstract class LanguageElement extends DbModel
+abstract class LanguageElement extends DbModel implements LinkableInterface
 {
     use Created;
+    use Linkable;
     use UpdatedAt;
+
+    protected string $feedbacksPropertyName = 'feedbacks';
 
     protected function requiredWiths(): array
     {
-        return ['creator', 'language', 'me', 'turns'];
+        return [
+            $this->creatorPropertyName,
+            $this->feedbacksPropertyName,
+            $this->urlPropertyName,
+            'language',
+            'me',
+            'turns',
+        ];
     }
 
-    abstract public function feedbacks() : FeedbackCollection;
+    public function feedbacks() : FeedbackCollection
+    {
+        return $this->getWithProperty(
+            $this->feedbacksPropertyName
+        );
+    }
 
     abstract public function dislikes() : FeedbackCollection;
 

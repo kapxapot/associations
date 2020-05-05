@@ -4,12 +4,15 @@ namespace App\Collections;
 
 use App\Models\LanguageElement;
 use App\Models\User;
-use Plasticode\TypedCollection;
+use Plasticode\Collections\Basic\DbModelCollection;
 
-class LanguageElementCollection extends TypedCollection
+class LanguageElementCollection extends DbModelCollection
 {
     protected string $class = LanguageElement::class;
 
+    /**
+     * @return static
+     */
     public function approved() : self
     {
         return $this->where(
@@ -17,6 +20,9 @@ class LanguageElementCollection extends TypedCollection
         );
     }
 
+    /**
+     * @return static
+     */
     public function notApproved() : self
     {
         return $this->where(
@@ -24,6 +30,9 @@ class LanguageElementCollection extends TypedCollection
         );
     }
 
+    /**
+     * @return static
+     */
     public function mature() : self
     {
         return $this->where(
@@ -31,6 +40,9 @@ class LanguageElementCollection extends TypedCollection
         );
     }
 
+    /**
+     * @return static
+     */
     public function notMature() : self
     {
         return $this->where(
@@ -38,6 +50,9 @@ class LanguageElementCollection extends TypedCollection
         );
     }
 
+    /**
+     * @return static
+     */
     public function visibleFor(?User $user) : self
     {
         return $this->where(
@@ -45,6 +60,9 @@ class LanguageElementCollection extends TypedCollection
         );
     }
 
+    /**
+     * @return static
+     */
     public function invisibleFor(?User $user) : self
     {
         return $this->where(

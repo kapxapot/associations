@@ -73,7 +73,7 @@ class WordService
         return $word;
     }
 
-    public function normalize($word) : string
+    public function normalize(string $word) : string
     {
         return Strings::normalize($word);
     }
@@ -167,14 +167,15 @@ class WordService
         Language $language = null
     ) : WordCollection
     {
-        return WordCollection::from(
-            $this
-                ->turnRepository
-                ->getAllByUser($user, $language)
-                ->map(
-                    fn (Turn $t) => $t->word()
-                )
-                ->distinct()
-        );
+        return
+            WordCollection::from(
+                $this
+                    ->turnRepository
+                    ->getAllByUser($user, $language)
+                    ->map(
+                        fn (Turn $t) => $t->word()
+                    )
+            )
+            ->distinct();
     }
 }

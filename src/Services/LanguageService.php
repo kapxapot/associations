@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Collection;
+use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Webmozart\Assert\Assert;
 
@@ -17,6 +17,7 @@ class LanguageService
     private WordRepositoryInterface $wordRepository;
 
     private SettingsProviderInterface $settingsProvider;
+
     private WordService $wordService;
 
     public function __construct(
@@ -30,6 +31,7 @@ class LanguageService
         $this->wordRepository = $wordRepository;
 
         $this->settingsProvider = $settingsProvider;
+
         $this->wordService = $wordService;
     }
 
@@ -59,7 +61,7 @@ class LanguageService
 
         // get user's words
         $userWords = $this->wordService->getAllUsedBy($user, $language);
-        
+
         // union them & distinct
         $words = $approvedWords
             ->concat($userWords)
@@ -71,14 +73,13 @@ class LanguageService
         if ($exclude && $exclude->any()) {
             $words = $words->whereNotIn('id', $exclude->ids());
         }
-        
+
         return $words->random();
     }
 
     public function normalizeWord(Language $language, string $word) : string
     {
-        $word = $this->wordService->normalize($word);
-        
-        return $word;
+        // language is ignored currently
+        return $this->wordService->normalize($word);
     }
 }

@@ -17,7 +17,9 @@ abstract class Feedback extends DbModel
 
     protected function requiredWiths(): array
     {
-        return ['creator'];
+        return [
+            $this->creatorPropertyName,
+        ];
     }
 
     public function isDisliked() : bool

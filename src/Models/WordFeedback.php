@@ -3,19 +3,24 @@
 namespace App\Models;
 
 /**
- * @property integer $wordId
- * @property string|null $typo
  * @property integer|null $duplicateId
- * @method Word|null duplicate()
+ * @property string|null $typo
+ * @property integer $wordId
  * @method Word word()
- * @method self withDuplicate(Word|callable|null $duplicate)
- * @method self withWord(Word|callable $word)
+ * @method static withDuplicate(Word|callable|null $duplicate)
+ * @method static withWord(Word|callable $word)
  */
 class WordFeedback extends Feedback
 {
+    private string $duplicatePropertyName = 'duplicate';
+
     protected function requiredWiths(): array
     {
-        return [...parent::requiredWiths(), 'duplicate', 'word'];
+        return [
+            ...parent::requiredWiths(),
+            $this->duplicatePropertyName,
+            'word',
+        ];
     }
 
     public function hasTypo() : bool
@@ -25,6 +30,13 @@ class WordFeedback extends Feedback
 
     public function hasDuplicate() : bool
     {
-        return $this->duplicate() !== null;
+        return $this->duplicateId > 0;
+    }
+
+    public function duplicate() : ?Word
+    {
+        return $this->getWithProperty(
+            $this->duplicatePropertyName
+        );
     }
 }

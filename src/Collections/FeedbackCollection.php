@@ -4,9 +4,9 @@ namespace App\Collections;
 
 use App\Models\Feedback;
 use App\Models\User;
-use Plasticode\TypedCollection;
+use Plasticode\Collections\Basic\DbModelCollection;
 
-class FeedbackCollection extends TypedCollection
+class FeedbackCollection extends DbModelCollection
 {
     protected string $class = Feedback::class;
 

@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Events\WordOutOfDateEvent;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Collection;
+use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 

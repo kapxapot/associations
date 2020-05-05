@@ -74,7 +74,7 @@ class WordFeedbackService
                 $duplicate
             );
 
-        $model->duplicateId = ($duplicateWord !== null)
+        $model->duplicateId = $duplicateWord
             ? $duplicateWord->getId()
             : null;
 

@@ -11,11 +11,9 @@ use App\Collections\WordCollection;
  * @property int $secondWordId
  * @method Word firstWord()
  * @method Word secondWord()
- * @method string url()
- * @method self withFeedbacks(AssociationFeedbackCollection|callable $feedbacks)
- * @method self withFirstWord(Word|callable $firstWord)
- * @method self withSecondWord(Word|callable $secondWord)
- * @method self withUrl(string|callable $url)
+ * @method static withFeedbacks(AssociationFeedbackCollection|callable $feedbacks)
+ * @method static withFirstWord(Word|callable $firstWord)
+ * @method static withSecondWord(Word|callable $secondWord)
  */
 class Association extends LanguageElement
 {
@@ -23,10 +21,8 @@ class Association extends LanguageElement
     {
         return [
             ...parent::requiredWiths(),
-            'feedbacks',
             'firstWord',
             'secondWord',
-            'url'
         ];
     }
 
@@ -42,7 +38,9 @@ class Association extends LanguageElement
 
     public function feedbacks() : AssociationFeedbackCollection
     {
-        return $this->getWithProperty('feedbacks');
+        return AssociationFeedbackCollection::from(
+            parent::feedbacks()
+        );
     }
 
     public function dislikes() : AssociationFeedbackCollection
@@ -72,7 +70,7 @@ class Association extends LanguageElement
      */
     public function otherWord(Word $word) : Word
     {
-        return $this->firstWord()->getId() === $word->getId()
+        return $this->firstWord()->equals($word)
             ? $this->secondWord()
             : $this->firstWord();
     }

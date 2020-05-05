@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Collections\WordCollection;
 use App\Events\WordFeedbackEvent;
 use App\Models\Association;
 use App\Models\Word;
@@ -92,20 +93,22 @@ class TestController extends Controller
                 fn (Word $w) => $w->isApproved()
             )
             ->count();
-        
-        $approvedByAssoc = $this
-            ->associationRepository
-            ->getAllApproved($language)
-            ->map(
-                fn (Association $assoc) => $assoc->words()
+
+        $approvedByAssoc =
+            WordCollection::from(
+                $this
+                    ->associationRepository
+                    ->getAllApproved($language)
+                    ->flatMap(
+                        fn (Association $assoc) => $assoc->words()
+                    )
             )
-            ->flatten()
             ->distinct();
-        
+
         $approvedByAssocCount = $approvedByAssoc->count();
-        
+
         var_dump($wordsCount, $approvedCount, $approvedByAssocCount);
-        
+
         return $approvedByAssoc->extract('word');
     }
 }

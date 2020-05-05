@@ -5,26 +5,28 @@ namespace App\Models;
 use App\Collections\AssociationCollection;
 use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
-use Plasticode\Collection;
 
 /**
  * @property string $word
  * @method AssociationCollection associations()
- * @method string url()
  * @method self withAssociations(AssociationCollection|callable $associations)
  * @method self withFeedbacks(WordFeedbackCollection|callable $feedbacks)
- * @method self withUrl(string|callable $url)
  */
 class Word extends LanguageElement
 {
     protected function requiredWiths(): array
     {
-        return [...parent::requiredWiths(), 'associations', 'feedbacks', 'url'];
+        return [
+            ...parent::requiredWiths(),
+            'associations',
+        ];
     }
 
     public function feedbacks() : WordFeedbackCollection
     {
-        return $this->getWithProperty('feedbacks');
+        return WordFeedbackCollection::from(
+            parent::feedbacks()
+        );
     }
 
     public function dislikes() : WordFeedbackCollection
@@ -90,7 +92,7 @@ class Word extends LanguageElement
             ->visibleFor($this->me());
     }
 
-    public function notApprovedInvisibleAssociations() : Collection
+    public function notApprovedInvisibleAssociations() : AssociationCollection
     {
         return $this
             ->notApprovedAssociations()
@@ -130,7 +132,7 @@ class Word extends LanguageElement
                 fn (WordFeedback $f) => $f->typo
             );
     }
-    
+
     public function proposedDuplicates() : array
     {
         return $this

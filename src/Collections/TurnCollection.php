@@ -4,10 +4,10 @@ namespace App\Collections;
 
 use App\Models\Turn;
 use App\Models\User;
-use Plasticode\TypedCollection;
+use Plasticode\Collections\Basic\DbModelCollection;
 use Plasticode\Util\Sort;
 
-class TurnCollection extends TypedCollection
+class TurnCollection extends DbModelCollection
 {
     protected string $class = Turn::class;
 
@@ -20,25 +20,26 @@ class TurnCollection extends TypedCollection
 
     public function users() : UserCollection
     {
-        return UserCollection::from(
-            $this
-                ->map(
-                    fn (Turn $t) => $t->user()
-                )
-                ->clean()
-                ->distinct()
-        );
+        return
+            UserCollection::from(
+                $this
+                    ->map(
+                        fn (Turn $t) => $t->user()
+                    )
+                    ->clean()
+            )
+            ->distinct();
     }
 
     public function words() : WordCollection
     {
-        return WordCollection::from(
-            $this
-                ->map(
+        return
+            WordCollection::from(
+                $this->map(
                     fn (Turn $t) => $t->word()
                 )
-                ->distinct()
-        );
+            )
+            ->distinct();
     }
 
     /**
