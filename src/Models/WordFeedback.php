@@ -33,6 +33,13 @@ class WordFeedback extends Feedback
         return $this->duplicateId > 0;
     }
 
+    /**
+     * For unknown reason Twig can't read 'duplicate' fake method
+     * (while having no problems with 'duplicat' or 'duplicatee').
+     * 
+     * The reason for that behavior is not found, so this explicit
+     * function declaration is a temporary (or a permanent) solution.
+     */
     public function duplicate() : ?Word
     {
         return $this->getWithProperty(
