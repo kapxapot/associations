@@ -17,7 +17,12 @@ class User extends UserBase
 {
     protected function requiredWiths(): array
     {
-        return [...parent::requiredWiths(), 'currentGame', 'isMature', 'lastGame'];
+        return [
+            ...parent::requiredWiths(),
+            'currentGame',
+            'isMature',
+            'lastGame',
+        ];
     }
 
     public function serialize() : array

@@ -2,11 +2,10 @@
 
 namespace App\Models;
 
+use App\Models\Traits\Created;
 use Plasticode\Models\DbModel;
-use Plasticode\Models\Traits\Created;
 
 /**
- * @property int $id
  * @property string $name
  * @property string|null $yandexDictWord
  */
