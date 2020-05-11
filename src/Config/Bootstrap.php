@@ -187,7 +187,8 @@ class Bootstrap extends BootstrapBase
         $map['linker'] = fn (CI $c) =>
             new Linker(
                 $c->settingsProvider,
-                $c->router
+                $c->router,
+                $c->tagsConfig
             );
 
         $map['config'] = fn (CI $c) =>
