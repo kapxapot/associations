@@ -3,9 +3,9 @@
 namespace App\Collections;
 
 use App\Models\User;
-use Plasticode\Collections\Basic\DbModelCollection;
+use Plasticode\Collections\UserCollection as BaseUserCollection;
 
-class UserCollection extends DbModelCollection
+class UserCollection extends BaseUserCollection
 {
     protected string $class = User::class;
 }

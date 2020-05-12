@@ -60,7 +60,7 @@ class GameController extends Controller
             return ($this->notFoundHandler)($request, $response);
         }
 
-        $canSeeAllGames = $this->access->checkRights('games', 'edit', $user);
+        $canSeeAllGames = $this->access->checkActionRights('games', 'edit', $user);
         $isPlayer = $game->hasPlayer($user);
 
         if (!$canSeeAllGames && !$isPlayer) {
@@ -77,10 +77,10 @@ class GameController extends Controller
                 ],
             ]
         );
-        
+
         return $this->render($response, 'main/games/item.twig', $params);
     }
-    
+
     public function start(
         SlimRequest $request,
         ResponseInterface $response
