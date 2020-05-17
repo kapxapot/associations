@@ -7,7 +7,6 @@ use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Webmozart\Assert\Assert;
 
@@ -52,8 +51,7 @@ class LanguageService
 
     public function getRandomWordFor(
         User $user,
-        ?Language $language = null,
-        ?Collection $exclude = null
+        ?Language $language = null
     ) : ?Word
     {
         // get common words
@@ -69,10 +67,6 @@ class LanguageService
             ->where(
                 fn (Word $w) => $w->isPlayableAgainst($user)
             );
-
-        if ($exclude && $exclude->any()) {
-            $words = $words->whereNotIn('id', $exclude->ids());
-        }
 
         return $words->random();
     }

@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Collections\WordCollection;
 use App\Events\WordOutOfDateEvent;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
@@ -27,7 +27,7 @@ class UpdateWordsJob
         $this->dispatcher = $dispatcher;
     }
 
-    public function run() : Collection
+    public function run() : WordCollection
     {
         $ttl = $this->settingsProvider
             ->get('words.update.ttl_min');

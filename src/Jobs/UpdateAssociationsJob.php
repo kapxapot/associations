@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
+use App\Collections\AssociationCollection;
 use App\Events\AssociationOutOfDateEvent;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
-use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
@@ -27,14 +27,14 @@ class UpdateAssociationsJob
         $this->dispatcher = $dispatcher;
     }
 
-    public function run() : Collection
+    public function run() : AssociationCollection
     {
         $ttl = $this->settingsProvider
             ->get('associations.update.ttl_min');
 
         $limit = $this->settingsProvider
             ->get('associations.update.limit');
-        
+
         $outOfDate = $this
             ->associationRepository
             ->getAllOutOfDate($ttl, $limit);

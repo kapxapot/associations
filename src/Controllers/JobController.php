@@ -4,7 +4,7 @@ namespace App\Controllers;
 
 use App\Jobs\UpdateAssociationsJob;
 use App\Jobs\UpdateWordsJob;
-use Plasticode\Collections\Basic\Collection;
+use Plasticode\Collections\Basic\DbModelCollection;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 use Psr\Container\ContainerInterface;
@@ -71,7 +71,7 @@ class JobController extends Controller
     }
 
     private function logCollectionResult(
-        Collection $result,
+        DbModelCollection $result,
         string $msg,
         $start,
         $end
