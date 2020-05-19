@@ -62,3 +62,10 @@ a.assoc-arrow {
     border-radius: 5px;
     transform: rotate(-10deg);
 }
+
+/* tooltip */
+
+.tooltip-inner {
+    max-width: 300px;
+    word-break: break-word;
+}
