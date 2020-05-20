@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Config\Interfaces\WordConfigInterface;
 use App\Events\AssociationApprovedEvent;
 use App\Events\WordApprovedEvent;
 use App\Events\WordFeedbackEvent;
@@ -10,6 +9,7 @@ use App\Events\WordMatureEvent;
 use App\Events\WordOutOfDateEvent;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Specifications\WordSpecification;
 use Plasticode\Events\EventProcessor;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
@@ -17,15 +17,15 @@ use Plasticode\Util\Date;
 class WordRecountService extends EventProcessor
 {
     private WordRepositoryInterface $wordRepository;
-    private WordConfigInterface $config;
+    private WordSpecification $wordSpecification;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
-        WordConfigInterface $config
+        WordSpecification $wordSpecification
     )
     {
         $this->wordRepository = $wordRepository;
-        $this->config = $config;
+        $this->wordSpecification = $wordSpecification;
     }
 
     /**
@@ -81,16 +81,7 @@ class WordRecountService extends EventProcessor
 
     private function recountApproved(Word $word) : Word
     {
-        $assocCoeff = $this->config->wordApprovedAssociationCoeff();
-        $dislikeCoeff = $this->config->wordDislikeCoeff();
-        $threshold = $this->config->wordApprovalThreshold();
-
-        $approvedAssocs = $word->approvedAssociations()->count();
-        $dislikes = $word->dislikes()->count();
-
-        $score = $approvedAssocs * $assocCoeff - $dislikes * $dislikeCoeff;
-
-        $approved = ($score >= $threshold);
+        $approved = $this->wordSpecification->isApproved($word);
 
         $now = Date::dbNow();
 
@@ -109,10 +100,7 @@ class WordRecountService extends EventProcessor
 
     private function recountMature(Word $word) : Word
     {
-        $threshold = $this->config->wordMatureThreshold();
-
-        $score = $word->matures()->count();
-        $mature = ($score >= $threshold);
+        $mature = $this->wordSpecification->isMature($word);
 
         $now = Date::dbNow();
 

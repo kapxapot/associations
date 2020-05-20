@@ -38,6 +38,7 @@ use App\Services\WordFeedbackService;
 use App\Services\WordRecountService;
 use App\Services\WordService;
 use App\Services\YandexDictService;
+use App\Specifications\WordSpecification;
 use Plasticode\Config\Bootstrap as BootstrapBase;
 use Plasticode\ObjectProxy;
 use Psr\Container\ContainerInterface as CI;
@@ -205,6 +206,11 @@ class Bootstrap extends BootstrapBase
                 $c->associationRecountService,
             ];
 
+        $map['wordSpecification'] = fn (CI $c) =>
+            new WordSpecification(
+                $c->config
+            );
+
         $map['anniversaryService'] = fn (CI $c) =>
             new AnniversaryService();
 
@@ -280,7 +286,7 @@ class Bootstrap extends BootstrapBase
         $map['wordRecountService'] = fn (CI $c) =>
             new WordRecountService(
                 $c->wordRepository,
-                $c->config
+                $c->wordSpecification
             );
 
         $map['wordService'] = fn (CI $c) =>
