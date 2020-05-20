@@ -7,7 +7,7 @@ use Plasticode\Models\DbModel;
 
 /**
  * @property string $name
- * @property string|null $yandexDictWord
+ * @property string|null $yandexDictCode
  */
 class Language extends DbModel
 {

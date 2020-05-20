@@ -2,12 +2,14 @@
 
 namespace App\Repositories;
 
+use App\Models\Interfaces\DictWordInterface;
 use App\Models\Language;
 use App\Models\Word;
 use App\Models\YandexDictWord;
 use App\Repositories\Interfaces\YandexDictWordRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
 use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
+use Webmozart\Assert\Assert;
 
 class YandexDictWordRepository extends IdiormRepository implements YandexDictWordRepositoryInterface
 {
@@ -15,14 +17,14 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
 
     protected string $entityClass = YandexDictWord::class;
 
-    public function create(array $data) : YandexDictWord
+    /**
+     * @param YandexDictWord $dictWord
+     */
+    public function save(DictWordInterface $dictWord) : YandexDictWord
     {
-        return $this->createEntity($data);
-    }
+        Assert::isInstanceOf($dictWord, YandexDictWord::class);
 
-    public function save(YandexDictWord $word) : YandexDictWord
-    {
-        return $this->saveEntity($word);
+        return $this->saveEntity($dictWord);
     }
 
     public function getByWord(Word $word) : ?YandexDictWord

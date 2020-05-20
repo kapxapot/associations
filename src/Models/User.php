@@ -9,9 +9,9 @@ use Plasticode\Util\Date;
  * @method Game|null currentGame()
  * @method bool isMature()
  * @method Game|null lastGame()
- * @method self withCurrentGame(Game|callable|null $currentGame)
- * @method self withIsMature(bool|callable $mature)
- * @method self withLastGame(Game|callable|null $lastGame)
+ * @method static withCurrentGame(Game|callable|null $currentGame)
+ * @method static withIsMature(bool|callable $mature)
+ * @method static withLastGame(Game|callable|null $lastGame)
  */
 class User extends UserBase
 {

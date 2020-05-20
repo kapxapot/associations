@@ -4,22 +4,18 @@ namespace App\Hydrators;
 
 use App\Models\YandexDictWord;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
-use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Hydrators\Basic\Hydrator;
 use Plasticode\Models\DbModel;
 
 class YandexDictWordHydrator extends Hydrator
 {
     private LanguageRepositoryInterface $languageRepository;
-    private WordRepositoryInterface $wordRepository;
 
     public function __construct(
-        LanguageRepositoryInterface $languageRepository,
-        WordRepositoryInterface $wordRepository
+        LanguageRepositoryInterface $languageRepository
     )
     {
         $this->languageRepository = $languageRepository;
-        $this->wordRepository = $wordRepository;
     }
 
     /**
@@ -28,9 +24,6 @@ class YandexDictWordHydrator extends Hydrator
     public function hydrate(DbModel $entity) : YandexDictWord
     {
         return $entity
-            ->withWordEntity(
-                fn () => $this->wordRepository->get($entity->wordId)
-            )
             ->withLanguage(
                 fn () => $this->languageRepository->get($entity->languageId)
             );

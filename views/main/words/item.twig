@@ -24,13 +24,25 @@
         <div class="panel-body">
             <p>
                 <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
+
                 <span class="label {{ word.is_approved ? 'label-success' : 'label-primary' }}" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто его использовал' }}" data-toggle="tooltip">{{ word.is_approved ? 'общее' : 'личное' }}</span>
+
+                {% if word.dict_word %}
+                    <span class="label label-success" title="Есть в словаре" data-toggle="tooltip"><i class="fas fa-check"></i> проверено</span>
+
+                    {% if word.dict_word.is_noun %}
+                        <span class="label label-success" title="Существительное" data-toggle="tooltip"><i class="fas fa-check"></i> сущ</span>
+                    {% endif %}
+                {% endif %}
+
                 {% if word.is_mature %}
                     <span class="label label-danger" title="Не для детей" data-toggle="tooltip">16+</span>
                 {% endif %}
+
                 {% if word.approved_associations.any %}
                     <span class="label label-success" title="Общие ассоциации" data-toggle="tooltip"><i class="fas fa-thumbs-up"></i> {{ word.approved_associations.count }}</span>
                 {% endif %}
+
                 {% if word.dislikes.any %}
                     <span class="label label-danger" title="Не нравится" data-toggle="tooltip"><i class="fas fa-thumbs-down"></i> {{ word.dislikes.count }}</span>
                 {% endif %}
@@ -136,9 +148,12 @@
         <div class="panel-secondary-heading">Модераторская панель</div>
         <div class="panel panel-secondary">
             <div class="panel-body">
-                <strong>Обновлено:</strong> {{ gm.moment_local(word.updated_at_iso) }}<br>
-                <strong>...общее:</strong> {{ gm.moment_local(word.approved_updated_at_iso, 'никогда') }}<br>
+                <strong>Обновлено:</strong> {{ gm.moment_local(word.updated_at_iso) }}<br/>
+                <strong>...общее:</strong> {{ gm.moment_local(word.approved_updated_at_iso, 'никогда') }}<br/>
                 <strong>...не для детей:</strong> {{ gm.moment_local(word.mature_updated_at_iso, 'никогда') }}
+                {% if word.dict_word %}
+                    <br/><strong>...проверено в словаре:</strong> {{ gm.moment_local(word.dict_word.updated_at_iso) }}
+                {% endif %}
             </div>
         </div>
     {% endif %}

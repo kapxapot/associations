@@ -17,10 +17,10 @@ use Plasticode\Util\Date;
  * @method TurnCollection turns()
  * @method string url()
  * @method User user()
- * @method self withLanguage(Language|callable $language)
- * @method self withTurns(TurnCollection|callable $turns)
- * @method self withUrl(string|callable $url)
- * @method self withUser(User|callable $user)
+ * @method static withLanguage(Language|callable $language)
+ * @method static withTurns(TurnCollection|callable $turns)
+ * @method static withUrl(string|callable $url)
+ * @method static withUser(User|callable $user)
  */
 class Game extends DbModel
 {

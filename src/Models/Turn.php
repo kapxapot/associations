@@ -16,11 +16,11 @@ use Plasticode\Models\Traits\CreatedAt;
  * @method static|null prev()
  * @method User|null user()
  * @method Word word()
- * @method self withAssociation(Association|callable|null $association)
- * @method self withGame(Game|callable $game)
- * @method self withPrev(static|callable|null $prev)
- * @method self withUser(User|callable|null $user)
- * @method self withWord(Word|callable $word)
+ * @method static withAssociation(Association|callable|null $association)
+ * @method static withGame(Game|callable $game)
+ * @method static withPrev(static|callable|null $prev)
+ * @method static withUser(User|callable|null $user)
+ * @method static withWord(Word|callable $word)
  */
 class Turn extends DbModel
 {

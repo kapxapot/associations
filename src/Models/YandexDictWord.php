@@ -14,9 +14,7 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @property string|null $response
  * @property string|null $pos
  * @method Language language()
- * @method Word wordEntity()
- * @method self withLanguage(Language|callable $language)
- * @method self withWordEntity(Word|callable|null $wordEntity)
+ * @method static withLanguage(Language|callable $language)
  */
 class YandexDictWord extends DbModel implements DictWordInterface
 {
@@ -25,11 +23,21 @@ class YandexDictWord extends DbModel implements DictWordInterface
 
     protected function requiredWiths(): array
     {
-        return ['language', 'wordEntity'];
+        return ['language'];
     }
 
     public function isValid() : bool
     {
         return !is_null($this->pos);
+    }
+
+    public function partOfSpeech() : string
+    {
+        return $this->pos;
+    }
+
+    public function isNoun() : bool
+    {
+        return $this->pos == 'noun';
     }
 }

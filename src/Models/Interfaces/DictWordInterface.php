@@ -4,5 +4,7 @@ namespace App\Models\Interfaces;
 
 interface DictWordInterface
 {
-    public function isValid() : bool;
+    function isNoun() : bool;
+    function isValid() : bool;
+    function partOfSpeech() : string;
 }

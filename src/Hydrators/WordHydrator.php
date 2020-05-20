@@ -10,6 +10,7 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
+use App\Services\DictionaryService;
 use Plasticode\Hydrators\Basic\Hydrator;
 use Plasticode\Models\DbModel;
 
@@ -24,6 +25,8 @@ class WordHydrator extends Hydrator
     private AuthInterface $auth;
     private LinkerInterface $linker;
 
+    private DictionaryService $dictionaryService;
+
     public function __construct(
         AssociationRepositoryInterface $associationRepository,
         LanguageRepositoryInterface $languageRepository,
@@ -31,7 +34,8 @@ class WordHydrator extends Hydrator
         UserRepositoryInterface $userRepository,
         WordFeedbackRepositoryInterface $wordFeedbackRepository,
         AuthInterface $auth,
-        LinkerInterface $linker
+        LinkerInterface $linker,
+        DictionaryService $dictionaryService
     )
     {
         $this->associationRepository = $associationRepository;
@@ -42,6 +46,8 @@ class WordHydrator extends Hydrator
 
         $this->auth = $auth;
         $this->linker = $linker;
+
+        $this->dictionaryService = $dictionaryService;
     }
 
     /**
@@ -67,6 +73,9 @@ class WordHydrator extends Hydrator
             )
             ->withMe(
                 fn () => $this->auth->getUser()
+            )
+            ->withDictWord(
+                fn () => $this->dictionaryService->getByWord($entity)
             )
             ->withCreator(
                 fn () => $this->userRepository->get($entity->createdBy)

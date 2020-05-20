@@ -5,12 +5,15 @@ namespace App\Models;
 use App\Collections\AssociationCollection;
 use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
+use App\Models\Interfaces\DictWordInterface;
 
 /**
  * @property string $word
  * @method AssociationCollection associations()
- * @method self withAssociations(AssociationCollection|callable $associations)
- * @method self withFeedbacks(WordFeedbackCollection|callable $feedbacks)
+ * @method DictWordInterface|null dictWord()
+ * @method static withAssociations(AssociationCollection|callable $associations)
+ * @method static withDictWord(DictWordInterface|callable|null $dictWord)
+ * @method static withFeedbacks(WordFeedbackCollection|callable $feedbacks)
  */
 class Word extends LanguageElement
 {

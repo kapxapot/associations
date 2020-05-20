@@ -164,7 +164,8 @@ class Bootstrap extends BootstrapBase
                         $c->userRepository,
                         $c->wordFeedbackRepository,
                         $c->auth,
-                        $c->linker
+                        $c->linker,
+                        $c->dictionaryService
                     )
                 )
             );
@@ -175,8 +176,7 @@ class Bootstrap extends BootstrapBase
                 new ObjectProxy(
                     fn () =>
                     new YandexDictWordHydrator(
-                        $c->languageRepository,
-                        $c->wordRepository
+                        $c->languageRepository
                     )
                 )
             );
@@ -234,6 +234,8 @@ class Bootstrap extends BootstrapBase
 
         $map['dictionaryService'] = fn (CI $c) =>
             new DictionaryService(
+                $c->yandexDictWordRepository,
+                $c->wordRepository,
                 $c->yandexDictService
             );
 
@@ -293,8 +295,6 @@ class Bootstrap extends BootstrapBase
 
         $map['yandexDictService'] = fn (CI $c) =>
             new YandexDictService(
-                $c->wordRepository,
-                $c->yandexDictWordRepository,
                 $c->yandexDict
             );
 
