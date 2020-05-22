@@ -13,18 +13,18 @@ class UpdateWordsJob
     private WordRepositoryInterface $wordRepository;
 
     private SettingsProviderInterface $settingsProvider;
-    private EventDispatcher $dispatcher;
+    private EventDispatcher $eventDispatcher;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
         SettingsProviderInterface $settingsProvider,
-        EventDispatcher $dispatcher
+        EventDispatcher $eventDispatcher
     )
     {
         $this->wordRepository = $wordRepository;
 
         $this->settingsProvider = $settingsProvider;
-        $this->dispatcher = $dispatcher;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function run() : WordCollection
@@ -41,7 +41,7 @@ class UpdateWordsJob
 
         foreach ($outOfDate as $word) {
             $event = new WordOutOfDateEvent($word);
-            $this->dispatcher->dispatch($event);
+            $this->eventDispatcher->dispatch($event);
         }
 
         return $outOfDate;

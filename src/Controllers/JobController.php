@@ -2,26 +2,27 @@
 
 namespace App\Controllers;
 
-use App\Jobs\UpdateAssociationsJob;
-use App\Jobs\UpdateWordsJob;
+use App\Factories\UpdateAssociationsJobFactory;
+use App\Factories\UpdateDictWordsJobFactory;
+use App\Factories\UpdateWordsJobFactory;
 use Plasticode\Collections\Basic\DbModelCollection;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
-use Plasticode\Events\EventDispatcher;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class JobController extends Controller
 {
-    private EventDispatcher $dispatcher;
-    private SettingsProviderInterface $settingsProvider;
+    private UpdateAssociationsJobFactory $updateAssociationsJobFactory;
+    private UpdateDictWordsJobFactory $updateDictWordsJobFactory;
+    private UpdateWordsJobFactory $updateWordsJobFactory;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
-        $this->dispatcher = $container->dispatcher;
-        $this->settingsProvider = $container->settingsProvider;
+        $this->updateAssociationsJobFactory = $container->updateAssociationsJobFactory;
+        $this->updateDictWordsJobFactory = $container->updateDictWordsJobFactory;
+        $this->updateWordsJobFactory = $container->updateWordsJobFactory;
     }
 
     public function updateAssociations(
@@ -31,15 +32,11 @@ class JobController extends Controller
     {
         $start = microtime(true);
 
-        $job = new UpdateAssociationsJob(
-            $this->associationRepository,
-            $this->settingsProvider,
-            $this->dispatcher
-        );
+        $job = $this->updateAssociationsJobFactory->make();
+        $result = $job->run();
 
         $end = microtime(true);
 
-        $result = $job->run();
         $msg = 'Updated associations: ' . $result->count();
 
         $this->logCollectionResult($result, $msg, $start, $end);
@@ -54,16 +51,32 @@ class JobController extends Controller
     {
         $start = microtime(true);
 
-        $job = new UpdateWordsJob(
-            $this->wordRepository,
-            $this->settingsProvider,
-            $this->dispatcher
-        );
+        $job = $this->updateWordsJobFactory->make();
+        $result = $job->run();
+
+        $end = microtime(true);
+
+        $msg = 'Updated words: ' . $result->count();
+
+        $this->logCollectionResult($result, $msg, $start, $end);
+
+        return $msg;
+    }
+
+    public function updateDictWords(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    )
+    {
+        $start = microtime(true);
+
+        $job = $this->updateDictWordsJobFactory->make();
+        $result = $job->run();
 
         $end = microtime(true);
 
         $result = $job->run();
-        $msg = 'Updated words: ' . $result->count();
+        $msg = 'Updated dictionary words: ' . $result->count();
 
         $this->logCollectionResult($result, $msg, $start, $end);
 

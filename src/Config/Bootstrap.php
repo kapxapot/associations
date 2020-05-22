@@ -5,6 +5,9 @@ namespace App\Config;
 use App\Auth\Auth;
 use App\Core\Linker;
 use App\External\YandexDict;
+use App\Factories\UpdateAssociationsJobFactory;
+use App\Factories\UpdateDictWordsJobFactory;
+use App\Factories\UpdateWordsJobFactory;
 use App\Handlers\NotFoundHandler;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
@@ -266,7 +269,7 @@ class Bootstrap extends BootstrapBase
                 $c->turnRepository,
                 $c->wordRepository,
                 $c->associationService,
-                $c->dispatcher
+                $c->eventDispatcher
             );
 
         $map['userService'] = fn (CI $c) =>
@@ -302,6 +305,27 @@ class Bootstrap extends BootstrapBase
         $map['yandexDictService'] = fn (CI $c) =>
             new YandexDictService(
                 $c->yandexDict
+            );
+
+        $map['updateAssociationsJobFactory'] = fn (CI $c) =>
+            new UpdateAssociationsJobFactory(
+                $c->settingsProvider,
+                $c->eventDispatcher,
+                $c->associationRepository
+            );
+
+        $map['updateWordsJobFactory'] = fn (CI $c) =>
+            new UpdateWordsJobFactory(
+                $c->settingsProvider,
+                $c->eventDispatcher,
+                $c->wordRepository
+            );
+
+        $map['updateDictWordsJobFactory'] = fn (CI $c) =>
+            new UpdateDictWordsJobFactory(
+                $c->settingsProvider,
+                $c->eventDispatcher,
+                $c->yandexDictWordRepository
             );
 
         // external

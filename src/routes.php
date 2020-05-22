@@ -190,6 +190,11 @@ $app->group(
                     '/update/words',
                     JobController::class . ':updateWords'
                 )->setName('main.jobs.update.words');
+
+                $this->get(
+                    '/update/dict_words',
+                    JobController::class . ':updateDictWords'
+                )->setName('main.jobs.update.dict_words');
             }
         );
 

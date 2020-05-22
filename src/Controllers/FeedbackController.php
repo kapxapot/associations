@@ -23,7 +23,7 @@ class FeedbackController extends Controller
 
     private AuthInterface $auth;
     private AssociationFeedbackService $associationFeedbackService;
-    private EventDispatcher $dispatcher;
+    private EventDispatcher $eventDispatcher;
     private WordFeedbackService $wordFeedbackService;
 
     public function __construct(ContainerInterface $container)
@@ -40,7 +40,7 @@ class FeedbackController extends Controller
         $this->associationFeedbackService =
             $container->associationFeedbackService;
 
-        $this->dispatcher = $container->dispatcher;
+        $this->eventDispatcher = $container->eventDispatcher;
         $this->wordFeedbackService = $container->wordFeedbackService;
     }
 
@@ -72,7 +72,7 @@ class FeedbackController extends Controller
                 ->save($wordFeedback);
 
             $event = new WordFeedbackEvent($wordFeedback);
-            $this->dispatcher->dispatch($event);
+            $this->eventDispatcher->dispatch($event);
         }
 
         if (!empty($associationData)) {
@@ -85,7 +85,7 @@ class FeedbackController extends Controller
                 ->save($assocFeedback);
 
             $event = new AssociationFeedbackEvent($assocFeedback);
-            $this->dispatcher->dispatch($event);
+            $this->eventDispatcher->dispatch($event);
         }
 
         return Response::json(

@@ -13,18 +13,18 @@ class UpdateAssociationsJob
     private AssociationRepositoryInterface $associationRepository;
 
     private SettingsProviderInterface $settingsProvider;
-    private EventDispatcher $dispatcher;
+    private EventDispatcher $eventDispatcher;
 
     public function __construct(
         AssociationRepositoryInterface $associationRepository,
         SettingsProviderInterface $settingsProvider,
-        EventDispatcher $dispatcher
+        EventDispatcher $eventDispatcher
     )
     {
         $this->associationRepository = $associationRepository;
 
         $this->settingsProvider = $settingsProvider;
-        $this->dispatcher = $dispatcher;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function run() : AssociationCollection
@@ -41,7 +41,7 @@ class UpdateAssociationsJob
 
         foreach ($outOfDate as $assoc) {
             $event = new AssociationOutOfDateEvent($assoc);
-            $this->dispatcher->dispatch($event);
+            $this->eventDispatcher->dispatch($event);
         }
 
         return $outOfDate;

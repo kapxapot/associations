@@ -55,7 +55,7 @@ class TestController extends Controller
         $wordFeedback = $this->wordFeedbackRepository->get(2);
         $event = new WordFeedbackEvent($wordFeedback);
 
-        $this->dispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch($event);
     }
 
     private function eventLogTest()

@@ -20,21 +20,21 @@ class TurnService
     private WordRepositoryInterface $wordRepository;
 
     private AssociationService $associationService;
-    private EventDispatcher $dispatcher;
+    private EventDispatcher $eventDispatcher;
 
     public function __construct(
         GameRepositoryInterface $gameRepository,
         TurnRepositoryInterface $turnRepository,
         WordRepositoryInterface $wordRepository,
         AssociationService $associationService,
-        EventDispatcher $dispatcher
+        EventDispatcher $eventDispatcher
     )
     {
         $this->gameRepository = $gameRepository;
         $this->turnRepository = $turnRepository;
         $this->wordRepository = $wordRepository;
         $this->associationService = $associationService;
-        $this->dispatcher = $dispatcher;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -58,7 +58,7 @@ class TurnService
         $turn = $this->newTurn($game, $word, $user);
 
         $event = new NewTurnEvent($turn);
-        $this->dispatcher->dispatch($event);
+        $this->eventDispatcher->dispatch($event);
 
         $this->processPlayerTurn($turn);
 
