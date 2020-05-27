@@ -103,6 +103,8 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         );
     }
 
+    // filters
+
     protected function filterApproved(Query $query, bool $approved = true) : Query
     {
         return $query->where('approved', Convert::toBit($approved));

@@ -184,17 +184,22 @@ $app->group(
                 $this->get(
                     '/update/associations',
                     JobController::class . ':updateAssociations'
-                )->setName('main.jobs.update.associations');
+                )->setName('main.jobs.update_associations');
 
                 $this->get(
                     '/update/words',
                     JobController::class . ':updateWords'
-                )->setName('main.jobs.update.words');
+                )->setName('main.jobs.update_words');
 
                 $this->get(
-                    '/update/dict_words',
-                    JobController::class . ':updateDictWords'
-                )->setName('main.jobs.update.dict_words');
+                    '/load_unchecked_dict_words',
+                    JobController::class . ':loadUncheckedDictWords'
+                )->setName('main.jobs.load_unchecked_dict_words');
+
+                $this->get(
+                    '/match_dangling_dict_words',
+                    JobController::class . ':matchDanglingDictWords'
+                )->setName('main.jobs.match_dangling_dict_words');
             }
         );
 

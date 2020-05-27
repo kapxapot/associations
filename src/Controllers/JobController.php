@@ -2,26 +2,29 @@
 
 namespace App\Controllers;
 
+use App\Factories\Interfaces\DbModelCollectionJobFactoryInterface;
+use App\Factories\LoadUncheckedDictWordsJobFactory;
+use App\Factories\MatchDanglingDictWordsJobFactory;
 use App\Factories\UpdateAssociationsJobFactory;
-use App\Factories\UpdateDictWordsJobFactory;
 use App\Factories\UpdateWordsJobFactory;
-use Plasticode\Collections\Basic\DbModelCollection;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class JobController extends Controller
 {
+    private LoadUncheckedDictWordsJobFactory $loadUncheckedDictWordsJobFactory;
+    private MatchDanglingDictWordsJobFactory $matchDanglingDictWordsJobFactory;
     private UpdateAssociationsJobFactory $updateAssociationsJobFactory;
-    private UpdateDictWordsJobFactory $updateDictWordsJobFactory;
     private UpdateWordsJobFactory $updateWordsJobFactory;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
+        $this->loadUncheckedDictWordsJobFactory = $container->loadUncheckedDictWordsJobFactory;
+        $this->matchDanglingDictWordsJobFactory = $container->matchDanglingDictWordsJobFactory;
         $this->updateAssociationsJobFactory = $container->updateAssociationsJobFactory;
-        $this->updateDictWordsJobFactory = $container->updateDictWordsJobFactory;
         $this->updateWordsJobFactory = $container->updateWordsJobFactory;
     }
 
@@ -30,18 +33,10 @@ class JobController extends Controller
         ResponseInterface $response
     )
     {
-        $start = microtime(true);
-
-        $job = $this->updateAssociationsJobFactory->make();
-        $result = $job->run();
-
-        $end = microtime(true);
-
-        $msg = 'Updated associations: ' . $result->count();
-
-        $this->logCollectionResult($result, $msg, $start, $end);
-
-        return $msg;
+        return $this->runJob(
+            $this->updateAssociationsJobFactory,
+            'Updated associations'
+        );
     }
 
     public function updateWords(
@@ -49,47 +44,48 @@ class JobController extends Controller
         ResponseInterface $response
     )
     {
-        $start = microtime(true);
-
-        $job = $this->updateWordsJobFactory->make();
-        $result = $job->run();
-
-        $end = microtime(true);
-
-        $msg = 'Updated words: ' . $result->count();
-
-        $this->logCollectionResult($result, $msg, $start, $end);
-
-        return $msg;
+        return $this->runJob(
+            $this->updateWordsJobFactory,
+            'Updated words'
+        );
     }
 
-    public function updateDictWords(
+    public function loadUncheckedDictWords(
         ServerRequestInterface $request,
         ResponseInterface $response
     )
     {
+        return $this->runJob(
+            $this->loadUncheckedDictWordsJobFactory,
+            'Loaded unchecked dictionary words'
+        );
+    }
+
+    public function matchDanglingDictWords(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    )
+    {
+        return $this->runJob(
+            $this->matchDanglingDictWordsJobFactory,
+            'Matched dangling dictionary words'
+        );
+    }
+
+    private function runJob(
+        DbModelCollectionJobFactoryInterface $factory,
+        string $msg
+    )
+    {
         $start = microtime(true);
 
-        $job = $this->updateDictWordsJobFactory->make();
+        $job = $factory->make();
         $result = $job->run();
 
         $end = microtime(true);
 
-        $result = $job->run();
-        $msg = 'Updated dictionary words: ' . $result->count();
+        $msg .= ': ' . $result->count();
 
-        $this->logCollectionResult($result, $msg, $start, $end);
-
-        return $msg;
-    }
-
-    private function logCollectionResult(
-        DbModelCollection $result,
-        string $msg,
-        $start,
-        $end
-    ) : void
-    {
         $this->logger->info(
             $msg,
             [
@@ -97,5 +93,7 @@ class JobController extends Controller
                 'ids' => $result->ids()->toArray(),
             ]
         );
+
+        return $msg;
     }
 }

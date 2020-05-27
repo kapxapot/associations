@@ -3,31 +3,31 @@
 namespace App\Factories;
 
 use App\Factories\Interfaces\DbModelCollectionJobFactoryInterface;
-use App\Jobs\UpdateWordsJob;
+use App\Jobs\MatchDanglingDictWordsJob;
+use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
-use Plasticode\Events\EventDispatcher;
 
-class UpdateWordsJobFactory implements DbModelCollectionJobFactoryInterface
+class MatchDanglingDictWordsJobFactory implements DbModelCollectionJobFactoryInterface
 {
     private \Closure $maker;
 
     public function __construct(
+        DictWordRepositoryInterface $dictWordRepository,
         WordRepositoryInterface $wordRepository,
-        SettingsProviderInterface $settingsProvider,
-        EventDispatcher $eventDispatcher
+        SettingsProviderInterface $settingsProvider
     )
     {
         $this->maker =
             fn () =>
-            new UpdateWordsJob(
+            new MatchDanglingDictWordsJob(
+                $dictWordRepository,
                 $wordRepository,
-                $settingsProvider,
-                $eventDispatcher
+                $settingsProvider
             );
     }
 
-    public function make() : UpdateWordsJob
+    public function make() : MatchDanglingDictWordsJob
     {
         return ($this->maker)();
     }

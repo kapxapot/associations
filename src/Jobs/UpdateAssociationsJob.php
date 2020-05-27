@@ -4,11 +4,12 @@ namespace App\Jobs;
 
 use App\Collections\AssociationCollection;
 use App\Events\AssociationOutOfDateEvent;
+use App\Jobs\Interfaces\DbModelCollectionJobInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
-class UpdateAssociationsJob
+class UpdateAssociationsJob implements DbModelCollectionJobInterface
 {
     private AssociationRepositoryInterface $associationRepository;
 
@@ -29,11 +30,13 @@ class UpdateAssociationsJob
 
     public function run() : AssociationCollection
     {
-        $ttl = $this->settingsProvider
-            ->get('associations.update.ttl_min');
+        $ttl = $this
+            ->settingsProvider
+            ->get('jobs.update_associations.ttl_min', 1440);
 
-        $limit = $this->settingsProvider
-            ->get('associations.update.limit');
+        $limit = $this
+            ->settingsProvider
+            ->get('jobs.update_associations.batch_size', 10);
 
         $outOfDate = $this
             ->associationRepository

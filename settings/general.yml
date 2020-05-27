@@ -48,9 +48,7 @@ associations:
   coeffs:
     usage: 1
     dislike: 1
-  update:
-    ttl_min: 1440
-    limit: 500
+  # sidebar limit
   last_added_limit: 10
 
 languages:
@@ -65,11 +63,22 @@ words:
   coeffs:
     approved_association: 1
     dislike: 1
-  update:
-    ttl_min: 1440
-    limit: 500
+  # sidebar limit
   last_added_limit: 10
 
 yandex_dict:
   key: {YANDEX_DICT_KEY}
   word_ttl_days: 30
+
+jobs:
+  update_associations:
+    ttl_min: 1440
+    batch_size: 500
+  update_words:
+    ttl_min: 1440
+    batch_size: 500
+  load_unchecked_dict_words:
+    batch_size: 10
+  match_dangling_dict_words:
+    ttl_min: 10
+    batch_size: 10

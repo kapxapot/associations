@@ -30,4 +30,9 @@ interface WordRepositoryInterface extends LanguageElementRepositoryInterface
         ?Language $language = null,
         int $limit = null
     ) : WordCollection;
+
+    /**
+     * Returns words without corresponding dict words.
+     */
+    function getAllUnchecked(int $limit = 0) : WordCollection;
 }

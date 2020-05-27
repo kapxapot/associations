@@ -26,6 +26,16 @@ class YandexDictWord extends DbModel implements DictWordInterface
         return ['language'];
     }
 
+    public function getLanguage() : Language
+    {
+        return $this->language();
+    }
+
+    public function getWord() : string
+    {
+        return $this->word;
+    }
+
     public function isValid() : bool
     {
         return !is_null($this->pos);

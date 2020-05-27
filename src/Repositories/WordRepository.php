@@ -79,4 +79,29 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             parent::getLastAddedByLanguage($language, $limit)
         );
     }
+
+    /**
+     * Returns words without corresponding dict words.
+     */
+    public function getAllUnchecked(int $limit = 0) : WordCollection
+    {
+        $dictWordTable = 'yandex_dict_words';
+        $dwAlias = 'dw';
+
+        return WordCollection::from(
+            $this
+                ->query()
+                ->select($this->getTable() . '.*')
+                ->leftOuterJoin(
+                    $dictWordTable,
+                    [
+                        $this->getTable() . '.' . $this->idField(),
+                        '=',
+                        $dwAlias . '.word_id'
+                    ],
+                    $dwAlias)
+                ->whereNull($dwAlias . '.id')
+                ->limit($limit)
+        );
+    }
 }

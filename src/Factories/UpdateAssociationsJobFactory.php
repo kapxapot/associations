@@ -2,29 +2,28 @@
 
 namespace App\Factories;
 
+use App\Factories\Interfaces\DbModelCollectionJobFactoryInterface;
 use App\Jobs\UpdateAssociationsJob;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
-class UpdateAssociationsJobFactory extends JobFactory
+class UpdateAssociationsJobFactory implements DbModelCollectionJobFactoryInterface
 {
     private \Closure $maker;
 
     public function __construct(
+        AssociationRepositoryInterface $associationRepository,
         SettingsProviderInterface $settingsProvider,
-        EventDispatcher $eventDispatcher,
-        AssociationRepositoryInterface $associationRepository
+        EventDispatcher $eventDispatcher
     )
     {
-        parent::__construct($settingsProvider, $eventDispatcher);
-
         $this->maker =
             fn () =>
             new UpdateAssociationsJob(
                 $associationRepository,
-                $this->settingsProvider,
-                $this->eventDispatcher
+                $settingsProvider,
+                $eventDispatcher
             );
     }
 

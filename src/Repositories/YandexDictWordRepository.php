@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Collections\DictWordCollection;
 use App\Models\Interfaces\DictWordInterface;
 use App\Models\Language;
 use App\Models\Word;
@@ -25,6 +26,25 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
         Assert::isInstanceOf($dictWord, YandexDictWord::class);
 
         return $this->saveEntity($dictWord);
+    }
+
+    /**
+     * Returns dict words without associated words that need to be updated.
+     *
+     * @param integer $ttlMin Update time-to-live in minutes.
+     */
+    public function getAllDanglingOutOfDate(int $ttlMin, int $limit = 0) : DictWordCollection
+    {
+        return DictWordCollection::from(
+            $this
+                ->query()
+                ->whereNull('word_id')
+                ->whereRaw(
+                    '(updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))'
+                )
+                ->limit($limit)
+                ->orderByAsc('updated_at')
+        );
     }
 
     public function getByWord(Word $word) : ?YandexDictWord

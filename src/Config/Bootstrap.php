@@ -5,8 +5,9 @@ namespace App\Config;
 use App\Auth\Auth;
 use App\Core\Linker;
 use App\External\YandexDict;
+use App\Factories\LoadUncheckedDictWordsJobFactory;
+use App\Factories\MatchDanglingDictWordsJobFactory;
 use App\Factories\UpdateAssociationsJobFactory;
-use App\Factories\UpdateDictWordsJobFactory;
 use App\Factories\UpdateWordsJobFactory;
 use App\Handlers\NotFoundHandler;
 use App\Hydrators\AssociationFeedbackHydrator;
@@ -85,6 +86,17 @@ class Bootstrap extends BootstrapBase
                         $c->wordRepository,
                         $c->auth,
                         $c->linker
+                    )
+                )
+            );
+
+        $map['dictWordRepository'] = fn (CI $c) =>
+            new YandexDictWordRepository(
+                $c->repositoryContext,
+                new ObjectProxy(
+                    fn () =>
+                    new YandexDictWordHydrator(
+                        $c->languageRepository
                     )
                 )
             );
@@ -173,17 +185,6 @@ class Bootstrap extends BootstrapBase
                     )
                 )
             );
-        
-        $map['yandexDictWordRepository'] = fn (CI $c) =>
-            new YandexDictWordRepository(
-                $c->repositoryContext,
-                new ObjectProxy(
-                    fn () =>
-                    new YandexDictWordHydrator(
-                        $c->languageRepository
-                    )
-                )
-            );
 
         $map['localizationConfig'] = fn (CI $c) =>
             new LocalizationConfig();
@@ -243,7 +244,7 @@ class Bootstrap extends BootstrapBase
 
         $map['dictionaryService'] = fn (CI $c) =>
             new DictionaryService(
-                $c->yandexDictWordRepository,
+                $c->dictWordRepository,
                 $c->wordRepository,
                 $c->yandexDictService
             );
@@ -307,25 +308,34 @@ class Bootstrap extends BootstrapBase
                 $c->yandexDict
             );
 
+        // factories
+
+        $map['loadUncheckedDictWordsJobFactory'] = fn (CI $c) =>
+            new LoadUncheckedDictWordsJobFactory(
+                $c->wordRepository,
+                $c->settingsProvider,
+                $c->dictionaryService
+            );
+
+        $map['matchDanglingDictWordsJobFactory'] = fn (CI $c) =>
+            new MatchDanglingDictWordsJobFactory(
+                $c->dictWordRepository,
+                $c->wordRepository,
+                $c->settingsProvider
+            );
+
         $map['updateAssociationsJobFactory'] = fn (CI $c) =>
             new UpdateAssociationsJobFactory(
+                $c->associationRepository,
                 $c->settingsProvider,
-                $c->eventDispatcher,
-                $c->associationRepository
+                $c->eventDispatcher
             );
 
         $map['updateWordsJobFactory'] = fn (CI $c) =>
             new UpdateWordsJobFactory(
+                $c->wordRepository,
                 $c->settingsProvider,
-                $c->eventDispatcher,
-                $c->wordRepository
-            );
-
-        $map['updateDictWordsJobFactory'] = fn (CI $c) =>
-            new UpdateDictWordsJobFactory(
-                $c->settingsProvider,
-                $c->eventDispatcher,
-                $c->yandexDictWordRepository
+                $c->eventDispatcher
             );
 
         // external

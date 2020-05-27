@@ -30,14 +30,6 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
         return $this->storeEntity($data);
     }
 
-    protected function getAllByUserQuery(User $user) : Query
-    {
-        return $this->filterByUser(
-            $this->query(),
-            $user
-        );
-    }
-
     public function getCurrentByUser(User $user) : ?Game
     {
         return $this
@@ -53,5 +45,15 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
             ->getAllByUserQuery($user)
             ->orderByDesc('id')
             ->one();
+    }
+
+    // queries
+
+    protected function getAllByUserQuery(User $user) : Query
+    {
+        return $this->filterByUser(
+            $this->query(),
+            $user
+        );
     }
 }

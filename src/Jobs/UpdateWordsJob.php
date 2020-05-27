@@ -4,11 +4,12 @@ namespace App\Jobs;
 
 use App\Collections\WordCollection;
 use App\Events\WordOutOfDateEvent;
+use App\Jobs\Interfaces\DbModelCollectionJobInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
-class UpdateWordsJob
+class UpdateWordsJob implements DbModelCollectionJobInterface
 {
     private WordRepositoryInterface $wordRepository;
 
@@ -29,11 +30,13 @@ class UpdateWordsJob
 
     public function run() : WordCollection
     {
-        $ttl = $this->settingsProvider
-            ->get('words.update.ttl_min');
+        $ttl = $this
+            ->settingsProvider
+            ->get('jobs.update_words.ttl_min', 1440);
 
-        $limit = $this->settingsProvider
-            ->get('words.update.limit');
+        $limit = $this
+            ->settingsProvider
+            ->get('jobs.update_words.batch_size', 10);
 
         $outOfDate = $this
             ->wordRepository

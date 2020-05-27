@@ -68,7 +68,7 @@ class DictionaryService
         bool $allowRemoteLoad = false
     ) : ?DictWordInterface
     {
-        return $this->get(null, null, $word, $allowRemoteLoad);
+        return $this->get($word->language(), $word->word, $word, $allowRemoteLoad);
     }
 
     private function get(
