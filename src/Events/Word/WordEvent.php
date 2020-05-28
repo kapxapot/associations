@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Word;
 
 use App\Models\Word;
 use Plasticode\Events\Event;

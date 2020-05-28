@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Feedback;
 
 use App\Models\AssociationFeedback;
 use Plasticode\Events\Event;
 
-class AssociationFeedbackEvent extends FeedbackEvent
+class AssociationFeedbackCreatedEvent extends FeedbackEvent
 {
     protected AssociationFeedback $feedback;
 

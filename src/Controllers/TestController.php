@@ -3,7 +3,7 @@
 namespace App\Controllers;
 
 use App\Collections\WordCollection;
-use App\Events\WordFeedbackEvent;
+use App\Events\Feedback\WordFeedbackCreatedEvent;
 use App\Models\Association;
 use App\Models\Word;
 use App\Services\WordService;
@@ -53,7 +53,7 @@ class TestController extends Controller
     private function eventTest()
     {
         $wordFeedback = $this->wordFeedbackRepository->get(2);
-        $event = new WordFeedbackEvent($wordFeedback);
+        $event = new WordFeedbackCreatedEvent($wordFeedback);
 
         $this->eventDispatcher->dispatch($event);
     }

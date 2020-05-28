@@ -2,13 +2,13 @@
 
 namespace App\Factories;
 
-use App\Factories\Interfaces\DbModelCollectionJobFactoryInterface;
+use App\Factories\Interfaces\ModelJobFactoryInterface;
 use App\Jobs\MatchDanglingDictWordsJob;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 
-class MatchDanglingDictWordsJobFactory implements DbModelCollectionJobFactoryInterface
+class MatchDanglingDictWordsJobFactory implements ModelJobFactoryInterface
 {
     private \Closure $maker;
 

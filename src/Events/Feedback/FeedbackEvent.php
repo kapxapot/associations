@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Feedback;
 
 use App\Models\Feedback;
 use Plasticode\Events\Event;

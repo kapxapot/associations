@@ -3,8 +3,8 @@
 namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
-use App\Events\AssociationFeedbackEvent;
-use App\Events\WordFeedbackEvent;
+use App\Events\Feedback\AssociationFeedbackCreatedEvent;
+use App\Events\Feedback\WordFeedbackCreatedEvent;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Services\AssociationFeedbackService;
@@ -71,7 +71,7 @@ class FeedbackController extends Controller
                 ->wordFeedbackRepository
                 ->save($wordFeedback);
 
-            $event = new WordFeedbackEvent($wordFeedback);
+            $event = new WordFeedbackCreatedEvent($wordFeedback);
             $this->eventDispatcher->dispatch($event);
         }
 
@@ -84,7 +84,7 @@ class FeedbackController extends Controller
                 ->associationFeedbackRepository
                 ->save($assocFeedback);
 
-            $event = new AssociationFeedbackEvent($assocFeedback);
+            $event = new AssociationFeedbackCreatedEvent($assocFeedback);
             $this->eventDispatcher->dispatch($event);
         }
 

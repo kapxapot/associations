@@ -3,13 +3,13 @@
 namespace App\Jobs;
 
 use App\Collections\WordCollection;
-use App\Events\WordOutOfDateEvent;
-use App\Jobs\Interfaces\DbModelCollectionJobInterface;
+use App\Events\Word\WordOutOfDateEvent;
+use App\Jobs\Interfaces\ModelJobInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
-class UpdateWordsJob implements DbModelCollectionJobInterface
+class UpdateWordsJob implements ModelJobInterface
 {
     private WordRepositoryInterface $wordRepository;
 

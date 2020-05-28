@@ -2,13 +2,13 @@
 
 namespace App\Factories;
 
-use App\Factories\Interfaces\DbModelCollectionJobFactoryInterface;
+use App\Factories\Interfaces\ModelJobFactoryInterface;
 use App\Jobs\UpdateWordsJob;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
-class UpdateWordsJobFactory implements DbModelCollectionJobFactoryInterface
+class UpdateWordsJobFactory implements ModelJobFactoryInterface
 {
     private \Closure $maker;
 

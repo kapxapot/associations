@@ -2,11 +2,11 @@
 
 namespace App\Services;
 
-use App\Events\AssociationApprovedEvent;
-use App\Events\WordApprovedEvent;
-use App\Events\WordFeedbackEvent;
-use App\Events\WordMatureEvent;
-use App\Events\WordOutOfDateEvent;
+use App\Events\Association\AssociationApprovedEvent;
+use App\Events\Feedback\WordFeedbackCreatedEvent;
+use App\Events\Word\WordApprovedEvent;
+use App\Events\Word\WordMatureEvent;
+use App\Events\Word\WordOutOfDateEvent;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Specifications\WordSpecification;
@@ -47,9 +47,9 @@ class WordRecountService extends EventProcessor
     }
 
     /**
-     * WordFeedbackEvent event processing.
+     * WordFeedbackCreatedEvent event processing.
      */
-    public function processWordFeedbackEvent(WordFeedbackEvent $event) : iterable
+    public function processWordFeedbackCreatedEvent(WordFeedbackCreatedEvent $event) : iterable
     {
         $feedback = $event->getFeedback();
         $word = $feedback->word();

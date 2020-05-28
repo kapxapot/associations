@@ -3,13 +3,13 @@
 namespace App\Jobs;
 
 use App\Collections\AssociationCollection;
-use App\Events\AssociationOutOfDateEvent;
-use App\Jobs\Interfaces\DbModelCollectionJobInterface;
+use App\Events\Association\AssociationOutOfDateEvent;
+use App\Jobs\Interfaces\ModelJobInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
 
-class UpdateAssociationsJob implements DbModelCollectionJobInterface
+class UpdateAssociationsJob implements ModelJobInterface
 {
     private AssociationRepositoryInterface $associationRepository;
 

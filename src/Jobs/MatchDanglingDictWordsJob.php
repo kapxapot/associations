@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Collections\DictWordCollection;
-use App\Jobs\Interfaces\DbModelCollectionJobInterface;
+use App\Jobs\Interfaces\ModelJobInterface;
 use App\Models\Interfaces\DictWordInterface;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
@@ -12,7 +12,7 @@ use Plasticode\Core\Interfaces\SettingsProviderInterface;
 /**
  * For all dict words without word try to find word and map if it exists.
  */
-class MatchDanglingDictWordsJob implements DbModelCollectionJobInterface
+class MatchDanglingDictWordsJob implements ModelJobInterface
 {
     private DictWordRepositoryInterface $dictWordRepository;
     private WordRepositoryInterface $wordRepository;

@@ -2,13 +2,13 @@
 
 namespace App\Factories;
 
-use App\Factories\Interfaces\DbModelCollectionJobFactoryInterface;
+use App\Factories\Interfaces\ModelJobFactoryInterface;
 use App\Jobs\LoadUncheckedDictWordsJob;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 
-class LoadUncheckedDictWordsJobFactory implements DbModelCollectionJobFactoryInterface
+class LoadUncheckedDictWordsJobFactory implements ModelJobFactoryInterface
 {
     private \Closure $maker;
 

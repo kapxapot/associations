@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Collections\DictWordCollection;
-use App\Jobs\Interfaces\DbModelCollectionJobInterface;
+use App\Jobs\Interfaces\ModelJobInterface;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
@@ -12,7 +12,7 @@ use Plasticode\Core\Interfaces\SettingsProviderInterface;
 /**
  * For all words without dict word load dict words.
  */
-class LoadUncheckedDictWordsJob implements DbModelCollectionJobInterface
+class LoadUncheckedDictWordsJob implements ModelJobInterface
 {
     private WordRepositoryInterface $wordRepository;
     private SettingsProviderInterface $settingsProvider;

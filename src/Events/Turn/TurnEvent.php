@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Turn;
 
 use App\Models\Turn;
 use Plasticode\Events\Event;

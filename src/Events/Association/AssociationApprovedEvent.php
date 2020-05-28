@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Association;
 
 class AssociationApprovedEvent extends AssociationEvent
 {

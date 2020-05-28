@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Factories\Interfaces\DbModelCollectionJobFactoryInterface;
+use App\Factories\Interfaces\ModelJobFactoryInterface;
 use App\Factories\LoadUncheckedDictWordsJobFactory;
 use App\Factories\MatchDanglingDictWordsJobFactory;
 use App\Factories\UpdateAssociationsJobFactory;
@@ -73,7 +73,7 @@ class JobController extends Controller
     }
 
     private function runJob(
-        DbModelCollectionJobFactoryInterface $factory,
+        ModelJobFactoryInterface $factory,
         string $msg
     )
     {

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Events;
+namespace App\Events\Feedback;
 
 use App\Models\WordFeedback;
 use Plasticode\Events\Event;
 
-class WordFeedbackEvent extends FeedbackEvent
+class WordFeedbackCreatedEvent extends FeedbackEvent
 {
     protected WordFeedback $feedback;
 

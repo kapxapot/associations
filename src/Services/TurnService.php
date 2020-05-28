@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Events\NewTurnEvent;
+use App\Events\Turn\TurnCreatedEvent;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\User;
@@ -57,7 +57,7 @@ class TurnService
     {
         $turn = $this->newTurn($game, $word, $user);
 
-        $event = new NewTurnEvent($turn);
+        $event = new TurnCreatedEvent($turn);
         $this->eventDispatcher->dispatch($event);
 
         $this->processPlayerTurn($turn);

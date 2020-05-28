@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Config\Interfaces\AssociationConfigInterface;
-use App\Events\AssociationApprovedEvent;
-use App\Events\AssociationFeedbackEvent;
-use App\Events\AssociationMatureEvent;
-use App\Events\AssociationOutOfDateEvent;
-use App\Events\NewTurnEvent;
-use App\Events\WordMatureEvent;
+use App\Events\Association\AssociationApprovedEvent;
+use App\Events\Association\AssociationMatureEvent;
+use App\Events\Association\AssociationOutOfDateEvent;
+use App\Events\Feedback\AssociationFeedbackCreatedEvent;
+use App\Events\Turn\TurnCreatedEvent;
+use App\Events\Word\WordMatureEvent;
 use App\Models\Association;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Events\EventProcessor;
@@ -30,9 +30,9 @@ class AssociationRecountService extends EventProcessor
     }
 
     /**
-     * NewTurnEvent event processing.
+     * TurnCreatedEvent event processing.
      */
-    public function processNewTurnEvent(NewTurnEvent $event) : iterable
+    public function processTurnCreatedEvent(TurnCreatedEvent $event) : iterable
     {
         $assoc = $event->getTurn()->association();
 
@@ -62,10 +62,10 @@ class AssociationRecountService extends EventProcessor
     }
 
     /**
-     * AssociationFeedbackEvent event processing.
+     * AssociationFeedbackCreatedEvent event processing.
      */
-    public function processAssociationFeedbackEvent(
-        AssociationFeedbackEvent $event
+    public function processAssociationFeedbackCreatedEvent(
+        AssociationFeedbackCreatedEvent $event
     ) : iterable
     {
         $feedback = $event->getFeedback();
