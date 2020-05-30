@@ -2,14 +2,13 @@
 
 namespace App\Services;
 
-use App\Events\Association\AssociationApprovedChangedEvent;
-use App\Events\Feedback\WordFeedbackCreatedEvent;
 use App\Events\Word\WordApprovedChangedEvent;
 use App\Events\Word\WordMatureChangedEvent;
-use App\Events\Word\WordOutOfDateEvent;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Specifications\WordSpecification;
+use Plasticode\Events\Event;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Events\EventProcessor;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
@@ -18,72 +17,33 @@ class WordRecountService extends EventProcessor
 {
     private WordRepositoryInterface $wordRepository;
     private WordSpecification $wordSpecification;
+    private EventDispatcher $eventDispatcher;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
-        WordSpecification $wordSpecification
+        WordSpecification $wordSpecification,
+        EventDispatcher $eventDispatcher
     )
     {
         $this->wordRepository = $wordRepository;
         $this->wordSpecification = $wordSpecification;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * AssociationApprovedChangedEvent event processing.
-     */
-    public function processAssociationApprovedChangedEvent(
-        AssociationApprovedChangedEvent $event
-    ) : iterable
+    public function recountAll(Word $word, ?Event $sourceEvent = null) : Word
     {
-        $assoc = $event->getAssociation();
+        $word = $this->recountApproved($word, $sourceEvent);
+        $word = $this->recountMature($word, $sourceEvent);
 
-        foreach ($assoc->words() as $word) {
-            $word = $this->recountApproved($word);
-
-            $word = $this->wordRepository->save($word);
-
-            yield new WordApprovedChangedEvent($word);
-        }
+        return $word;
     }
 
-    /**
-     * WordFeedbackCreatedEvent event processing.
-     */
-    public function processWordFeedbackCreatedEvent(WordFeedbackCreatedEvent $event) : iterable
+    public function recountApproved(Word $word, ?Event $sourceEvent = null) : Word
     {
-        $feedback = $event->getFeedback();
-        $word = $feedback->word();
-
-        return $this->recountAll($word);
-    }
-
-    /**
-     * WordOutOfDateEvent event processing.
-     */
-    public function processWordOutOfDateEvent(
-        WordOutOfDateEvent $event
-    ) : iterable
-    {
-        $word = $event->getWord();
-        return $this->recountAll($word);
-    }
-
-    private function recountAll(Word $word) : iterable
-    {
-        $word = $this->recountApproved($word);
-        $word = $this->recountMature($word);
-
-        $word = $this->wordRepository->save($word);
-
-        yield new WordApprovedChangedEvent($word);
-        yield new WordMatureChangedEvent($word);
-    }
-
-    private function recountApproved(Word $word) : Word
-    {
-        $approved = $this->wordSpecification->isApproved($word);
-
         $now = Date::dbNow();
+        $changed = false;
+
+        $approved = $this->wordSpecification->isApproved($word);
 
         if (
             $word->isApproved() !== $approved
@@ -91,18 +51,29 @@ class WordRecountService extends EventProcessor
         ) {
             $word->approved = Convert::toBit($approved);
             $word->approvedUpdatedAt = $now;
+
+            $changed = true;
         }
 
         $word->updatedAt = $now;
 
+        $word = $this->wordRepository->save($word);
+
+        if ($changed) {
+            $this->eventDispatcher->dispatch(
+                new WordApprovedChangedEvent($word, $sourceEvent)
+            );
+        }
+
         return $word;
     }
 
-    private function recountMature(Word $word) : Word
+    public function recountMature(Word $word, ?Event $sourceEvent = null) : Word
     {
-        $mature = $this->wordSpecification->isMature($word);
-
         $now = Date::dbNow();
+        $changed = false;
+
+        $mature = $this->wordSpecification->isMature($word);
 
         if (
             $word->isMature() !== $mature
@@ -110,9 +81,19 @@ class WordRecountService extends EventProcessor
         ) {
             $word->mature = Convert::toBit($mature);
             $word->matureUpdatedAt = $now;
+
+            $changed = true;
         }
 
         $word->updatedAt = $now;
+
+        $word = $this->wordRepository->save($word);
+
+        if ($changed) {
+            $this->eventDispatcher->dispatch(
+                new WordMatureChangedEvent($word, $sourceEvent)
+            );
+        }
 
         return $word;
     }

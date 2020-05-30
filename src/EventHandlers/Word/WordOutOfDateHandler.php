@@ -1,0 +1,23 @@
+<?php
+
+namespace App\EventHandlers\Word;
+
+use App\Events\Word\WordOutOfDateEvent;
+use App\Services\WordRecountService;
+
+class WordOutOfDateHandler
+{
+    private WordRecountService $wordRecountService;
+
+    public function __construct(WordRecountService $wordRecountService)
+    {
+        $this->wordRecountService = $wordRecountService;
+    }
+
+    public function __invoke(WordOutOfDateEvent $event) : void
+    {
+        $word = $event->getWord();
+
+        $this->wordRecountService->recountAll($word, $event);
+    }
+}

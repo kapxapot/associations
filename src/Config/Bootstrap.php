@@ -4,6 +4,9 @@ namespace App\Config;
 
 use App\Auth\Auth;
 use App\Core\Linker;
+use App\EventHandlers\Association\AssociationApprovedChangedHandler;
+use App\EventHandlers\Feedback\WordFeedbackCreatedEventHandler;
+use App\EventHandlers\Word\WordOutOfDateHandler;
 use App\External\YandexDict;
 use App\Factories\LoadUncheckedDictWordsJobFactory;
 use App\Factories\MatchDanglingDictWordsJobFactory;
@@ -204,10 +207,11 @@ class Bootstrap extends BootstrapBase
         $map['captchaConfig'] = fn (CI $c) =>
             new CaptchaConfig();
 
-        $map['eventProcessors'] = fn (CI $c) =>
+        $map['eventHandlers'] = fn (CI $c) =>
             [
-                $c->wordRecountService,
-                $c->associationRecountService,
+                new AssociationApprovedChangedHandler($c->wordRecountService),
+                new WordOutOfDateHandler($c->wordRecountService),
+                new WordFeedbackCreatedEventHandler($c->wordRecountService),
             ];
 
         $map['wordSpecification'] = fn (CI $c) =>
@@ -290,7 +294,8 @@ class Bootstrap extends BootstrapBase
         $map['wordRecountService'] = fn (CI $c) =>
             new WordRecountService(
                 $c->wordRepository,
-                $c->wordSpecification
+                $c->wordSpecification,
+                $c->eventDispatcher
             );
 
         $map['wordService'] = fn (CI $c) =>
