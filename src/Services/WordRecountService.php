@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Events\Association\AssociationApprovedEvent;
+use App\Events\Association\AssociationApprovedChangedEvent;
 use App\Events\Feedback\WordFeedbackCreatedEvent;
-use App\Events\Word\WordApprovedEvent;
-use App\Events\Word\WordMatureEvent;
+use App\Events\Word\WordApprovedChangedEvent;
+use App\Events\Word\WordMatureChangedEvent;
 use App\Events\Word\WordOutOfDateEvent;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
@@ -29,10 +29,10 @@ class WordRecountService extends EventProcessor
     }
 
     /**
-     * AssociationApprovedEvent event processing.
+     * AssociationApprovedChangedEvent event processing.
      */
-    public function processAssociationApprovedEvent(
-        AssociationApprovedEvent $event
+    public function processAssociationApprovedChangedEvent(
+        AssociationApprovedChangedEvent $event
     ) : iterable
     {
         $assoc = $event->getAssociation();
@@ -42,7 +42,7 @@ class WordRecountService extends EventProcessor
 
             $word = $this->wordRepository->save($word);
 
-            yield new WordApprovedEvent($word);
+            yield new WordApprovedChangedEvent($word);
         }
     }
 
@@ -75,8 +75,8 @@ class WordRecountService extends EventProcessor
 
         $word = $this->wordRepository->save($word);
 
-        yield new WordApprovedEvent($word);
-        yield new WordMatureEvent($word);
+        yield new WordApprovedChangedEvent($word);
+        yield new WordMatureChangedEvent($word);
     }
 
     private function recountApproved(Word $word) : Word

@@ -3,12 +3,12 @@
 namespace App\Services;
 
 use App\Config\Interfaces\AssociationConfigInterface;
-use App\Events\Association\AssociationApprovedEvent;
-use App\Events\Association\AssociationMatureEvent;
+use App\Events\Association\AssociationApprovedChangedEvent;
+use App\Events\Association\AssociationMatureChangedEvent;
 use App\Events\Association\AssociationOutOfDateEvent;
 use App\Events\Feedback\AssociationFeedbackCreatedEvent;
 use App\Events\Turn\TurnCreatedEvent;
-use App\Events\Word\WordMatureEvent;
+use App\Events\Word\WordMatureChangedEvent;
 use App\Models\Association;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Events\EventProcessor;
@@ -41,14 +41,14 @@ class AssociationRecountService extends EventProcessor
 
             $assoc = $this->associationRepository->save($assoc);
 
-            yield new AssociationApprovedEvent($assoc);
+            yield new AssociationApprovedChangedEvent($assoc);
         }
     }
 
     /**
-     * WordMatureEvent event processing.
+     * WordMatureChangedEvent event processing.
      */
-    public function processWordMatureEvent(WordMatureEvent $event) : iterable
+    public function processWordMatureChangedEvent(WordMatureChangedEvent $event) : iterable
     {
         $word = $event->getWord();
 
@@ -57,7 +57,7 @@ class AssociationRecountService extends EventProcessor
 
             $assoc = $this->associationRepository->save($assoc);
 
-            yield new AssociationMatureEvent($assoc);
+            yield new AssociationMatureChangedEvent($assoc);
         }
     }
 
@@ -92,8 +92,8 @@ class AssociationRecountService extends EventProcessor
 
         $assoc = $this->associationRepository->save($assoc);
 
-        yield new AssociationApprovedEvent($assoc);
-        yield new AssociationMatureEvent($assoc);
+        yield new AssociationApprovedChangedEvent($assoc);
+        yield new AssociationMatureChangedEvent($assoc);
     }
 
     private function recountApproved(Association $assoc) : Association
