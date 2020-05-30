@@ -5,6 +5,9 @@ namespace App\EventHandlers\Feedback;
 use App\Events\Feedback\WordFeedbackCreatedEvent;
 use App\Services\WordRecountService;
 
+/**
+ * Recounts all (approved & mature) for the word based on the feedback.
+ */
 class WordFeedbackCreatedEventHandler
 {
     private WordRecountService $wordRecountService;

@@ -5,7 +5,11 @@ namespace App\Config;
 use App\Auth\Auth;
 use App\Core\Linker;
 use App\EventHandlers\Association\AssociationApprovedChangedHandler;
+use App\EventHandlers\Association\AssociationOutOfDateHandler;
+use App\EventHandlers\Feedback\AssociationFeedbackCreatedHandler;
 use App\EventHandlers\Feedback\WordFeedbackCreatedEventHandler;
+use App\EventHandlers\Turn\TurnCreatedHandler;
+use App\EventHandlers\Word\WordMatureChangedHandler;
 use App\EventHandlers\Word\WordOutOfDateHandler;
 use App\External\YandexDict;
 use App\Factories\LoadUncheckedDictWordsJobFactory;
@@ -45,6 +49,7 @@ use App\Services\WordFeedbackService;
 use App\Services\WordRecountService;
 use App\Services\WordService;
 use App\Services\YandexDictService;
+use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
 use Plasticode\Config\Bootstrap as BootstrapBase;
 use Plasticode\ObjectProxy;
@@ -209,10 +214,33 @@ class Bootstrap extends BootstrapBase
 
         $map['eventHandlers'] = fn (CI $c) =>
             [
-                new AssociationApprovedChangedHandler($c->wordRecountService),
-                new WordOutOfDateHandler($c->wordRecountService),
-                new WordFeedbackCreatedEventHandler($c->wordRecountService),
+                new AssociationApprovedChangedHandler(
+                    $c->wordRecountService
+                ),
+                new AssociationFeedbackCreatedHandler(
+                    $c->associationRecountService
+                ),
+                new AssociationOutOfDateHandler(
+                    $c->associationRecountService
+                ),
+                new TurnCreatedHandler(
+                    $c->associationRecountService
+                ),
+                new WordFeedbackCreatedEventHandler(
+                    $c->wordRecountService
+                ),
+                new WordMatureChangedHandler(
+                    $c->associationRecountService
+                ),
+                new WordOutOfDateHandler(
+                    $c->wordRecountService
+                ),
             ];
+
+        $map['associationSpecification'] = fn (CI $c) =>
+            new AssociationSpecification(
+                $c->config
+            );
 
         $map['wordSpecification'] = fn (CI $c) =>
             new WordSpecification(
@@ -233,7 +261,8 @@ class Bootstrap extends BootstrapBase
         $map['associationRecountService'] = fn (CI $c) =>
             new AssociationRecountService(
                 $c->associationRepository,
-                $c->config
+                $c->associationSpecification,
+                $c->eventDispatcher
             );
 
         $map['associationService'] = fn (CI $c) =>

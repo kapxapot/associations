@@ -5,8 +5,10 @@ namespace App\Jobs;
 use App\Collections\AssociationCollection;
 use App\Events\Association\AssociationOutOfDateEvent;
 use App\Jobs\Interfaces\ModelJobInterface;
+use App\Models\Association;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
+use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
 
 class UpdateAssociationsJob implements ModelJobInterface
@@ -42,10 +44,13 @@ class UpdateAssociationsJob implements ModelJobInterface
             ->associationRepository
             ->getAllOutOfDate($ttl, $limit);
 
-        foreach ($outOfDate as $assoc) {
-            $event = new AssociationOutOfDateEvent($assoc);
-            $this->eventDispatcher->dispatch($event);
-        }
+        $outOfDate
+            ->map(
+                fn (Association $a) => new AssociationOutOfDateEvent($a)
+            )
+            ->apply(
+                fn (Event $e) => $this->eventDispatcher->dispatch($e)
+            );
 
         return $outOfDate;
     }

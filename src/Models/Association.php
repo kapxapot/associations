@@ -82,4 +82,13 @@ class Association extends LanguageElement
     {
         return $this->turns()->users();
     }
+
+    public function hasMatureWords() : bool
+    {
+        return $this
+            ->words()
+            ->any(
+                fn (Word $w) => $w->isMature()
+            );
+    }
 }

@@ -5,6 +5,9 @@ namespace App\EventHandlers\Word;
 use App\Events\Word\WordOutOfDateEvent;
 use App\Services\WordRecountService;
 
+/**
+ * Recounts all (approved & mature) for the word if it's out of date.
+ */
 class WordOutOfDateHandler
 {
     private WordRecountService $wordRecountService;

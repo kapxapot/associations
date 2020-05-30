@@ -6,6 +6,11 @@ use App\Events\Association\AssociationApprovedChangedEvent;
 use App\Models\Word;
 use App\Services\WordRecountService;
 
+/**
+ * Recounts approved for words in the assosiation.
+ * 
+ * If the association is approved, the words in it should approved too.
+ */
 class AssociationApprovedChangedHandler
 {
     private WordRecountService $wordRecountService;

@@ -9,11 +9,14 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Specifications\WordSpecification;
 use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
-use Plasticode\Events\EventProcessor;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 
-class WordRecountService extends EventProcessor
+/**
+ * @emits WordApprovedChangedEvent
+ * @emits WordMatureChangedEvent
+ */
+class WordRecountService
 {
     private WordRepositoryInterface $wordRepository;
     private WordSpecification $wordSpecification;

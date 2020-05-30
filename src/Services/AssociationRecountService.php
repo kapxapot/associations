@@ -2,116 +2,54 @@
 
 namespace App\Services;
 
-use App\Config\Interfaces\AssociationConfigInterface;
 use App\Events\Association\AssociationApprovedChangedEvent;
 use App\Events\Association\AssociationMatureChangedEvent;
-use App\Events\Association\AssociationOutOfDateEvent;
-use App\Events\Feedback\AssociationFeedbackCreatedEvent;
-use App\Events\Turn\TurnCreatedEvent;
-use App\Events\Word\WordMatureChangedEvent;
 use App\Models\Association;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
-use Plasticode\Events\EventProcessor;
+use App\Specifications\AssociationSpecification;
+use Plasticode\Events\Event;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 
-class AssociationRecountService extends EventProcessor
+/**
+ * @emits AssociationApprovedChangedEvent
+ * @emits AssociationMatureChangedEvent
+ */
+class AssociationRecountService
 {
     private AssociationRepositoryInterface $associationRepository;
-    private AssociationConfigInterface $config;
+    private AssociationSpecification $associationSpecification;
+    private EventDispatcher $eventDispatcher;
 
     public function __construct(
         AssociationRepositoryInterface $associationRepository,
-        AssociationConfigInterface $config
+        AssociationSpecification $associationSpecification,
+        EventDispatcher $eventDispatcher
     )
     {
         $this->associationRepository = $associationRepository;
-        $this->config = $config;
+        $this->associationSpecification = $associationSpecification;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
-    /**
-     * TurnCreatedEvent event processing.
-     */
-    public function processTurnCreatedEvent(TurnCreatedEvent $event) : iterable
+    public function recountAll(Association $assoc, ?Event $sourceEvent = null) : Association
     {
-        $assoc = $event->getTurn()->association();
+        $assoc = $this->recountApproved($assoc, $sourceEvent);
+        $assoc = $this->recountMature($assoc, $sourceEvent);
 
-        if ($assoc) {
-            $assoc = $this->recountApproved($assoc);
-
-            $assoc = $this->associationRepository->save($assoc);
-
-            yield new AssociationApprovedChangedEvent($assoc);
-        }
+        return $assoc;
     }
 
-    /**
-     * WordMatureChangedEvent event processing.
-     */
-    public function processWordMatureChangedEvent(WordMatureChangedEvent $event) : iterable
+    public function recountApproved(
+        Association $assoc,
+        ?Event $sourceEvent = null
+    ) : Association
     {
-        $word = $event->getWord();
-
-        foreach ($word->associations() as $assoc) {
-            $assoc = $this->recountMature($assoc);
-
-            $assoc = $this->associationRepository->save($assoc);
-
-            yield new AssociationMatureChangedEvent($assoc);
-        }
-    }
-
-    /**
-     * AssociationFeedbackCreatedEvent event processing.
-     */
-    public function processAssociationFeedbackCreatedEvent(
-        AssociationFeedbackCreatedEvent $event
-    ) : iterable
-    {
-        $feedback = $event->getFeedback();
-        $assoc = $feedback->association();
-
-        return $this->recountAll($assoc);
-    }
-
-    /**
-     * AssociationOutOfDateEvent event processing.
-     */
-    public function processAssociationOutOfDateEvent(
-        AssociationOutOfDateEvent $event
-    ) : iterable
-    {
-        $assoc = $event->getAssociation();
-        return $this->recountAll($assoc);
-    }
-
-    private function recountAll(Association $assoc) : iterable
-    {
-        $assoc = $this->recountApproved($assoc);
-        $assoc = $this->recountMature($assoc);
-
-        $assoc = $this->associationRepository->save($assoc);
-
-        yield new AssociationApprovedChangedEvent($assoc);
-        yield new AssociationMatureChangedEvent($assoc);
-    }
-
-    private function recountApproved(Association $assoc) : Association
-    {
-        $usageCoeff = $this->config->associationUsageCoeff();
-        $dislikeCoeff = $this->config->associationDislikeCoeff();
-        $threshold = $this->config->associationApprovalThreshold();
-
-        $turnsByUsers = $assoc->turns()->groupByUser();
-
-        $turnCount = count($turnsByUsers);
-
-        $dislikeCount = $assoc->dislikes()->count();
-
-        $score = $turnCount * $usageCoeff - $dislikeCount * $dislikeCoeff;
-        $approved = ($score >= $threshold);
-
         $now = Date::dbNow();
+        $changed = false;
+
+        $approved = $this->associationSpecification->isApproved($assoc);
 
         if (
             $assoc->isApproved() !== $approved
@@ -119,29 +57,32 @@ class AssociationRecountService extends EventProcessor
         ) {
             $assoc->approved = Convert::toBit($approved);
             $assoc->approvedUpdatedAt = $now;
+
+            $changed = true;
         }
 
         $assoc->updatedAt = $now;
 
+        $assoc = $this->associationRepository->save($assoc);
+
+        if ($changed) {
+            $this->eventDispatcher->dispatch(
+                new AssociationApprovedChangedEvent($assoc, $sourceEvent)
+            );
+        }
+
         return $assoc;
     }
 
-    private function recountMature(Association $assoc) : Association
+    public function recountMature(
+        Association $assoc,
+        ?Event $sourceEvent = null
+    ) : Association
     {
-        if (
-            $assoc->firstWord()->isMature()
-            || $assoc->secondWord()->isMature()
-        ) {
-            $mature = true;
-        } else {
-            $threshold = $this->config->associationMatureThreshold();
-
-            $maturesCount = $assoc->matures()->count();
-
-            $mature = ($maturesCount >= $threshold);
-        }
-
         $now = Date::dbNow();
+        $changed = false;
+
+        $mature = $this->associationSpecification->isMature($assoc);
 
         if (
             $assoc->isMature() !== $mature
@@ -149,9 +90,19 @@ class AssociationRecountService extends EventProcessor
         ) {
             $assoc->mature = Convert::toBit($mature);
             $assoc->matureUpdatedAt = $now;
+
+            $changed = true;
         }
 
         $assoc->updatedAt = $now;
+
+        $assoc = $this->associationRepository->save($assoc);
+
+        if ($changed) {
+            $this->eventDispatcher->dispatch(
+                new AssociationMatureChangedEvent($assoc, $sourceEvent)
+            );
+        }
 
         return $assoc;
     }

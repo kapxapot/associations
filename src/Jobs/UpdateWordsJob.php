@@ -5,8 +5,10 @@ namespace App\Jobs;
 use App\Collections\WordCollection;
 use App\Events\Word\WordOutOfDateEvent;
 use App\Jobs\Interfaces\ModelJobInterface;
+use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
+use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
 
 class UpdateWordsJob implements ModelJobInterface
@@ -42,10 +44,13 @@ class UpdateWordsJob implements ModelJobInterface
             ->wordRepository
             ->getAllOutOfDate($ttl, $limit);
 
-        foreach ($outOfDate as $word) {
-            $event = new WordOutOfDateEvent($word);
-            $this->eventDispatcher->dispatch($event);
-        }
+        $outOfDate
+            ->map(
+                fn (Word $w) => new WordOutOfDateEvent($w)
+            )
+            ->apply(
+                fn (Event $e) => $this->eventDispatcher->dispatch($e)
+            );
 
         return $outOfDate;
     }
