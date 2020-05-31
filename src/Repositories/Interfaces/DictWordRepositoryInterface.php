@@ -18,5 +18,8 @@ interface DictWordRepositoryInterface
      *
      * @param integer $ttlMin Update time-to-live in minutes.
      */
-    public function getAllDanglingOutOfDate(int $ttlMin, int $limit = 0) : DictWordCollection;
+    public function getAllDanglingOutOfDate(
+        int $ttlMin,
+        int $limit = 0
+    ) : DictWordCollection;
 }

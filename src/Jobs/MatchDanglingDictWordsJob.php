@@ -7,6 +7,7 @@ use App\Jobs\Interfaces\ModelJobInterface;
 use App\Models\Interfaces\DictWordInterface;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\DictionaryService;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 
 /**
@@ -16,16 +17,23 @@ class MatchDanglingDictWordsJob implements ModelJobInterface
 {
     private DictWordRepositoryInterface $dictWordRepository;
     private WordRepositoryInterface $wordRepository;
+
+    private DictionaryService $dictionaryService;
+
     private SettingsProviderInterface $settingsProvider;
 
     public function __construct(
         DictWordRepositoryInterface $dictWordRepository,
         WordRepositoryInterface $wordRepository,
+        DictionaryService $dictionaryService,
         SettingsProviderInterface $settingsProvider
     )
     {
         $this->dictWordRepository = $dictWordRepository;
         $this->wordRepository = $wordRepository;
+
+        $this->dictionaryService = $dictionaryService;
+
         $this->settingsProvider = $settingsProvider;
     }
 
@@ -43,9 +51,9 @@ class MatchDanglingDictWordsJob implements ModelJobInterface
             ->dictWordRepository
             ->getAllDanglingOutOfDate($danglingTtl, $limit)
             ->map(
-                function (DictWordInterface $dw) {
-                    $language = $dw->getLanguage();
-                    $wordStr = $dw->getWord();
+                function (DictWordInterface $dictWord) {
+                    $language = $dictWord->getLanguage();
+                    $wordStr = $dictWord->getWord();
 
                     $word = $this->wordRepository->findInLanguage($language, $wordStr);
 
@@ -53,10 +61,7 @@ class MatchDanglingDictWordsJob implements ModelJobInterface
                         return null;
                     }
 
-                    $dw->wordId = $word->getId();
-                    $this->dictWordRepository->save($dw);
-
-                    return $dw;
+                    return $this->dictionaryService->link($dictWord, $word);
                 }
             );
 

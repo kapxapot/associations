@@ -2,13 +2,20 @@
 
 namespace App\Services;
 
+use App\Events\DictWord\DictWordLinkedEvent;
+use App\Events\DictWord\DictWordUnlinkedEvent;
 use App\Models\Interfaces\DictWordInterface;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\Interfaces\ExternalDictServiceInterface;
+use Plasticode\Events\EventDispatcher;
 
+/**
+ * @emits DictWordLinkedEvent
+ * @emits DictWordUnlinkedEvent
+ */
 class DictionaryService
 {
     private DictWordRepositoryInterface $dictWordRepository;
@@ -16,16 +23,21 @@ class DictionaryService
 
     private ExternalDictServiceInterface $externalDictService;
 
+    private EventDispatcher $eventDispatcher;
+
     public function __construct(
         DictWordRepositoryInterface $dictWordRepository,
         WordRepositoryInterface $wordRepository,
-        ExternalDictServiceInterface $externalDictService
+        ExternalDictServiceInterface $externalDictService,
+        EventDispatcher $eventDispatcher
     )
     {
         $this->dictWordRepository = $dictWordRepository;
         $this->wordRepository = $wordRepository;
 
         $this->externalDictService = $externalDictService;
+
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function isWordKnown(Word $word) : bool
@@ -101,13 +113,68 @@ class DictionaryService
                 ->loadFromDictionary($language, $wordStr);
 
             if ($dictWord) {
-                if ($word) {
-                    $dictWord->wordId = $word->getId();
-                }
-
                 $dictWord = $this->dictWordRepository->save($dictWord);
+
+                if ($word) {
+                    $this->link($dictWord, $word);
+                }
             }
         }
+
+        return $dictWord;
+    }
+
+    /**
+     * Links dict word with word and emits {@see DictWordLinkedEvent}.
+     * 
+     * If dict word was already linked to another word, emits {@see DictWordUnlinkedEvent}
+     * as well.
+     */
+    public function link(DictWordInterface $dictWord, Word $word) : DictWordInterface
+    {
+        $unlinkedWord = $this->wordRepository->get($dictWord->wordId);
+
+        // nothing to do?
+        if ($word->equals($unlinkedWord)) {
+            return $dictWord;
+        }
+
+        $dictWord->wordId = $word->getId();
+
+        $dictWord = $this->dictWordRepository->save($dictWord);
+
+        if ($unlinkedWord) {
+            $this->eventDispatcher->dispatch(
+                new DictWordUnlinkedEvent($dictWord, $unlinkedWord)
+            );
+        }
+
+        $this->eventDispatcher->dispatch(
+            new DictWordLinkedEvent($dictWord)
+        );
+
+        return $dictWord;
+    }
+
+    /**
+     * Unlinks word from dict word and emits {@see DictWordUnlinkedEvent}.
+     */
+    public function unlink(DictWordInterface $dictWord) : DictWordInterface
+    {
+        $unlinkedWord = $this->wordRepository->get($dictWord->wordId);
+
+        // nothing to do?
+        if (is_null($unlinkedWord)) {
+            return $dictWord;
+        }
+
+        $dictWord->wordId = null;
+
+        $dictWord = $this->dictWordRepository->save($dictWord);
+
+        $this->eventDispatcher->dispatch(
+            new DictWordUnlinkedEvent($dictWord, $unlinkedWord)
+        );
 
         return $dictWord;
     }

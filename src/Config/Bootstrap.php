@@ -52,6 +52,7 @@ use App\Services\YandexDictService;
 use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
 use Plasticode\Config\Bootstrap as BootstrapBase;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\ObjectProxy;
 use Psr\Container\ContainerInterface as CI;
 
@@ -212,31 +213,6 @@ class Bootstrap extends BootstrapBase
         $map['captchaConfig'] = fn (CI $c) =>
             new CaptchaConfig();
 
-        $map['eventHandlers'] = fn (CI $c) =>
-            [
-                new AssociationApprovedChangedHandler(
-                    $c->wordRecountService
-                ),
-                new AssociationFeedbackCreatedHandler(
-                    $c->associationRecountService
-                ),
-                new AssociationOutOfDateHandler(
-                    $c->associationRecountService
-                ),
-                new TurnCreatedHandler(
-                    $c->associationRecountService
-                ),
-                new WordFeedbackCreatedEventHandler(
-                    $c->wordRecountService
-                ),
-                new WordMatureChangedHandler(
-                    $c->associationRecountService
-                ),
-                new WordOutOfDateHandler(
-                    $c->wordRecountService
-                ),
-            ];
-
         $map['associationSpecification'] = fn (CI $c) =>
             new AssociationSpecification(
                 $c->config
@@ -279,7 +255,8 @@ class Bootstrap extends BootstrapBase
             new DictionaryService(
                 $c->dictWordRepository,
                 $c->wordRepository,
-                $c->yandexDictService
+                $c->yandexDictService,
+                $c->eventDispatcher
             );
 
         $map['gameService'] = fn (CI $c) =>
@@ -355,6 +332,7 @@ class Bootstrap extends BootstrapBase
             new MatchDanglingDictWordsJobFactory(
                 $c->dictWordRepository,
                 $c->wordRepository,
+                $c->dictionaryService,
                 $c->settingsProvider
             );
 
@@ -387,5 +365,53 @@ class Bootstrap extends BootstrapBase
             );
 
         return $map;
+    }
+
+    public function registerEventHandlers(CI $c)
+    {
+        /** @var EventDispatcher */
+        $dispatcher = $c->eventDispatcher;
+
+        $dispatcher->addHandler(
+            new AssociationApprovedChangedHandler(
+                $c->wordRecountService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new AssociationFeedbackCreatedHandler(
+                $c->associationRecountService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new AssociationOutOfDateHandler(
+                $c->associationRecountService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new TurnCreatedHandler(
+                $c->associationRecountService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new WordFeedbackCreatedEventHandler(
+                $c->wordRecountService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new WordMatureChangedHandler(
+                $c->associationRecountService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new WordOutOfDateHandler(
+                $c->wordRecountService
+            )
+        );
     }
 }

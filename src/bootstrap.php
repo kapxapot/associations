@@ -47,6 +47,10 @@ $app->add(
     )
 );
 
+// event handlers
+
+$bootstrap->registerEventHandlers($container);
+
 require $root . '/src/routes.php';
 
 $app->run();

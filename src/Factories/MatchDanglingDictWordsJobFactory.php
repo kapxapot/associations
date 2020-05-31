@@ -6,6 +6,7 @@ use App\Factories\Interfaces\ModelJobFactoryInterface;
 use App\Jobs\MatchDanglingDictWordsJob;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\DictionaryService;
 use Plasticode\Core\Interfaces\SettingsProviderInterface;
 
 class MatchDanglingDictWordsJobFactory implements ModelJobFactoryInterface
@@ -15,6 +16,7 @@ class MatchDanglingDictWordsJobFactory implements ModelJobFactoryInterface
     public function __construct(
         DictWordRepositoryInterface $dictWordRepository,
         WordRepositoryInterface $wordRepository,
+        DictionaryService $dictionaryService,
         SettingsProviderInterface $settingsProvider
     )
     {
@@ -23,6 +25,7 @@ class MatchDanglingDictWordsJobFactory implements ModelJobFactoryInterface
             new MatchDanglingDictWordsJob(
                 $dictWordRepository,
                 $wordRepository,
+                $dictionaryService,
                 $settingsProvider
             );
     }
