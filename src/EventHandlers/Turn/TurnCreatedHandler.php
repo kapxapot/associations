@@ -6,7 +6,7 @@ use App\Events\Turn\TurnCreatedEvent;
 use App\Services\AssociationRecountService;
 
 /**
- * Recounts approved for the association if it's present in the created turn.
+ * Recounts approved status for the association if it relates to the created turn.
  */
 class TurnCreatedHandler
 {

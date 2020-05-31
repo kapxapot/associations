@@ -6,7 +6,7 @@ use App\Events\Feedback\AssociationFeedbackCreatedEvent;
 use App\Services\AssociationRecountService;
 
 /**
- * Recounts all (approved & mature) for the association based on the feedback.
+ * Recounts all statuses (approved & mature) for the association based on the feedback.
  */
 class AssociationFeedbackCreatedHandler
 {

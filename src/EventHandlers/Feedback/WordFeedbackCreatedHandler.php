@@ -6,7 +6,7 @@ use App\Events\Feedback\WordFeedbackCreatedEvent;
 use App\Services\WordRecountService;
 
 /**
- * Recounts all (approved & mature) for the word based on the feedback.
+ * Recounts all statuses (approved & mature) for the word based on the feedback.
  */
 class WordFeedbackCreatedEventHandler
 {

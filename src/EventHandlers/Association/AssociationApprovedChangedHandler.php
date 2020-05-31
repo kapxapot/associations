@@ -7,9 +7,9 @@ use App\Models\Word;
 use App\Services\WordRecountService;
 
 /**
- * Recounts approved for words in the assosiation.
+ * Recounts approved status for words in the association.
  * 
- * If the association is approved, the words in it should approved too.
+ * If the association is approved, the words in it should be approved too.
  */
 class AssociationApprovedChangedHandler
 {

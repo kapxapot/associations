@@ -3,9 +3,10 @@
 namespace App\Events\Feedback;
 
 use App\Models\Feedback;
+use Plasticode\Events\EntityEvent;
 use Plasticode\Events\Event;
 
-abstract class FeedbackEvent extends Event
+abstract class FeedbackEvent extends EntityEvent
 {
     protected Feedback $feedback;
 

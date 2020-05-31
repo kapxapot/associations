@@ -7,7 +7,7 @@ use App\Models\Association;
 use App\Services\AssociationRecountService;
 
 /**
- * Recounts mature for associations that use the word.
+ * Recounts mature status for associations that use the word.
  * 
  * If the word is mature, all its associations must be mature.
  */

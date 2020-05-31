@@ -3,13 +3,14 @@
 namespace App\Events\Word;
 
 use App\Models\Word;
+use Plasticode\Events\EntityEvent;
 use Plasticode\Events\Event;
 
-abstract class WordEvent extends Event
+abstract class WordEvent extends EntityEvent
 {
     protected Word $word;
 
-    public function __construct(Word $word, Event $parent = null)
+    public function __construct(Word $word, ?Event $parent = null)
     {
         parent::__construct($parent);
 

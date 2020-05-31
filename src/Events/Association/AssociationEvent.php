@@ -3,13 +3,14 @@
 namespace App\Events\Association;
 
 use App\Models\Association;
+use Plasticode\Events\EntityEvent;
 use Plasticode\Events\Event;
 
-abstract class AssociationEvent extends Event
+abstract class AssociationEvent extends EntityEvent
 {
     protected Association $association;
 
-    public function __construct(Association $association, Event $parent = null)
+    public function __construct(Association $association, ?Event $parent = null)
     {
         parent::__construct($parent);
 

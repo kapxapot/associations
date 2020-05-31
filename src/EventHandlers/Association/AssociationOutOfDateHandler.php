@@ -5,6 +5,9 @@ namespace App\EventHandlers\Association;
 use App\Events\Association\AssociationOutOfDateEvent;
 use App\Services\AssociationRecountService;
 
+/**
+ * Recounts all statuses (approved & mature) for the association if it's out of date.
+ */
 class AssociationOutOfDateHandler
 {
     private AssociationRecountService $associationRecountService;

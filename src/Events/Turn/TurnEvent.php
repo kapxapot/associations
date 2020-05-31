@@ -3,13 +3,14 @@
 namespace App\Events\Turn;
 
 use App\Models\Turn;
+use Plasticode\Events\EntityEvent;
 use Plasticode\Events\Event;
 
-abstract class TurnEvent extends Event
+abstract class TurnEvent extends EntityEvent
 {
     protected Turn $turn;
 
-    public function __construct(Turn $turn, Event $parent = null)
+    public function __construct(Turn $turn, ?Event $parent = null)
     {
         parent::__construct($parent);
 
