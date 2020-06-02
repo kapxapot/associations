@@ -6,8 +6,10 @@ use App\Auth\Auth;
 use App\Core\Linker;
 use App\EventHandlers\Association\AssociationApprovedChangedHandler;
 use App\EventHandlers\Association\AssociationOutOfDateHandler;
+use App\EventHandlers\DictWord\DictWordLinkedHandler;
+use App\EventHandlers\DictWord\DictWordUnlinkedHandler;
 use App\EventHandlers\Feedback\AssociationFeedbackCreatedHandler;
-use App\EventHandlers\Feedback\WordFeedbackCreatedEventHandler;
+use App\EventHandlers\Feedback\WordFeedbackCreatedHandler;
 use App\EventHandlers\Turn\TurnCreatedHandler;
 use App\EventHandlers\Word\WordMatureChangedHandler;
 use App\EventHandlers\Word\WordOutOfDateHandler;
@@ -105,7 +107,8 @@ class Bootstrap extends BootstrapBase
                 new ObjectProxy(
                     fn () =>
                     new YandexDictWordHydrator(
-                        $c->languageRepository
+                        $c->languageRepository,
+                        $c->wordRepository
                     )
                 )
             );
@@ -397,7 +400,7 @@ class Bootstrap extends BootstrapBase
         );
 
         $dispatcher->addHandler(
-            new WordFeedbackCreatedEventHandler(
+            new WordFeedbackCreatedHandler(
                 $c->wordRecountService
             )
         );
@@ -410,6 +413,18 @@ class Bootstrap extends BootstrapBase
 
         $dispatcher->addHandler(
             new WordOutOfDateHandler(
+                $c->wordRecountService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new DictWordLinkedHandler(
+                $c->wordRecountService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new DictWordUnlinkedHandler(
                 $c->wordRecountService
             )
         );

@@ -14,7 +14,9 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @property string|null $response
  * @property string|null $pos
  * @method Language language()
+ * @method Word|null linkedWord()
  * @method static withLanguage(Language|callable $language)
+ * @method static withLinkedWord(Word|callable|null $linkedWord)
  */
 class YandexDictWord extends DbModel implements DictWordInterface
 {
@@ -23,7 +25,10 @@ class YandexDictWord extends DbModel implements DictWordInterface
 
     protected function requiredWiths(): array
     {
-        return ['language'];
+        return [
+            'language',
+            'linkedWord'
+        ];
     }
 
     public function getLanguage() : Language
@@ -34,6 +39,31 @@ class YandexDictWord extends DbModel implements DictWordInterface
     public function getWord() : string
     {
         return $this->word;
+    }
+
+    public function getLinkedWord(): ?Word
+    {
+        return $this->linkedWord();
+    }
+
+    /**
+     * @return static
+     */
+    public function linkWord(Word $word) : self
+    {
+        $this->wordId = $word->getId();
+
+        return $this->withLinkedWord($word);
+    }
+
+    /**
+     * @return static
+     */
+    public function unlinkWord() : self
+    {
+        $this->wordId = null;
+
+        return $this->withLinkedWord(null);
     }
 
     public function isValid() : bool

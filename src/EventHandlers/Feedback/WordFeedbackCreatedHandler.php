@@ -8,7 +8,7 @@ use App\Services\WordRecountService;
 /**
  * Recounts all statuses (approved & mature) for the word based on the feedback.
  */
-class WordFeedbackCreatedEventHandler
+class WordFeedbackCreatedHandler
 {
     private WordRecountService $wordRecountService;
 

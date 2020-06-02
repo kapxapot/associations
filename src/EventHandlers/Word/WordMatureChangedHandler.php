@@ -29,6 +29,5 @@ class WordMatureChangedHandler
                 fn (Association $a) =>
                 $this->associationRecountService->recountMature($a, $event)
             );
-        }
     }
 }

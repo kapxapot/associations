@@ -132,14 +132,14 @@ class DictionaryService
      */
     public function link(DictWordInterface $dictWord, Word $word) : DictWordInterface
     {
-        $unlinkedWord = $this->wordRepository->get($dictWord->wordId);
+        $unlinkedWord = $dictWord->getLinkedWord();
 
         // nothing to do?
         if ($word->equals($unlinkedWord)) {
             return $dictWord;
         }
 
-        $dictWord->wordId = $word->getId();
+        $dictWord = $dictWord->linkWord($word);
 
         $dictWord = $this->dictWordRepository->save($dictWord);
 
@@ -161,14 +161,14 @@ class DictionaryService
      */
     public function unlink(DictWordInterface $dictWord) : DictWordInterface
     {
-        $unlinkedWord = $this->wordRepository->get($dictWord->wordId);
+        $unlinkedWord = $dictWord->getLinkedWord();
 
         // nothing to do?
         if (is_null($unlinkedWord)) {
             return $dictWord;
         }
 
-        $dictWord->wordId = null;
+        $dictWord = $dictWord->unlinkWord();
 
         $dictWord = $this->dictWordRepository->save($dictWord);
 

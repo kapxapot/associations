@@ -14,7 +14,9 @@ class AssociationFeedbackCreatedEvent extends FeedbackEvent
         ?Event $parent = null
     )
     {
-        parent::__construct($feedback, $parent);
+        parent::__construct($parent);
+
+        $this->feedback = $feedback;
     }
 
     public function getFeedback() : AssociationFeedback
