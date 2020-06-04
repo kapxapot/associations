@@ -11,8 +11,10 @@ use App\EventHandlers\DictWord\DictWordUnlinkedHandler;
 use App\EventHandlers\Feedback\AssociationFeedbackCreatedHandler;
 use App\EventHandlers\Feedback\WordFeedbackCreatedHandler;
 use App\EventHandlers\Turn\TurnCreatedHandler;
+use App\EventHandlers\Word\WordCreatedHandler;
 use App\EventHandlers\Word\WordMatureChangedHandler;
 use App\EventHandlers\Word\WordOutOfDateHandler;
+use App\EventHandlers\Word\WordUpdatedHandler;
 use App\External\YandexDict;
 use App\Factories\LoadUncheckedDictWordsJobFactory;
 use App\Factories\MatchDanglingDictWordsJobFactory;
@@ -257,7 +259,6 @@ class Bootstrap extends BootstrapBase
         $map['dictionaryService'] = fn (CI $c) =>
             new DictionaryService(
                 $c->dictWordRepository,
-                $c->wordRepository,
                 $c->yandexDictService,
                 $c->eventDispatcher
             );
@@ -302,8 +303,8 @@ class Bootstrap extends BootstrapBase
 
         $map['wordRecountService'] = fn (CI $c) =>
             new WordRecountService(
-                $c->wordRepository,
                 $c->wordSpecification,
+                $c->wordService,
                 $c->eventDispatcher
             );
 
@@ -314,7 +315,8 @@ class Bootstrap extends BootstrapBase
                 $c->casesService,
                 $c->validator,
                 $c->validationRules,
-                $c->config
+                $c->config,
+                $c->eventDispatcher
             );
 
         $map['yandexDictService'] = fn (CI $c) =>
@@ -426,6 +428,18 @@ class Bootstrap extends BootstrapBase
         $dispatcher->addHandler(
             new DictWordUnlinkedHandler(
                 $c->wordRecountService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new WordCreatedHandler(
+                $c->dictionaryService
+            )
+        );
+
+        $dispatcher->addHandler(
+            new WordUpdatedHandler(
+                $c->dictionaryService
             )
         );
     }

@@ -40,7 +40,7 @@ class LoadUncheckedDictWordsJob implements ModelJobInterface
                 ->wordRepository
                 ->getAllUnchecked($limit)
                 ->map(
-                    fn (Word $w) => $this->dictionaryService->getByWord($w, true)
+                    fn (Word $w) => $this->dictionaryService->loadByWord($w)
                 )
         );
     }

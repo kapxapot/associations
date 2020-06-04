@@ -4,12 +4,15 @@ namespace App\Services;
 
 use App\Collections\WordCollection;
 use App\Config\Interfaces\WordConfigInterface;
+use App\Events\Word\WordCreatedEvent;
+use App\Events\Word\WordUpdatedEvent;
 use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
 use Plasticode\Util\Strings;
@@ -18,6 +21,10 @@ use Plasticode\Validation\ValidationRules;
 use Respect\Validation\Validator;
 use Webmozart\Assert\Assert;
 
+/**
+ * @emits WordCreatedEvent
+ * @emits WordUpdatedEvent
+ */
 class WordService
 {
     private TurnRepositoryInterface $turnRepository;
@@ -29,13 +36,16 @@ class WordService
 
     private WordConfigInterface $config;
 
+    private EventDispatcher $eventDispatcher;
+
     public function __construct(
         TurnRepositoryInterface $turnRepository,
         WordRepositoryInterface $wordRepository,
         CasesService $casesService,
         ValidatorInterface $validator,
         ValidationRules $validationRules,
-        WordConfigInterface $config
+        WordConfigInterface $config,
+        EventDispatcher $eventDispatcher
     )
     {
         $this->turnRepository = $turnRepository;
@@ -46,6 +56,8 @@ class WordService
         $this->validationRules = $validationRules;
 
         $this->config = $config;
+
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -79,9 +91,9 @@ class WordService
     }
 
     /**
-     * Creates new word
+     * Creates new word.
      * 
-     * Word should be normalized in advance!
+     * Word must be normalized in advance!
      * 
      * !!!!!!!!!!!!!!!!!!!
      * Same problem as with duplicate association
@@ -103,7 +115,7 @@ class WordService
             throw new InvalidOperationException('Word already exists.');
         }
 
-        return $this
+        $word = $this
             ->wordRepository
             ->store(
                 [
@@ -113,6 +125,23 @@ class WordService
                     'created_by' => $user->getId(),
                 ]
             );
+
+        $this->eventDispatcher->dispatch(
+            new WordCreatedEvent($word)
+        );
+
+        return $word;
+    }
+
+    public function update(Word $word) : Word
+    {
+        $word = $this->wordRepository->save($word);
+
+        $this->eventDispatcher->dispatch(
+            new WordUpdatedEvent($word)
+        );
+
+        return $word;
     }
 
     /**

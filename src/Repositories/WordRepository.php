@@ -99,7 +99,8 @@ class WordRepository extends LanguageElementRepository implements WordRepository
                         '=',
                         $dwAlias . '.word_id'
                     ],
-                    $dwAlias)
+                    $dwAlias
+                )
                 ->whereNull($dwAlias . '.id')
                 ->limit($limit)
         );

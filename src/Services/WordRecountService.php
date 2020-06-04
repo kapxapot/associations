@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Events\Word\WordApprovedChangedEvent;
 use App\Events\Word\WordMatureChangedEvent;
 use App\Models\Word;
-use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Specifications\WordSpecification;
 use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
@@ -18,18 +17,18 @@ use Plasticode\Util\Date;
  */
 class WordRecountService
 {
-    private WordRepositoryInterface $wordRepository;
     private WordSpecification $wordSpecification;
+    private WordService $wordService;
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
-        WordRepositoryInterface $wordRepository,
         WordSpecification $wordSpecification,
+        WordService $wordService,
         EventDispatcher $eventDispatcher
     )
     {
-        $this->wordRepository = $wordRepository;
         $this->wordSpecification = $wordSpecification;
+        $this->wordService = $wordService;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -60,7 +59,7 @@ class WordRecountService
 
         $word->updatedAt = $now;
 
-        $word = $this->wordRepository->save($word);
+        $word = $this->wordService->update($word);
 
         if ($changed) {
             $this->eventDispatcher->dispatch(
@@ -90,7 +89,7 @@ class WordRecountService
 
         $word->updatedAt = $now;
 
-        $word = $this->wordRepository->save($word);
+        $word = $this->wordService->update($word);
 
         if ($changed) {
             $this->eventDispatcher->dispatch(
