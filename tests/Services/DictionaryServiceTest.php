@@ -2,52 +2,24 @@
 
 namespace App\Tests\Services;
 
-use App\Models\Language;
+use App\Services\DictionaryService;
 use App\Tests\BaseTestCase;
 
 final class DictionaryServiceTest extends BaseTestCase
 {
-    /** @dataProvider isWordStrKnownProvider */
-    public function testIsWordStrKnown(string $word, bool $expected) : void
+    public function testIsWordKnown() : void
     {
-        $languageRepository = $this->container->languageRepository;
-        $language = $languageRepository->get(Language::RUSSIAN);
-
-        $service = $this->container->dictionaryService;
-        
-        $actual = $service->isWordStrKnown($language, $word);
-
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function isWordStrKnownProvider()
-    {
-        return [
-            ['секс', true],
-            ['самолет', true],
-            ['таблица', true],
-            ['чучундрик', false],
-            ['овоывалоарл', false],
-        ];
-    }
-
-    /** @dataProvider isWordKnownProvider */
-    public function testIsWordKnown(int $wordId, bool $expected) : void
-    {
+        /** @var DictionaryService */
         $service = $this->container->dictionaryService;
 
         $wordRepository = $this->container->wordRepository;
-        $word = $wordRepository->get($wordId);
+        $word = $wordRepository->get(1); // стол
 
-        $actual = $service->isWordKnown($word);
+        $dictWord = $service->getByWord($word, true);
 
-        $this->assertEquals($expected, $actual);
-    }
-
-    public function isWordKnownProvider()
-    {
-        return [
-            [1, true],
-        ];
+        $this->assertNotNull($dictWord);
+        $this->assertTrue($dictWord->getLinkedWord()->equals($word));
+        $this->assertTrue($dictWord->isValid());
+        $this->assertTrue($dictWord->isNoun());
     }
 }
