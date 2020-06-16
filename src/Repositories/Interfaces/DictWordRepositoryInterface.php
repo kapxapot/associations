@@ -9,6 +9,7 @@ use App\Models\Word;
 
 interface DictWordRepositoryInterface
 {
+    function create(array $data) : DictWordInterface;
     function save(DictWordInterface $dictWord) : DictWordInterface;
     function getByWord(Word $word) : ?DictWordInterface;
     function getByWordStr(Language $language, string $wordStr) : ?DictWordInterface;

@@ -5,17 +5,21 @@ namespace App\Services;
 use App\External\YandexDict;
 use App\Models\Language;
 use App\Models\YandexDictWord;
+use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Services\Interfaces\ExternalDictServiceInterface;
 use Webmozart\Assert\Assert;
 
 class YandexDictService implements ExternalDictServiceInterface
 {
+    private DictWordRepositoryInterface $dictWordRepository;
     private YandexDict $yandexDict;
 
     public function __construct(
+        DictWordRepositoryInterface $dictWordRepository,
         YandexDict $yandexDict
     )
     {
+        $this->dictWordRepository = $dictWordRepository;
         $this->yandexDict = $yandexDict;
     }
 
@@ -35,7 +39,7 @@ class YandexDictService implements ExternalDictServiceInterface
             return null;
         }
 
-        $dictWord = YandexDictWord::create(
+        $dictWord = $this->dictWordRepository->create(
             [
                 'word' => $wordStr,
                 'language_id' => $language->getId(),
@@ -51,9 +55,9 @@ class YandexDictService implements ExternalDictServiceInterface
 
     private function parseApiResult(?string $result) : ?array
     {
-        return is_null($result)
-            ? null
-            : json_decode($result, true);
+        return strlen($result) > 0
+            ? json_decode($result, true)
+            : null;
     }
 
     private function applyParsedData(

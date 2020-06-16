@@ -259,8 +259,14 @@ class Bootstrap extends BootstrapBase
         $map['dictionaryService'] = fn (CI $c) =>
             new DictionaryService(
                 $c->dictWordRepository,
-                $c->yandexDictService,
+                $c->externalDictService,
                 $c->eventDispatcher
+            );
+
+        $map['externalDictService'] = fn (CI $c) =>
+            new YandexDictService(
+                $c->dictWordRepository,
+                $c->yandexDict
             );
 
         $map['gameService'] = fn (CI $c) =>
@@ -317,11 +323,6 @@ class Bootstrap extends BootstrapBase
                 $c->validationRules,
                 $c->config,
                 $c->eventDispatcher
-            );
-
-        $map['yandexDictService'] = fn (CI $c) =>
-            new YandexDictService(
-                $c->yandexDict
             );
 
         // factories

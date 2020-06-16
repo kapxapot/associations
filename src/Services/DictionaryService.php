@@ -101,10 +101,10 @@ class DictionaryService
 
         $dictWord = $this->dictWordRepository->save($dictWord);
 
+        $word = $word->withDictWord($dictWord);
+
         if ($unlinkedWord) {
-            $this->eventDispatcher->dispatch(
-                new DictWordUnlinkedEvent($dictWord, $unlinkedWord)
-            );
+            $this->unlinkWord($dictWord, $unlinkedWord);
         }
 
         $this->eventDispatcher->dispatch(
@@ -130,10 +130,17 @@ class DictionaryService
 
         $dictWord = $this->dictWordRepository->save($dictWord);
 
-        $this->eventDispatcher->dispatch(
-            new DictWordUnlinkedEvent($dictWord, $unlinkedWord)
-        );
+        $this->unlinkWord($dictWord, $unlinkedWord);
 
         return $dictWord;
+    }
+
+    private function unlinkWord(DictWordInterface $dictWord, Word $word) : void
+    {
+        $word = $word->withDictWord(null);
+
+        $this->eventDispatcher->dispatch(
+            new DictWordUnlinkedEvent($dictWord, $word)
+        );
     }
 }

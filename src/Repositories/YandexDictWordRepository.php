@@ -18,6 +18,11 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
 
     protected string $entityClass = YandexDictWord::class;
 
+    public function create(array $data) : YandexDictWord
+    {
+        return $this->createEntity($data);
+    }
+
     /**
      * @param YandexDictWord $dictWord
      */
