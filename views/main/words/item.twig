@@ -25,13 +25,25 @@
             <p>
                 <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
 
-                <span class="label {{ word.is_approved ? 'label-success' : 'label-primary' }}" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто его использовал' }}" data-toggle="tooltip">{{ word.is_approved ? 'общее' : 'личное' }}</span>
+                <span class="label {{ word.is_approved ? 'label-success' : 'label-primary' }}" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто его использовал' }}" data-toggle="tooltip">{{ word.is_approved ? '<i class="fas fa-check"></i> общее' : 'личное' }}</span>
 
                 {% if word.dict_word %}
-                    <span class="label label-success" title="Есть в словаре" data-toggle="tooltip"><i class="fas fa-check"></i> проверено</span>
+                    {% set dw = word.dict_word %}
 
-                    {% if word.dict_word.is_noun %}
-                        <span class="label label-success" title="Существительное" data-toggle="tooltip"><i class="fas fa-check"></i> сущ</span>
+                    {% if dw.is_valid %}
+                        <span class="label label-success" title="Есть в словаре" data-toggle="tooltip"><i class="fas fa-check"></i> словарь</span>
+
+                        {% if dw.is_noun %}
+                            <span class="label label-success" title="Существительное" data-toggle="tooltip"><i class="fas fa-check"></i> сущ</span>
+                        {% elseif dw.part_of_speech == 'adjective' %}
+                            <span class="label label-warning" title="Прилагательное" data-toggle="tooltip"><i class="fas fa-times"></i> прил</span>
+                        {% elseif dw.part_of_speech == 'verb' %}
+                            <span class="label label-danger" title="Глагол" data-toggle="tooltip"><i class="fas fa-times"></i> глагол</span>
+                        {% else %}
+                            <span class="label label-danger"><i class="fas fa-times"></i> {{ dw.part_of_speech }}</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="label label-danger" title="Нет в словаре" data-toggle="tooltip"><i class="fas fa-times"></i> словарь</span>
                     {% endif %}
                 {% endif %}
 

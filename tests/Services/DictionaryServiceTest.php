@@ -89,4 +89,71 @@ final class DictionaryServiceTest extends TestCase
         $this->assertFalse($dictWord->isValid());
         $this->assertFalse($dictWord->isNoun());
     }
+
+    public function testRelink() : void
+    {
+        /** @var Word */
+        $word1 = Word::create(
+            [
+                'id' => 1,
+                'language_id' => $this->language->getId(),
+                'word' => 'стол',
+            ]
+        );
+
+        /** @var Word */
+        $word2 = Word::create(
+            [
+                'id' => 2,
+                'language_id' => $this->language->getId(),
+                'word' => 'кровать',
+            ]
+        );
+
+        $word1 = $word1->withLanguage($this->language);
+        $word2 = $word2->withLanguage($this->language);
+
+        $dictWord = $this->dictService->getByWord($word1, true);
+
+        // dictWord and word1 should be linked
+        $this->assertNotNull($dictWord);
+        $this->assertTrue($dictWord->getLinkedWord()->equals($word1));
+        $this->assertTrue($word1->dictWord()->equals($dictWord));
+
+        $dictWord = $this->dictService->link($dictWord, $word2);
+
+        // dictWord and word2 should be linked
+        $this->assertNotNull($dictWord);
+        $this->assertTrue($dictWord->getLinkedWord()->equals($word2));
+        $this->assertTrue($word2->dictWord()->equals($dictWord));
+        $this->assertNull($word1->dictWord());
+    }
+
+    public function testUnlink() : void
+    {
+        /** @var Word */
+        $word = Word::create(
+            [
+                'id' => 1,
+                'language_id' => $this->language->getId(),
+                'word' => 'стол',
+            ]
+        );
+
+        $word = $word->withLanguage($this->language);
+
+        $dictWord = $this->dictService->getByWord($word, true);
+
+        // dictWord and word should be linked
+        $this->assertNotNull($dictWord);
+        $this->assertTrue($dictWord->getLinkedWord()->equals($word));
+        $this->assertTrue($word->dictWord()->equals($dictWord));
+
+        $dictWord = $this->dictService->unlink($dictWord);
+
+        // dictWord and word should be not linked
+        $this->assertNotNull($dictWord);
+        $this->assertNull($dictWord->getLinkedWord());
+        $this->assertNull($word->dictWord());
+    }
 }
