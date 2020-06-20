@@ -64,6 +64,14 @@ abstract class LanguageElement extends DbModel implements LinkableInterface
     }
 
     /**
+     * Is visible for everyone.
+     */
+    public function isPublic() : bool
+    {
+        return $this->isVisibleFor(null);
+    }
+
+    /**
      * Maturity check.
      */
     public function isVisibleFor(?User $user) : bool
@@ -80,7 +88,15 @@ abstract class LanguageElement extends DbModel implements LinkableInterface
             );
     }
 
-    public function isPlayableAgainst(User $user) : bool
+    /**
+     * Is visible for all (public) and is approved.
+     */
+    public function isPlayableAgainstAll() : bool
+    {
+        return $this->isPlayableAgainst(null);
+    }
+
+    public function isPlayableAgainst(?User $user) : bool
     {
         // element can't be played against user, if
         //
@@ -90,7 +106,7 @@ abstract class LanguageElement extends DbModel implements LinkableInterface
         return $this->isVisibleFor($user)
             && (
                 $this->isApproved()
-                || ($this->isUsedBy($user) && !$this->isDislikedBy($user))
+                || ($user && $this->isUsedBy($user) && !$this->isDislikedBy($user))
             );
     }
 

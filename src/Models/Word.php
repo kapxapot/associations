@@ -64,6 +64,16 @@ class Word extends LanguageElement
             );
     }
 
+    /**
+     * Returns approved associations that are visible for everyone (public).
+     */
+    public function publicAssociations() : AssociationCollection
+    {
+        return $this
+            ->approvedAssociations()
+            ->public();
+    }
+
     public function approvedVisibleAssociations() : AssociationCollection
     {
         return $this

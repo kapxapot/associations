@@ -12,6 +12,14 @@ languages:
     name:
       name: Название
 
+    code:
+      name: Код
+      attributes: [ nullable ]
+
+    yandex_dict_code:
+      name: Код Яндекс.Словаря
+      attributes: [ nullable, hidden ]
+
     created_at:
       name: Дата создания
       type: date
@@ -20,10 +28,6 @@ languages:
     created_by_name:
       name: Автор
       attributes: [ readonly ]
-
-    yandex_dict_code:
-      name: Код Яндекс.Словаря
-      attributes: [ nullable, hidden ]
 
 menus:
 

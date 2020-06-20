@@ -28,11 +28,11 @@ class AssociationController extends Controller
     ) : ResponseInterface
     {
         $id = $args['id'];
-        
+
         $debug = $request->getQueryParam('debug', null) !== null;
 
         $association = $this->associationRepository->get($id);
-        
+
         $user = $this->auth->getUser();
 
         if (
@@ -54,7 +54,7 @@ class AssociationController extends Controller
                 ],
             ]
         );
-        
+
         return $this->render($response, 'main/associations/item.twig', $params);
     }
 }

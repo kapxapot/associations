@@ -7,4 +7,5 @@ use App\Models\Language;
 interface LanguageRepositoryInterface
 {
     function get(?int $id) : ?Language;
+    function getByCode(?string $code) : ?Language;
 }

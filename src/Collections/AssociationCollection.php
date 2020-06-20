@@ -15,4 +15,9 @@ class AssociationCollection extends LanguageElementCollection
             fn (Association $a) => $a->isPlayableAgainst($user)
         );
     }
+
+    public function random() : ?Association
+    {
+        return parent::random();
+    }
 }

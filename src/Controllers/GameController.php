@@ -23,11 +23,12 @@ class GameController extends Controller
     private GameRepositoryInterface $gameRepository;
     private LanguageRepositoryInterface $languageRepository;
 
+    private GameService $gameService;
+    private TurnService $turnService;
+
     private Access $access;
     private AuthInterface $auth;
-    private GameService $gameService;
     private NotFoundHandler $notFoundHandler;
-    private TurnService $turnService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -36,11 +37,12 @@ class GameController extends Controller
         $this->gameRepository = $container->gameRepository;
         $this->languageRepository = $container->languageRepository;
 
+        $this->gameService = $container->gameService;
+        $this->turnService = $container->turnService;
+
         $this->access = $container->access;
         $this->auth = $container->auth;
-        $this->gameService = $container->gameService;
         $this->notFoundHandler = $container->notFoundHandler;
-        $this->turnService = $container->turnService;
     }
 
     public function get(
@@ -50,7 +52,7 @@ class GameController extends Controller
     ) : ResponseInterface
     {
         $id = $args['id'];
-        
+
         $debug = $request->getQueryParam('debug', null) !== null;
 
         $game = $this->gameRepository->get($id);
@@ -100,7 +102,7 @@ class GameController extends Controller
         };
 
         $this->gameService->newGame($language, $user);
-        
+
         return Response::json(
             $response,
             ['message' => $this->translate('New game started.')]
@@ -115,22 +117,103 @@ class GameController extends Controller
         $user = $this->auth->getUser();
 
         Assert::notNull($user);
-        
+
         $game = $user->currentGame();
 
         /** @var string */
         $msg = null;
-        
+
         if ($game !== null) {
             $this->turnService->finishGame($game);
             $msg = 'Game finished.';
         } else {
             $msg = 'No current game found.';
         }
-        
+
         return Response::json(
             $response,
             ['message' => $this->translate($msg)]
         );
+    }
+
+    /**
+     * Play out of game context.
+     */
+    public function play(
+        SlimRequest $request,
+        ResponseInterface $response,
+        array $args
+    ) : ResponseInterface
+    {
+        $wordStr = $args['word'] ?? null;
+
+        /** @var Language|null */
+        $language = null;
+
+        $langCode = $request->getQueryParam('lang', null);
+
+        if (strlen($langCode) > 0) {
+            $language = $this->languageRepository->getByCode($langCode);
+
+            if (is_null($language)) {
+                throw new BadRequestException('Unknown language code.');
+            }
+        }
+
+        $language ??= $this->languageService->getDefaultLanguage();
+
+        $word = $this->wordRepository->findInLanguage($language, $wordStr);
+
+        $associations = $word
+            ? $word->publicAssociations()
+            : null;
+
+        $answerAssociation = $associations
+            ? $associations->random()
+            : null;
+
+        $answer = $answerAssociation
+            ? $answerAssociation->otherWord($word)
+            : $this->languageService->getRandomPublicWord($language);
+
+        $wordResponse = ['word' => $wordStr];
+
+        if ($word) {
+            $wordResponse['id'] = $word->getId();
+            $wordResponse['link'] = $this->linker->abs($word->url());
+
+            if ($associations) {
+                $wordResponse['association_count'] = $associations->count();
+            }
+        }
+
+        /** @var array|null */
+        $answerResponse = null;
+
+        if ($answer) {
+            $answerResponse = [
+                'word' => $answer->word,
+                'id' => $answer->getId(),
+                'link' => $this->linker->abs($answer->url()),
+            ];
+
+            if ($answerAssociation) {
+                $answerResponse['association'] = [
+                    'id' => $answerAssociation->getId(),
+                    'link' => $this->linker->abs($answerAssociation->url()),
+                ];
+            }
+        }
+
+        $result = [
+            'question' => $wordStr ? $wordResponse : null,
+            'answer' => $answerAssociation ? $answerResponse : null,
+        ];
+
+        if (is_null($answerAssociation)) {
+            $result['new'] = $answerResponse;
+        }
+
+        return Response::json($response, $result);
     }
 }

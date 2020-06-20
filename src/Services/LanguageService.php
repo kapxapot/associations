@@ -49,26 +49,34 @@ class LanguageService
         return $language;
     }
 
+    public function getRandomPublicWord(?Language $language = null) : ?Word
+    {
+        return $this->getRandomWordFor(null, $language);
+    }
+
     public function getRandomWordFor(
-        User $user,
+        ?User $user,
         ?Language $language = null
     ) : ?Word
     {
         // get common words
         $approvedWords = $this->wordRepository->getAllApproved($language);
 
-        // get user's words
-        $userWords = $this->wordService->getAllUsedBy($user, $language);
+        if ($user) {
+            // get user's words
+            $userWords = $this->wordService->getAllUsedBy($user, $language);
 
-        // union them & distinct
-        $words = $approvedWords
-            ->concat($userWords)
-            ->distinct()
+            // union them & distinct
+            $approvedWords = $approvedWords
+                ->concat($userWords)
+                ->distinct();
+        }
+
+        return $approvedWords
             ->where(
                 fn (Word $w) => $w->isPlayableAgainst($user)
-            );
-
-        return $words->random();
+            )
+            ->random();
     }
 
     public function normalizeWord(Language $language, string $word) : string

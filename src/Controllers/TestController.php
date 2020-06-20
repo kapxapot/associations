@@ -50,19 +50,6 @@ class TestController extends Controller
         );
     }
 
-    private function eventTest()
-    {
-        $wordFeedback = $this->wordFeedbackRepository->get(2);
-        $event = new WordFeedbackCreatedEvent($wordFeedback);
-
-        $this->eventDispatcher->dispatch($event);
-    }
-
-    private function eventLogTest()
-    {
-        $this->eventLog->info('Test');
-    }
-
     private function randomWordTest()
     {
         $start = microtime(true);

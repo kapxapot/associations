@@ -6,6 +6,7 @@ use App\Models\Traits\Created;
 use Plasticode\Models\DbModel;
 
 /**
+ * @property string|null $code
  * @property string $name
  * @property string|null $yandexDictCode
  */

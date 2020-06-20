@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Config\Interfaces\AssociationConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
+use App\Core\Interfaces\LinkerInterface;
 use App\Models\Game;
 use App\Models\Language;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
@@ -26,6 +27,8 @@ class Controller extends BaseController
     protected AssociationConfigInterface $associationConfig;
     protected WordConfigInterface $wordConfig;
 
+    protected LinkerInterface $linker;
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container->appContext);
@@ -39,6 +42,8 @@ class Controller extends BaseController
 
         $this->associationConfig = $container->config;
         $this->wordConfig = $container->config;
+
+        $this->linker = $container->linker;
     }
 
     /**
@@ -49,7 +54,7 @@ class Controller extends BaseController
     protected function buildParams(array $settings) : array
     {
         $params = $settings['params'] ?? [];
-        
+
         /** @var Game|null */
         $game = $params['game'] ?? null;
 
@@ -61,7 +66,7 @@ class Controller extends BaseController
                 ? $game->language()
                 : $this->languageService->getDefaultLanguage();
         }
-        
+
         // todo: move this to SidebarPartsProviderService
         if ($language) {
             $wordCount = $this
@@ -79,9 +84,9 @@ class Controller extends BaseController
             $associationCountStr = $this
                 ->casesService
                 ->associationCount($associationCount);
-            
+
             $params['language'] = $language;
-            
+
             $params = array_merge(
                 $params,
                 [
@@ -98,7 +103,7 @@ class Controller extends BaseController
                             $language,
                             $this->wordConfig->wordLastAddedLimit()
                         ),
-                    
+
                     'association_count' => $associationCount,
                     'association_count_str' => $associationCountStr,
 
@@ -115,7 +120,7 @@ class Controller extends BaseController
                 ]
             );
         }
-        
+
         return parent::buildParams(['params' => $params]);
     }
 }

@@ -14,4 +14,12 @@ class LanguageRepository extends IdiormRepository implements LanguageRepositoryI
     {
         return $this->getEntity($id);
     }
+
+    public function getByCode(?string $code) : ?Language
+    {
+        return $this
+            ->query()
+            ->where('code', $code)
+            ->one();
+    }
 }

@@ -41,7 +41,7 @@ class WordController extends Controller
                 ],
             ]
         );
-        
+
         return $this->render($response, 'main/words/index.twig', $params);
     }
 

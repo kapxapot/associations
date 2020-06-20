@@ -53,6 +53,16 @@ class LanguageElementCollection extends DbModelCollection
     /**
      * @return static
      */
+    public function public() : self
+    {
+        return $this->where(
+            fn (LanguageElement $el) => $el->isPublic()
+        );
+    }
+
+    /**
+     * @return static
+     */
     public function visibleFor(?User $user) : self
     {
         return $this->where(

@@ -37,13 +37,15 @@ $access = fn (string $entity, string $action, ?string $redirect = null)
 $root = $settings['root'];
 $trueRoot = (strlen($root) == 0);
 
+$apiPrefix = '/api/v1';
+
 $app->group(
     $root,
-    function () use ($trueRoot, $settings, $access, $container, $env) {
+    function () use ($trueRoot, $settings, $access, $container, $env, $apiPrefix) {
         // public api
-        
+
         $this->group(
-            '/api/v1',
+            $apiPrefix,
             function () use ($settings) {
                 $this->get(
                     '/captcha',
@@ -52,13 +54,18 @@ $app->group(
                             $settings['captcha_digits'],
                             true
                         );
-                        
+
                         return Response::json(
                             $response,
                             ['captcha' => $captcha['captcha']]
                         );
                     }
                 );
+
+                $this->get(
+                    '/play[/{word}]',
+                    GameController::class . ':play'
+                )->setName('api.public.play');
 
                 $this->get(
                     '/public/words',
@@ -70,7 +77,7 @@ $app->group(
         // private api
 
         $this->group(
-            '/api/v1',
+            $apiPrefix,
             function () use ($settings, $access, $container) {
                 foreach ($settings['tables'] as $alias => $table) {
                     if (isset($table['api'])) {
