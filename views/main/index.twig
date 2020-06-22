@@ -52,16 +52,28 @@
                         <form autocomplete="off">
                             <div class="form-group mb-2">
                                 <label for="nextWord">Ваше слово:</label>
-                                <input name="nextWord" id="nextWord" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
+
+                                <div class="input-group">
+                                    <input name="nextWord" id="nextWord" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
+
+                                    <span class="input-group-btn">
+                                        <button type="submit" ng-click="sendWord()" class="btn btn-success ajax-button" ng-disabled="loading || saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving"><i class="fas fa-paper-plane mr-1"></i> Отправить</span></button>
+                                    </span>
+                                </div>
                             </div>
 
-                            <button type="submit" ng-click="sendWord()" class="btn btn-success ajax-button" ng-disabled="loading || saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Отправить</span></button>
+                            <div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
+                                <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
+                                <div ng-bind-html="alertError|rawHtml"></div>
+                            </div>
 
-                            <a role="button" ng-click="giveUp()" class="btn btn-default ml-3" ng-disabled="loading || saving">Сдаться</a>
-                            
-                            {% if with_problems %}
-                                <a role="button" ng-click="problemsDialog()" class="btn btn-default problems ml-2" ng-disabled="loading || saving" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
-                            {% endif %}
+                            <div class="mt-3">
+                                <a role="button" ng-click="giveUp()" class="btn btn-default mr-2" ng-disabled="loading || saving"><i class="fas fa-forward mr-1"></i> Пропустить</a>
+
+                                {% if with_problems %}
+                                    <a role="button" ng-click="problemsDialog()" class="btn btn-default problems" ng-disabled="loading || saving"><i class="fas fa-exclamation-triangle mr-1"></i> Пожаловаться</a>
+                                {% endif %}
+                            </div>
                         </form>
                     </div>
                     <div class="clearfix"></div>
@@ -91,11 +103,6 @@
                         <button ng-click="newGame()" class="btn btn-success ajax-button" ng-disabled="loading || saving" data-focus><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Начать игру</span></button>
                     </div>
                 {% endif %}
-
-                <div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
-                    <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
-                    <div ng-bind-html="alertError|rawHtml"></div>
-                </div>
             {% endif %}
         </div>
     </div>

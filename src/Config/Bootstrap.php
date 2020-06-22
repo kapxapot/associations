@@ -30,10 +30,14 @@ use App\Hydrators\UserHydrator;
 use App\Hydrators\WordFeedbackHydrator;
 use App\Hydrators\WordHydrator;
 use App\Hydrators\YandexDictWordHydrator;
+use App\Models\News;
+use App\Models\Page;
 use App\Repositories\AssociationFeedbackRepository;
 use App\Repositories\AssociationRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\LanguageRepository;
+use App\Repositories\NewsRepository;
+use App\Repositories\PageRepository;
 use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
@@ -56,8 +60,13 @@ use App\Services\YandexDictService;
 use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
 use Plasticode\Config\Bootstrap as BootstrapBase;
+use Plasticode\Config\TagsConfig;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\ObjectProxy;
+use Plasticode\Parsing\LinkMappers\NewsLinkMapper;
+use Plasticode\Parsing\LinkMappers\PageLinkMapper;
+use Plasticode\Parsing\LinkMappers\TagLinkMapper;
+use Plasticode\Parsing\LinkMapperSource;
 use Psr\Container\ContainerInterface as CI;
 
 class Bootstrap extends BootstrapBase
@@ -140,6 +149,18 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
+        $map['newsRepository'] = fn (CI $c) =>
+            new NewsRepository(
+                $c->repositoryContext,
+                $c->tagRepository
+            );
+
+        $map['pageRepository'] = fn (CI $c) =>
+            new PageRepository(
+                $c->repositoryContext,
+                $c->tagRepository
+            );
+
         $map['turnRepository'] = fn (CI $c) =>
             new TurnRepository(
                 $c->repositoryContext,
@@ -200,8 +221,24 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
+        $map['config'] = fn (CI $c) =>
+            new Config(
+                $c->settingsProvider
+            );
+
+        $map['captchaConfig'] = fn (CI $c) =>
+            new CaptchaConfig();
+
         $map['localizationConfig'] = fn (CI $c) =>
             new LocalizationConfig();
+
+        $map['tagsConfig'] = fn (CI $c) =>
+            new TagsConfig(
+                [
+                    News::class => 'news',
+                    Page::class => 'pages',
+                ]
+            );
 
         $map['linker'] = fn (CI $c) =>
             new Linker(
@@ -210,13 +247,41 @@ class Bootstrap extends BootstrapBase
                 $c->tagsConfig
             );
 
-        $map['config'] = fn (CI $c) =>
-            new Config(
-                $c->settingsProvider
+        $map['tagLinkMapper'] = fn (CI $c) =>
+            new TagLinkMapper(
+                $c->renderer,
+                $c->linker
             );
 
-        $map['captchaConfig'] = fn (CI $c) =>
-            new CaptchaConfig();
+        $map['pageLinkMapper'] = fn (CI $c) =>
+            new PageLinkMapper(
+                $c->pageRepository,
+                $c->tagRepository,
+                $c->renderer,
+                $c->linker,
+                $c->tagLinkMapper
+            );
+
+        $map['newsLinkMapper'] = fn (CI $c) =>
+            new NewsLinkMapper(
+                $c->renderer,
+                $c->linker
+            );
+
+        $map['doubleBracketsConfig'] = function (CI $c) {
+            $config = new LinkMapperSource();
+
+            $config->setDefaultMapper($c->pageLinkMapper);
+            
+            $config->registerTaggedMappers(
+                [
+                    $c->newsLinkMapper,
+                    $c->tagLinkMapper,
+                ]
+            );
+
+            return $config;
+        };
 
         $map['associationSpecification'] = fn (CI $c) =>
             new AssociationSpecification(
