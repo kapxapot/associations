@@ -26,17 +26,19 @@ class PagesGenerator extends TaggableEntityGenerator
 
     public function getRules(array $data, $id = null) : array
     {
-        return [
-            ...parent::getRules($data, $id),
-            'title' => $this->rule('text'),
-            'parent_id' => Validator::nonRecursiveParent($this->entity, $id),
-            'slug' => $this
-                ->rule('extendedAlias')
-                ->pageSlugAvailable(
-                    $this->pageRepository,
-                    $id
-                ),
-        ];
+        return array_merge(
+            parent::getRules($data, $id),
+            [
+                'title' => $this->rule('text'),
+                'parent_id' => Validator::nonRecursiveParent($this->entity, $id),
+                'slug' => $this
+                    ->rule('extendedAlias')
+                    ->pageSlugAvailable(
+                        $this->pageRepository,
+                        $id
+                    ),
+            ]
+        );
     }
 
     public function getOptions() : array

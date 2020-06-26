@@ -22,14 +22,14 @@ news:
   name_field: title
   sort: created_at
   reverse: true
-  has: [created_at, updated_at]
+  has: [created_at, updated_at, created_by, updated_by]
 
 pages:
   api: full
   name_field: title
   sort: created_at
   reverse: true
-  has: [created_at, updated_at]
+  has: [created_at, updated_at, created_by, updated_by]
 
 roles:
   api: full
