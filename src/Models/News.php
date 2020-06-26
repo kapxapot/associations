@@ -2,27 +2,41 @@
 
 namespace App\Models;
 
-use App\Models\Traits\Stamps;
-use Plasticode\Models\DbModel;
-use Plasticode\Models\Interfaces\TaggedInterface;
-use Plasticode\Models\Traits\FullPublished;
-use Plasticode\Models\Traits\Tagged;
+use Plasticode\Util\Strings;
 
-/**
- * @property integer $id
- * @property string $title
- * @property string|null $text
-*/
-class News extends DbModel implements TaggedInterface
+class News extends NewsSource
 {
-    use FullPublished;
-    use Stamps;
-    use Tagged;
+    // SearchableInterface
 
-    protected function requiredWiths(): array
+    public function code() : string
+    {
+        return Strings::doubleBracketsTag(
+            'news',
+            $this->getId(),
+            $this->displayTitle()
+        );
+    }
+
+    // SerializableInterface
+
+    public function serialize() : array
     {
         return [
-            $this->tagLinksPropertyName
+            'id' => $this->getId(),
+            'title' => $this->displayTitle(),
+            'tags' => Strings::toTags($this->tags),
         ];
+    }
+
+    // NewsSourceInterface
+
+    public function displayTitle() : string
+    {
+        return $this->title;
+    }
+
+    public function rawText() : ?string
+    {
+        return $this->text;
     }
 }

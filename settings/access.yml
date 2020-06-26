@@ -37,6 +37,11 @@ templates:
     editor: [ edit ]
     author: [ read_own, create, edit_own ]
 
+  public_immutable:
+    admin: [ full ]
+    editor: [ edit ]
+    author: [ read_own, create ]
+
   public_extended:
     admin: [ full ]
     editor: [ edit ]
@@ -47,7 +52,7 @@ rights:
     template: editor
 
   games:
-    template: public
+    template: public_immutable
 
   languages:
     template: admin_strict
@@ -58,11 +63,17 @@ rights:
   menu_items:
     template: admin_strict
 
+  news:
+    template: editor
+
+  pages:
+    template: editor
+
   roles:
     template: admin_api
 
   turns:
-    template: public
+    template: public_immutable
 
   users:
     template: admin_strict

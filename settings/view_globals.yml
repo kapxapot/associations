@@ -37,6 +37,8 @@ word_max_length: 100
 
 admin_menu:
   - languages
+  - news
+  - pages
   - group:
       title: Сайт
       items:

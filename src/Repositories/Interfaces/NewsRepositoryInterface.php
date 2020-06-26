@@ -2,6 +2,13 @@
 
 namespace App\Repositories\Interfaces;
 
-interface NewsRepositoryInterface
+use App\Collections\NewsCollection;
+use App\Models\News;
+use Plasticode\Repositories\Interfaces\Basic\SearchableNewsSourceRepositoryInterface;
+
+interface NewsRepositoryInterface extends SearchableNewsSourceRepositoryInterface
 {
+    function get(?int $id) : ?News;
+    function getProtected(?int $id) : ?News;
+    function search(string $searchQuery) : NewsCollection;
 }

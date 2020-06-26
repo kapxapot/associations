@@ -101,6 +101,129 @@ menu_items:
       attributes: [ readonly ]
 
 
+news:
+
+  name_gen: новости
+  name_accus: новость
+  title: Новости
+
+  columns:
+    id:
+      name: id
+      attributes: [ readonly ]
+
+    title:
+      name: Заголовок
+      template: >
+        '<a href="' + row.url + '">' + row.title + '</a>'
+
+    text:
+      name: Текст
+      type: html
+      attributes: [ hidden ]
+
+    tags:
+      name: Теги
+      attributes: [ nullable, hidden ]
+      access: publish
+      tooltip: Через запятую.
+
+    published:
+      name: Опубликована
+      form_name: Опубликовать
+      type: bool
+      access: publish
+
+    published_at:
+      name: Дата публикации
+      type: datetime-local
+      attributes: [ nullable, hidden ]
+      access: publish
+      tooltip: Оставьте пустой для автозаполнения.
+
+    created_by_name:
+      name: Автор
+      attributes: [ readonly ]
+
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [ readonly ]
+
+
+pages:
+
+  name_gen: страницы
+  name_accus: страницу
+  title: Страницы
+
+  columns:
+    id:
+      name: id
+      attributes: [ readonly ]
+
+    title:
+      name: Заголовок
+      template: >
+        '<a href="' + row.url + '">' + row.title + '</a>'
+
+    slug:
+      name: Адрес
+      attributes: [ hidden ]
+
+    text:
+      name: Текст
+      type: html
+      attributes: [ nullable, hidden ]
+
+    parent_id:
+      name: Родительская страница
+      entity: pages
+      dropdown_template: '{{%item%.select_title}}'
+      attributes: [ nullable, hidden, tokens ]
+
+    tags:
+      name: Теги
+      attributes: [ nullable, hidden ]
+      access: publish
+      tooltip: Через запятую.
+
+    show_in_feed:
+      name: Выводить в ленте
+      type: bool
+      access: publish
+      attributes: [ hidden ]
+
+    skip_in_breadcrumbs:
+      name: Скрыта в пути
+      form_name: Скрыта в пути (в «хлебных крошках»)
+      type: bool
+      access: publish
+      attributes: [ hidden ]
+
+    published:
+      name: Опубликована
+      form_name: Опубликовать
+      type: bool
+      access: publish
+
+    published_at:
+      name: Дата публикации
+      type: datetime-local
+      attributes: [ nullable, hidden ]
+      access: publish
+      tooltip: Оставьте пустой для автозаполнения.
+
+    created_by_name:
+      name: Автор
+      attributes: [ readonly ]
+    
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [ readonly ]
+
+
 roles:
 
   name_gen: роли

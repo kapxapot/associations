@@ -179,6 +179,16 @@ $app->group(
         }
 
         $this->get(
+            '/news/{id:\d+}',
+            NewsController::class . ':get'
+        )->setName('main.news');
+
+        $this->get(
+            '/{slug}',
+            PageController::class . ':get'
+        )->setName('main.page');
+
+        $this->get(
             $trueRoot ? '/' : '',
             IndexController::class . ':index'
         )->setName('main.index');

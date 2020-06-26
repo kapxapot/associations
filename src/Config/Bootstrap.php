@@ -25,6 +25,8 @@ use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
 use App\Hydrators\GameHydrator;
 use App\Hydrators\LanguageHydrator;
+use App\Hydrators\NewsHydrator;
+use App\Hydrators\PageHydrator;
 use App\Hydrators\TurnHydrator;
 use App\Hydrators\UserHydrator;
 use App\Hydrators\WordFeedbackHydrator;
@@ -152,13 +154,32 @@ class Bootstrap extends BootstrapBase
         $map['newsRepository'] = fn (CI $c) =>
             new NewsRepository(
                 $c->repositoryContext,
-                $c->tagRepository
+                $c->tagRepository,
+                new ObjectProxy(
+                    fn () =>
+                    new NewsHydrator(
+                        $c->userRepository,
+                        $c->cutParser,
+                        $c->linker,
+                        $c->parser
+                    )
+                )
             );
 
         $map['pageRepository'] = fn (CI $c) =>
             new PageRepository(
                 $c->repositoryContext,
-                $c->tagRepository
+                $c->tagRepository,
+                new ObjectProxy(
+                    fn () =>
+                    new PageHydrator(
+                        $c->pageRepository,
+                        $c->userRepository,
+                        $c->cutParser,
+                        $c->linker,
+                        $c->parser
+                    )
+                )
             );
 
         $map['turnRepository'] = fn (CI $c) =>

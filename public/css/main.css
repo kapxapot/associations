@@ -33,8 +33,13 @@ a.assoc-arrow {
     margin-bottom: 1rem !important;
 }
 
-.problems {
+.problems,
+.danger-color {
     color: indianred;
+}
+
+.action-color {
+    color: blue;
 }
 
 .avatar--big {
