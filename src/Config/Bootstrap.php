@@ -53,6 +53,7 @@ use App\Services\CasesService;
 use App\Services\DictionaryService;
 use App\Services\GameService;
 use App\Services\LanguageService;
+use App\Services\TagPartsProviderService;
 use App\Services\TurnService;
 use App\Services\UserService;
 use App\Services\WordFeedbackService;
@@ -69,6 +70,7 @@ use Plasticode\Parsing\LinkMappers\NewsLinkMapper;
 use Plasticode\Parsing\LinkMappers\PageLinkMapper;
 use Plasticode\Parsing\LinkMappers\TagLinkMapper;
 use Plasticode\Parsing\LinkMapperSource;
+use Plasticode\Services\NewsAggregatorService;
 use Psr\Container\ContainerInterface as CI;
 
 class Bootstrap extends BootstrapBase
@@ -368,6 +370,23 @@ class Bootstrap extends BootstrapBase
                 $c->wordRepository,
                 $c->settingsProvider,
                 $c->wordService
+            );
+
+        $map['newsAggregatorService'] = function (CI $c) {
+            $service = new NewsAggregatorService(
+                $c->linker
+            );
+
+            $service->registerStrictSource($c->newsRepository);
+            $service->registerSource($c->pageRepository);
+
+            return $service;
+        };
+
+        $map['tagPartsProviderService'] = fn (CI $c) =>
+            new TagPartsProviderService(
+                $c->newsRepository,
+                $c->pageRepository
             );
 
         $map['turnService'] = fn (CI $c) =>

@@ -5,6 +5,9 @@ use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
 use App\Controllers\IndexController;
 use App\Controllers\JobController;
+use App\Controllers\NewsController;
+use App\Controllers\PageController;
+use App\Controllers\TagController;
 use App\Controllers\TestController;
 use App\Controllers\TurnController;
 use App\Controllers\WordController;
@@ -178,15 +181,14 @@ $app->group(
             )->setName('main.test');
         }
 
-        $this->get(
-            '/news/{id:\d+}',
-            NewsController::class . ':get'
-        )->setName('main.news');
+        $this->get('/news/{id:\d+}', NewsController::class . ':get')
+            ->setName('main.news');
 
-        $this->get(
-            '/{slug}',
-            PageController::class . ':get'
-        )->setName('main.page');
+        $this->get('/tags/{tag}', TagController::class . ':get')
+            ->setName('main.tag');
+
+        $this->get('/{slug}', PageController::class . ':get')
+            ->setName('main.page');
 
         $this->get(
             $trueRoot ? '/' : '',

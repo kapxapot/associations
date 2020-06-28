@@ -10,11 +10,7 @@
 
 {% block content %}
     <div class="panel panel-primary">
-        <div class="panel-heading panel-title">
-            <header>
-                <h1>{{ title|raw }}</h1>
-            </header>
-        </div>
+        {{ lm.panel_header(_context, title, { 'no_breadcrumbs': true }) }}
 
         <div class="panel-body">
             <p>

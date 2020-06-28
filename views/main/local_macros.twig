@@ -7,3 +7,39 @@
 {% macro user_full(user, big = false) %}{% import _self as m %}{{ m.user(user, true, big) }}{% endmacro %}
 
 {% macro info(text) %}<i class="fas fa-question-circle" title="{{ text }}" data-toggle="tooltip"></i>{% endmacro %}
+
+{% macro panel_header(context, title = null, data = null) %}
+    {% import 'main/macros.twig' as m %}
+
+    {% set title = title ?? context.title %}
+    {% set breadcrumbs = data.breadcrumbs ?? context.breadcrumbs %}
+    {% set breadcrumbs_title = data.bc_title ?? title %}
+
+    <div class="panel-heading panel-title">
+        <header>
+            <h1>
+                {% if data.url %}
+                    <a href="{{ data.url }}">{{ title|raw }}</a>
+                {% else %}
+                    {{ title|raw }}
+                {% endif %}
+
+                {% if not (data.published ?? true) %}
+                    <i class="fa fa-eye-slash" title="Не опубликовано!"></i>
+                {% endif %}
+            </h1>
+        </header>
+
+        {% if data.buttons %}
+            <div class="panel-title-buttons">
+                {% for b in data.buttons %}
+                    {{ b|raw }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+
+    {% if not data.no_breadcrumbs %}
+        {{ m.breadcrumbs(context, breadcrumbs, breadcrumbs_title) }}
+    {% endif %}
+{% endmacro %}

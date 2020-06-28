@@ -1,0 +1,33 @@
+{% extends 'main/layout.twig' %}
+
+{% import 'main/macros.twig' as m %}
+{% import 'main/local_macros.twig' as lm %}
+
+{% block content %}
+    <div class="panel panel-primary">
+        {{ lm.panel_header(_context, news.display_title, {
+            'buttons': [ m.edit_button(news) ],
+            'published': news.published
+        }) }}
+
+        {% include 'components/news_source_text.twig' with { 'news_source': news, 'full': true } only %}
+        {% include 'components/news_source_footer.twig' with { 'news_source': news } only %}
+    </div>
+
+    {% if news_prev or news_next %}
+        <div class="pagination-flex">
+            {% if news_prev %}
+                <a href="{{ news_prev.url }}" title="Предыдущая новость" class="btn btn-default btn-lg">
+                    {% include 'components/prev.twig' %}
+                    {{ news_prev.display_title }}
+                </a>
+            {% endif %}
+            {% if news_next %}
+                <a href="{{ news_next.url }}" title="Следующая новость" class="btn btn-default btn-lg">
+                    {{ news_next.display_title }}
+                    {% include 'components/next.twig' %}
+                </a>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}

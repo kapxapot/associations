@@ -11,15 +11,11 @@
 
 {% block content %}
     <div class="panel panel-primary">
-        <div class="panel-heading panel-title">
-            <header>
-                <h1>{{ word_upper }}</h1>
-            </header>
-        </div>
-
-        {{ m.breadcrumbs(_context, [
-            { 'url': path_for('main.words'), 'text': 'Слова' }
-        ], word_upper) }}
+        {{ lm.panel_header(_context, word_upper, {
+            'breadcrumbs': [
+                { 'url': path_for('main.words'), 'text': 'Слова' }
+            ]
+        }) }}
 
         <div class="panel-body">
             <p>

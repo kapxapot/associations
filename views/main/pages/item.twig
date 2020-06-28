@@ -1,0 +1,29 @@
+{% extends 'main/layout.twig' %}
+
+{% import 'macros.twig' as gm %}
+{% import 'main/macros.twig' as m %}
+{% import 'main/local_macros.twig' as lm %}
+
+{% block content %}
+    <div class="panel panel-primary">
+        {{ lm.panel_header(_context, page.title, {
+            'buttons': [ m.edit_button(page) ],
+            'published': page.published
+        }) }}
+
+        {% if page.sub_pages.any %}
+            <div class="panel-body sub-articles">
+                {% for sp in page.sub_pages %}
+                    <a class="label label-default" href="{{ sp.url }}">{{ sp.title }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        {% if page.parsed.contents.any %}
+            {% include 'components/contents.twig' with { 'items': page.parsed.contents } only %}
+        {% endif %}
+
+        {% include 'components/news_source_text.twig' with { 'news_source': page, 'full': true } only %}
+        {% include 'components/news_source_footer.twig' with { 'news_source': page } only %}
+    </div>
+{% endblock %}

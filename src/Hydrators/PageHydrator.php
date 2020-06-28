@@ -49,7 +49,7 @@ class PageHydrator extends NewsSourceHydrator
                 fn () => $this->pageRepository->get($entity->parentId)
             )
             ->withUrl(
-                fn () => $this->linker->page($entity->getSlug())
+                fn () => $this->linker->page($entity)
             );
     }
 }

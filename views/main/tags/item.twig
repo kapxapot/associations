@@ -1,0 +1,42 @@
+{% extends 'main/layout.twig' %}
+
+{% import 'macros.twig' as gm %}
+{% import 'main/macros.twig' as m %}
+{% import 'main/local_macros.twig' as lm %}
+
+{% block content %}
+    <div class="panel panel-primary">
+        {{ lm.panel_header(_context) }}
+
+        {% if parts|length > 0 %}
+            <div class="panel-body body-nopad">
+                <ul class="nav nav-tabs" role="tablist">
+                      {% for part in parts %}
+                          {{ m.tab(part.id, part.label, loop.first) }}
+                    {% endfor %}
+                </ul>
+
+                <div class="tab-content">
+                    {% for part in parts %}
+                        <div role="tabpanel" class="tab-pane fade{% if loop.first %} in active{% endif %}{% if not part.no_linkblock %} linkblock-big{% endif %}" id="{{ part.id }}">
+                            {% for news in part.values %}
+                                <div class="noicon">
+                                    <div>
+                                        <a href="{{ news.url }}">{{ news.display_title }}</a>
+                                    </div>
+                                    <div ng-cloak>
+                                        {{ gm.moment_local(news.published_at_iso) }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+            <div class="panel-body">
+                По тегу <b>&laquo;{{ tag }}&raquo;</b> ничего не найдено.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
