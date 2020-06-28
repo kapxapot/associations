@@ -7,6 +7,7 @@ use App\Controllers\IndexController;
 use App\Controllers\JobController;
 use App\Controllers\NewsController;
 use App\Controllers\PageController;
+use App\Controllers\SearchController;
 use App\Controllers\TagController;
 use App\Controllers\TestController;
 use App\Controllers\TurnController;
@@ -64,6 +65,11 @@ $app->group(
                         );
                     }
                 );
+
+                $this->get(
+                    '/search/{query}',
+                    SearchController::class . ':search'
+                )->setName('api.search');
 
                 $this->get(
                     '/play[/{word}]',

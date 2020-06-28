@@ -53,6 +53,7 @@ use App\Services\CasesService;
 use App\Services\DictionaryService;
 use App\Services\GameService;
 use App\Services\LanguageService;
+use App\Services\SearchService;
 use App\Services\TagPartsProviderService;
 use App\Services\TurnService;
 use App\Services\UserService;
@@ -382,6 +383,14 @@ class Bootstrap extends BootstrapBase
 
             return $service;
         };
+
+        $map['searchService'] = fn (CI $c) =>
+            new SearchService(
+                $c->newsRepository,
+                $c->pageRepository,
+                $c->tagRepository,
+                $c->linker
+            );
 
         $map['tagPartsProviderService'] = fn (CI $c) =>
             new TagPartsProviderService(
