@@ -5,10 +5,6 @@
 {% set no_social = true %}
 {% set sidebar = true %}
 
-{% if index %}
-    {% set signin_onload = true %}
-{% endif %}
-
 {% set more_angular %}
     {% if not debug %}
         $scope.postSuccess = (data) => {
@@ -20,6 +16,6 @@
         obj.age = $('#signUpForm').find('#su_age').val();
         return obj;
     };
-    
+
     {{ even_more_angular }}
 {% endset %}

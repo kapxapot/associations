@@ -54,7 +54,10 @@ associations:
 languages:
   default_id: 1
 
-users:
+news:
+  latest_limit: 5
+
+  users:
   mature_age: 16
 
 words:

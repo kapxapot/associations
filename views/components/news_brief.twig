@@ -1,0 +1,14 @@
+{% import 'macros.twig' as gm %}
+
+{% if news|length > 0 %}
+    <div class="panel-secondary-heading">Новости</div>
+    <div class="panel panel-secondary">
+        <div class="panel-body linkblock">
+            {% for n in news %}
+                <div>
+                    <a href="{{ n.url }}">{{ n.title|raw }}</a> // {{ gm.moment_smart(n.published_at_iso) }}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}

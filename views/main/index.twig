@@ -106,7 +106,9 @@
             {% endif %}
         </div>
     </div>
-    
+
+    {% include 'components/news_brief.twig' with { 'news': news } %}
+
     {% include 'main/modals/problems.twig' with {
         'word': problems_word,
         'association': problems_association,

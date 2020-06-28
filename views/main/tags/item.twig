@@ -20,7 +20,7 @@
                     {% for part in parts %}
                         <div role="tabpanel" class="tab-pane fade{% if loop.first %} in active{% endif %}{% if not part.no_linkblock %} linkblock-big{% endif %}" id="{{ part.id }}">
                             {% for news in part.values %}
-                                <div class="noicon">
+                                <div>
                                     <div>
                                         <a href="{{ news.url }}">{{ news.display_title }}</a>
                                     </div>
