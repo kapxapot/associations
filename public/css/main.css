@@ -42,6 +42,10 @@ a.assoc-arrow {
     color: blue;
 }
 
+.success-color {
+    color: rgb(32, 204, 32);
+}
+
 .avatar--big {
     width: 40px;
     height: 40px;
