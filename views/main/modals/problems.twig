@@ -6,7 +6,7 @@
 
 {% set modal_name = 'problems' %}
 {% set modal_title %}
-    <i class="fas fa-exclamation-triangle problems"></i> Что-то не так?
+    <i class="fas fa-exclamation-triangle problems mr-1"></i> Что не так?
 {% endset %}
 {% set modal_save_label = 'Отправить' %}
 
@@ -21,7 +21,7 @@
     {% if word %}
         <div class="col-xs-12{% if full %} col-sm-6{% endif %}" >
             <div>Слово <strong>{{ word.word }}</strong>:</div>
-    
+
             <div class="checkbox">
                 <label>
                     <input type="checkbox" ng-model="model.word.dislike">

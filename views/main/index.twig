@@ -22,16 +22,31 @@
     <div class="panel">
         <div class="panel-body">
             {% if not auth.user %}
-                <div>Для игры в <strong>Ассоциации</strong> вам нужно <a href="javascript:void(0);" ng-click="signIn()">войти</a> или <a href="javascript:void(0);" ng-click="signUp()">зарегистрироваться</a>.</div>
+                <div class="mb-2" ng-cloak>
+                    <span class="label wrap-all label-info turn-label">
+                        <a ng-href="{{'{{demo.word.link}}'}}" ng-bind="demo.word.word"></a>
+                    </span>
+                </div>
+
+                <div class="quote">
+                    <div class="quote-body">
+                        <p><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Внимание!</p>
+                        <p>Без регистрации игра доступна только в <strong>демо-режиме</strong>.</p>
+                        <p>Для полноценной игры в <strong>Ассоциации</strong> нужно <a href="javascript:void(0);" ng-click="signIn()">войти</a> или <a href="javascript:void(0);" ng-click="signUp()">зарегистрироваться</a>.</p>
+                    </div>
+                </div>
             {% else %}
                 {% if game %}
                     {% set game_turns_count = game.turns.count %}
+
                     <div ng-cloak class="mb-2">Идет игра! Началась {{ gm.moment_from_now(game.created_at_iso) }}, ход: {{ game_turns_count + 1 }}.</div>
+
                     {% if game_turns_count > 1 %}
                         <div class="mb-2">
                             {% include 'components/game_log_inline.twig' with { 'game': game } only %}
                         </div>
                     {% endif %}
+
                     {% if last_turn %}
                         {% if before_last_turn %}
                             {% set msg %}В ответ на {% include 'components/turn_word.twig' with { 'turn': before_last_turn } only %} {% endset %}
@@ -68,10 +83,10 @@
                             </div>
 
                             <div class="mt-3">
-                                <a role="button" ng-click="giveUp()" class="btn btn-default mr-2" ng-disabled="loading || saving"><i class="fas fa-forward action-color mr-1"></i> Пропустить</a>
+                                <a role="button" ng-click="skip()" class="btn btn-default mr-2" ng-disabled="loading || saving"><i class="fas fa-forward action-color mr-1"></i> Пропустить</a>
 
                                 {% if with_problems %}
-                                    <a role="button" ng-click="problemsDialog()" class="btn btn-default" ng-disabled="loading || saving"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Пожаловаться</a>
+                                    <a role="button" ng-click="problemsDialog()" class="btn btn-default" ng-disabled="loading || saving"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</a>
                                 {% endif %}
                             </div>
                         </form>
@@ -121,6 +136,35 @@
     $scope.languageId = {{ language.id }};
 
     autofocus();
+
+    {% if not auth.user %}
+        {# demo-game init #}
+        $scope.demo = {
+            init: function () {
+                console.log('demo init start');
+
+                this.fetchWord();
+
+                console.log('demo init finish');
+            },
+            fetchWord: function () {
+                $http
+                    .get('{{ api }}play')
+                    .success((data) => {
+                        const fetchedWord = data.new;
+
+                        console.log('fetched word: ' + fetchedWord);
+
+                        this.word = fetchedWord;
+                    });
+            },
+            word: null
+        };
+
+        $timeout(() => {
+            $scope.demo.init();
+        });
+    {% endif %}
 
     {% if not game %}
         $scope.newGame = () => {
@@ -187,8 +231,8 @@
                 noSuccessMessage: true,
             });
         };
-        
-        $scope.giveUp = () => {
+
+        $scope.skip = () => {
             $scope.ajax({
                 url: '{{ path_for('actions.game.finish') }}',
                 onSuccess: $scope.postSuccess,

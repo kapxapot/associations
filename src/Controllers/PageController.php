@@ -43,13 +43,12 @@ class PageController extends Controller
                 'large_image' => $page->largeImage(),
                 'image' => $page->image(),
                 'params' => [
-                    'breadcrumbs' => $page->breadcrumbs(),
-                    'disqus_url' => $this->linker->disqusPage($page),
-                    'disqus_id' => 'page' . $page->getId(),
                     'page' => $page,
                     'title' => $page->displayTitle(),
+                    'breadcrumbs' => $page->breadcrumbs(),
                     'page_description' => $this->makeNewsPageDescription($page),
                     'canonical_url' => $this->linker->abs($page->url()),
+                    'disqus_id' => 'page' . $page->getId(),
                 ],
             ]
         );
