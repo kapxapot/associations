@@ -23,6 +23,9 @@
         <div class="panel-body">
             {% if not auth.user %}
                 <div class="mb-0" ng-cloak>
+                    <div ng-hide="demo.word">
+                        Компьютер думает...
+                    </div>
                     <div ng-show="demo.word">
                         Компьютер говорит:
                         <span class="label wrap-all label-info turn-label">
