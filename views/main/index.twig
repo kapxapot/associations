@@ -61,11 +61,11 @@
                                 <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
                                 <div ng-bind-html="demo.alertError|rawHtml"></div>
                             </div>
-
-                            <div class="mt-3">
-                                <a role="button" ng-click="demo.fetch()" class="btn btn-default mr-2" ng-disabled="demo.loading || demo.saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</a>
-                            </div>
                         </form>
+
+                        <div class="mt-3">
+                            <button ng-click="demo.fetch()" class="btn btn-default mr-2" ng-disabled="demo.loading || demo.saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
+                        </div>
                     </div>
                 </div>
             {% else %}
@@ -114,15 +114,15 @@
                                 <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
                                 <div ng-bind-html="alertError|rawHtml"></div>
                             </div>
-
-                            <div class="mt-3">
-                                <a role="button" ng-click="skip()" class="btn btn-default mr-2" ng-disabled="loading || saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</a>
-
-                                {% if with_problems %}
-                                    <a role="button" ng-click="problemsDialog()" class="btn btn-default" ng-disabled="loading || saving"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</a>
-                                {% endif %}
-                            </div>
                         </form>
+
+                        <div class="mt-3">
+                            <button ng-click="skip()" class="btn btn-default mr-2" ng-disabled="loading || saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
+
+                            {% if with_problems %}
+                                <button ng-click="problemsDialog()" class="btn btn-default" ng-disabled="loading || saving"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</button>
+                            {% endif %}
+                        </div>
                     </div>
                 {% else %}
                     {% if last_game %}
