@@ -36,6 +36,18 @@ class Association extends LanguageElement
         );
     }
 
+    public function hasWords(Word $first, Word $second) : bool
+    {
+        // the same word is NO
+        if ($first->equals($second)) {
+            return false;
+        }
+
+        $ids = $this->words()->ids();
+
+        return $ids->contains($first->getId()) && $ids->contains($second->getId());
+    }
+
     public function feedbacks() : AssociationFeedbackCollection
     {
         return AssociationFeedbackCollection::from(

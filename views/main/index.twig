@@ -26,7 +26,10 @@
                     <div ng-show="demo.history.length > 1" class="br-word mb-2">
                         <span ng-repeat="word in demo.history">
                             <span ng-show="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.link}}'}}">&#x21C9;</a></span>
-                            <span class="label turn-label" ng-class="[{true:'mr-1'}[!$last && (word.isAi || !word.association_count)], {1:'label-info', 2:'label-success', 3:'label-warning'}[word.isAi ? 1 : (word.id ? 2 : 3)]]"><a ng-show="word.link" ng-href="{{'{{word.link}}'}}" ng-bind="word.word"></a><span ng-hide="word.link" ng-bind="word.word"></span></span>
+
+                            <span ng-show="!$first && !word.isAi && !word.association && demo.history[$index - 1].isAi"><a class="assoc-arrow">&#x21E2;</a></span>
+
+                            <span class="label turn-label" ng-class="[{true:'mr-1'}[!$last && ((word.isAi && demo.history[$index + 1].isAi) || (!word.isAi && !demo.history[$index + 1].association))], {1:'label-info', 2:'label-success', 3:'label-warning'}[word.isAi ? 1 : (word.id ? 2 : 3)]]"><a ng-show="word.link" ng-href="{{'{{word.link}}'}}" ng-bind="word.word"></a><span ng-hide="word.link" ng-bind="word.word"></span></span>
                         </span>
                     </div>
                     <div ng-hide="demo.word">

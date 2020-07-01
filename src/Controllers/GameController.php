@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
 use App\Handlers\NotFoundHandler;
+use App\Models\Association;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Services\GameService;
@@ -165,8 +166,18 @@ class GameController extends Controller
 
         $word = $this->wordRepository->findInLanguage($language, $wordStr);
 
+        $prevWord = ($prevWordId > 0)
+            ? $this->wordRepository->get($prevWordId)
+            : null;
+
         $associations = $word
             ? $word->publicAssociations()
+            : null;
+
+        $wordAssociation = $associations
+            ? $associations->first(
+                fn (Association $a) => $a->hasWords($word, $prevWord)
+            )
             : null;
 
         $answerAssociation = $associations
@@ -185,6 +196,13 @@ class GameController extends Controller
 
             if ($associations) {
                 $wordResponse['association_count'] = $associations->count();
+            }
+
+            if ($wordAssociation) {
+                $wordResponse['association'] = [
+                    'id' => $wordAssociation->getId(),
+                    'link' => $this->linker->abs($wordAssociation->url()),
+                ];
             }
         }
 
