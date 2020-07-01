@@ -12,7 +12,17 @@ class LocalizationConfig extends BaseConfig
             parent::ru(),
             [
                 'age' => 'Возраст',
-                
+
+                'noun' => 'существительное',
+                'adjective' => 'прилагательное',
+                'verb' => 'глагол',
+                'adverb' => 'наречие',
+                'pronoun' => 'местоимение',
+                'numeral' => 'числительное',
+                'preposition' => 'предлог',
+                'conjunction' => 'союз',
+                'predicative' => 'частица',
+
                 'Language not found.' => 'Язык не найден.',
                 'New game started.' => 'Начата новая игра.',
                 'Association not found.' => 'Ассоциация не найдена.',

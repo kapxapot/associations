@@ -23,12 +23,19 @@
         <div class="panel-body">
             {% if not auth.user %}
                 <div class="mb-0" ng-cloak>
+                    <div ng-show="demo.history.length > 1" class="br-word mb-2">
+                        <span ng-repeat="word in demo.history">
+                            <span ng-show="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.link}}'}}">&#x21C9;</a></span>
+                            <span class="label turn-label" ng-class="[{true:'mr-1'}[!$last && (word.isAi || !word.association_count)], {1:'label-info', 2:'label-success', 3:'label-warning'}[word.isAi ? 1 : (word.id ? 2 : 3)]]"><a ng-show="word.link" ng-href="{{'{{word.link}}'}}" ng-bind="word.word"></a><span ng-hide="word.link" ng-bind="word.word"></span></span>
+                        </span>
+                    </div>
                     <div ng-hide="demo.word">
                         Компьютер думает...
                     </div>
                     <div ng-show="demo.word">
-                        Компьютер говорит:
-                        <span class="label wrap-all label-info turn-label">
+                        <span ng-show="!demo.word.association">Компьютер говорит новое слово:</span>
+                        <span ng-show="demo.word.association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{demo.prevWord().link}}'}}" ng-bind="demo.prevWord().word"></a></span> компьютер говорит:</span>
+                        <span class="label br-word label-info turn-label">
                             <a ng-href="{{'{{demo.word.link}}'}}" ng-bind="demo.word.word"></a>
                         </span>
                     </div>
@@ -57,7 +64,6 @@
                             </div>
                         </form>
                     </div>
-                    <div class="clearfix"></div>
                 </div>
             {% else %}
                 {% if game %}
@@ -115,7 +121,6 @@
                             </div>
                         </form>
                     </div>
-                    <div class="clearfix"></div>
                 {% else %}
                     {% if last_game %}
                         <div class="mb-2">
@@ -146,11 +151,13 @@
         </div>
     </div>
 
-    <div class="panel">
-        <div class="panel-body">
-            {% include 'main/includes/demo_warning.twig' %}
+    {% if not auth.user %}
+        <div class="panel">
+            <div class="panel-body">
+                {% include 'main/includes/demo_warning.twig' %}
+            </div>
         </div>
-    </div>
+    {% endif %}
 
     {% include 'components/news_brief.twig' with { 'news': news } %}
 
@@ -168,65 +175,109 @@
     {% if auth.user %}
         autofocus();
     {% else %}
-        {# demo-game init #}
+        {# demo game block #}
+        $scope.languageCode = '{{ language.code }}';
+
+        $scope.demoRequest = (config) => {
+            $scope.ajax({
+                method: config.method ? config.method : 'get',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                url: config.url,
+                data: config.data ? config.data : '',
+                setError: (msg) => { $scope.demo.alertError = msg; },
+                showError: () => { showAlertError(); },
+                setLoading: (loading) => { $scope.loading = loading; },
+                setSaving: (saving) => { $scope.saving = saving; },
+                onSuccess: config.onSuccess,
+                noSuccessMessage: true
+            });
+        };
+
         $scope.demo = {
             word: null,
+            history: [],
+            prevWord: function () {
+                if (this.history.length < 2) {
+                    return null;
+                }
+
+                return this.history[this.history.length - 2];
+            },
             input: null,
             loading: true,
             saving: false,
             alertError: null,
             init: function () {
-                console.log('demo init start');
-
                 this.fetch();
                 this.loading = false;
-                autofocus();
 
-                console.log('demo init finish');
+                autofocus();
+            },
+            buildUrl: function () {
+                let url = '{{ path_for('api.public.play') }}';
+
+                if (this.input) {
+                    url += '/' + encodeURIComponent(this.input);
+                }
+
+                url += '?lang=' + $scope.languageCode;
+
+                if (this.word) {
+                    url += '&prev_word_id=' + this.word.id;
+                }
+
+                return url;
             },
             fetch: function () {
-                $http
-                    .get('{{ api }}play')
-                    .success((data) => {
-                        const fetched = data.new;
-
-                        console.log('fetched word: ' + fetched.word);
-
-                        this.word = fetched;
-                    });
+                $scope.demoRequest({
+                    url: this.buildUrl(),
+                    onSuccess: (data) => {
+                        this.setWord(data.new, true);
+                    }
+                });
+            },
+            setWord: function (word) {
+                this.word = word;
+                this.addToHistory(word, true);
+            },
+            addToHistory: function (word, isAi) {
+                word.isAi = isAi;
+                this.history.push(word);
             },
             send: function () {
                 this.saving = true;
 
-                console.log(this.input);
-
                 const said = encodeURIComponent(this.input);
 
-                $http
-                    .get('{{ api }}play/' + said)
-                    .success((data) => {
+                $scope.demoRequest({
+                    url: this.buildUrl(),
+                    onSuccess: (data) => {
+                        const question = data.question;
                         const answer = data.answer;
                         const fetched = data.new;
 
-                        if (answer) {
-                            console.log('answer: ' + answer.word);
+                        if (question) {
+                            this.addToHistory(question, false);
+                        }
 
-                            this.word = answer;
+                        if (answer) {
+                            this.setWord(answer);
                         }
                         else if (fetched) {
-                            console.log('new word: ' + fetched.word);
-
-                            this.word = fetched;
+                            this.setWord(fetched);
                         }
                         else {
-                            this.alertError = 'Что-то пошло не так... (нет слов?)';
+                            this.alertError = 'Что-то пошло не так. У компьютера нет слов...';
                             showAlertError();
                         }
 
                         this.input = null;
 
                         this.saving = false;
-                    });
+                    }
+                });
             }
         };
 

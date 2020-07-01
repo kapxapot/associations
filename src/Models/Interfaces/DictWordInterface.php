@@ -4,6 +4,7 @@ namespace App\Models\Interfaces;
 
 use App\Models\Language;
 use App\Models\Word;
+use App\Semantics\PartOfSpeech;
 use Plasticode\Models\Interfaces\DbModelInterface;
 
 interface DictWordInterface extends DbModelInterface
@@ -30,7 +31,11 @@ interface DictWordInterface extends DbModelInterface
      */
     function unlinkWord() : self;
 
-    function isNoun() : bool;
+    function partOfSpeech() : ?PartOfSpeech;
+
     function isValid() : bool;
-    function partOfSpeech() : string;
+
+    function isGood() : bool;
+    function isBad() : bool;
+    function isUgly() : bool;
 }

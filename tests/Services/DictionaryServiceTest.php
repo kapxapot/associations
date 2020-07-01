@@ -64,7 +64,7 @@ final class DictionaryServiceTest extends TestCase
         $this->assertTrue($dictWord->getLinkedWord()->equals($word));
         $this->assertTrue($word->dictWord()->equals($dictWord));
         $this->assertTrue($dictWord->isValid());
-        $this->assertTrue($dictWord->isNoun());
+        $this->assertTrue($dictWord->isGood());
     }
 
     public function testGetByWordRemoteInvalid() : void
@@ -87,7 +87,7 @@ final class DictionaryServiceTest extends TestCase
         $this->assertTrue($dictWord->getLinkedWord()->equals($word));
         $this->assertTrue($word->dictWord()->equals($dictWord));
         $this->assertFalse($dictWord->isValid());
-        $this->assertFalse($dictWord->isNoun());
+        $this->assertFalse($dictWord->isGood());
     }
 
     public function testRelink() : void

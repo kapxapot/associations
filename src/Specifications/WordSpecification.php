@@ -35,7 +35,7 @@ class WordSpecification
     {
         $dictWord = $word->dictWord();
 
-        return $dictWord && $dictWord->isNoun();
+        return $dictWord && $dictWord->isGood();
     }
 
     private function isApprovedByAssociations(Word $word) : bool

@@ -29,15 +29,9 @@
                     {% if dw.is_valid %}
                         <span class="label label-success" title="Есть в словаре" data-toggle="tooltip"><i class="fas fa-check"></i> словарь</span>
 
-                        {% if dw.is_noun %}
-                            <span class="label label-success" title="Существительное" data-toggle="tooltip"><i class="fas fa-check"></i> сущ</span>
-                        {% elseif dw.part_of_speech == 'adjective' %}
-                            <span class="label label-warning" title="Прилагательное" data-toggle="tooltip"><i class="fas fa-times"></i> прил</span>
-                        {% elseif dw.part_of_speech == 'verb' %}
-                            <span class="label label-danger" title="Глагол" data-toggle="tooltip"><i class="fas fa-times"></i> глагол</span>
-                        {% else %}
-                            <span class="label label-danger"><i class="fas fa-times"></i> {{ dw.part_of_speech }}</span>
-                        {% endif %}
+                        {% set pos = dw.part_of_speech %}
+
+                        <span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}" data-toggle="tooltip"><i class="fas {{ pos.isGood ? 'fa-check' : 'fa-times' }}"></i> {{ pos ? translate(pos.name) : dw.pos }}</span>
                     {% else %}
                         <span class="label label-danger" title="Нет в словаре" data-toggle="tooltip"><i class="fas fa-times"></i> словарь</span>
                     {% endif %}
@@ -57,7 +51,7 @@
             </p>
 
             {% if word.typo_by_me %}
-                <div class="quote break-all">
+                <div class="quote br-word">
                     <div class="quote-body">
                         <p>Оригинальное слово <strong>{{ word.word }}</strong> исправлено вами на слово <strong>{{ word.typo_by_me }}</strong>.</p>
                         <p>Это исправление видите <strong>только вы</strong>.</p>
@@ -70,7 +64,7 @@
             {% if word.approved_associations.any %}
                 <p><strong>Общие ассоциации ({{ word.approved_associations.count }}):</strong></p>
 
-                <ul class="vgap-2 break-all">
+                <ul class="vgap-2 br-word">
                     {% for assoc in word.approved_visible_associations %}
                         <li>
                             {{ lm.association(assoc, word) }}
@@ -90,7 +84,7 @@
             {% if word.not_approved_associations.any %}
                 <p><strong>Личные ассоциации ({{ word.not_approved_associations.count }}):</strong></p>
 
-                <ul class="vgap-2 break-all">
+                <ul class="vgap-2 br-word">
                     {% for assoc in word.not_approved_visible_associations %}
                         <li>
                             {{ lm.association(assoc, word) }}
@@ -107,7 +101,7 @@
                 {% endif %}
             {% endif %}
 
-            {% if word.proposed_typos|length > 0 %}
+            {% if is_moderator and word.proposed_typos|length > 0 %}
                 <p><strong>Возможные исправления:</strong></p>
 
                 <ul class="vgap-2">
@@ -123,7 +117,7 @@
                 </ul>
             {% endif %}
             
-            {% if word.proposed_duplicates|length > 0 %}
+            {% if is_moderator and word.proposed_duplicates|length > 0 %}
                 <p><strong>Возможные дубликаты:</strong></p>
                 
                 <ul class="vgap-2">
@@ -141,8 +135,8 @@
             {% endif %}
 
             {% if auth.user %}
-                <div>
-                    <a role="button" ng-click="problemsDialog()" class="btn btn-default problems" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
+                <div class="mt-3">
+                    <a role="button" ng-click="problemsDialog()" class="btn btn-default"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</a>
                 </div>
             {% endif %}
         </div>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Interfaces\DictWordInterface;
+use App\Semantics\PartOfSpeech;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
@@ -71,13 +72,29 @@ class YandexDictWord extends DbModel implements DictWordInterface
         return !is_null($this->pos);
     }
 
-    public function partOfSpeech() : string
+    public function partOfSpeech() : ?PartOfSpeech
     {
-        return $this->pos;
+        return PartOfSpeech::getByName($this->pos);
     }
 
-    public function isNoun() : bool
+    public function isGood() : bool
     {
-        return $this->pos == 'noun';
+        $partOfSpeech = $this->partOfSpeech();
+
+        return $partOfSpeech && $partOfSpeech->isGood();
+    }
+
+    public function isBad() : bool
+    {
+        $partOfSpeech = $this->partOfSpeech();
+
+        return $partOfSpeech && $partOfSpeech->isBad();
+    }
+
+    public function isUgly() : bool
+    {
+        $partOfSpeech = $this->partOfSpeech();
+
+        return is_null($partOfSpeech) || $partOfSpeech->isUgly();
     }
 }

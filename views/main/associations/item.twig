@@ -27,7 +27,7 @@
                 {% endif %}
             </p>
 
-            <p class="font-xl break-all lh-1 mb-3">
+            <p class="font-xl br-word lh-1 mb-3">
                 {% include "components/word.twig" with { 'word': association.first_word } only %}
                 {% include 'components/association_sign.twig' with { 'association': association } only %}
                 {% include "components/word.twig" with { 'word': association.second_word } only %}
@@ -55,8 +55,8 @@
             </ul>
 
             {% if auth.user %}
-                <div>
-                    <a role="button" ng-click="problemsDialog()" class="btn btn-default problems" title="Пожаловаться"><i class="fas fa-exclamation-triangle"></i></a>
+                <div class="mt-3">
+                    <a role="button" ng-click="problemsDialog()" class="btn btn-default"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</a>
                 </div>
             {% endif %}
         </div>

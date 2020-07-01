@@ -151,6 +151,7 @@ class GameController extends Controller
         $language = null;
 
         $langCode = $request->getQueryParam('lang', null);
+        $prevWordId = $request->getQueryParam('prev_word_id', 0);
 
         if (strlen($langCode) > 0) {
             $language = $this->languageRepository->getByCode($langCode);
