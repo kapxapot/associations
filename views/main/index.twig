@@ -25,7 +25,7 @@
                 <div class="mb-0" ng-cloak>
                     <div ng-show="demo.history.length > 1" class="br-word mb-2">
                         <span ng-repeat="word in demo.history">
-                            <span ng-show="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.link}}'}}">&#x21C9;</a></span>
+                            <span ng-show="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.link}}'}}">{{'{{word.association.is_approved ? "&#x21C9;" : "&#x2192;"}}'}}</a></span>
 
                             <span ng-show="!$first && !word.isAi && !word.association && demo.history[$index - 1].isAi"><a class="assoc-arrow">&#x21E2;</a></span>
 

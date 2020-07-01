@@ -174,10 +174,8 @@ class GameController extends Controller
             ? $word->publicAssociations()
             : null;
 
-        $wordAssociation = $associations
-            ? $associations->first(
-                fn (Association $a) => $a->hasWords($word, $prevWord)
-            )
+        $wordAssociation = $word
+            ? $word->associationByWord($prevWord)
             : null;
 
         $answerAssociation = $associations
@@ -201,6 +199,7 @@ class GameController extends Controller
             if ($wordAssociation) {
                 $wordResponse['association'] = [
                     'id' => $wordAssociation->getId(),
+                    'is_approved' => $wordAssociation->isApproved(),
                     'link' => $this->linker->abs($wordAssociation->url()),
                 ];
             }
@@ -219,6 +218,7 @@ class GameController extends Controller
             if ($answerAssociation) {
                 $answerResponse['association'] = [
                     'id' => $answerAssociation->getId(),
+                    'is_approved' => $answerAssociation->isApproved(),
                     'link' => $this->linker->abs($answerAssociation->url()),
                 ];
             }

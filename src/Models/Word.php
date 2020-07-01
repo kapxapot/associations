@@ -54,6 +54,15 @@ class Word extends LanguageElement
             : null;
     }
 
+    public function associationByWord(Word $word) : ?Association
+    {
+        return $this
+            ->associations()
+            ->first(
+                fn (Association $a) => $a->otherWord($this)->equals($word)
+            );
+    }
+
     public function approvedAssociations() : AssociationCollection
     {
         return $this
