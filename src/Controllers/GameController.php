@@ -171,7 +171,11 @@ class GameController extends Controller
             : null;
 
         $associations = $word
-            ? $word->publicAssociations()
+            ? $word
+                ->publicAssociations()
+                ->where(
+                    fn (Association $a) => !$a->otherWord($word)->equals($prevWord)
+                )
             : null;
 
         $wordAssociation = $word
