@@ -85,7 +85,7 @@ class WordService
         return $word;
     }
 
-    public function normalize(string $word) : string
+    public function normalize(?string $word) : ?string
     {
         return Strings::normalize($word);
     }

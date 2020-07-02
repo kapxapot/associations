@@ -164,6 +164,8 @@ class GameController extends Controller
 
         $language ??= $this->languageService->getDefaultLanguage();
 
+        $wordStr = $this->languageService->normalizeWord($language, $wordStr);
+
         $word = $this->wordRepository->findInLanguage($language, $wordStr);
 
         $prevWord = ($prevWordId > 0)

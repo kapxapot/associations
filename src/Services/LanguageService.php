@@ -79,7 +79,7 @@ class LanguageService
             ->random();
     }
 
-    public function normalizeWord(Language $language, string $word) : string
+    public function normalizeWord(Language $language, ?string $word) : ?string
     {
         // language is ignored currently
         return $this->wordService->normalize($word);
