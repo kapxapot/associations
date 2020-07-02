@@ -18,8 +18,15 @@
     text-decoration: none;
 }
 
-a.assoc-arrow {
+.assoc-arrow {
     color: var(--gray-3);
+}
+
+.assoc-arrow--dimmed {
+    color: var(--gray-6);
+}
+
+a.assoc-arrow {
     text-decoration: none;
 }
 
