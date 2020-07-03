@@ -244,8 +244,17 @@
             setWord: function (word) {
                 this.word = word;
                 this.addToHistory(word, true);
+
+                if (!word) {
+                    this.alertError = 'Что-то пошло не так. У компьютера нет слов...';
+                    showAlertError();
+                }
             },
             addToHistory: function (word, isAi) {
+                if (!word) {
+                    return;
+                }
+
                 word.isAi = isAi;
                 this.history.push(word);
             },
@@ -270,10 +279,6 @@
                         }
                         else if (fetched) {
                             this.setWord(fetched);
-                        }
-                        else {
-                            this.alertError = 'Что-то пошло не так. У компьютера нет слов...';
-                            showAlertError();
                         }
 
                         this.input = null;
