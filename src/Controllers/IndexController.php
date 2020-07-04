@@ -53,8 +53,7 @@ class IndexController extends Controller
                 $this->config->newsLatestLimit(),
                 0,
                 false
-            )
-            ->reverse();
+            );
 
         $params = $this->buildParams(
             [

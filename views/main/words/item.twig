@@ -31,7 +31,7 @@
 
                         {% set pos = dw.part_of_speech %}
 
-                        <span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}" data-toggle="tooltip"><i class="fas {{ pos.isGood ? 'fa-check' : 'fa-times' }}"></i> {{ pos ? translate(pos.name) : dw.pos }}</span>
+                        <span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}">{{ pos ? translate(pos.name) : dw.pos }}</span>
                     {% else %}
                         <span class="label label-danger" title="Нет в словаре" data-toggle="tooltip"><i class="fas fa-times"></i> словарь</span>
                     {% endif %}
