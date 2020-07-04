@@ -64,10 +64,10 @@ rights:
     template: admin_strict
 
   news:
-    template: editor
+    template: editor_strict
 
   pages:
-    template: editor
+    template: editor_strict
 
   roles:
     template: admin_api
