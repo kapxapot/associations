@@ -159,7 +159,26 @@ class WordService
             ->wordIsValid();
     }
 
-    public function validateWord(string $wordStr) : void
+    /**
+     * Returns true if the word is valid.
+     */
+    public function isWordValid(?string $wordStr) : bool
+    {
+        $valid = true;
+
+        try {
+            $this->validateWord($wordStr);
+        } catch (\Exception $ex) {
+            $valid = false;
+        }
+
+        return $valid;
+    }
+
+    /**
+     * Throws exception if the word is not valid.
+     */
+    public function validateWord(?string $wordStr) : void
     {
         $this
             ->validator
