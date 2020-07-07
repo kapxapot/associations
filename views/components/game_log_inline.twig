@@ -1,3 +1,5 @@
+<a href="{{ path_for('main.game', { 'id': game.id }) }}" data-toggle="tooltip" title="Игра #{{ game.id }}">#{{ game.id }}</a>:
+
 {% for turn in game.turns.reverse %}
     {% if not loop.first %}
         {% include 'components/association.twig' with { 'association': turn.association, 'short': true } only %}
