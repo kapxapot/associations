@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Auth\Interfaces\AuthInterface;
 use App\Handlers\NotFoundHandler;
 use App\Models\Association;
+use App\Models\Word;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Services\GameService;
@@ -195,48 +196,29 @@ class GameController extends Controller
             ? $answerAssociation->otherWord($word)
             : $this->languageService->getRandomPublicWord($language);
 
-        $wordResponse = [
-            'word' => $wordStr
-        ];
+        $wordResponse = ['word' => $wordStr];
 
         if (strlen($wordStr) > 0) {
             $wordResponse['is_valid'] = $this->wordService->isWordValid($wordStr);
         }
 
         if ($word) {
-            $wordResponse['id'] = $word->getId();
-            $wordResponse['link'] = $this->linker->abs($word->url());
-
-            if ($associations) {
-                $wordResponse['association_count'] = $associations->count();
-            }
-
-            if ($wordAssociation) {
-                $wordResponse['association'] = [
-                    'id' => $wordAssociation->getId(),
-                    'is_approved' => $wordAssociation->isApproved(),
-                    'link' => $this->linker->abs($wordAssociation->url()),
-                ];
-            }
+            $wordResponse = $this->serialize(
+                $wordResponse,
+                $word,
+                $wordAssociation
+            );
         }
 
         /** @var array|null */
         $answerResponse = null;
 
         if ($answer) {
-            $answerResponse = [
-                'word' => $answer->word,
-                'id' => $answer->getId(),
-                'link' => $this->linker->abs($answer->url()),
-            ];
-
-            if ($answerAssociation) {
-                $answerResponse['association'] = [
-                    'id' => $answerAssociation->getId(),
-                    'is_approved' => $answerAssociation->isApproved(),
-                    'link' => $this->linker->abs($answerAssociation->url()),
-                ];
-            }
+            $answerResponse = $this->serialize(
+                ['word' => $answer->word],
+                $answer,
+                $answerAssociation
+            );
         }
 
         $result = [
@@ -249,5 +231,21 @@ class GameController extends Controller
         }
 
         return Response::json($response, $result);
+    }
+
+    private function serialize(array $array, Word $word, ?Association $association) : array
+    {
+        $array['id'] = $word->getId();
+        $array['url'] = $this->linker->abs($word->url());
+
+        if ($association) {
+            $array['association'] = [
+                'id' => $association->getId(),
+                'is_approved' => $association->isApproved(),
+                'url' => $this->linker->abs($association->url()),
+            ];
+        }
+
+        return $array;
     }
 }

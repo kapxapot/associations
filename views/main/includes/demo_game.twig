@@ -1,0 +1,42 @@
+<div class="mb-0" ng-cloak>
+    <div ng-show="demo.history.length > 1" class="br-word mb-2">
+        {% include 'components/history.twig' with { 'history': 'demo.history'} only %}
+    </div>
+
+    <div ng-hide="demo.word">
+        Компьютер думает...
+    </div>
+
+    <div ng-show="demo.word">
+        <span ng-show="!demo.word.association">Компьютер говорит новое слово:</span>
+        <span ng-show="demo.word.association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{demo.prevWord().url}}'}}" ng-bind="demo.prevWord().word"></a></span> компьютер говорит:</span>
+        <span class="label br-word label-info turn-label">
+            <a ng-href="{{'{{demo.word.url}}'}}" ng-bind="demo.word.word"></a>
+        </span>
+    </div>
+
+    <div ng-cloak class="col-md-6 col-xs-12 mt-2 ph-0">
+        <form autocomplete="off">
+            <div class="form-group mb-2">
+                <label for="demoNextWord">Ваше слово:</label>
+
+                <div class="input-group">
+                    <input name="demoNextWord" id="demoNextWord" ng-model="demo.input" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
+
+                    <span class="input-group-btn">
+                        <button type="submit" ng-click="demo.send()" class="btn btn-success ajax-button" ng-disabled="!demo.input || demo.loading || demo.saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="demo.saving"></i><span ng-hide="demo.saving">Отправить</span></button>
+                    </span>
+                </div>
+            </div>
+
+            <div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
+                <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
+                <div ng-bind-html="demo.alertError|rawHtml"></div>
+            </div>
+        </form>
+
+        <div class="mt-3">
+            <button ng-click="demo.fetch()" class="btn btn-default mr-2" ng-disabled="demo.loading || demo.saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
+        </div>
+    </div>
+</div>

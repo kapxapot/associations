@@ -22,61 +22,14 @@
     <div class="panel">
         <div class="panel-body">
             {% if not auth.user %}
-                <div class="mb-0" ng-cloak>
-                    <div ng-show="demo.history.length > 1" class="br-word mb-2">
-                        <span ng-repeat="word in demo.history">
-                            <span ng-show="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.link}}'}}">{{'{{word.association.is_approved ? "&#x21C9;" : "&#x2192;"}}'}}</a></span>
-
-                            <span ng-show="!$first && !word.isAi && !word.association && demo.history[$index - 1].isAi" class="assoc-arrow--dimmed">&#x21E2;</span>
-
-                            <span class="label turn-label" ng-class="[{true:'mr-1'}[!$last && ((word.isAi && demo.history[$index + 1].isAi) || (!word.isAi && !demo.history[$index + 1].association))], {1:'label-info', 2:'label-success', 3:'label-warning', 4:'label-danger'}[word.isAi ? 1 : (word.id ? 2 : (word.is_valid ? 3 : 4))]]"><a ng-show="word.link" ng-href="{{'{{word.link}}'}}" ng-bind="word.word"></a><span ng-hide="word.link" ng-bind="word.word"></span></span>
-                        </span>
-                    </div>
-                    <div ng-hide="demo.word">
-                        Компьютер думает...
-                    </div>
-                    <div ng-show="demo.word">
-                        <span ng-show="!demo.word.association">Компьютер говорит новое слово:</span>
-                        <span ng-show="demo.word.association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{demo.prevWord().link}}'}}" ng-bind="demo.prevWord().word"></a></span> компьютер говорит:</span>
-                        <span class="label br-word label-info turn-label">
-                            <a ng-href="{{'{{demo.word.link}}'}}" ng-bind="demo.word.word"></a>
-                        </span>
-                    </div>
-
-                    <div ng-cloak class="col-md-6 col-xs-12 mt-2 ph-0">
-                        <form autocomplete="off">
-                            <div class="form-group mb-2">
-                                <label for="demoNextWord">Ваше слово:</label>
-
-                                <div class="input-group">
-                                    <input name="demoNextWord" id="demoNextWord" ng-model="demo.input" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
-
-                                    <span class="input-group-btn">
-                                        <button type="submit" ng-click="demo.send()" class="btn btn-success ajax-button" ng-disabled="!demo.input || demo.loading || demo.saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="demo.saving"></i><span ng-hide="demo.saving">Отправить</span></button>
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
-                                <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
-                                <div ng-bind-html="demo.alertError|rawHtml"></div>
-                            </div>
-                        </form>
-
-                        <div class="mt-3">
-                            <button ng-click="demo.fetch()" class="btn btn-default mr-2" ng-disabled="demo.loading || demo.saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
-                        </div>
-                    </div>
-                </div>
+                {% include 'main/includes/demo_game.twig' %}
             {% else %}
                 {% if game %}
-                    {% set game_turns_count = game.turns.count %}
+                    <div ng-show="play.currentGame().history.length > 1" class="br-word mb-2" ng-cloak>
+                        <a ng-href="{{'{{play.currentGame().url}}'}}" data-toggle="tooltip" ng-attr-title="{{'{{\'Игра #\' + play.currentGame().id}}'}}" ng-bind="'#' + play.currentGame().id"></a>:
 
-                    {% if game_turns_count > 1 %}
-                        <div class="mb-2">
-                            {% include 'components/game_log_inline.twig' with { 'game': game } only %}
-                        </div>
-                    {% endif %}
+                        {% include 'components/history.twig' with { 'history': 'play.currentGame().history'} only %}
+                    </div>
 
                     {% if last_turn %}
                         {% if before_last_turn %}
@@ -173,91 +126,140 @@
 {% set even_more_angular %}
     $scope.languageId = {{ language.id }};
 
-    {% if auth.user %}
-        autofocus();
-    {% else %}
+    {% if not auth.user %}
         {% include 'main/scripts/demo_game.twig' %}
-    {% endif %}
-
-    {% if not game %}
-        $scope.newGame = () => {
-            $scope.prePost(null);
-
-            $scope.ajax({
-                url: '{{ path_for('actions.game.start') }}',
-                data: { language_id: $scope.languageId },
-                onSuccess: $scope.postSuccess,
-                noSuccessMessage: true,
-            });
-        };
     {% else %}
-        $scope.normalize = (word) => {
-            return word.trim().toLowerCase();
+        autofocus();
+
+        $scope.play = {
+            word: null,
+            prevWord: function () {
+                const currentGame = this.currentGame();
+
+                if (!currentGame) {
+                    return null;
+                }
+
+                const history = currentGame.history;
+
+                if (history.length < 2) {
+                    return null;
+                }
+
+                return history[history.length - 2];
+            },
+            input: null,
+            loading: true,
+            saving: false,
+            alertError: null,
+            currentGame: function () {
+                return this.games.length > 0
+                    ? this.games[0]
+                    : null;
+            },
+            games: [
+                {% if game %}
+                {
+                    id: {{ game.id }},
+                    url: '{{ game.url }}',
+                    history: [
+                        {% for turn in game.turns.reverse %}
+                            {
+                                'word': '{{ turn.word.word }}',
+                                'id': {{ turn.word.id }},
+                                'url': '{{ turn.word.url }}',
+                                'isAi': {{ turn.user ? 'false' : 'true' }}{% if turn.association %},
+                                'association': {
+                                    'id': {{ turn.association.id }},
+                                    'is_approved': {{ turn.association.is_approved ? 'true' : 'false' }},
+                                    'url': '{{ turn.association.url }}'
+                                }{% endif %}
+                            }{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ],
+                }
+                {% endif %}
+            ]
         };
-        
-        $scope.showWordError = (error) => {
-            $scope.alertError = error;
-            showAlertError();
-        };
 
-        $scope.sendWord = () => {
-            let nextWord = $('#nextWord').val();
-            nextWord = $scope.normalize(nextWord);
+        {% if not game %}
+            $scope.newGame = () => {
+                $scope.prePost(null);
 
-            console.log(nextWord);
+                $scope.ajax({
+                    url: '{{ path_for('actions.game.start') }}',
+                    data: { language_id: $scope.languageId },
+                    onSuccess: $scope.postSuccess,
+                    noSuccessMessage: true,
+                });
+            };
+        {% else %}
+            $scope.normalize = (word) => {
+                return word.trim().toLowerCase();
+            };
 
-            if (!nextWord || nextWord.length == 0) {
-                $scope.showWordError('Слово не может быть пустым.');
-                return;
-            }
+            $scope.showWordError = (error) => {
+                $scope.alertError = error;
+                showAlertError();
+            };
 
-            {% if last_turn %}
-                const prevWord = '{{ last_turn.word.word }}';
+            $scope.sendWord = () => {
+                let nextWord = $('#nextWord').val();
+                nextWord = $scope.normalize(nextWord);
 
-                if (nextWord == prevWord) {
-                    $scope.showWordError('Слово совпадает с предыдущим.');
+                if (!nextWord || nextWord.length == 0) {
+                    $scope.showWordError('Слово не может быть пустым.');
                     return;
                 }
 
-                {% if before_last_turn %}
-                    const beforePrevWord = '{{ before_last_turn.word.word }}';
+                {% if last_turn %}
+                    const prevWord = '{{ last_turn.word.word }}';
 
-                    if (nextWord == beforePrevWord) {
-                        $scope.showWordError('Слово совпадает с предпоследним.');
+                    if (nextWord == prevWord) {
+                        $scope.showWordError('Слово совпадает с предыдущим.');
                         return;
                     }
-                {% endif %}
-            {% endif %}
 
-            $scope.prePost(null);
+                    {% if before_last_turn %}
+                        const beforePrevWord = '{{ before_last_turn.word.word }}';
 
-            $scope.ajax({
-                url: '{{ path_for('actions.turn.create') }}',
-                data: {
-                    game_id: {{ game.id }},
-                    {% if last_turn %}
-                        prev_turn_id: {{ last_turn.id }},
+                        if (nextWord == beforePrevWord) {
+                            $scope.showWordError('Слово совпадает с предпоследним.');
+                            return;
+                        }
                     {% endif %}
-                    word: nextWord
-                },
-                onSuccess: $scope.postSuccess,
-                noSuccessMessage: true,
-            });
-        };
+                {% endif %}
 
-        $scope.skip = () => {
-            $scope.ajax({
-                url: '{{ path_for('actions.game.finish') }}',
-                onSuccess: $scope.postSuccess,
-                noSuccessMessage: true,
-            });
-        };
+                $scope.prePost(null);
 
-        {% if with_problems %}
-            {% include 'main/scripts/problems.twig' with {
-                'word': problems_word,
-                'association': problems_association
-            } only %}
+                $scope.ajax({
+                    url: '{{ path_for('actions.turn.create') }}',
+                    data: {
+                        game_id: {{ game.id }},
+                        {% if last_turn %}
+                            prev_turn_id: {{ last_turn.id }},
+                        {% endif %}
+                        word: nextWord
+                    },
+                    onSuccess: $scope.postSuccess,
+                    noSuccessMessage: true,
+                });
+            };
+
+            $scope.skip = () => {
+                $scope.ajax({
+                    url: '{{ path_for('actions.game.finish') }}',
+                    onSuccess: $scope.postSuccess,
+                    noSuccessMessage: true,
+                });
+            };
+
+            {% if with_problems %}
+                {% include 'main/scripts/problems.twig' with {
+                    'word': problems_word,
+                    'association': problems_association
+                } only %}
+            {% endif %}
         {% endif %}
     {% endif %}
 {% endset %}
