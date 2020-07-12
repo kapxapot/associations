@@ -6,11 +6,9 @@ use App\Collections\LanguageElementCollection;
 use App\Models\Language;
 use App\Models\User;
 
-interface LanguageElementRepositoryInterface
+interface LanguageElementRepositoryInterface extends WithLanguageRepositoryInterface
 {
     function getAllByLanguage(Language $language) : LanguageElementCollection;
-
-    function getByLanguageCount(Language $language) : int;
 
     function getAllCreatedByUser(
         User $user,
@@ -35,6 +33,6 @@ interface LanguageElementRepositoryInterface
 
     function getLastAddedByLanguage(
         ?Language $language = null,
-        int $limit = null
+        int $limit = 0
     ) : LanguageElementCollection;
 }

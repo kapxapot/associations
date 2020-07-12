@@ -53,16 +53,27 @@ class TurnService
         return true;
     }
 
-    public function newPlayerTurn(Game $game, Word $word, User $user) : Turn
+    /**
+     * Returns new player turn and AI turn/answer if it happens.
+     *
+     * @return Turn[]
+     */
+    public function newPlayerTurn(Game $game, Word $word, User $user) : array
     {
         $turn = $this->newTurn($game, $word, $user);
 
         $event = new TurnCreatedEvent($turn);
         $this->eventDispatcher->dispatch($event);
 
-        $this->processPlayerTurn($turn);
+        $turns = [$turn];
 
-        return $turn;
+        $aiTurn = $this->processPlayerTurn($turn);
+
+        if ($aiTurn) {
+            $turns[] = $aiTurn;
+        }
+
+        return $turns;
     }
 
     public function newAiTurn(Game $game, Word $word) : Turn
@@ -105,7 +116,12 @@ class TurnService
             $turn->associationId = $association->getId();
         }
 
-        return $this->turnRepository->save($turn);
+        $turn = $this->turnRepository->save($turn);
+
+        // todo: this relation must be updated by repositories (+ entity manager)
+        $this->gameRepository->save($game);
+
+        return $turn;
     }
 
     public function processAiTurn(Turn $turn) : void
@@ -123,22 +139,28 @@ class TurnService
         }
     }
 
-    public function processPlayerTurn(Turn $turn) : void
+    /**
+     * Returns AI turn in answer to player turn (if any).
+     */
+    public function processPlayerTurn(Turn $turn) : ?Turn
     {
         $this->finishPrevTurn($turn);
-        $this->nextAiTurn($turn);
+
+        return $this->nextAiTurn($turn);
     }
 
-    private function nextAiTurn(Turn $turn) : void
+    private function nextAiTurn(Turn $turn) : ?Turn
     {
         $game = $turn->game();
         $word = $this->findAnswer($turn);
 
         if ($word) {
-            $this->newAiTurn($game, $word);
-        } else {
-            $this->finishGame($game);
+            return $this->newAiTurn($game, $word);
         }
+
+        $this->finishGame($game);
+
+        return null;
     }
 
     /**

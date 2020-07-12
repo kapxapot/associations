@@ -7,6 +7,7 @@ use Plasticode\Models\Traits\CreatedAt;
 
 /**
  * @property integer $gameId
+ * @property integer $languageId
  * @property integer $wordId
  * @property integer|null $userId
  * @property integer|null $associationId

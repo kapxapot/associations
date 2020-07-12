@@ -72,7 +72,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 
     public function getLastAddedByLanguage(
         ?Language $language = null,
-        int $limit = null
+        int $limit = 0
     ) : WordCollection
     {
         return WordCollection::from(

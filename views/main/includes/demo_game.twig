@@ -21,19 +21,21 @@
                 <label for="demoNextWord">Ваше слово:</label>
 
                 <div class="input-group">
-                    <input name="demoNextWord" id="demoNextWord" ng-model="demo.input" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
+                    <input id="demoNextWord" ng-model="demo.input" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
 
                     <span class="input-group-btn">
                         <button type="submit" ng-click="demo.send()" class="btn btn-success ajax-button" ng-disabled="!demo.input || demo.loading || demo.saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="demo.saving"></i><span ng-hide="demo.saving">Отправить</span></button>
                     </span>
                 </div>
             </div>
-
-            <div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
-                <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
-                <div ng-bind-html="demo.alertError|rawHtml"></div>
-            </div>
         </form>
+    </div>
+
+    <div class="col-xs-12 ph-0">
+        <div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
+            <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
+            <div ng-bind-html="demo.alertError|rawHtml"></div>
+        </div>
 
         <div class="mt-3">
             <button ng-click="demo.fetch()" class="btn btn-default mr-2" ng-disabled="demo.loading || demo.saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>

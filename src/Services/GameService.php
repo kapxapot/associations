@@ -53,19 +53,19 @@ class GameService
     public function startGame(Game $game) : ?Turn
     {
         Assert::notNull($game, 'Game can\'t be null.');
-        
+
         // already started
         if ($game->isStarted()) {
             return null;
         }
-        
+
         $language = $game->language();
         $user = $game->user();
-        
+
         // if language has words, AI goes first
         // otherwise player goes first
         $word = $this->languageService->getRandomWordFor($user, $language);
-        
+
         return $word
             ? $this->turnService->newAiTurn($game, $word)
             : null;

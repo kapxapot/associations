@@ -13,6 +13,7 @@ use Plasticode\Models\Traits\UpdatedAt;
 /**
  * @property integer $approved
  * @property string|null $approvedUpdatedAt
+ * @property int $languageId
  * @property integer $mature
  * @property string|null $matureUpdatedAt
  * @method Language language()

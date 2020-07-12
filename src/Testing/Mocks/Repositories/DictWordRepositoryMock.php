@@ -18,6 +18,16 @@ class DictWordRepositoryMock implements DictWordRepositoryInterface
         $this->dictWords = DictWordCollection::empty();
     }
 
+    public function getCountByLanguage(Language $language): int
+    {
+        return $this
+            ->dictWords
+            ->where(
+                fn (DictWordInterface $dw) => $dw->getLanguage()->equals($language)
+            )
+            ->count();
+    }
+
     public function create(array $data) : DictWordInterface
     {
         /** @var YandexDictWord */
@@ -50,7 +60,7 @@ class DictWordRepositoryMock implements DictWordRepositoryInterface
             ->dictWords
             ->first(
                 fn (DictWordInterface $dw) =>
-                $language->equals($dw->getLanguage())
+                $dw->getLanguage()->equals($language)
                 && $dw->getWord() == $wordStr
             );
     }

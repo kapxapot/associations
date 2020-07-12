@@ -28,7 +28,7 @@ interface WordRepositoryInterface extends LanguageElementRepositoryInterface
 
     function getLastAddedByLanguage(
         ?Language $language = null,
-        int $limit = null
+        int $limit = 0
     ) : WordCollection;
 
     /**

@@ -71,7 +71,7 @@ class Controller extends BaseController
         if ($language) {
             $wordCount = $this
                 ->wordRepository
-                ->getByLanguageCount($language);
+                ->getCountByLanguage($language);
 
             $wordCountStr = $this
                 ->casesService
@@ -79,7 +79,7 @@ class Controller extends BaseController
 
             $associationCount = $this
                 ->associationRepository
-                ->getByLanguageCount($language);
+                ->getCountByLanguage($language);
 
             $associationCountStr = $this
                 ->casesService

@@ -31,21 +31,13 @@
                         {% include 'components/history.twig' with { 'history': 'play.currentGame().history'} only %}
                     </div>
 
-                    {% if last_turn %}
-                        {% if before_last_turn %}
-                            {% set msg %}В ответ на {% include 'components/turn_word.twig' with { 'turn': before_last_turn } only %} {% endset %}
-                        {% endif %}
-                        {% set msg_part_two %}
-                            {% if last_turn.is_ai_turn %}
-                                {% if msg %}к{% else %}К{% endif %}омпьютер
-                            {% elseif last_turn.user %}
-                                {% if msg %}и{% else %}И{% endif %}грок <strong>{{ last_turn.user.display_name }}</strong>
-                            {% endif %}
-                            говорит: {% include 'components/turn_word.twig' with { 'turn': last_turn } only %}
-                        {% endset %}
-                        {% set msg = msg ? msg ~ msg_part_two : msg_part_two %}
-                        <div>{{ msg|raw }}</div>
-                    {% endif %}
+                    <div ng-show="play.turn">
+                        <span ng-show="!play.turn().association">Компьютер говорит новое слово:</span>
+                        <span ng-show="play.turn().association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{play.prevTurn().url}}'}}" ng-bind="play.prevTurn().word"></a></span> компьютер говорит:</span>
+                        <span class="label br-word label-info turn-label">
+                            <a ng-href="{{'{{play.turn().url}}'}}" ng-bind="play.turn().word"></a>
+                        </span>
+                    </div>
 
                     <div ng-cloak class="col-md-6 col-xs-12 mt-2 ph-0">
                         <form autocomplete="off">
@@ -53,21 +45,23 @@
                                 <label for="nextWord">Ваше слово:</label>
 
                                 <div class="input-group">
-                                    <input name="nextWord" id="nextWord" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
+                                    <input id="nextWord" ng-model="play.input" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
 
                                     <span class="input-group-btn">
-                                        <button type="submit" ng-click="sendWord()" class="btn btn-success ajax-button" ng-disabled="loading || saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Отправить</span></button>
+                                        <button type="submit" ng-click="sendWord()" class="btn btn-success ajax-button" ng-disabled="!play.input || play.loading || play.saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="play.saving"></i><span ng-hide="play.saving">Отправить</span></button>
                                     </span>
                                 </div>
                             </div>
-
-                            <div ng-cloak class="alert alert-danger alert-dismissable fade in mt-2">
-                                <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
-                                <div ng-bind-html="alertError|rawHtml"></div>
-                            </div>
                         </form>
+                    </div>
 
-                        <div class="mt-3">
+                    <div class="col-xs-12 ph-0">
+                        <div ng-cloak class="alert alert-danger alert-dismissable fade in">
+                            <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
+                            <div ng-bind-html="alertError|rawHtml"></div>
+                        </div>
+
+                        <div class="mt-2">
                             <button ng-click="skip()" class="btn btn-default mr-2" ng-disabled="loading || saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
 
                             {% if with_problems %}
@@ -129,11 +123,14 @@
     {% if not auth.user %}
         {% include 'main/scripts/demo_game.twig' %}
     {% else %}
-        autofocus();
-
         $scope.play = {
-            word: null,
-            prevWord: function () {
+            turn: function () {
+                return this.turnByIndex(0);
+            },
+            prevTurn: function () {
+                return this.turnByIndex(1);
+            },
+            turnByIndex: function (index) {
                 const currentGame = this.currentGame();
 
                 if (!currentGame) {
@@ -142,16 +139,21 @@
 
                 const history = currentGame.history;
 
-                if (history.length < 2) {
+                if (history.length < (index + 1)) {
                     return null;
                 }
 
-                return history[history.length - 2];
+                return history[history.length - index - 1];
             },
             input: null,
             loading: true,
             saving: false,
             alertError: null,
+            init: function () {
+                this.loading = false;
+
+                autofocus();
+            },
             currentGame: function () {
                 return this.games.length > 0
                     ? this.games[0]
@@ -165,10 +167,11 @@
                     history: [
                         {% for turn in game.turns.reverse %}
                             {
+                                'turn_id': {{ turn.id }},
                                 'word': '{{ turn.word.word }}',
                                 'id': {{ turn.word.id }},
                                 'url': '{{ turn.word.url }}',
-                                'isAi': {{ turn.user ? 'false' : 'true' }}{% if turn.association %},
+                                'is_ai': {{ turn.user ? 'false' : 'true' }}{% if turn.association %},
                                 'association': {
                                     'id': {{ turn.association.id }},
                                     'is_approved': {{ turn.association.is_approved ? 'true' : 'false' }},
@@ -179,87 +182,110 @@
                     ],
                 }
                 {% endif %}
-            ]
+            ],
+            processResponse: function (data) {
+                console.log('processing response');
+                console.log(data);
+
+                return;
+            }
         };
 
-        {% if not game %}
-            $scope.newGame = () => {
-                $scope.prePost(null);
+        $timeout(() => {
+            $scope.play.init();
+        });
 
-                $scope.ajax({
-                    url: '{{ path_for('actions.game.start') }}',
-                    data: { language_id: $scope.languageId },
-                    onSuccess: $scope.postSuccess,
-                    noSuccessMessage: true,
-                });
-            };
-        {% else %}
-            $scope.normalize = (word) => {
-                return word.trim().toLowerCase();
-            };
+        $scope.normalize = (word) => {
+            return word.trim().toLowerCase();
+        };
 
-            $scope.showWordError = (error) => {
-                $scope.alertError = error;
-                showAlertError();
-            };
+        $scope.showWordError = (error) => {
+            $scope.alertError = error;
+            showAlertError();
+        };
 
-            $scope.sendWord = () => {
-                let nextWord = $('#nextWord').val();
-                nextWord = $scope.normalize(nextWord);
+        {# todo: remove this #}
+        $scope.newGame = () => {
+            $scope.prePost(null);
 
-                if (!nextWord || nextWord.length == 0) {
-                    $scope.showWordError('Слово не может быть пустым.');
+            $scope.ajax({
+                url: '{{ path_for('actions.game.start') }}',
+                data: { language_id: $scope.languageId },
+                onSuccess: $scope.postSuccess,
+                noSuccessMessage: true,
+            });
+        };
+
+        $scope.sendWord = () => {
+            const game = $scope.play.currentGame();
+
+            if (!game) {
+                $scope.showWordError('Игра не начата, что-то пошло не так.');
+                return;
+            }
+
+            let nextWord = $scope.play.input;
+            nextWord = $scope.normalize(nextWord);
+
+            if (!nextWord || nextWord.length == 0) {
+                $scope.showWordError('Слово не может быть пустым.');
+                return;
+            }
+
+            const turn = $scope.play.turn();
+
+            if (turn) {
+                const word = turn.word;
+
+                if (nextWord == word) {
+                    $scope.showWordError('Слово совпадает с предыдущим.');
                     return;
                 }
+            }
 
-                {% if last_turn %}
-                    const prevWord = '{{ last_turn.word.word }}';
+            const prevTurn = $scope.play.prevTurn();
 
-                    if (nextWord == prevWord) {
-                        $scope.showWordError('Слово совпадает с предыдущим.');
-                        return;
-                    }
+            if (prevTurn) {
+                const prevWord = prevTurn.word;
 
-                    {% if before_last_turn %}
-                        const beforePrevWord = '{{ before_last_turn.word.word }}';
+                if (nextWord == prevWord) {
+                    $scope.showWordError('Слово совпадает с предпоследним.');
+                    return;
+                }
+            }
 
-                        if (nextWord == beforePrevWord) {
-                            $scope.showWordError('Слово совпадает с предпоследним.');
-                            return;
-                        }
-                    {% endif %}
-                {% endif %}
+            $scope.prePost(null);
 
-                $scope.prePost(null);
-
-                $scope.ajax({
-                    url: '{{ path_for('actions.turn.create') }}',
-                    data: {
-                        game_id: {{ game.id }},
-                        {% if last_turn %}
-                            prev_turn_id: {{ last_turn.id }},
-                        {% endif %}
-                        word: nextWord
-                    },
-                    onSuccess: $scope.postSuccess,
-                    noSuccessMessage: true,
-                });
+            let data = {
+                game_id: game.id,
+                word: nextWord
             };
 
-            $scope.skip = () => {
-                $scope.ajax({
-                    url: '{{ path_for('actions.game.finish') }}',
-                    onSuccess: $scope.postSuccess,
-                    noSuccessMessage: true,
-                });
-            };
+            if (turn) {
+                data.prev_turn_id = turn.turn_id;
+            }
 
-            {% if with_problems %}
-                {% include 'main/scripts/problems.twig' with {
-                    'word': problems_word,
-                    'association': problems_association
-                } only %}
-            {% endif %}
+            $scope.ajax({
+                url: '{{ path_for('actions.turn.create') }}',
+                data: data,
+                onSuccess: $scope.play.processResponse,
+                noSuccessMessage: true,
+            });
+        };
+
+        $scope.skip = () => {
+            $scope.ajax({
+                url: '{{ path_for('actions.game.finish') }}',
+                onSuccess: $scope.play.processResponse,
+                noSuccessMessage: true,
+            });
+        };
+
+        {% if with_problems %}
+            {% include 'main/scripts/problems.twig' with {
+                'word': problems_word,
+                'association': problems_association
+            } only %}
         {% endif %}
     {% endif %}
 {% endset %}

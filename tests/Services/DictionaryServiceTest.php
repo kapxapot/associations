@@ -2,29 +2,34 @@
 
 namespace App\Tests\Services;
 
-use App\Models\Language;
-use App\Models\Word;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
 use App\Testing\Mocks\Repositories\DictWordRepositoryMock;
+use App\Testing\Mocks\Repositories\LanguageRepositoryMock;
+use App\Testing\Mocks\Repositories\WordRepositoryMock;
 use App\Testing\Mocks\Services\ExternalDictServiceMock;
+use App\Testing\Seeders\LanguageSeeder;
+use App\Testing\Seeders\WordSeeder;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Events\EventDispatcher;
 
 final class DictionaryServiceTest extends TestCase
 {
-    private Language $language;
+    private WordRepositoryInterface $wordRepository;
     private DictionaryService $dictService;
 
     protected function setUp() : void
     {
         parent::setUp();
 
-        /** @var Language */
-        $this->language = Language::create(
-            [
-                'id' => 1,
-                'name' => 'Dummy',
-            ]
+        $languageRepository = new LanguageRepositoryMock(
+            new LanguageSeeder()
+        );
+
+        $this->wordRepository = new WordRepositoryMock(
+            new WordSeeder(
+                $languageRepository
+            )
         );
 
         $this->dictService = new DictionaryService(
@@ -39,23 +44,14 @@ final class DictionaryServiceTest extends TestCase
     protected function tearDown() : void
     {
         unset($this->dictService);
-        unset($this->language);
+        unset($this->wordRepository);
 
         parent::tearDown();
     }
 
     public function testGetByWordRemoteValid() : void
     {
-        /** @var Word */
-        $word = Word::create(
-            [
-                'id' => 1,
-                'language_id' => $this->language->getId(),
-                'word' => 'стол',
-            ]
-        );
-
-        $word = $word->withLanguage($this->language);
+        $word = $this->wordRepository->get(1);
 
         $dictWord = $this->dictService->getByWord($word, true);
 
@@ -69,16 +65,7 @@ final class DictionaryServiceTest extends TestCase
 
     public function testGetByWordRemoteInvalid() : void
     {
-        /** @var Word */
-        $word = Word::create(
-            [
-                'id' => 2,
-                'language_id' => $this->language->getId(),
-                'word' => 'табурет',
-            ]
-        );
-
-        $word = $word->withLanguage($this->language);
+        $word = $this->wordRepository->get(2);
 
         $dictWord = $this->dictService->getByWord($word, true);
 
@@ -92,26 +79,8 @@ final class DictionaryServiceTest extends TestCase
 
     public function testRelink() : void
     {
-        /** @var Word */
-        $word1 = Word::create(
-            [
-                'id' => 1,
-                'language_id' => $this->language->getId(),
-                'word' => 'стол',
-            ]
-        );
-
-        /** @var Word */
-        $word2 = Word::create(
-            [
-                'id' => 2,
-                'language_id' => $this->language->getId(),
-                'word' => 'кровать',
-            ]
-        );
-
-        $word1 = $word1->withLanguage($this->language);
-        $word2 = $word2->withLanguage($this->language);
+        $word1 = $this->wordRepository->get(1);
+        $word2 = $this->wordRepository->get(3);
 
         $dictWord = $this->dictService->getByWord($word1, true);
 
@@ -131,16 +100,7 @@ final class DictionaryServiceTest extends TestCase
 
     public function testUnlink() : void
     {
-        /** @var Word */
-        $word = Word::create(
-            [
-                'id' => 1,
-                'language_id' => $this->language->getId(),
-                'word' => 'стол',
-            ]
-        );
-
-        $word = $word->withLanguage($this->language);
+        $word = $this->wordRepository->get(1);
 
         $dictWord = $this->dictService->getByWord($word, true);
 

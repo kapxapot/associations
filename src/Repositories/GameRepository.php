@@ -2,22 +2,33 @@
 
 namespace App\Repositories;
 
+use App\Collections\GameCollection;
 use App\Models\Game;
+use App\Models\Language;
 use App\Models\User;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Traits\ByUserRepository;
+use App\Repositories\Traits\WithLanguageRepository;
 use Plasticode\Query;
 use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 
 class GameRepository extends IdiormRepository implements GameRepositoryInterface
 {
     use ByUserRepository;
+    use WithLanguageRepository;
 
     protected string $entityClass = Game::class;
 
     public function get(?int $id) : ?Game
     {
         return $this->getEntity($id);
+    }
+
+    public function getAllByLanguage(Language $language) : GameCollection
+    {
+        return GameCollection::from(
+            $this->getByLanguageQuery($language)
+        );
     }
 
     public function save(Game $game) : Game

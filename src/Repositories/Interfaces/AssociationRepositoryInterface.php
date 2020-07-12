@@ -28,6 +28,6 @@ interface AssociationRepositoryInterface extends LanguageElementRepositoryInterf
 
     function getLastAddedByLanguage(
         ?Language $language = null,
-        int $limit = null
+        int $limit = 0
     ) : AssociationCollection;
 }

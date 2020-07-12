@@ -7,7 +7,7 @@ use App\Models\Interfaces\DictWordInterface;
 use App\Models\Language;
 use App\Models\Word;
 
-interface DictWordRepositoryInterface
+interface DictWordRepositoryInterface extends WithLanguageRepositoryInterface
 {
     function create(array $data) : DictWordInterface;
     function save(DictWordInterface $dictWord) : DictWordInterface;

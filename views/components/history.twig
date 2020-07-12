@@ -1,7 +1,7 @@
 <span ng-repeat="word in {{ history }}">
     <span ng-show="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.url}}'}}">{{'{{word.association.is_approved ? "&#x21C9;" : "&#x2192;"}}'}}</a></span>
 
-    <span ng-show="!$first && !word.isAi && !word.association && {{ history }}[$index - 1].isAi" class="assoc-arrow--dimmed">&#x21E2;</span>
+    <span ng-show="!$first && !word.is_ai && !word.association && {{ history }}[$index - 1].is_ai" class="assoc-arrow--dimmed">&#x21E2;</span>
 
-    <span class="label turn-label" ng-class="[{true:'mr-1'}[!$last && ((word.isAi && {{ history }}[$index + 1].isAi) || (!word.isAi && !{{ history }}[$index + 1].association))], {1:'label-info', 2:'label-success', 3:'label-warning', 4:'label-danger'}[word.isAi ? 1 : (word.id ? 2 : (word.is_valid ? 3 : 4))]]"><a ng-show="word.url" ng-href="{{'{{word.url}}'}}" ng-bind="word.word"></a><span ng-hide="word.url" ng-bind="word.word"></span></span>
+    <span class="label turn-label" ng-class="[{true:'mr-1'}[!$last && ((word.is_ai && {{ history }}[$index + 1].is_ai) || (!word.is_ai && !{{ history }}[$index + 1].association))], {1:'label-info', 2:'label-success', 3:'label-warning', 4:'label-danger'}[word.is_ai ? 1 : (word.id ? 2 : (word.is_valid ? 3 : 4))]]"><a ng-show="word.url" ng-href="{{'{{word.url}}'}}" ng-bind="word.word"></a><span ng-hide="word.url" ng-bind="word.word"></span></span>
 </span>

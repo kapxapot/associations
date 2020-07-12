@@ -14,20 +14,14 @@ use Plasticode\Util\Convert;
 
 abstract class LanguageElementRepository extends IdiormRepository implements LanguageElementRepositoryInterface
 {
-    use CreatedRepository, WithLanguageRepository;
+    use CreatedRepository;
+    use WithLanguageRepository;
 
     public function getAllByLanguage(Language $language) : LanguageElementCollection
     {
         return LanguageElementCollection::from(
             $this->getByLanguageQuery($language)
         );
-    }
-
-    public function getByLanguageCount(Language $language): int
-    {
-        return $this
-            ->getByLanguageQuery($language)
-            ->count();
     }
 
     public function getAllCreatedByUser(
@@ -85,7 +79,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     public function getLastAddedByLanguage(
         ?Language $language = null,
-        int $limit = null
+        int $limit = 0
     ) : LanguageElementCollection
     {
         return LanguageElementCollection::from(

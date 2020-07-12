@@ -61,7 +61,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
 
     public function getAllByUser(
         User $user,
-        Language $language = null
+        ?Language $language = null
     ) : TurnCollection
     {
         $query = $this->getByLanguageQuery($language);

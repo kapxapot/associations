@@ -73,7 +73,7 @@ $app->group(
 
                 $this->get(
                     '/play[/{word}]',
-                    GameController::class . ':play'
+                    TurnController::class . ':play'
                 )->setName('api.public.play');
 
                 $this->get(

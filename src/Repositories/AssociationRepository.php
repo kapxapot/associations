@@ -74,7 +74,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
 
     public function getLastAddedByLanguage(
         ?Language $language = null,
-        int $limit = null
+        int $limit = 0
     ) : AssociationCollection
     {
         return AssociationCollection::from(
