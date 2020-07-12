@@ -32,7 +32,7 @@
 
             <p><strong>Ход игры:</strong></p>
 
-            {% include 'components/game_log_inline.twig' with { 'game': game } only %}
+            {% include 'components/game_log_inline.twig' with { 'game': game, 'no_game_link': true } only %}
         </div>
     </div>
 {% endblock %}

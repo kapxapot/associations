@@ -1,4 +1,6 @@
-<a href="{{ path_for('main.game', { 'id': game.id }) }}" data-toggle="tooltip" title="Игра #{{ game.id }}">#{{ game.id }}</a>:
+{% if not no_game_link %}
+    <a href="{{ path_for('main.game', { 'id': game.id }) }}" data-toggle="tooltip" title="Игра #{{ game.id }}">#{{ game.id }}</a>:
+{% endif %}
 
 {% for turn in game.turns.reverse %}
     {% if not loop.first %}

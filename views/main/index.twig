@@ -25,10 +25,12 @@
                 {% include 'main/includes/demo_game.twig' %}
             {% else %}
                 {% if game %}
-                    <div ng-show="play.currentGame().history.length > 1" class="br-word mb-2" ng-cloak>
-                        <a ng-href="{{'{{play.currentGame().url}}'}}" data-toggle="tooltip" ng-attr-title="{{'{{\'Игра #\' + play.currentGame().id}}'}}" ng-bind="'#' + play.currentGame().id"></a>:
+                    <div ng-show="play.games.length > 1 || play.currentGame().history.length > 1" class="br-word mb-2" ng-cloak>
+                        <span ng-repeat="game in play.games" ng-class="[{true:'ml-1'}[!$first]]">
+                            <a ng-href="{{'{{game.url}}'}}" data-toggle="tooltip" ng-attr-title="{{'{{\'Игра #\' + game.id}}'}}">#</a>
 
-                        {% include 'components/history.twig' with { 'history': 'play.currentGame().history'} only %}
+                            {% include 'components/history.twig' with { 'history': 'game.history'} only %}
+                        </span>
                     </div>
 
                     <div ng-show="play.turn">
@@ -156,7 +158,7 @@
             },
             currentGame: function () {
                 return this.games.length > 0
-                    ? this.games[0]
+                    ? this.games[this.games.length - 1]
                     : null;
             },
             games: [
@@ -183,17 +185,52 @@
                 }
                 {% endif %}
             ],
-            processResponse: function (data) {
-                console.log('processing response');
-                console.log(data);
+            addToHistory: function (turn) {
+                const currentGame = this.currentGame();
 
-                return;
+                if (currentGame && turn.game.id == currentGame.id) {
+                    currentGame.history.push(turn);
+                } else {
+                    let newGame = {
+                        id: turn.game.id,
+                        url: turn.game.url,
+                        history: [turn]
+                    };
+
+                    this.games.push(newGame);
+                }
+
+                $scope.updateUI();
             }
         };
 
         $timeout(() => {
             $scope.play.init();
         });
+
+        $scope.processGameResponse = (data) => {
+            console.log('processing response');
+            console.log(data);
+
+            const question = data.question;
+            const answer = data.answer;
+            const fetched = data.new;
+
+            if (question) {
+                $scope.play.addToHistory(question);
+            }
+
+            if (answer) {
+                $scope.play.addToHistory(answer);
+            }
+            else if (fetched) {
+                $scope.play.addToHistory(fetched);
+            }
+
+            $scope.play.input = null;
+
+            $scope.play.saving = false;
+        };
 
         $scope.normalize = (word) => {
             return word.trim().toLowerCase();
@@ -268,7 +305,7 @@
             $scope.ajax({
                 url: '{{ path_for('actions.turn.create') }}',
                 data: data,
-                onSuccess: $scope.play.processResponse,
+                onSuccess: $scope.processGameResponse,
                 noSuccessMessage: true,
             });
         };
@@ -276,7 +313,7 @@
         $scope.skip = () => {
             $scope.ajax({
                 url: '{{ path_for('actions.game.finish') }}',
-                onSuccess: $scope.play.processResponse,
+                onSuccess: $scope.processGameResponse,
                 noSuccessMessage: true,
             });
         };

@@ -217,7 +217,10 @@ class TurnController extends Controller
     {
         return $this->serialize(
             [
-                'game_id' => $turn->gameId,
+                'game' => [
+                    'id' => $turn->gameId,
+                    'url' => $turn->game()->url()
+                ],
                 'turn_id' => $turn->getId(),
                 'word' => $turn->word()->word,
                 'is_ai' => $turn->isAiTurn()
