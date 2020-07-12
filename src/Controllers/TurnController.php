@@ -111,7 +111,11 @@ class TurnController extends Controller
         ];
 
         if (is_null($answer)) {
-            $result['new'] = null; // todo: new game, new turn
+            $newGame = $this->gameService->newGame($language, $user);
+
+            if ($newGame && $newGame->turns()->any()) {
+                $result['new'] = $this->serializeTurn($newGame->turns()->first());
+            }
         }
 
         return Response::json($response, $result);
