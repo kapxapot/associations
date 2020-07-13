@@ -35,9 +35,9 @@
 
                     <div ng-show="play.turn">
                         <span ng-show="!play.turn().association">Компьютер говорит новое слово:</span>
-                        <span ng-show="play.turn().association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{play.prevTurn().url}}'}}" ng-bind="play.prevTurn().word"></a></span> компьютер говорит:</span>
+                        <span ng-show="play.turn().association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{play.prevTurn().url}}'}}" ng-bind="play.prevTurn().display_name" ng-attr-title="{{'{{play.prevTurn().word != play.prevTurn().display_name ? \'Оригинальное слово: \' + play.prevTurn().word : \'\'}}'}}" data-toggle="tooltip" data-placement="bottom"></a></span> компьютер говорит:</span>
                         <span class="label br-word label-info turn-label">
-                            <a ng-href="{{'{{play.turn().url}}'}}" ng-bind="play.turn().word"></a>
+                            <a ng-href="{{'{{play.turn().url}}'}}" ng-bind="play.turn().display_name" ng-attr-title="{{'{{play.turn().word != play.turn().display_name ? \'Оригинальное слово: \' + play.turn().word : \'\'}}'}}" data-toggle="tooltip" data-placement="bottom"></a>
                         </span>
                     </div>
 
@@ -174,6 +174,7 @@
                                 'id': {{ turn.word.id }},
                                 'url': '{{ turn.word.url }}',
                                 'is_ai': {{ turn.user ? 'false' : 'true' }}{% if turn.association %},
+                                'display_name': '{{ turn.word.display_name }}',
                                 'association': {
                                     'id': {{ turn.association.id }},
                                     'is_approved': {{ turn.association.is_approved ? 'true' : 'false' }},

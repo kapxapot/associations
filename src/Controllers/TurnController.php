@@ -276,6 +276,7 @@ class TurnController extends Controller
         $array['id'] = $word->getId();
         $array['is_approved'] = $word->isApproved();
         $array['url'] = $this->linker->abs($word->url());
+        $array['display_name'] = $word->displayName();
 
         if ($association) {
             $array['association'] = [
