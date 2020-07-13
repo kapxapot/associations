@@ -154,6 +154,11 @@ $app->group(
                 )->setName('actions.turn.create');
 
                 $this->post(
+                    '/turn/skip',
+                    TurnController::class . ':skip'
+                )->setName('actions.turn.skip');
+
+                $this->post(
                     '/feedback',
                     FeedbackController::class . ':save'
                 )->setName('actions.feedback');

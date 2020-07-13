@@ -209,9 +209,6 @@
         });
 
         $scope.processGameResponse = (data) => {
-            console.log('processing response');
-            console.log(data);
-
             const question = data.question;
             const answer = data.answer;
             const fetched = data.new;
@@ -228,7 +225,6 @@
             }
 
             $scope.play.input = null;
-
             $scope.play.saving = false;
         };
 
@@ -312,7 +308,7 @@
 
         $scope.skip = () => {
             $scope.ajax({
-                url: '{{ path_for('actions.game.finish') }}',
+                url: '{{ path_for('actions.turn.skip') }}',
                 onSuccess: $scope.processGameResponse,
                 noSuccessMessage: true,
             });

@@ -17,6 +17,7 @@ use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\Http\NotFoundException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request as SlimRequest;
 use Webmozart\Assert\Assert;
 
@@ -106,19 +107,59 @@ class TurnController extends Controller
 
         $result = [
             'question' => $this->serializeTurn($question),
-            'answer' => $answer ? $this->serializeTurn($answer) : null,
-            'new' => null,
+            'answer' => $answer ? $this->serializeTurn($answer) : null
         ];
 
         if (is_null($answer)) {
             $newGame = $this->gameService->newGame($language, $user);
 
-            if ($newGame && $newGame->turns()->any()) {
-                $result['new'] = $this->serializeTurn($newGame->turns()->first());
-            }
+            $firstTurn = $newGame
+                ? $newGame->turns()->first()
+                : null;
+
+            $result['new'] = $firstTurn
+                ? $this->serializeTurn($firstTurn)
+                : null;
         }
 
         return Response::json($response, $result);
+    }
+
+    public function skip(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    ) : ResponseInterface
+    {
+        $user = $this->auth->getUser();
+
+        Assert::notNull($user);
+
+        $game = $user->currentGame();
+
+        if ($game) {
+            $this->turnService->finishGame($game);
+        }
+
+        $language = $game
+            ? $game->language()
+            : $this->languageService->getDefaultLanguage();
+
+        $newGame = $this->gameService->newGame($language, $user);
+
+        $firstTurn = $newGame
+            ? $newGame->turns()->first()
+            : null;
+
+        return Response::json(
+            $response,
+            [
+                'question' => null,
+                'answer' => null,
+                'new' => $firstTurn
+                    ? $this->serializeTurn($firstTurn)
+                    : null
+            ]
+        );
     }
 
     /**
@@ -183,7 +224,7 @@ class TurnController extends Controller
         }
 
         if ($word) {
-            $wordResponse = $this->serialize(
+            $wordResponse = $this->serializeRaw(
                 $wordResponse,
                 $word,
                 $wordAssociation
@@ -194,7 +235,7 @@ class TurnController extends Controller
         $answerResponse = null;
 
         if ($answer) {
-            $answerResponse = $this->serialize(
+            $answerResponse = $this->serializeRaw(
                 ['word' => $answer->word],
                 $answer,
                 $answerAssociation
@@ -215,7 +256,7 @@ class TurnController extends Controller
 
     private function serializeTurn(Turn $turn) : array
     {
-        return $this->serialize(
+        return $this->serializeRaw(
             [
                 'game' => [
                     'id' => $turn->gameId,
@@ -230,9 +271,10 @@ class TurnController extends Controller
         );
     }
 
-    private function serialize(array $array, Word $word, ?Association $association) : array
+    private function serializeRaw(array $array, Word $word, ?Association $association) : array
     {
         $array['id'] = $word->getId();
+        $array['is_approved'] = $word->isApproved();
         $array['url'] = $this->linker->abs($word->url());
 
         if ($association) {
