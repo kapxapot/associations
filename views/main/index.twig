@@ -126,13 +126,13 @@
         {% include 'main/scripts/demo_game.twig' %}
     {% else %}
         $scope.play = {
-            turn: function () {
+            turn: function() {
                 return this.turnByIndex(0);
             },
-            prevTurn: function () {
+            prevTurn: function() {
                 return this.turnByIndex(1);
             },
-            turnByIndex: function (index) {
+            turnByIndex: function(index) {
                 const currentGame = this.currentGame();
 
                 if (!currentGame) {
@@ -151,12 +151,12 @@
             loading: true,
             saving: false,
             alertError: null,
-            init: function () {
+            init: function() {
                 this.loading = false;
 
                 autofocus();
             },
-            currentGame: function () {
+            currentGame: function() {
                 return this.games.length > 0
                     ? this.games[this.games.length - 1]
                     : null;
@@ -185,7 +185,7 @@
                 }
                 {% endif %}
             ],
-            addToHistory: function (turn) {
+            addToHistory: function(turn) {
                 const currentGame = this.currentGame();
 
                 if (currentGame && turn.game.id == currentGame.id) {
@@ -200,7 +200,7 @@
                     this.games.push(newGame);
                 }
 
-                $scope.updateUI();
+                $scope.updateUi();
             }
         };
 
@@ -235,18 +235,6 @@
         $scope.showWordError = (error) => {
             $scope.alertError = error;
             showAlertError();
-        };
-
-        {# todo: remove this #}
-        $scope.newGame = () => {
-            $scope.prePost(null);
-
-            $scope.ajax({
-                url: '{{ path_for('actions.game.start') }}',
-                data: { language_id: $scope.languageId },
-                onSuccess: $scope.postSuccess,
-                noSuccessMessage: true,
-            });
         };
 
         $scope.sendWord = () => {

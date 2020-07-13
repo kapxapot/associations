@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
 use App\Config\Interfaces\NewsConfigInterface;
+use App\Services\GameService;
 use Plasticode\Services\NewsAggregatorService;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -12,6 +13,8 @@ use Slim\Http\Request as SlimRequest;
 class IndexController extends Controller
 {
     private AuthInterface $auth;
+
+    private GameService $gameService;
     private NewsAggregatorService $newsAggregatorService;
     private NewsConfigInterface $config;
 
@@ -20,6 +23,8 @@ class IndexController extends Controller
         parent::__construct($container);
 
         $this->auth = $container->auth;
+
+        $this->gameService = $container->gameService;
         $this->newsAggregatorService = $container->newsAggregatorService;
         $this->config = $container->config;
     }
@@ -46,6 +51,15 @@ class IndexController extends Controller
                 $lastGame->turns()->count()
             )
             : null;
+
+        // if there is no current game, start it
+        if ($user && is_null($game)) {
+            $language = $lastGame
+                ? $lastGame->language()
+                : $this->languageService->getDefaultLanguage();
+
+            $game = $this->gameService->newGame($language, $user);
+        }
 
         $latestNews = $this
             ->newsAggregatorService

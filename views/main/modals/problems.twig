@@ -12,10 +12,6 @@
 
 {% set modal_body_style = 'pb-1' %}
 
-{% set var_loading = 'modalLoading' %}
-{% set var_saving = 'modalSaving' %}
-{% set var_alert_error = 'modalAlertError' %}
-
 {% block modal_body %}
     <div class="row mh-0 br-word">
     {% if word %}
@@ -33,7 +29,7 @@
                     <input type="checkbox" ng-model="model.word.withTypo" ng-change="focusTypo()">
                     Ошибка/опечатка...
                 </label>
-                {{ lm.info('Правильное слово может отсутствовать в игре') }}
+                {{ lm.info('Правильное слово может отсутствовать в игре.') }}
             </div>
             <div class="form-group" ng-if="model.word.withTypo">
                 <input type="text" id="problemsWordTypo" placeholder="ваш вариант" class="form-control" maxlength="{{ word_max_length }}" required ng-model="model.word.typo" />
@@ -43,7 +39,7 @@
                     <input type="checkbox" ng-model="model.word.withDuplicate" ng-change="focusDuplicate()">
                     Дублирует слово...
                 </label>
-                {{ lm.info('Главное слово должно присутствовать в игре') }}
+                {{ lm.info('Главное слово должно присутствовать в игре.') }}
             </div>
             <div class="form-group" ng-if="model.word.withDuplicate">
                 <input type="text" id="problemsWordDuplicate" placeholder="главное слово" class="form-control" maxlength="{{ word_max_length }}" required ng-model="model.word.duplicate" />

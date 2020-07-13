@@ -9,9 +9,6 @@ $scope.demoRequest = (config) => {
         url: config.url,
         data: config.data ? config.data : '',
         setError: (msg) => { $scope.demo.alertError = msg; },
-        showError: () => { showAlertError(); },
-        setLoading: (loading) => { $scope.loading = loading; },
-        setSaving: (saving) => { $scope.saving = saving; },
         onSuccess: config.onSuccess,
         noSuccessMessage: true
     });
@@ -20,7 +17,7 @@ $scope.demoRequest = (config) => {
 $scope.demo = {
     word: null,
     history: [],
-    prevWord: function () {
+    prevWord: function() {
         if (this.history.length < 2) {
             return null;
         }
@@ -31,13 +28,13 @@ $scope.demo = {
     loading: true,
     saving: false,
     alertError: null,
-    init: function () {
+    init: function() {
         this.fetch();
         this.loading = false;
 
         autofocus();
     },
-    buildUrl: function () {
+    buildUrl: function() {
         let url = '{{ path_for('api.public.play') }}';
 
         if (this.input) {
@@ -52,7 +49,7 @@ $scope.demo = {
 
         return url;
     },
-    fetch: function () {
+    fetch: function() {
         $scope.demoRequest({
             url: this.buildUrl(),
             onSuccess: (data) => {
@@ -60,7 +57,7 @@ $scope.demo = {
             }
         });
     },
-    setWord: function (word) {
+    setWord: function(word) {
         this.word = word;
         this.addToHistory(word, true);
 
@@ -69,7 +66,7 @@ $scope.demo = {
             showAlertError();
         }
     },
-    addToHistory: function (word, isAi) {
+    addToHistory: function(word, isAi) {
         if (!word) {
             return;
         }
@@ -77,7 +74,7 @@ $scope.demo = {
         word.is_ai = isAi;
         this.history.push(word);
     },
-    send: function () {
+    send: function() {
         this.saving = true;
 
         const said = encodeURIComponent(this.input);
