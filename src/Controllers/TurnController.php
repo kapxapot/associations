@@ -3,11 +3,7 @@
 namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
-use App\Models\Association;
-use App\Models\Turn;
-use App\Models\Word;
 use App\Repositories\Interfaces\GameRepositoryInterface;
-use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Services\GameService;
 use App\Services\TurnService;
@@ -24,7 +20,6 @@ use Webmozart\Assert\Assert;
 class TurnController extends Controller
 {
     private GameRepositoryInterface $gameRepository;
-    private LanguageRepositoryInterface $languageRepository;
     private TurnRepositoryInterface $turnRepository;
 
     private AuthInterface $auth;
@@ -37,7 +32,6 @@ class TurnController extends Controller
         parent::__construct($container);
 
         $this->gameRepository = $container->gameRepository;
-        $this->languageRepository = $container->languageRepository;
         $this->turnRepository = $container->turnRepository;
 
         $this->auth = $container->auth;
@@ -106,8 +100,8 @@ class TurnController extends Controller
         $answer = (count($turns) > 1) ? $turns[1] : null;
 
         $result = [
-            'question' => $this->serializeTurn($question),
-            'answer' => $answer ? $this->serializeTurn($answer) : null
+            'question' => $this->serializer->serializeTurn($question),
+            'answer' => $answer ? $this->serializer->serializeTurn($answer) : null
         ];
 
         if (is_null($answer)) {
@@ -118,7 +112,7 @@ class TurnController extends Controller
                 : null;
 
             $result['new'] = $firstTurn
-                ? $this->serializeTurn($firstTurn)
+                ? $this->serializer->serializeTurn($firstTurn)
                 : null;
         }
 
@@ -156,136 +150,9 @@ class TurnController extends Controller
                 'question' => null,
                 'answer' => null,
                 'new' => $firstTurn
-                    ? $this->serializeTurn($firstTurn)
+                    ? $this->serializer->serializeTurn($firstTurn)
                     : null
             ]
         );
-    }
-
-    /**
-     * Play out of game context.
-     */
-    public function play(
-        SlimRequest $request,
-        ResponseInterface $response,
-        array $args
-    ) : ResponseInterface
-    {
-        $wordStr = $args['word'] ?? null;
-
-        /** @var Language|null */
-        $language = null;
-
-        $langCode = $request->getQueryParam('lang', null);
-        $prevWordId = $request->getQueryParam('prev_word_id', 0);
-
-        if (strlen($langCode) > 0) {
-            $language = $this->languageRepository->getByCode($langCode);
-
-            if (is_null($language)) {
-                throw new BadRequestException('Unknown language code.');
-            }
-        }
-
-        $language ??= $this->languageService->getDefaultLanguage();
-
-        $wordStr = $this->languageService->normalizeWord($language, $wordStr);
-
-        $word = $this->wordRepository->findInLanguage($language, $wordStr);
-
-        $prevWord = ($prevWordId > 0)
-            ? $this->wordRepository->get($prevWordId)
-            : null;
-
-        $associations = $word
-            ? $word
-                ->publicAssociations()
-                ->where(
-                    fn (Association $a) => !$a->otherWord($word)->equals($prevWord)
-                )
-            : null;
-
-        $wordAssociation = $word
-            ? $word->associationByWord($prevWord)
-            : null;
-
-        $answerAssociation = $associations
-            ? $associations->random()
-            : null;
-
-        $answer = $answerAssociation
-            ? $answerAssociation->otherWord($word)
-            : $this->languageService->getRandomPublicWord($language);
-
-        $wordResponse = ['word' => $wordStr];
-
-        if (strlen($wordStr) > 0) {
-            $wordResponse['is_valid'] = $this->wordService->isWordValid($wordStr);
-        }
-
-        if ($word) {
-            $wordResponse = $this->serializeRaw(
-                $wordResponse,
-                $word,
-                $wordAssociation
-            );
-        }
-
-        /** @var array|null */
-        $answerResponse = null;
-
-        if ($answer) {
-            $answerResponse = $this->serializeRaw(
-                ['word' => $answer->word],
-                $answer,
-                $answerAssociation
-            );
-        }
-
-        $result = [
-            'question' => $wordStr ? $wordResponse : null,
-            'answer' => $answerAssociation ? $answerResponse : null,
-        ];
-
-        if (is_null($answerAssociation)) {
-            $result['new'] = $answerResponse;
-        }
-
-        return Response::json($response, $result);
-    }
-
-    private function serializeTurn(Turn $turn) : array
-    {
-        return $this->serializeRaw(
-            [
-                'game' => [
-                    'id' => $turn->gameId,
-                    'url' => $turn->game()->url()
-                ],
-                'turn_id' => $turn->getId(),
-                'word' => $turn->word()->word,
-                'is_ai' => $turn->isAiTurn()
-            ],
-            $turn->word(),
-            $turn->association()
-        );
-    }
-
-    private function serializeRaw(array $array, Word $word, ?Association $association) : array
-    {
-        $array['id'] = $word->getId();
-        $array['is_approved'] = $word->isApproved();
-        $array['url'] = $this->linker->abs($word->url());
-        $array['display_name'] = $word->displayName();
-
-        if ($association) {
-            $array['association'] = [
-                'id' => $association->getId(),
-                'is_approved' => $association->isApproved(),
-                'url' => $this->linker->abs($association->url()),
-            ];
-        }
-
-        return $array;
     }
 }

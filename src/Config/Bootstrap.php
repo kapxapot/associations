@@ -4,6 +4,7 @@ namespace App\Config;
 
 use App\Auth\Auth;
 use App\Core\Linker;
+use App\Core\Serializer;
 use App\EventHandlers\Association\AssociationApprovedChangedHandler;
 use App\EventHandlers\Association\AssociationOutOfDateHandler;
 use App\EventHandlers\DictWord\DictWordLinkedHandler;
@@ -269,6 +270,11 @@ class Bootstrap extends BootstrapBase
                 $c->settingsProvider,
                 $c->router,
                 $c->tagsConfig
+            );
+
+        $map['serializer'] = fn (CI $c) =>
+            new Serializer(
+                $c->linker
             );
 
         $map['tagLinkMapper'] = fn (CI $c) =>

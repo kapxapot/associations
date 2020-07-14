@@ -1,28 +1,75 @@
-$scope.model = {};
+{% import 'main/local_macros.twig' as lm %}
 
-{% if word %}
-    {% set word_feedback = word.feedback_by_me %}
+$scope.problems = {
+    word: null,
+    association: null,
+    full: function() {
+        return this.word && this.association;
+    }
+};
 
-    $scope.model.word = {
-        word_id: {{ word.id }},
-        dislike: {{ word_feedback.is_disliked ? 'true' : 'false' }},
-        withTypo: {{ word_feedback.typo ? 'true' : 'false' }},
-        typo: {% if word_feedback.typo %}'{{ word_feedback.typo }}'{% else %}null{% endif %},
-        withDuplicate: {{ word_feedback.duplicate ? 'true' : 'false' }},
-        duplicate: {% if word_feedback.duplicate %}'{{ word_feedback.duplicate.word }}'{% else %}null{% endif %},
-        mature: {{ word_feedback.is_mature ? 'true' : 'false' }}
+if ($scope.play) {
+    $scope.updateProblemsModel = () => {
+        let turn = $scope.play.turn();
+        let prevTurn = $scope.play.prevTurn();
+
+        $scope.problems.word = null;
+        $scope.problems.association = null;
+
+        if (turn) {
+            $scope.problems.word = {
+                word_id: turn.id,
+                word: turn.word
+            };
+
+            if (prevTurn && turn.association) {
+                $scope.problems.association = {
+                    association_id: turn.association.id,
+                    label:
+                        prevTurn.display_name +
+                        ' ' +
+                        (turn.association.is_approved ? '\u21C9' : '\u2192') +
+                        ' ' +
+                        turn.display_name
+                };
+            }
+        }
+
+        $scope.updateModalWidth();
     };
-{% endif %}
+} else {
+    {% if word %}
+        {% set word_feedback = word.feedback_by_me %}
 
-{% if association %}
-    {% set association_feedback = association.feedback_by_me %}
+        $scope.problems.word = {
+            word_id: {{ word.id }},
+            word: '{{ word.word }}',
+            dislike: {{ word_feedback.is_disliked ? 'true' : 'false' }},
+            withTypo: {{ word_feedback.typo ? 'true' : 'false' }},
+            typo: {% if word_feedback.typo %}'{{ word_feedback.typo }}'{% else %}null{% endif %},
+            withDuplicate: {{ word_feedback.duplicate ? 'true' : 'false' }},
+            duplicate: {% if word_feedback.duplicate %}'{{ word_feedback.duplicate.word }}'{% else %}null{% endif %},
+            mature: {{ word_feedback.is_mature ? 'true' : 'false' }}
+        };
+    {% endif %}
 
-    $scope.model.association = {
-        association_id: {{ association.id }},
-        dislike: {{ association_feedback.is_disliked ? 'true' : 'false' }},
-        mature: {{ association_feedback.is_mature ? 'true' : 'false' }}
-    };
-{% endif %}
+    {% if association %}
+        {% set association_feedback = association.feedback_by_me %}
+
+        $scope.problems.association = {
+            association_id: {{ association.id }},
+            dislike: {{ association_feedback.is_disliked ? 'true' : 'false' }},
+            mature: {{ association_feedback.is_mature ? 'true' : 'false' }},
+            label: '{{ lm.association(association, null, true) }}'
+        };
+    {% endif %}
+}
+
+$scope.updateModalWidth = () => {
+    $scope.isNarrowModal = !$scope.problems.full();
+};
+
+$scope.updateModalWidth();
 
 $scope.problemsDialog = () => {
     showModal('problems');
@@ -31,7 +78,7 @@ $scope.problemsDialog = () => {
 $('#problemsForm').submit(function(e) {
     $scope.modalPrePost(e);
 
-    let obj = $.extend(true, {}, $scope.model);
+    let obj = $.extend(true, {}, $scope.problems);
 
     if (obj.word) {
         if (obj.word.withTypo !== true) {
@@ -56,7 +103,7 @@ $('#problemsForm').submit(function(e) {
 });
 
 $scope.focusTypo = () => {
-    if ($scope.model.word.withTypo) {
+    if ($scope.problems.word.withTypo) {
         setTimeout(() => {
             $('#problemsWordTypo').focus();
         }, 100);
@@ -64,7 +111,7 @@ $scope.focusTypo = () => {
 };
 
 $scope.focusDuplicate = () => {
-    if ($scope.model.word.withDuplicate) {
+    if ($scope.problems.word.withDuplicate) {
         setTimeout(() => {
             $('#problemsWordDuplicate').focus();
         }, 100);

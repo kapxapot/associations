@@ -1,3 +1,6 @@
+games:
+  api: read_one
+
 languages:
   api: full
   name_field: name

@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Config\Interfaces\AssociationConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Core\Interfaces\LinkerInterface;
+use App\Core\Serializer;
 use App\Models\Game;
 use App\Models\Language;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
@@ -28,6 +29,7 @@ class Controller extends BaseController
     protected WordConfigInterface $wordConfig;
 
     protected LinkerInterface $linker;
+    protected Serializer $serializer;
 
     public function __construct(ContainerInterface $container)
     {
@@ -44,6 +46,7 @@ class Controller extends BaseController
         $this->wordConfig = $container->config;
 
         $this->linker = $container->linker;
+        $this->serializer = $container->serializer;
     }
 
     /**

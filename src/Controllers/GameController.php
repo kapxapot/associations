@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
 use App\Handlers\NotFoundHandler;
+use App\Models\Association;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Services\GameService;
@@ -134,5 +135,97 @@ class GameController extends Controller
             $response,
             ['message' => $this->translate($msg)]
         );
+    }
+
+    /**
+     * Play out of game context.
+     */
+    public function play(
+        SlimRequest $request,
+        ResponseInterface $response,
+        array $args
+    ) : ResponseInterface
+    {
+        $wordStr = $args['word'] ?? null;
+
+        /** @var Language|null */
+        $language = null;
+
+        $langCode = $request->getQueryParam('lang', null);
+        $prevWordId = $request->getQueryParam('prev_word_id', 0);
+
+        if (strlen($langCode) > 0) {
+            $language = $this->languageRepository->getByCode($langCode);
+
+            if (is_null($language)) {
+                throw new BadRequestException('Unknown language code.');
+            }
+        }
+
+        $language ??= $this->languageService->getDefaultLanguage();
+
+        $wordStr = $this->languageService->normalizeWord($language, $wordStr);
+
+        $word = $this->wordRepository->findInLanguage($language, $wordStr);
+
+        $prevWord = ($prevWordId > 0)
+            ? $this->wordRepository->get($prevWordId)
+            : null;
+
+        $associations = $word
+            ? $word
+                ->publicAssociations()
+                ->where(
+                    fn (Association $a) => !$a->otherWord($word)->equals($prevWord)
+                )
+            : null;
+
+        $wordAssociation = $word
+            ? $word->associationByWord($prevWord)
+            : null;
+
+        $answerAssociation = $associations
+            ? $associations->random()
+            : null;
+
+        $answer = $answerAssociation
+            ? $answerAssociation->otherWord($word)
+            : $this->languageService->getRandomPublicWord($language);
+
+        $wordResponse = ['word' => $wordStr];
+
+        if (strlen($wordStr) > 0) {
+            $wordResponse['is_valid'] = $this->wordService->isWordValid($wordStr);
+        }
+
+        if ($word) {
+            $wordResponse = $this->serializer->serializeRaw(
+                $wordResponse,
+                $word,
+                $wordAssociation
+            );
+        }
+
+        /** @var array|null */
+        $answerResponse = null;
+
+        if ($answer) {
+            $answerResponse = $this->serializer->serializeRaw(
+                ['word' => $answer->word],
+                $answer,
+                $answerAssociation
+            );
+        }
+
+        $result = [
+            'question' => $wordStr ? $wordResponse : null,
+            'answer' => $answerAssociation ? $answerResponse : null,
+        ];
+
+        if (is_null($answerAssociation)) {
+            $result['new'] = $answerResponse;
+        }
+
+        return Response::json($response, $result);
     }
 }

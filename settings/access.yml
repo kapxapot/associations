@@ -39,13 +39,8 @@ templates:
 
   public_immutable:
     admin: [ full ]
-    editor: [ edit ]
+    editor: [ read ]
     author: [ read_own, create ]
-
-  public_extended:
-    admin: [ full ]
-    editor: [ edit ]
-    author: [ read, create, edit_own ]
 
 rights:
   associations:

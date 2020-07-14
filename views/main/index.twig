@@ -25,6 +25,10 @@
                 {% include 'main/includes/demo_game.twig' %}
             {% else %}
                 {% if game %}
+                    <div ng-hide="!play.loading">
+                        Загрузка...
+                    </div>
+
                     <div ng-show="play.games.length > 1 || play.currentGame().history.length > 1" class="br-word mb-2" ng-cloak>
                         <span ng-repeat="game in play.games" ng-class="[{true:'ml-1'}[!$first]]">
                             <a ng-href="{{'{{game.url}}'}}" data-toggle="tooltip" ng-attr-title="{{'{{\'Игра #\' + game.id}}'}}">#</a>
@@ -33,11 +37,11 @@
                         </span>
                     </div>
 
-                    <div ng-show="play.turn">
+                    <div ng-show="play.turn()" ng-cloak>
                         <span ng-show="!play.turn().association">Компьютер говорит новое слово:</span>
-                        <span ng-show="play.turn().association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{play.prevTurn().url}}'}}" ng-bind="play.prevTurn().display_name" ng-attr-title="{{'{{play.prevTurn().word != play.prevTurn().display_name ? \'Оригинальное слово: \' + play.prevTurn().word : \'\'}}'}}" data-toggle="tooltip" data-placement="bottom"></a></span> компьютер говорит:</span>
+                        <span ng-show="play.turn().association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{play.prevTurn().url}}'}}" ng-bind="play.prevTurn().display_name" {% include 'components/original_word_title.twig' with {'word': 'play.prevTurn()'} only %}></a></span> компьютер говорит:</span>
                         <span class="label br-word label-info turn-label">
-                            <a ng-href="{{'{{play.turn().url}}'}}" ng-bind="play.turn().display_name" ng-attr-title="{{'{{play.turn().word != play.turn().display_name ? \'Оригинальное слово: \' + play.turn().word : \'\'}}'}}" data-toggle="tooltip" data-placement="bottom"></a>
+                            <a ng-href="{{'{{play.turn().url}}'}}" ng-bind="play.turn().display_name" {% include 'components/original_word_title.twig' with {'word': 'play.turn()'} only %}></a>
                         </span>
                     </div>
 
@@ -125,6 +129,11 @@
     {% if not auth.user %}
         {% include 'main/scripts/demo_game.twig' %}
     {% else %}
+        $scope.showError = (error) => {
+            $scope.alertError = error;
+            showAlertError();
+        };
+
         $scope.play = {
             turn: function() {
                 return this.turnByIndex(0);
@@ -151,8 +160,38 @@
             loading: true,
             saving: false,
             alertError: null,
+            reloadGame: function(gameId) {
+                $http
+                    .get('{{ api }}games/' + gameId)
+                    .then(
+                        response => {
+                            const data = response.data;
+
+                            const gameIndex = $scope.play.games.findIndex(
+                                game => game.id == gameId
+                            );
+
+                            if (gameIndex >= 0) {
+                                $scope.play.games[gameIndex] = data;
+                            } else {
+                                $scope.play.games.push(data);
+                            }
+
+                            $scope.updateProblemsModel();
+
+                            $scope.play.loading = false;
+                        },
+                        response => {
+                            $scope.showError(response.statusText);
+                        }
+                    );
+            },
             init: function() {
-                this.loading = false;
+                {% if game %}
+                    this.reloadGame({{ game.id }});
+                {% else %}
+                    this.loading = false;
+                {% endif %}
 
                 autofocus();
             },
@@ -161,31 +200,7 @@
                     ? this.games[this.games.length - 1]
                     : null;
             },
-            games: [
-                {% if game %}
-                {
-                    id: {{ game.id }},
-                    url: '{{ game.url }}',
-                    history: [
-                        {% for turn in game.turns.reverse %}
-                            {
-                                'turn_id': {{ turn.id }},
-                                'word': '{{ turn.word.word }}',
-                                'id': {{ turn.word.id }},
-                                'url': '{{ turn.word.url }}',
-                                'is_ai': {{ turn.user ? 'false' : 'true' }}{% if turn.association %},
-                                'display_name': '{{ turn.word.display_name }}',
-                                'association': {
-                                    'id': {{ turn.association.id }},
-                                    'is_approved': {{ turn.association.is_approved ? 'true' : 'false' }},
-                                    'url': '{{ turn.association.url }}'
-                                }{% endif %}
-                            }{% if not loop.last %},{% endif %}
-                        {% endfor %}
-                    ],
-                }
-                {% endif %}
-            ],
+            games: [],
             addToHistory: function(turn) {
                 const currentGame = this.currentGame();
 
@@ -200,6 +215,8 @@
 
                     this.games.push(newGame);
                 }
+
+                $scope.updateProblemsModel();
 
                 $scope.updateUi();
             }
@@ -233,16 +250,11 @@
             return word.trim().toLowerCase();
         };
 
-        $scope.showWordError = (error) => {
-            $scope.alertError = error;
-            showAlertError();
-        };
-
         $scope.sendWord = () => {
             const game = $scope.play.currentGame();
 
             if (!game) {
-                $scope.showWordError('Игра не начата, что-то пошло не так.');
+                $scope.showError('Игра не начата, что-то пошло не так.');
                 return;
             }
 
@@ -250,7 +262,7 @@
             nextWord = $scope.normalize(nextWord);
 
             if (!nextWord || nextWord.length == 0) {
-                $scope.showWordError('Слово не может быть пустым.');
+                $scope.showError('Слово не может быть пустым.');
                 return;
             }
 
@@ -260,7 +272,7 @@
                 const word = turn.word;
 
                 if (nextWord == word) {
-                    $scope.showWordError('Слово совпадает с предыдущим.');
+                    $scope.showError('Слово совпадает с предыдущим.');
                     return;
                 }
             }
@@ -271,7 +283,7 @@
                 const prevWord = prevTurn.word;
 
                 if (nextWord == prevWord) {
-                    $scope.showWordError('Слово совпадает с предпоследним.');
+                    $scope.showError('Слово совпадает с предпоследним.');
                     return;
                 }
             }
