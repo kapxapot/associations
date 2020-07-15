@@ -68,7 +68,7 @@
                     {% for assoc in word.approved_visible_associations %}
                         <li>
                             {{ lm.association(assoc, word) }}
-                            
+
                             {% for user in assoc.users %}
                                 {{ lm.user(user) }}
                             {% endfor %}
@@ -77,7 +77,7 @@
                 </ul>
 
                 {% if approved_invisible_associations_str %}
-                    <p>{{ approved_invisbile_associations_str }}.</p>
+                    <p>{{ approved_invisible_associations_str }}.</p>
                 {% endif %}
             {% endif %}
 
@@ -102,13 +102,13 @@
             {% endif %}
 
             {% if is_moderator and word.proposed_typos|length > 0 %}
-                <p><strong>Возможные исправления:</strong></p>
+                <p><strong>Возможно, <u>{{ word.word }}</u> правильно писать как:</strong></p>
 
                 <ul class="vgap-2">
                     {% for typo, typo_items in word.proposed_typos %}
                         <li>
                             {{ typo }}
-                            
+
                             {% for typo_item in typo_items %}
                                 {{ lm.user(typo_item.creator) }}
                             {% endfor %}
@@ -117,21 +117,33 @@
                 </ul>
             {% endif %}
             
-            {% if is_moderator and word.proposed_duplicates|length > 0 %}
-                <p><strong>Возможные дубликаты:</strong></p>
-                
-                <ul class="vgap-2">
-                    {% for dup_id, dup_items in word.proposed_duplicates %}
-                        {% set duplicate = dup_items[0].duplicate %}
-                        <li>
-                            {{ lm.word(duplicate) }}
+            {% if word.proposed_duplicates|length > 0 %}
+                {% if is_moderator %}
+                    <p><strong>Возможно, <u>{{ word.word }}</u> дублирует:</strong></p>
 
-                            {% for dup_item in dup_items %}
-                                {{ lm.user(dup_item.creator) }}
-                            {% endfor %}
+                    <ul class="vgap-2">
+                        {% for dup_id, dup_items in word.proposed_duplicates %}
+                            {% set duplicate = dup_items[0].duplicate %}
+                            <li>
+                                {{ lm.word(duplicate) }}
+
+                                {% for dup_item in dup_items %}
+                                    {{ lm.user(dup_item.creator) }}
+                                {% endfor %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if word.duplicate_by_me %}
+                    <p><strong>Вы отметили, что <u>{{ word.word }}</u> дублирует:</strong></p>
+                    
+                    <ul class="vgap-2">
+                        <li>
+                            {{ lm.word(word.duplicate_by_me) }}
                         </li>
-                    {% endfor %}
-                </ul>
+                    </ul>
+                {% endif %}
             {% endif %}
 
             {% if auth.user %}

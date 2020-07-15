@@ -178,6 +178,18 @@ class Word extends LanguageElement
     }
 
     /**
+     * Returns the duplicate provided by the current user.
+     */
+    public function duplicateByMe() : ?Word
+    {
+        $feedback = $this->feedbackByMe();
+
+        return $feedback
+            ? $feedback->duplicate()
+            : null;
+    }
+
+    /**
      * Returns word or typo by the current user with '*' (if any).
      */
     public function displayName() : string

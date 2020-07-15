@@ -8,36 +8,50 @@ $scope.problems = {
     }
 };
 
-if ($scope.play) {
+{% if play_mode %}
     $scope.updateProblemsModel = () => {
-        let turn = $scope.play.turn();
-        let prevTurn = $scope.play.prevTurn();
+        const turn = $scope.play.turn();
 
-        $scope.problems.word = null;
-        $scope.problems.association = null;
+        // no turn - no problems
+        if (!turn) {
+            $scope.problems.word = null;
+            $scope.problems.association = null;
 
-        if (turn) {
-            $scope.problems.word = {
-                word_id: turn.id,
-                word: turn.word
+            return;
+        }
+
+        $scope.problems.word = {
+            word_id: turn.id,
+            word: turn.word,
+            dislike: turn.feedback?.dislike == 1,
+            withTypo: turn.feedback?.typo?.length > 0,
+            typo: turn.feedback?.typo,
+            withDuplicate: turn.feedback?.duplicate_word?.length > 0,
+            duplicate: turn.feedback?.duplicate_word,
+            mature: turn.feedback?.mature == 1
+        };
+
+        const prevTurn = $scope.play.prevTurn();
+
+        if (!prevTurn || !turn.association) {
+            $scope.problems.association = null;
+        } else {
+            $scope.problems.association = {
+                association_id: turn.association.id,
+                dislike: turn.association.feedback?.dislike == 1,
+                mature: turn.association.feedback?.mature == 1,
+                label:
+                    prevTurn.display_name +
+                    ' ' +
+                    (turn.association.is_approved ? '\u21C9' : '\u2192') +
+                    ' ' +
+                    turn.display_name
             };
-
-            if (prevTurn && turn.association) {
-                $scope.problems.association = {
-                    association_id: turn.association.id,
-                    label:
-                        prevTurn.display_name +
-                        ' ' +
-                        (turn.association.is_approved ? '\u21C9' : '\u2192') +
-                        ' ' +
-                        turn.display_name
-                };
-            }
         }
 
         $scope.updateModalWidth();
     };
-} else {
+{% else %}
     {% if word %}
         {% set word_feedback = word.feedback_by_me %}
 
@@ -63,15 +77,21 @@ if ($scope.play) {
             label: '{{ lm.association(association, null, true) }}'
         };
     {% endif %}
-}
+{% endif %}
 
 $scope.updateModalWidth = () => {
     $scope.isNarrowModal = !$scope.problems.full();
 };
 
-$scope.updateModalWidth();
+{% if not play_mode %}
+    $scope.updateModalWidth();
+{% endif %}
 
 $scope.problemsDialog = () => {
+    {% if play_mode %}
+        $scope.updateProblemsModel();
+    {% endif %}
+
     showModal('problems');
 };
 
@@ -97,8 +117,8 @@ $('#problemsForm').submit(function(e) {
         url: '{{ path_for('actions.feedback') }}',
         data: obj,
         view: 'problems',
-        onSuccess: $scope.postSuccess,
-        noSuccessMessage: true
+        onSuccess: {{ on_success ?? '$scope.postSuccess' }},
+        noSuccessMessage: {{ on_success ? 'false' : 'true' }}
     });
 });
 
@@ -117,3 +137,5 @@ $scope.focusDuplicate = () => {
         }, 100);
     }
 };
+
+$('#problemsView').on('hidden.bs.modal', () => { autofocus(); });

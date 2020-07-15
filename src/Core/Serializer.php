@@ -37,16 +37,32 @@ class Serializer
 
     public function serializeRaw(array $array, Word $word, ?Association $association) : array
     {
-        $array['id'] = $word->getId();
-        $array['is_approved'] = $word->isApproved();
-        $array['url'] = $this->linker->abs($word->url());
-        $array['display_name'] = $word->displayName();
+        $array = array_merge(
+            $array,
+            [
+                'id' => $word->getId(),
+                'is_approved' => $word->isApproved(),
+                'url' => $this->linker->abs($word->url()),
+                'display_name' => $word->displayName(),
+            ]
+        );
+
+        $wordFeedback = $word->feedbackByMe();
+
+        if ($wordFeedback) {
+            $array['feedback'] = $wordFeedback;
+
+            $array['feedback']['duplicate_word'] = $wordFeedback->hasDuplicate()
+                ? $wordFeedback->duplicate()->word
+                : null;
+        }
 
         if ($association) {
             $array['association'] = [
                 'id' => $association->getId(),
                 'is_approved' => $association->isApproved(),
                 'url' => $this->linker->abs($association->url()),
+                'feedback' => $association->feedbackByMe()
             ];
         }
 

@@ -9,6 +9,7 @@ use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Services\GameService;
 use App\Services\TurnService;
+use App\Services\WordService;
 use Plasticode\Auth\Access;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
@@ -26,6 +27,7 @@ class GameController extends Controller
 
     private GameService $gameService;
     private TurnService $turnService;
+    private WordService $wordService;
 
     private Access $access;
     private AuthInterface $auth;
@@ -40,6 +42,7 @@ class GameController extends Controller
 
         $this->gameService = $container->gameService;
         $this->turnService = $container->turnService;
+        $this->wordService = $container->wordService;
 
         $this->access = $container->access;
         $this->auth = $container->auth;
