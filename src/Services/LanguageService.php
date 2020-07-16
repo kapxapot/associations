@@ -49,6 +49,17 @@ class LanguageService
         return $language;
     }
 
+    public function getCurrentLanguage(?User $user) : Language
+    {
+        $game = $user
+            ? $user->currentGame() ?? $user->lastGame()
+            : null;
+
+        return $game
+            ? $game->language()
+            : $this->getDefaultLanguage();
+    }
+
     public function getRandomPublicWord(?Language $language = null) : ?Word
     {
         return $this->getRandomWordFor(null, $language);

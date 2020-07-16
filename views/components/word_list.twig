@@ -1,0 +1,5 @@
+{% import 'main/local_macros.twig' as lm %}
+
+{% for word in words %}
+    <li>{% include 'components/word.twig' %}{% if word.creator %} {{ lm.user(word.creator) }}{% endif %}</li>
+{% endfor %}

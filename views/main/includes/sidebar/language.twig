@@ -26,9 +26,7 @@
     <div class="panel panel-secondary">
         <div class="panel-body">
             <ul class="mb-0 pl-3">
-                {% for word in last_added_words %}
-                    <li>{% include "components/word.twig" with { 'word': word } only %}{% if word.creator %} <span class="nowrap">{{ lm.user(word.creator) }}</span>{% endif %}</li>
-                {% endfor %}
+                {% include 'components/word_list.twig' with { 'words': last_added_words } %}
             </ul>
         </div>
     </div>
@@ -39,9 +37,7 @@
     <div class="panel panel-secondary">
         <div class="panel-body">
             <ul class="mb-0 pl-3">
-                {% for assoc in last_added_associations %}
-                    <li>{{ lm.association(assoc) }}{% if assoc.creator %} <span class="nowrap">{{ lm.user(assoc.creator) }}</span>{% endif %}</li>
-                {% endfor %}
+                {% include 'components/association_list.twig' with { 'associations': last_added_associations } %}
             </ul>
         </div>
     </div>

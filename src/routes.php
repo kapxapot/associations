@@ -93,11 +93,11 @@ $app->group(
                         $gen = $container
                             ->generatorResolver
                             ->resolveEntity($alias);
-                        
+
                         $gen->generateAPIRoutes($this, $access);
                     }
                 }
-            
+
                 $this->post(
                     '/parser/parse',
                     ParserController::class . ':parse'
@@ -184,6 +184,16 @@ $app->group(
             '/words',
             WordController::class . ':index'
         )->setName('main.words');
+
+        $this->get(
+            '/chunks/latest/words',
+            WordController::class . ':latestChunk'
+        )->setName('main.chunks.latest.words');
+
+        $this->get(
+            '/chunks/latest/associations',
+            AssociationController::class . ':latestChunk'
+        )->setName('main.chunks.latest.associations');
 
         if ($env->isDev()) {
             $this->get(

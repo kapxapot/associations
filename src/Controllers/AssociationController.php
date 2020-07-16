@@ -4,14 +4,18 @@ namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
 use App\Handlers\NotFoundHandler;
+use Plasticode\Core\Interfaces\RendererInterface;
+use Plasticode\Core\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request as SlimRequest;
 
 class AssociationController extends Controller
 {
     private AuthInterface $auth;
     private NotFoundHandler $notFoundHandler;
+    private RendererInterface $renderer;
 
     public function __construct(ContainerInterface $container)
     {
@@ -19,6 +23,7 @@ class AssociationController extends Controller
 
         $this->auth = $container->auth;
         $this->notFoundHandler = $container->notFoundHandler;
+        $this->renderer = $container->renderer;
     }
 
     public function get(
@@ -56,5 +61,29 @@ class AssociationController extends Controller
         );
 
         return $this->render($response, 'main/associations/item.twig', $params);
+    }
+
+    public function latestChunk(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    ) : ResponseInterface
+    {
+        $user = $this->auth->getUser();
+
+        $language = $this->languageService->getCurrentLanguage($user);
+
+        $associations = $this
+            ->associationRepository
+            ->getLastAddedByLanguage(
+                $language,
+                $this->associationConfig->associationLastAddedLimit()
+            );
+
+        $result = $this->renderer->component(
+            'association_list',
+            ['associations' => $associations]
+        );
+
+        return Response::text($response, $result);
     }
 }
