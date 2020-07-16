@@ -244,6 +244,9 @@
 
             $scope.play.input = null;
             $scope.play.saving = false;
+
+            $scope.reloadLatestWords();
+            $scope.reloadLatestAssociations();
         };
 
         $scope.processFeedbackResponse = (data) => {

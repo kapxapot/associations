@@ -100,26 +100,12 @@ class Controller extends BaseController
                         ->anniversaryService
                         ->toAnniversary($wordCount),
 
-                    'last_added_words' => $this
-                        ->wordRepository
-                        ->getLastAddedByLanguage(
-                            $language,
-                            $this->wordConfig->wordLastAddedLimit()
-                        ),
-
                     'association_count' => $associationCount,
                     'association_count_str' => $associationCountStr,
 
                     'association_anniversary' => $this
                         ->anniversaryService
                         ->toAnniversary($associationCount),
-
-                    'last_added_associations' => $this
-                        ->associationRepository
-                        ->getLastAddedByLanguage(
-                            $language,
-                            $this->associationConfig->associationLastAddedLimit()
-                        ),
                 ]
             );
         }

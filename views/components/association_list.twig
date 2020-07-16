@@ -1,5 +1,7 @@
 {% import 'main/local_macros.twig' as lm %}
 
 {% for assoc in associations %}
-    <li>{{ lm.association(assoc) }}{% if assoc.creator %} {{ lm.user(assoc.creator) }}{% endif %}</li>
+    <li>
+        {{ lm.association(assoc) }}{% if assoc.creator %}<span class="ml-1">{{ lm.user(assoc.creator) }}</span>{% endif %}
+    </li>
 {% endfor %}

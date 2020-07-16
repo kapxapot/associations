@@ -1,5 +1,3 @@
-{% import 'main/local_macros.twig' as lm %}
-
 <div class="panel-secondary-heading">Игра</div>
 <div class="panel panel-secondary">
     <div class="panel-body">
@@ -21,24 +19,16 @@
     </div>
 </div>
 
-{% if last_added_words.any %}
-    <div class="panel-secondary-heading">Новые слова</div>
-    <div class="panel panel-secondary">
-        <div class="panel-body">
-            <ul class="mb-0 pl-3">
-                {% include 'components/word_list.twig' with { 'words': last_added_words } %}
-            </ul>
-        </div>
+<div class="panel-secondary-heading">Новые слова</div>
+<div class="panel panel-secondary">
+    <div class="panel-body">
+        <ul class="mb-0 pl-3" id="latest-words"></ul>
     </div>
-{% endif %}
+</div>
 
-{% if last_added_associations.any %}
-    <div class="panel-secondary-heading">Новые ассоциации</div>
-    <div class="panel panel-secondary">
-        <div class="panel-body">
-            <ul class="mb-0 pl-3">
-                {% include 'components/association_list.twig' with { 'associations': last_added_associations } %}
-            </ul>
-        </div>
+<div class="panel-secondary-heading">Новые ассоциации</div>
+<div class="panel panel-secondary">
+    <div class="panel-body">
+        <ul class="mb-0 pl-3" id="latest-associations"></ul>
     </div>
-{% endif %}
+</div>

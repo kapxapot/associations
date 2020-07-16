@@ -17,5 +17,39 @@
         return obj;
     };
 
+    $scope.reloadElement = (url, id, errorMessage) => {
+        $scope.ajax({
+            method: 'get',
+            url: url,
+            noSuccessMessage: true,
+            onSuccess: (data) => {
+                $('#' + id).html(data);
+                $scope.updateUi();
+            },
+            onError: () => {
+                console.log('Failed to reload \'' + id + '\' element, url = ' + url + '.');
+            }
+        });
+    };
+
+    $scope.reloadLatestWords = () => {
+        $scope.reloadElement(
+            '{{ path_for('main.chunks.latest.words') }}',
+            'latest-words'
+        );
+    };
+
+    $scope.reloadLatestAssociations = () => {
+        $scope.reloadElement(
+            '{{ path_for('main.chunks.latest.associations') }}',
+            'latest-associations'
+        );
+    };
+
+    $timeout(() => {
+        $scope.reloadLatestWords();
+        $scope.reloadLatestAssociations();
+    });
+
     {{ even_more_angular }}
 {% endset %}
