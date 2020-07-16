@@ -5,6 +5,7 @@ use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
 use App\Controllers\IndexController;
 use App\Controllers\JobController;
+use App\Controllers\LanguageController;
 use App\Controllers\NewsController;
 use App\Controllers\PageController;
 use App\Controllers\SearchController;
@@ -184,6 +185,11 @@ $app->group(
             '/words',
             WordController::class . ':index'
         )->setName('main.words');
+
+        $this->get(
+            '/chunks/stats/language',
+            LanguageController::class . ':statsChunk'
+        )->setName('main.chunks.stats.language');
 
         $this->get(
             '/chunks/latest/words',

@@ -79,10 +79,12 @@ class AssociationController extends Controller
                 $this->associationConfig->associationLastAddedLimit()
             );
 
-        $result = $this->renderer->component(
-            'association_list',
-            ['associations' => $associations]
-        );
+        $result = $associations->any()
+            ? $this->renderer->component(
+                'association_list',
+                ['associations' => $associations]
+            )
+            : $this->translate('No associations yet. :(');
 
         return Response::text($response, $result);
     }

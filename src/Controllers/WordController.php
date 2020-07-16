@@ -126,10 +126,12 @@ class WordController extends Controller
                 $this->wordConfig->wordLastAddedLimit()
             );
 
-        $result = $this->renderer->component(
-            'word_list',
-            ['words' => $words]
-        );
+        $result = $words->any()
+            ? $this->renderer->component(
+                'word_list',
+                ['words' => $words]
+            )
+            : $this->translate('No words yet. :(');
 
         return Response::text($response, $result);
     }

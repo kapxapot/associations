@@ -32,6 +32,13 @@
         });
     };
 
+    $scope.reloadLanguageStats = () => {
+        $scope.reloadElement(
+            '{{ path_for('main.chunks.stats.language') }}',
+            'language-stats'
+        );
+    };
+
     $scope.reloadLatestWords = () => {
         $scope.reloadElement(
             '{{ path_for('main.chunks.latest.words') }}',
@@ -46,10 +53,13 @@
         );
     };
 
-    $timeout(() => {
+    $scope.reloadSidebar = () => {
+        $scope.reloadLanguageStats();
         $scope.reloadLatestWords();
         $scope.reloadLatestAssociations();
-    });
+    };
+
+    $scope.reloadSidebar();
 
     {{ even_more_angular }}
 {% endset %}

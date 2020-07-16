@@ -28,11 +28,19 @@ $scope.demo = {
     loading: true,
     saving: false,
     alertError: null,
+    isBroken: false,
+    isOk: false,
     init: function() {
-        this.fetch();
-        this.loading = false;
+        this.fetch(() => {
+            this.loading = false;
 
-        autofocus();
+            this.isBroken = !this.word && this.history.length == 0;
+            this.isOk = this.word;
+
+            setTimeout(() => {
+                autofocus();
+            }, 100);
+        });
     },
     buildUrl: function() {
         let url = '{{ path_for('api.public.play') }}';
@@ -49,22 +57,21 @@ $scope.demo = {
 
         return url;
     },
-    fetch: function() {
+    fetch: function(onSuccess = null) {
         $scope.demoRequest({
             url: this.buildUrl(),
             onSuccess: (data) => {
                 this.setWord(data.new, true);
+
+                if (onSuccess) {
+                    onSuccess();
+                }
             }
         });
     },
     setWord: function(word) {
         this.word = word;
         this.addToHistory(word, true);
-
-        if (!word) {
-            this.alertError = 'Что-то пошло не так. У компьютера нет слов...';
-            showAlertError();
-        }
     },
     addToHistory: function(word, isAi) {
         if (!word) {

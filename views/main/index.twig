@@ -5,24 +5,20 @@
 {% set index = true %}
 {% set no_disqus = true %}
 
-{% if game %}
-    {% set with_problems = true %}
-{% endif %}
-
 {% set title = short_site_description %}
 
 {% block content %}
-    <div class="panel">
-        <div class="panel-body">
-            {% if not auth.user %}
-                {% include 'main/includes/demo_game.twig' %}
-            {% else %}
+    {% if not auth.user %}
+        {% include 'main/includes/demo_game.twig' %}
+    {% else %}
+        <div class="panel" ng-cloak>
+            <div class="panel-body">
                 {% if game %}
-                    <div ng-hide="!play.loading">
+                    <div ng-if="play.loading">
                         Загрузка игры...
                     </div>
 
-                    <div ng-show="play.games.length > 1 || play.currentGame().history.length > 1" class="br-word mb-2" ng-cloak>
+                    <div ng-if="play.games.length > 1 || play.currentGame().history.length > 1" class="br-word mb-2">
                         <span ng-repeat="game in play.games" ng-class="[{true:'ml-1'}[!$first]]">
                             <a ng-href="{{'{{game.url}}'}}" data-toggle="tooltip" ng-attr-title="{{'{{\'Игра #\' + game.id}}'}}" data-placement="bottom">#</a>
 
@@ -30,7 +26,7 @@
                         </span>
                     </div>
 
-                    <div ng-if="play.turn()" ng-cloak>
+                    <div ng-if="play.turn()">
                         <span ng-if="!play.turn().association">Компьютер говорит новое слово:</span>
                         <span ng-if="play.turn().association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{play.prevTurn().url}}'}}" ng-bind="play.prevTurn().display_name" {% include 'components/original_word_title.twig' with {'word': 'play.prevTurn()'} only %}></a></span> компьютер говорит:</span>
                         <span class="label br-word label-info turn-label">
@@ -39,7 +35,11 @@
                         </span>
                     </div>
 
-                    <div ng-hide="play.loading" ng-cloak class="col-md-6 col-xs-12 mt-2 ph-0">
+                    <div ng-if="!play.loading && !play.turn()">
+                        Компьютер не знает слов, начинайте вы.
+                    </div>
+
+                    <div ng-if="!play.loading" class="col-md-6 col-xs-12 mt-2 ph-0">
                         <form autocomplete="off">
                             <div class="form-group mb-2">
                                 <label for="nextWord">Ваше слово:</label>
@@ -55,59 +55,26 @@
                         </form>
                     </div>
 
-                    <div ng-hide="play.loading" ng-cloak class="col-xs-12 ph-0">
-                        <div ng-cloak class="alert alert-danger alert-dismissable fade in">
+                    <div ng-show="!play.loading" class="col-xs-12 ph-0">
+                        <div class="alert alert-danger alert-dismissable fade in">
                             <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
                             <div ng-bind-html="alertError|rawHtml"></div>
                         </div>
 
-                        <div class="mt-2">
+                        <div ng-if="play.turn()" class="mt-1">
                             <button ng-click="skip()" class="btn btn-default mr-2" ng-disabled="play.loading || play.saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
 
-                            {% if with_problems %}
-                                <button ng-click="problemsDialog()" class="btn btn-default" ng-disabled="play.loading || play.saving || !play.turn()"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</button>
-                            {% endif %}
+                            <button ng-click="problemsDialog()" class="btn btn-default" ng-disabled="play.loading || play.saving"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</button>
                         </div>
                     </div>
 
-                    <div class="alert alert-success alert-dismissable alert-corner fade in" ng-cloak>
+                    <div class="alert alert-success alert-dismissable alert-corner fade in">
                         <a href="javascript:void()" class="close" data-hide="alert" aria-label="close">&times;</a>
                         {{ '{{alertSuccess}}' }}
                     </div>
                 {% else %}
-                    {% if last_game %}
-                        <div class="mb-2">
-                            <strong>
-                                {% if last_game.is_won_by_player %}
-                                    Поздравляем! Вы победили! :)
-                                {% else %}
-                                    Вы проиграли. :( Попробуйте еще!
-                                {% endif %}
-                            </strong>
-                        </div>
-                        <div class="mb-2">Запись игры ({{ last_game_turn_count_str }}):</div>
-                        <div class="mb-2">
-                            {% include 'components/game_log_inline.twig' with { 'game': last_game } only %}
-                        </div>
-                    {% else %}
-                        <div class="mb-2">
-                            Привет, <strong>{{ auth.user.display_name }}</strong>!
-                        </div>
-                    {% endif %}
-
-                    <div class="mb-2">{% if last_game %}Сыграем еще?{% else %}Поиграем?{% endif %}</div>
-                    <div ng-cloak>
-                        <button ng-click="newGame()" class="btn btn-success ajax-button" ng-disabled="loading || saving" data-focus><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="saving"></i><span ng-hide="saving">Начать игру</span></button>
-                    </div>
+                    Активная игра не найдена. Что-то пошло не так. :/
                 {% endif %}
-            {% endif %}
-        </div>
-    </div>
-
-    {% if not auth.user %}
-        <div class="panel">
-            <div class="panel-body">
-                {% include 'main/includes/demo_warning.twig' %}
             </div>
         </div>
     {% endif %}
@@ -193,8 +160,6 @@
             init: function() {
                 {% if game %}
                     this.reloadGame({{ game.id }});
-                {% else %}
-                    $scope.showError('Активная игра не найдена. Что-то пошло не так.');
                 {% endif %}
             },
             currentGame: function() {
@@ -245,8 +210,7 @@
             $scope.play.input = null;
             $scope.play.saving = false;
 
-            $scope.reloadLatestWords();
-            $scope.reloadLatestAssociations();
+            $scope.reloadSidebar();
         };
 
         $scope.processFeedbackResponse = (data) => {
@@ -327,11 +291,9 @@
             });
         };
 
-        {% if with_problems %}
-            {% include 'main/scripts/problems.twig' with {
-                'on_success': '$scope.processFeedbackResponse',
-                'play_mode': true
-            } %}
-        {% endif %}
+        {% include 'main/scripts/problems.twig' with {
+            'on_success': '$scope.processFeedbackResponse',
+            'play_mode': true
+        } %}
     {% endif %}
 {% endset %}

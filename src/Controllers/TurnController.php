@@ -69,7 +69,7 @@ class TurnController extends Controller
         $prevTurnId = $request->getParam('prev_turn_id');
         $prevTurn = $this->turnRepository->get($prevTurnId);
 
-        if (!$this->gameService->validateLastTurn($game, $prevTurn)) {
+        if ($prevTurn && !$this->gameService->validateLastTurn($game, $prevTurn)) {
             throw new BadRequestException(
                 'Game turn is not correct. Please, reload the page.'
             );

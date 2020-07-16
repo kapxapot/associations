@@ -36,6 +36,9 @@ class LocalizationConfig extends BaseConfig
                 'Word must contain only letters, digits, -, _ and \'.' => 'Слово должно содержать только буквы, цифры, -, _ и \'.',
                 'Main word must be different and present in game.' => 'Главное слово должно присутствовать в игре и отличаться от текущего.',
                 'Feedback saved successfully.' => 'Ваш отзыв успешно сохранен.',
+
+                'No words yet. :(' => 'Пока слов нет. :(',
+                'No associations yet. :(' => 'Пока ассоциаций нет. :(',
             ]
         );
     }

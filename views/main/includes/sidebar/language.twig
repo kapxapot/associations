@@ -3,32 +3,16 @@
     <div class="panel-body">
         <div class="vgap-2"><strong>Язык:</strong> {{ language.name }}</div>
 
-        {% if word_count + association_count > 0 %}
-            <div class="vgap-2">В игре {{ word_count_str }} и {{ association_count_str }} на этом языке.</div>
-
-            {% if word_anniversary %}
-                <div class="vgap-2">Ура, у нас {{ word_anniversary }} слов! \o/</div>
-            {% endif %}
-            
-            {% if association_anniversary %}
-                <div>Ура, у нас {{ association_anniversary }} ассоциаций! \o/</div>
-            {% endif %}
-        {% else %}
-            <div>В игре нет слов на этом языке. :(</div>
-        {% endif %}
+        <div id="language-stats">Ммм...</div>
     </div>
 </div>
 
 <div class="panel-secondary-heading">Новые слова</div>
 <div class="panel panel-secondary">
-    <div class="panel-body">
-        <ul class="mb-0 pl-3" id="latest-words"></ul>
-    </div>
+    <div class="panel-body" id="latest-words">Ммм...</div>
 </div>
 
 <div class="panel-secondary-heading">Новые ассоциации</div>
 <div class="panel panel-secondary">
-    <div class="panel-body">
-        <ul class="mb-0 pl-3" id="latest-associations"></ul>
-    </div>
+    <div class="panel-body" id="latest-associations">Ммм...</div>
 </div>

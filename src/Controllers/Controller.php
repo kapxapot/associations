@@ -6,11 +6,8 @@ use App\Config\Interfaces\AssociationConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Core\Interfaces\LinkerInterface;
 use App\Core\Serializer;
-use App\Models\Game;
-use App\Models\Language;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Services\AnniversaryService;
 use App\Services\CasesService;
 use App\Services\LanguageService;
 use Plasticode\Controllers\Controller as BaseController;
@@ -21,7 +18,6 @@ class Controller extends BaseController
     protected AssociationRepositoryInterface $associationRepository;
     protected WordRepositoryInterface $wordRepository;
 
-    protected AnniversaryService $anniversaryService;
     protected CasesService $casesService;
     protected LanguageService $languageService;
 
@@ -38,7 +34,6 @@ class Controller extends BaseController
         $this->associationRepository = $container->associationRepository;
         $this->wordRepository = $container->wordRepository;
 
-        $this->anniversaryService = $container->anniversaryService;
         $this->casesService = $container->casesService;
         $this->languageService = $container->languageService;
 
@@ -68,46 +63,8 @@ class Controller extends BaseController
             $language = $game
                 ? $game->language()
                 : $this->languageService->getDefaultLanguage();
-        }
-
-        // todo: move this to SidebarPartsProviderService
-        if ($language) {
-            $wordCount = $this
-                ->wordRepository
-                ->getCountByLanguage($language);
-
-            $wordCountStr = $this
-                ->casesService
-                ->wordCount($wordCount);
-
-            $associationCount = $this
-                ->associationRepository
-                ->getCountByLanguage($language);
-
-            $associationCountStr = $this
-                ->casesService
-                ->associationCount($associationCount);
 
             $params['language'] = $language;
-
-            $params = array_merge(
-                $params,
-                [
-                    'word_count' => $wordCount,
-                    'word_count_str' => $wordCountStr,
-
-                    'word_anniversary' => $this
-                        ->anniversaryService
-                        ->toAnniversary($wordCount),
-
-                    'association_count' => $associationCount,
-                    'association_count_str' => $associationCountStr,
-
-                    'association_anniversary' => $this
-                        ->anniversaryService
-                        ->toAnniversary($associationCount),
-                ]
-            );
         }
 
         return parent::buildParams(['params' => $params]);
