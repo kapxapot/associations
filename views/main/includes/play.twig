@@ -1,0 +1,66 @@
+<div class="panel" ng-cloak>
+    <div class="panel-body">
+        {% if game %}
+            <div ng-if="play.loading">
+                Загрузка игры...
+            </div>
+
+            <div ng-if="play.games.length > 1 || play.currentGame().history.length > 1" class="br-word mb-2">
+                <span ng-repeat="game in play.games" ng-class="[{true:'ml-1'}[!$first]]">
+                    <a ng-href="{{'{{game.url}}'}}" data-toggle="tooltip" ng-attr-title="{{'{{\'Игра #\' + game.id}}'}}" data-placement="bottom">#</a>
+
+                    {% include 'components/history.twig' with { 'history': 'game.history'} only %}
+                </span>
+            </div>
+
+            <div ng-if="play.turn()">
+                <span ng-if="!play.turn().association">Компьютер говорит новое слово:</span>
+                <span ng-if="play.turn().association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{play.prevTurn().url}}'}}" ng-bind="play.prevTurn().display_name" {% include 'components/original_word_title.twig' with {'word': 'play.prevTurn()'} only %}></a></span> компьютер говорит:</span>
+                <span class="label br-word label-info turn-label">
+                    <a ng-if="play.turn().feedback.typo" ng-href="{{'{{play.turn().url}}'}}" ng-bind="play.turn().display_name" {% include 'components/original_word_title.twig' with {'word': 'play.turn()'} only %}></a>
+                    <a ng-if="!play.turn().feedback.typo" ng-href="{{'{{play.turn().url}}'}}" ng-bind="play.turn().display_name"></a>
+                </span>
+            </div>
+
+            <div ng-if="!play.loading && !play.turn()">
+                Компьютер не знает слов, начинайте вы.
+            </div>
+
+            <div ng-if="!play.loading" class="col-md-6 col-xs-12 mt-2 ph-0">
+                <form autocomplete="off">
+                    <div class="form-group mb-2">
+                        <label for="nextWord">Ваше слово:</label>
+
+                        <div class="input-group">
+                            <input id="nextWord" ng-model="play.input" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
+
+                            <span class="input-group-btn">
+                                <button type="submit" ng-click="sendWord()" class="btn btn-success ajax-button" ng-disabled="!play.input || play.loading || play.saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="play.saving"></i><span ng-hide="play.saving">Отправить</span></button>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div ng-show="!play.loading" class="col-xs-12 ph-0">
+                <div class="alert alert-danger alert-dismissable fade in mt-2">
+                    <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
+                    <div ng-bind-html="alertError|rawHtml"></div>
+                </div>
+
+                <div ng-if="play.turn()" class="mt-2">
+                    <button ng-click="skip()" class="btn btn-default mr-2" ng-disabled="play.loading || play.saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
+
+                    <button ng-click="problemsDialog()" class="btn btn-default" ng-disabled="play.loading || play.saving"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</button>
+                </div>
+            </div>
+
+            <div class="alert alert-success alert-dismissable alert-corner fade in">
+                <a href="javascript:void()" class="close" data-hide="alert" aria-label="close">&times;</a>
+                <span ng-bind="alertSuccess"></span>
+            </div>
+        {% else %}
+            Активная игра не найдена. Что-то пошло не так. :/
+        {% endif %}
+    </div>
+</div>

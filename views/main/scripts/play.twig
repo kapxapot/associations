@@ -1,0 +1,206 @@
+$scope.showError = (error) => {
+    $scope.alertError = error;
+    showAlertError();
+};
+
+$scope.play = {
+    turn: function() {
+        return this.turnByIndex(0);
+    },
+    prevTurn: function() {
+        return this.turnByIndex(1);
+    },
+    turnByIndex: function(index) {
+        const currentGame = this.currentGame();
+
+        if (!currentGame) {
+            return null;
+        }
+
+        const history = currentGame.history;
+
+        if (history.length < (index + 1)) {
+            return null;
+        }
+
+        return history[history.length - index - 1];
+    },
+    input: null,
+    loading: true,
+    saving: false,
+    alertError: null,
+    reloadGame: function(gameId) {
+        $http
+            .get('{{ api }}games/' + gameId)
+            .then(
+                response => {
+                    const data = response.data;
+
+                    const gameIndex = $scope.play.games.findIndex(
+                        game => game.id == gameId
+                    );
+
+                    if (gameIndex >= 0) {
+                        $scope.play.games[gameIndex] = data;
+                    } else {
+                        $scope.play.games.push(data);
+                    }
+
+                    $scope.updateUi();
+
+                    if ($scope.play.loading) {
+                        $scope.play.loading = false;
+                    }
+
+                    setTimeout(() => {
+                        autofocus();
+                    }, 100);
+                },
+                response => {
+                    $scope.showError(response.statusText);
+                }
+            );
+    },
+    refreshGames: function() {
+        for (let i = 0; i < this.games.length; i++) {
+            this.reloadGame(this.games[i].id);
+        }
+    },
+    init: function() {
+        {% if game %}
+            this.reloadGame({{ game.id }});
+        {% endif %}
+    },
+    currentGame: function() {
+        return this.games.length > 0
+            ? this.games[this.games.length - 1]
+            : null;
+    },
+    games: [],
+    addToHistory: function(turn) {
+        const currentGame = this.currentGame();
+
+        if (currentGame && turn.game.id == currentGame.id) {
+            currentGame.history.push(turn);
+        } else {
+            let newGame = {
+                id: turn.game.id,
+                url: turn.game.url,
+                history: [turn]
+            };
+
+            this.games.push(newGame);
+        }
+
+        $scope.updateUi();
+    }
+};
+
+$timeout(() => {
+    $scope.play.init();
+});
+
+$scope.processGameResponse = (data) => {
+    const question = data.question;
+    const answer = data.answer;
+    const fetched = data.new;
+
+    if (question) {
+        $scope.play.addToHistory(question);
+    }
+
+    if (answer) {
+        $scope.play.addToHistory(answer);
+    }
+    else if (fetched) {
+        $scope.play.addToHistory(fetched);
+    }
+
+    $scope.play.input = null;
+    $scope.play.saving = false;
+
+    $scope.reloadSidebar();
+};
+
+$scope.processFeedbackResponse = (data) => {
+    $scope.play.refreshGames();
+};
+
+$scope.normalize = (word) => {
+    return word.trim().toLowerCase();
+};
+
+$scope.sendWord = () => {
+    const game = $scope.play.currentGame();
+
+    if (!game) {
+        $scope.showError('Игра не начата, что-то пошло не так.');
+        return;
+    }
+
+    let nextWord = $scope.play.input;
+    nextWord = $scope.normalize(nextWord);
+
+    if (!nextWord || nextWord.length == 0) {
+        $scope.showError('Слово не может быть пустым.');
+        return;
+    }
+
+    const turn = $scope.play.turn();
+
+    if (turn) {
+        const word = turn.word;
+
+        if (nextWord == word) {
+            $scope.showError('Слово совпадает с предыдущим.');
+            return;
+        }
+    }
+
+    const prevTurn = $scope.play.prevTurn();
+
+    if (prevTurn) {
+        const prevWord = prevTurn.word;
+
+        if (nextWord == prevWord) {
+            $scope.showError('Слово совпадает с предпоследним.');
+            return;
+        }
+    }
+
+    $scope.prePost(null);
+
+    $scope.play.saving = true;
+
+    let data = {
+        game_id: game.id,
+        word: nextWord
+    };
+
+    if (turn) {
+        data.prev_turn_id = turn.turn_id;
+    }
+
+    $scope.ajax({
+        url: '{{ path_for('actions.turn.create') }}',
+        data: data,
+        setSaving: (saving) => { $scope.play.saving = saving; },
+        onSuccess: $scope.processGameResponse,
+        noSuccessMessage: true,
+    });
+};
+
+$scope.skip = () => {
+    hideAlerts();
+
+    $scope.ajax({
+        url: '{{ path_for('actions.turn.skip') }}',
+        onSuccess: $scope.processGameResponse,
+        noSuccessMessage: true,
+    });
+};
+
+{% include 'main/scripts/problems.twig' with {
+    'on_success': '$scope.processFeedbackResponse',
+    'play_mode': true
+} %}
