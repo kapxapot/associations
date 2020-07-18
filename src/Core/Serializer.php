@@ -42,7 +42,7 @@ class Serializer
             [
                 'id' => $word->getId(),
                 'is_approved' => $word->isApproved(),
-                'url' => $this->linker->abs($word->url()),
+                'url' => $word->url(),
                 'display_name' => $word->displayName(),
             ]
         );
@@ -61,7 +61,7 @@ class Serializer
             $array['association'] = [
                 'id' => $association->getId(),
                 'is_approved' => $association->isApproved(),
-                'url' => $this->linker->abs($association->url()),
+                'url' => $association->url(),
                 'feedback' => $association->feedbackByMe()
             ];
         }

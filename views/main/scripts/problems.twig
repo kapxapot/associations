@@ -20,15 +20,19 @@ $scope.problems = {
             return;
         }
 
+        const wf = turn.feedback;
+        const typo = wf ? wf.typo : null;
+        const dup = wf ? wf.duplicate_word : null;
+
         $scope.problems.word = {
             word_id: turn.id,
             word: turn.word,
-            dislike: turn.feedback?.dislike == 1,
-            withTypo: turn.feedback?.typo?.length > 0,
-            typo: turn.feedback?.typo,
-            withDuplicate: turn.feedback?.duplicate_word?.length > 0,
-            duplicate: turn.feedback?.duplicate_word,
-            mature: turn.feedback?.mature == 1
+            dislike: wf && wf.dislike == 1,
+            withTypo: typo && typo.length > 0,
+            typo: typo,
+            withDuplicate: dup && dup.length > 0,
+            duplicate: dup,
+            mature: wf && wf.mature == 1
         };
 
         const prevTurn = $scope.play.prevTurn();
@@ -36,10 +40,12 @@ $scope.problems = {
         if (!prevTurn || !turn.association) {
             $scope.problems.association = null;
         } else {
+            const af = turn.association.feedback;
+
             $scope.problems.association = {
                 association_id: turn.association.id,
-                dislike: turn.association.feedback?.dislike == 1,
-                mature: turn.association.feedback?.mature == 1,
+                dislike: af && af.dislike == 1,
+                mature: af && af.mature == 1,
                 label:
                     prevTurn.display_name +
                     ' ' +
