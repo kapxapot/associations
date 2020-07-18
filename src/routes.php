@@ -72,8 +72,8 @@ $app->group(
                     SearchController::class . ':search'
                 )->setName('api.search');
 
-                $this->get(
-                    '/play[/{word}]',
+                $this->post(
+                    '/play',
                     GameController::class . ':play'
                 )->setName('api.public.play');
 

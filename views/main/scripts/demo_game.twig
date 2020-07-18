@@ -1,19 +1,5 @@
 $scope.languageCode = '{{ language.code }}';
 
-$scope.demoRequest = (config) => {
-    $scope.ajax({
-        method: config.method ? config.method : 'get',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        url: config.url,
-        data: config.data ? config.data : '',
-        setError: (msg) => { $scope.demo.alertError = msg; },
-        onSuccess: config.onSuccess,
-        noSuccessMessage: true
-    });
-};
-
 $scope.demo = {
     word: null,
     history: [],
@@ -30,6 +16,45 @@ $scope.demo = {
     alertError: null,
     isBroken: false,
     isOk: false,
+    request: function(config) {
+        let data = {
+            lang_code: $scope.languageCode
+        };
+
+        if (this.input) {
+            data.word = this.input;
+        }
+
+        if (this.word) {
+            data.prev_word_id = this.word.id;
+        }
+
+        this.saving = true;
+
+        $scope.ajax({
+            url: '{{ path_for('api.public.play') }}',
+            data: data,
+            setSaving: (value) => { this.saving = value; },
+            setError: (msg) => { this.alertError = msg; },
+            onSuccess: (data) => {
+                config.onSuccess(data);
+
+                this.saving = false;
+            },
+            noSuccessMessage: true
+        });
+    },
+    fetch: function(onSuccess = null) {
+        this.request({
+            onSuccess: (data) => {
+                this.setWord(data.new, true);
+
+                if (onSuccess) {
+                    onSuccess();
+                }
+            }
+        });
+    },
     init: function() {
         this.fetch(() => {
             this.loading = false;
@@ -40,33 +65,6 @@ $scope.demo = {
             setTimeout(() => {
                 autofocus();
             }, 100);
-        });
-    },
-    buildUrl: function() {
-        let url = '{{ path_for('api.public.play') }}';
-
-        if (this.input) {
-            url += '/' + encodeURIComponent(this.input);
-        }
-
-        url += '?lang=' + $scope.languageCode;
-
-        if (this.word) {
-            url += '&prev_word_id=' + this.word.id;
-        }
-
-        return url;
-    },
-    fetch: function(onSuccess = null) {
-        $scope.demoRequest({
-            url: this.buildUrl(),
-            onSuccess: (data) => {
-                this.setWord(data.new, true);
-
-                if (onSuccess) {
-                    onSuccess();
-                }
-            }
         });
     },
     setWord: function(word) {
@@ -82,12 +80,7 @@ $scope.demo = {
         this.history.push(word);
     },
     send: function() {
-        this.saving = true;
-
-        const said = encodeURIComponent(this.input);
-
-        $scope.demoRequest({
-            url: this.buildUrl(),
+        this.request({
             onSuccess: (data) => {
                 const question = data.question;
                 const answer = data.answer;
@@ -105,8 +98,6 @@ $scope.demo = {
                 }
 
                 this.input = null;
-
-                this.saving = false;
             }
         });
     }

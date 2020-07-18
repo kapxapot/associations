@@ -149,13 +149,13 @@ class GameController extends Controller
         array $args
     ) : ResponseInterface
     {
-        $wordStr = $args['word'] ?? null;
+        $wordStr = $request->getParam('word');
 
         /** @var Language|null */
         $language = null;
 
-        $langCode = $request->getQueryParam('lang', null);
-        $prevWordId = $request->getQueryParam('prev_word_id', 0);
+        $langCode = $request->getParam('lang_code');
+        $prevWordId = $request->getParam('prev_word_id', 0);
 
         if (strlen($langCode) > 0) {
             $language = $this->languageRepository->getByCode($langCode);

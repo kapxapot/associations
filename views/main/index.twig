@@ -56,12 +56,12 @@
                     </div>
 
                     <div ng-show="!play.loading" class="col-xs-12 ph-0">
-                        <div class="alert alert-danger alert-dismissable fade in">
+                        <div class="alert alert-danger alert-dismissable fade in mt-2">
                             <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
                             <div ng-bind-html="alertError|rawHtml"></div>
                         </div>
 
-                        <div ng-if="play.turn()" class="mt-1">
+                        <div ng-if="play.turn()" class="mt-2">
                             <button ng-click="skip()" class="btn btn-default mr-2" ng-disabled="play.loading || play.saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
 
                             <button ng-click="problemsDialog()" class="btn btn-default" ng-disabled="play.loading || play.saving"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</button>
@@ -70,7 +70,7 @@
 
                     <div class="alert alert-success alert-dismissable alert-corner fade in">
                         <a href="javascript:void()" class="close" data-hide="alert" aria-label="close">&times;</a>
-                        {{ '{{alertSuccess}}' }}
+                        <span ng-bind="alertSuccess"></span>
                     </div>
                 {% else %}
                     Активная игра не найдена. Что-то пошло не так. :/
