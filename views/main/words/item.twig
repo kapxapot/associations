@@ -135,7 +135,7 @@
                     </ul>
                 {% endif %}
 
-                {% if word.duplicate_by_me %}
+                {% if not is_moderator and word.duplicate_by_me %}
                     <p><strong>Вы отметили, что <u>{{ word.word }}</u> дублирует:</strong></p>
                     
                     <ul class="vgap-2">
