@@ -62,8 +62,13 @@ class Serializer
                 'id' => $association->getId(),
                 'is_approved' => $association->isApproved(),
                 'url' => $association->url(),
-                'feedback' => $association->feedbackByMe()
             ];
+
+            $associationFeedback = $association->feedbackByMe();
+
+            if ($associationFeedback) {
+                $array['association']['feedback'] = $associationFeedback;
+            }
         }
 
         return $array;
