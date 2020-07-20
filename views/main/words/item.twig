@@ -69,7 +69,7 @@
                         <li>
                             {{ lm.association(assoc, word) }}
 
-                            {% for user in assoc.users %}
+                            {% for user in assoc.extended_users %}
                                 {{ lm.user(user) }}
                             {% endfor %}
                         </li>
@@ -88,8 +88,8 @@
                     {% for assoc in word.not_approved_visible_associations %}
                         <li>
                             {{ lm.association(assoc, word) }}
-                            
-                            {% for user in assoc.users %}
+
+                            {% for user in assoc.extended_users %}
                                 {{ lm.user(user) }}
                             {% endfor %}
                         </li>
@@ -137,7 +137,7 @@
 
                 {% if not is_moderator and word.duplicate_by_me %}
                     <p><strong>Вы отметили, что <u>{{ word.word }}</u> дублирует:</strong></p>
-                    
+
                     <ul class="vgap-2">
                         <li>
                             {{ lm.word(word.duplicate_by_me) }}
@@ -173,12 +173,12 @@
     {% endif %}
 
     {% if auth.user %}
-        {% include 'main/modals/problems.twig' with { 'word': word, 'word_max_length': word_max_length } %}
+        {% include 'main/modals/problems.twig' %}
     {% endif %}
 {% endblock %}
 
 {% if auth.user %}
     {% set even_more_angular %}
-        {% include 'main/scripts/problems.twig' with { 'word': word } only %}
+        {% include 'main/scripts/problems.twig' %}
     {% endset %}
 {% endif %}

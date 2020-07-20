@@ -95,6 +95,17 @@ class Association extends LanguageElement
         return $this->turns()->users();
     }
 
+    /**
+     * Users + creator (in case when turns are deleted/lost).
+     */
+    public function extendedUsers() : UserCollection
+    {
+        return $this
+            ->users()
+            ->add($this->creator())
+            ->distinct();
+    }
+
     public function hasMatureWords() : bool
     {
         return $this
