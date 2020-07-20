@@ -2,7 +2,7 @@ site_name: Associ.ru
 site_bare_url: {SITE_BARE_URL}
 site_url: {SITE_URL}
 cool_site_url: {COOL_SITE_URL}
-site_description: 'Игра в Ассоциации онлайн для детей и взрослых'
+site_description: 'Игра в ассоциации онлайн для детей и взрослых'
 short_site_description: 'Ассоциации - Игра в ассоциации онлайн для детей и взрослых'
 logo: '{ASSETS_PATH}images/logo.jpg'
 fav_icon: '{ASSETS_PATH}images/logo.jpg'
