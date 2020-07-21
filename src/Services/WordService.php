@@ -226,4 +226,14 @@ class WordService
             )
             ->distinct();
     }
+
+    /**
+     * Returns word only in case it is not null and the word is visible for the user.
+     */
+    public function purgeFor(?Word $word, ?User $user) : ?Word
+    {
+        return ($word && $word->isVisibleFor($user))
+            ? $word
+            : null;
+    }
 }

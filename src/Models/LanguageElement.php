@@ -79,7 +79,8 @@ abstract class LanguageElement extends DbModel implements LinkableInterface
     {
         // 1. non-mature elements are visible for everyone
         // 2. mature elements are invisible for non-authed users ($user == null)
-        // 3. mature elements are visible for non-mature users only if they used it
+        // 3. mature elements are visible for mature users
+        // 4. mature elements are visible for non-mature users only if they used them
 
         return 
             !$this->isMature()

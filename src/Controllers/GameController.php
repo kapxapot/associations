@@ -149,6 +149,8 @@ class GameController extends Controller
         array $args
     ) : ResponseInterface
     {
+        $user = $this->auth->getUser();
+
         $wordStr = $request->getParam('word');
 
         /** @var Language|null */
@@ -174,6 +176,10 @@ class GameController extends Controller
         $prevWord = ($prevWordId > 0)
             ? $this->wordRepository->get($prevWordId)
             : null;
+
+        // don't reveal invisible words
+        $word = $this->wordService->purgeFor($word, $user);
+        $prevWord = $this->wordService->purgeFor($prevWord, $user);
 
         $associations = $word
             ? $word
