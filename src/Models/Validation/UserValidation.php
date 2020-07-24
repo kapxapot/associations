@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Generators;
+namespace App\Models\Validation;
 
-use Plasticode\Generators\UsersGenerator as UsersGeneratorBase;
+use Plasticode\Models\Validation\UserValidation as BaseUserValidation;
 
-class UsersGenerator extends UsersGeneratorBase
+class UserValidation extends BaseUserValidation
 {
     public function getRules(array $data, $id = null) : array
     {
         $rules = parent::getRules($data, $id);
 
         $rules['age'] = $this->rule('posInt');
-        
+
         return $rules;
     }
 }
