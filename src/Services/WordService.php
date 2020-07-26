@@ -121,7 +121,6 @@ class WordService
                 [
                     'language_id' => $language->getId(),
                     'word' => $wordStr,
-                    'word_bin' => $wordStr,
                     'created_by' => $user->getId(),
                 ]
             );

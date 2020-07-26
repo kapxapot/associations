@@ -20,11 +20,17 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 
     public function save(Word $word) : Word
     {
+        if (!$word->isPersisted()) {
+            $word['word_bin'] = $word->word;
+        }
+
         return $this->saveEntity($word);
     }
 
     public function store(array $data) : Word
     {
+        $data['word_bin'] = $data['word'];
+
         return $this->storeEntity($data);
     }
 
@@ -85,6 +91,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
      */
     public function getAllUnchecked(int $limit = 0) : WordCollection
     {
+        // todo: this needs to be refactored (somehow)
         $dictWordTable = 'yandex_dict_words';
         $dwAlias = 'dw';
 

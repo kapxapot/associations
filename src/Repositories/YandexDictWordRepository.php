@@ -30,6 +30,10 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
     {
         Assert::isInstanceOf($dictWord, YandexDictWord::class);
 
+        if (!$dictWord->isPersisted()) {
+            $dictWord['word_bin'] = $dictWord->word;
+        }
+
         return $this->saveEntity($dictWord);
     }
 
@@ -67,7 +71,7 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
     {
         return $this
             ->getByLanguageQuery($language)
-            ->where('word', $wordStr)
+            ->where('word_bin', $wordStr)
             ->one();
     }
 }
