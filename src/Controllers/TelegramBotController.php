@@ -133,7 +133,7 @@ class TelegramBotController extends Controller
             } catch (ValidationException $vEx) {
                 $error = $this->translate($vEx->getMessage());
             } catch (DuplicateWordException $dwEx) {
-                $error = 'Слово *' . $dwEx->word . '* уже использовано в игре.';
+                $error = 'Слово *' . mb_strtoupper($dwEx->word) . '* уже использовано в игре.';
             }
 
             if ($error) {
@@ -156,9 +156,11 @@ class TelegramBotController extends Controller
             Assert::true($answer->isAiTurn());
 
             if ($question) {
-                $parts[] = 'На *' . $question->word()->word . '* я говорю: *' . $answer->word()->word . '*';
+                $parts[] = 'Моя ассоциация:';
+                $parts[] = '*' . mb_strtoupper($question->word()->word) . '* → *' . mb_strtoupper($answer->word()->word) . '*';
             } else {
-                $parts[] = 'Я говорю новое слово: *' . $answer->word()->word . '*';
+                $parts[] = 'У меня нет ассоциаций. 😥 Начинаем заново!';
+                $parts[] = '*' . mb_strtoupper($answer->word()->word) . '*';
             }
         } else {
             $parts[] = 'Мне нечего сказать, начинайте вы.';

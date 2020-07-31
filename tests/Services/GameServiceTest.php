@@ -152,7 +152,8 @@ class GameServiceTest extends TestCase
         $gameService = new GameService(
             $this->gameRepository,
             $languageService,
-            $turnService
+            $turnService,
+            $wordService
         );
 
         // the meat

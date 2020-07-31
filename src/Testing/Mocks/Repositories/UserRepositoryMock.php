@@ -24,11 +24,18 @@ class UserRepositoryMock implements UserRepositoryInterface
         return $this->users->first('id', $id);
     }
 
+    /**
+     * @return User
+     */
     public function create(array $data) : BaseUser
     {
-        return new BaseUser($data);
+        return User::create($data);
     }
 
+    /**
+     * @param User $user
+     * @return User
+     */
     public function save(BaseUser $user) : BaseUser
     {
         if ($this->users->contains($user)) {
@@ -44,6 +51,16 @@ class UserRepositoryMock implements UserRepositoryInterface
         return $user;
     }
 
+    public function store(array $data) : User
+    {
+        $user = $this->create($data);
+
+        return $this->save($user);
+    }
+
+    /**
+     * @return User|null
+     */
     public function getByLogin(string $login) : ?BaseUser
     {
         return $this->users->first('login', $login);
