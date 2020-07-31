@@ -39,27 +39,8 @@ class IndexController extends Controller
         $user = $this->auth->getUser();
 
         $game = $user
-            ? $user->currentGame()
+            ? $this->gameService->getOrCreateGameFor($user)
             : null;
-
-        $lastGame = $user
-            ? $user->lastGame()
-            : null;
-
-        $turnCountStr = $lastGame
-            ? $this->casesService->turnCount(
-                $lastGame->turns()->count()
-            )
-            : null;
-
-        // if there is no current game, start it
-        if ($user && is_null($game)) {
-            $language = $lastGame
-                ? $lastGame->language()
-                : $this->languageService->getDefaultLanguage();
-
-            $game = $this->gameService->newGame($language, $user);
-        }
 
         $latestNews = $this
             ->newsAggregatorService
@@ -73,8 +54,6 @@ class IndexController extends Controller
             [
                 'params' => [
                     'game' => $game,
-                    'last_game' => $lastGame,
-                    'last_game_turn_count_str' => $turnCountStr,
                     'news' => $latestNews,
                     'debug' => $debug,
                 ],

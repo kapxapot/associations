@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Auth\Interfaces\AuthInterface;
+use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Services\GameService;
@@ -11,6 +12,7 @@ use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\Http\NotFoundException;
+use Plasticode\Exceptions\InvalidResultException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -63,8 +65,6 @@ class TurnController extends Controller
             );
         }
 
-        $language = $game->language();
-
         // validate prev turn
         $prevTurnId = $request->getParam('prev_turn_id');
         $prevTurn = $this->turnRepository->get($prevTurnId);
@@ -77,43 +77,30 @@ class TurnController extends Controller
 
         // validate word
         $wordStr = $request->getParam('word');
-        $wordStr = $this->languageService->normalizeWord($language, $wordStr);
 
-        $this->wordService->validateWord($wordStr);
-
-        if (!$this->turnService->validatePlayerTurn($game, $wordStr)) {
-            throw new BadRequestException(
-                'Word is already used in this game.'
-            );
+        try {
+            $turns = $this->gameService->makeTurn($user, $game, $wordStr);
+        } catch (InvalidResultException $ex) {
+            throw new BadRequestException($ex->getMessage());
         }
 
-        // get word
-        $word = $this->wordService->getOrCreate($language, $wordStr, $user);
+        /** @var Turn */
+        $question = $turns->first();
 
-        // new turn
-        $turns = $this->turnService->newPlayerTurn($game, $word, $user);
-
-        Assert::minCount($turns, 1);
-
-        $question = $turns[0];
-
-        $answer = (count($turns) > 1) ? $turns[1] : null;
+        /** @var Turn|null */
+        $answer = $turns->skip(1)->first();
 
         $result = [
             'question' => $this->serializer->serializeTurn($question),
-            'answer' => $answer ? $this->serializer->serializeTurn($answer) : null
+            'answer' => $this->serializer->serializeTurn($answer)
         ];
 
         if (is_null($answer)) {
-            $newGame = $this->gameService->newGame($language, $user);
+            $newGame = $this->gameService->createGameFor($user);
 
-            $firstTurn = $newGame
-                ? $newGame->turns()->first()
-                : null;
-
-            $result['new'] = $firstTurn
-                ? $this->serializer->serializeTurn($firstTurn)
-                : null;
+            $result['new'] = $this->serializer->serializeTurn(
+                $newGame->lastTurn()
+            );
         }
 
         return Response::json($response, $result);
@@ -138,7 +125,7 @@ class TurnController extends Controller
             ? $game->language()
             : $this->languageService->getDefaultLanguage();
 
-        $newGame = $this->gameService->newGame($language, $user);
+        $newGame = $this->gameService->createGameFor($user, $language);
 
         $firstTurn = $newGame
             ? $newGame->turns()->first()
@@ -149,9 +136,7 @@ class TurnController extends Controller
             [
                 'question' => null,
                 'answer' => null,
-                'new' => $firstTurn
-                    ? $this->serializer->serializeTurn($firstTurn)
-                    : null
+                'new' => $this->serializer->serializeTurn($firstTurn)
             ]
         );
     }

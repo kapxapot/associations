@@ -10,6 +10,7 @@ use App\Controllers\NewsController;
 use App\Controllers\PageController;
 use App\Controllers\SearchController;
 use App\Controllers\TagController;
+use App\Controllers\TelegramBotController;
 use App\Controllers\TestController;
 use App\Controllers\TurnController;
 use App\Controllers\WordController;
@@ -213,6 +214,15 @@ $app->group(
 
         $this->get('/tags/{tag}', TagController::class . ':get')
             ->setName('main.tag');
+
+        $telegramBotToken = $settings['telegram']['bot_token'];
+
+        if (strlen($telegramBotToken) > 0) {
+            $this->post(
+                '/bots/telegram/' . $telegramBotToken,
+                TelegramBotController::class
+            );
+        }
 
         $this->get('/{slug}', PageController::class . ':get')
             ->setName('main.page');

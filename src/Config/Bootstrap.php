@@ -28,6 +28,7 @@ use App\Hydrators\GameHydrator;
 use App\Hydrators\LanguageHydrator;
 use App\Hydrators\NewsHydrator;
 use App\Hydrators\PageHydrator;
+use App\Hydrators\TelegramUserHydrator;
 use App\Hydrators\TurnHydrator;
 use App\Hydrators\UserHydrator;
 use App\Hydrators\WordFeedbackHydrator;
@@ -42,6 +43,7 @@ use App\Repositories\GameRepository;
 use App\Repositories\LanguageRepository;
 use App\Repositories\NewsRepository;
 use App\Repositories\PageRepository;
+use App\Repositories\TelegramUserRepository;
 use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
@@ -57,6 +59,7 @@ use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\SearchService;
 use App\Services\TagPartsProviderService;
+use App\Services\TelegramUserService;
 use App\Services\TurnService;
 use App\Services\UserService;
 use App\Services\WordFeedbackService;
@@ -183,6 +186,17 @@ class Bootstrap extends BootstrapBase
                         $c->cutParser,
                         $c->linker,
                         $c->parser
+                    )
+                )
+            );
+
+        $map['telegramUserRepository'] = fn (CI $c) =>
+            new TelegramUserRepository(
+                $c->repositoryContext,
+                new ObjectProxy(
+                    fn () =>
+                    new TelegramUserHydrator(
+                        $c->userRepository
                     )
                 )
             );
@@ -375,7 +389,8 @@ class Bootstrap extends BootstrapBase
             new GameService(
                 $c->gameRepository,
                 $c->languageService,
-                $c->turnService
+                $c->turnService,
+                $c->wordService
             );
 
         $map['languageService'] = fn (CI $c) =>
@@ -409,6 +424,12 @@ class Bootstrap extends BootstrapBase
             new TagPartsProviderService(
                 $c->newsRepository,
                 $c->pageRepository
+            );
+
+        $map['telegramUserService'] = fn (CI $c) =>
+            new TelegramUserService(
+                $c->telegramUserRepository,
+                $c->userRepository
             );
 
         $map['turnService'] = fn (CI $c) =>

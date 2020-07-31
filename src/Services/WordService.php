@@ -15,6 +15,7 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
+use Plasticode\Exceptions\ValidationException;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
@@ -176,6 +177,8 @@ class WordService
 
     /**
      * Throws exception if the word is not valid.
+     * 
+     * @throws ValidationException
      */
     public function validateWord(?string $wordStr) : void
     {

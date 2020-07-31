@@ -70,7 +70,7 @@ class AssociationController extends Controller
     {
         $user = $this->auth->getUser();
 
-        $language = $this->languageService->getCurrentLanguage($user);
+        $language = $this->languageService->getCurrentLanguageFor($user);
 
         $associations = $this
             ->associationRepository

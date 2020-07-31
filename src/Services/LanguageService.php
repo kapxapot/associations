@@ -49,7 +49,7 @@ class LanguageService
         return $language;
     }
 
-    public function getCurrentLanguage(?User $user) : Language
+    public function getCurrentLanguageFor(?User $user) : Language
     {
         $game = $user
             ? $user->currentGame() ?? $user->lastGame()

@@ -14,4 +14,9 @@ class UserRepository extends BaseUserRepository implements UserRepositoryInterfa
     {
         return $this->getEntity($id);
     }
+
+    public function store(array $data) : User
+    {
+        return $this->storeEntity($data);
+    }
 }

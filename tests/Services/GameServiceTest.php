@@ -176,7 +176,7 @@ class GameServiceTest extends TestCase
         );
 
         // the test
-        $game = $gameService->newGame($language, $user);
+        $game = $gameService->createGameFor($user, $language);
 
         // test counts
         $gameCountAfter = $gameCountFunc();

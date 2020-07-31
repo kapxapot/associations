@@ -2,11 +2,14 @@
 
 namespace App\Services;
 
+use App\Collections\TurnCollection;
+use App\Exceptions\DuplicateWordException;
 use App\Models\Game;
 use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
 use App\Repositories\Interfaces\GameRepositoryInterface;
+use Plasticode\Exceptions\ValidationException;
 use Webmozart\Assert\Assert;
 
 class GameService
@@ -15,39 +18,47 @@ class GameService
 
     private LanguageService $languageService;
     private TurnService $turnService;
+    private WordService $wordService;
 
     public function __construct(
         GameRepositoryInterface $gameRepository,
         LanguageService $languageService,
-        TurnService $turnService
+        TurnService $turnService,
+        WordService $wordService
     )
     {
         $this->gameRepository = $gameRepository;
 
         $this->languageService = $languageService;
         $this->turnService = $turnService;
+        $this->wordService = $wordService;
     }
 
     /**
-     * Creates and starts a new game.
+     * Returns user's current game or creates and starts a new one for them.
      */
-    public function newGame(Language $language, User $user) : Game
+    public function getOrCreateGameFor(User $user) : Game
     {
-        $game = $this->createGame($language, $user);
-        $this->startGame($game);
-
-        return $game;
+        return $user->currentGame() ?? $this->createGameFor($user);
     }
 
-    public function createGame(Language $language, User $user) : Game
+    /**
+     * Creates and starts a new game for a user.
+     */
+    public function createGameFor(User $user, ?Language $language = null) : Game
     {
-        // todo: potentially can create several games in parallel
-        return $this->gameRepository->store(
+        $language ??= $this->languageService->getCurrentLanguageFor($user);
+
+        $game = $this->gameRepository->store(
             [
                 'language_id' => $language->getId(),
                 'user_id' => $user->getId(),
             ]
         );
+
+        $this->startGame($game);
+
+        return $game;
     }
 
     public function startGame(Game $game) : ?Turn
@@ -82,5 +93,32 @@ class GameService
         return
             ($lastTurn && $lastTurn->equals($turn))
             || (is_null($lastTurn) && is_null($turn));
+    }
+
+    /**
+     * User says a word in the game (makes a turn).
+     * The result is the user's turn and AI's turn (if the AI has something to say).
+     * 
+     * @throws ValidationException
+     * @throws DuplicateWordException
+     */
+    public function makeTurn(User $user, Game $game, string $wordStr) : TurnCollection
+    {
+        $language = $game->language();
+
+        $wordStr = $this->languageService->normalizeWord($language, $wordStr);
+
+        $this->wordService->validateWord($wordStr);
+        $this->turnService->validatePlayerTurn($game, $wordStr);
+
+        // get word
+        $word = $this->wordService->getOrCreate($language, $wordStr, $user);
+
+        // new turn
+        $turns = $this->turnService->newPlayerTurn($game, $word, $user);
+
+        Assert::minCount($turns, 1);
+
+        return $turns;
     }
 }

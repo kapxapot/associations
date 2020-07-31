@@ -18,8 +18,12 @@ class Serializer
         $this->linker = $linker;
     }
 
-    public function serializeTurn(Turn $turn) : array
+    public function serializeTurn(?Turn $turn) : ?array
     {
+        if (is_null($turn)) {
+            return null;
+        }
+
         return $this->serializeRaw(
             [
                 'game' => [

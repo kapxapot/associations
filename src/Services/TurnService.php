@@ -2,7 +2,9 @@
 
 namespace App\Services;
 
+use App\Collections\TurnCollection;
 use App\Events\Turn\TurnCreatedEvent;
+use App\Exceptions\DuplicateWordException;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\User;
@@ -55,10 +57,8 @@ class TurnService
 
     /**
      * Returns new player turn and AI turn/answer if it happens.
-     *
-     * @return Turn[]
      */
-    public function newPlayerTurn(Game $game, Word $word, User $user) : array
+    public function newPlayerTurn(Game $game, Word $word, User $user) : TurnCollection
     {
         $turn = $this->newTurn($game, $word, $user);
 
@@ -73,7 +73,7 @@ class TurnService
             $turns[] = $aiTurn;
         }
 
-        return $turns;
+        return TurnCollection::make($turns);
     }
 
     public function newAiTurn(Game $game, Word $word) : Turn
@@ -189,9 +189,13 @@ class TurnService
     }
 
     /**
+     * Validates player turn.
+     * 
      * Normalized word string expected.
+     * 
+     * @throws DuplicateWordException
      */
-    public function validatePlayerTurn(Game $game, string $wordStr) : bool
+    public function validatePlayerTurn(Game $game, string $wordStr) : void
     {
         $language = $game->language();
 
@@ -201,10 +205,12 @@ class TurnService
 
         // unknown yet word
         if (is_null($word)) {
-            return true;
+            return;
         }
 
-        return !$game->containsWord($word);
+        if ($game->containsWord($word)) {
+            throw new DuplicateWordException($word->word);
+        };
     }
 
     public function findAnswer(Turn $turn) : ?Word

@@ -87,6 +87,9 @@ class GameController extends Controller
         return $this->render($response, 'main/games/item.twig', $params);
     }
 
+    /**
+     * @deprecated
+     */
     public function start(
         SlimRequest $request,
         ResponseInterface $response
@@ -105,7 +108,7 @@ class GameController extends Controller
             throw new BadRequestException('Game is already on.');
         };
 
-        $this->gameService->newGame($language, $user);
+        $this->gameService->createGameFor($user, $language);
 
         return Response::json(
             $response,
@@ -113,6 +116,9 @@ class GameController extends Controller
         );
     }
 
+    /**
+     * @deprecated
+     */
     public function finish(
         ServerRequestInterface $request,
         ResponseInterface $response
