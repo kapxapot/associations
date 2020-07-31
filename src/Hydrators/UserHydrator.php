@@ -5,6 +5,7 @@ namespace App\Hydrators;
 use App\Core\Interfaces\LinkerInterface;
 use App\Models\User;
 use App\Repositories\Interfaces\GameRepositoryInterface;
+use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\UserService;
 use Plasticode\External\Gravatar;
 use Plasticode\Hydrators\UserHydrator as BaseUserHydrator;
@@ -14,11 +15,13 @@ use Plasticode\Repositories\Interfaces\RoleRepositoryInterface;
 class UserHydrator extends BaseUserHydrator
 {
     private GameRepositoryInterface $gameRepository;
+    private TelegramUserRepositoryInterface $telegramUserRepository;
     private UserService $userService;
 
     public function __construct(
         GameRepositoryInterface $gameRepository,
         RoleRepositoryInterface $roleRepository,
+        TelegramUserRepositoryInterface $telegramUserRepository,
         LinkerInterface $linker,
         Gravatar $gravatar,
         UserService $userService
@@ -27,6 +30,8 @@ class UserHydrator extends BaseUserHydrator
         parent::__construct($roleRepository, $linker, $gravatar);
 
         $this->gameRepository = $gameRepository;
+        $this->telegramUserRepository = $telegramUserRepository;
+
         $this->userService = $userService;
     }
 
@@ -47,6 +52,9 @@ class UserHydrator extends BaseUserHydrator
             )
             ->withLastGame(
                 fn () => $this->gameRepository->getLastByUser($entity)
+            )
+            ->withTelegramUser(
+                fn () => $this->telegramUserRepository->getByUser($entity)
             );
     }
 }

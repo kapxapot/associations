@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\TelegramUser;
+use App\Models\User;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 
@@ -18,6 +19,14 @@ class TelegramUserRepository extends IdiormRepository implements TelegramUserRep
     public function getByTelegramId(int $id) : ?TelegramUser
     {
         return $this->query()->where('telegram_id', $id)->one();
+    }
+
+    public function getByUser(User $user) : ?TelegramUser
+    {
+        return $this
+            ->query()
+            ->where('user_id', $user->getId())
+            ->one();
     }
 
     public function save(TelegramUser $user) : TelegramUser

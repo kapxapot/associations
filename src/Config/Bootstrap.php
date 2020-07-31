@@ -224,6 +224,7 @@ class Bootstrap extends BootstrapBase
                     new UserHydrator(
                         $c->gameRepository,
                         $c->roleRepository,
+                        $c->telegramUserRepository,
                         $c->linker,
                         $c->gravatar,
                         $c->userService

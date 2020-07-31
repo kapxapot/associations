@@ -40,4 +40,20 @@ class TelegramUser extends DbModel
     {
         return $this->firstName ?? $this->lastName ?? $this->username ?? 'инкогнито';
     }
+
+    public function publicName() : string
+    {
+        return $this->username ?? $this->fullName() ?? 'инкогнито';
+    }
+
+    public function fullName() : ?string
+    {
+        $parts = [$this->firstName, $this->lastName];
+
+        $fullName = implode(' ', array_filter($parts));
+
+        return (strlen($fullName) > 0)
+            ? $fullName
+            : $this->username;
+    }
 }

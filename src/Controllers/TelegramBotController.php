@@ -163,7 +163,7 @@ class TelegramBotController extends Controller
                 $parts[] = '*' . mb_strtoupper($answer->word()->word) . '*';
             }
         } else {
-            $parts[] = 'Мне нечего сказать, начинайте вы.';
+            $parts[] = 'Мне нечего сказать. ☹ Начинайте вы.';
         }
 
         return implode(PHP_EOL . PHP_EOL, $parts);

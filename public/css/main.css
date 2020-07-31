@@ -53,6 +53,14 @@ a.assoc-arrow {
     color: rgb(32, 204, 32);
 }
 
+.telegram-color {
+    color: #2e8ddf;
+}
+
+.kid-color {
+    color: #74c074;
+}
+
 .avatar--big {
     width: 40px;
     height: 40px;

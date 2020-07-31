@@ -9,9 +9,11 @@ use Plasticode\Util\Date;
  * @method Game|null currentGame()
  * @method bool isMature()
  * @method Game|null lastGame()
+ * @method TelegramUser|null telegramUser()
  * @method static withCurrentGame(Game|callable|null $currentGame)
  * @method static withIsMature(bool|callable $mature)
  * @method static withLastGame(Game|callable|null $lastGame)
+ * @method static withTelegramUser(TelegramUser|callable|null $telegramUser)
  */
 class User extends UserBase
 {
@@ -38,5 +40,25 @@ class User extends UserBase
         $yearsPassed = Date::age($this->createdAt)->y;
 
         return $this->age + $yearsPassed;
+    }
+
+    public function displayName() : string
+    {
+        $name = parent::displayName();
+
+        if (strlen($name) > 0) {
+            return $name;
+        }
+
+        $tgUser = $this->telegramUser();
+
+        return $tgUser
+            ? $tgUser->publicName()
+            : 'глюк какой-то';
+    }
+
+    public function isTelegramUser() : bool
+    {
+        return $this->telegramUser() !== null;
     }
 }
