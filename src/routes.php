@@ -244,17 +244,17 @@ $app->group(
                         '/update/associations',
                         JobController::class . ':updateAssociations'
                     )->setName('main.jobs.update_associations');
-    
+
                     $this->get(
                         '/update/words',
                         JobController::class . ':updateWords'
                     )->setName('main.jobs.update_words');
-    
+
                     $this->get(
                         '/load_unchecked_dict_words',
                         JobController::class . ':loadUncheckedDictWords'
                     )->setName('main.jobs.load_unchecked_dict_words');
-    
+
                     $this->get(
                         '/match_dangling_dict_words',
                         JobController::class . ':matchDanglingDictWords'
