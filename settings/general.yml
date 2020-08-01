@@ -78,6 +78,7 @@ telegram:
   bot_token: {TELEGRAM_BOT_TOKEN}
 
 jobs:
+  secret: {JOBS_SECRET}
   update_associations:
     ttl_min: 1440
     batch_size: 500

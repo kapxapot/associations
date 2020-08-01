@@ -234,30 +234,34 @@ $app->group(
 
         // jobs
 
-        $this->group(
-            '/jobs',
-            function () {
-                $this->get(
-                    '/update/associations',
-                    JobController::class . ':updateAssociations'
-                )->setName('main.jobs.update_associations');
+        $jobsSecret = $settings['jobs']['secret'];
 
-                $this->get(
-                    '/update/words',
-                    JobController::class . ':updateWords'
-                )->setName('main.jobs.update_words');
-
-                $this->get(
-                    '/load_unchecked_dict_words',
-                    JobController::class . ':loadUncheckedDictWords'
-                )->setName('main.jobs.load_unchecked_dict_words');
-
-                $this->get(
-                    '/match_dangling_dict_words',
-                    JobController::class . ':matchDanglingDictWords'
-                )->setName('main.jobs.match_dangling_dict_words');
-            }
-        );
+        if (strlen($jobsSecret) > 0) {
+            $this->group(
+                '/jobs/' . $jobsSecret,
+                function () {
+                    $this->get(
+                        '/update/associations',
+                        JobController::class . ':updateAssociations'
+                    )->setName('main.jobs.update_associations');
+    
+                    $this->get(
+                        '/update/words',
+                        JobController::class . ':updateWords'
+                    )->setName('main.jobs.update_words');
+    
+                    $this->get(
+                        '/load_unchecked_dict_words',
+                        JobController::class . ':loadUncheckedDictWords'
+                    )->setName('main.jobs.load_unchecked_dict_words');
+    
+                    $this->get(
+                        '/match_dangling_dict_words',
+                        JobController::class . ':matchDanglingDictWords'
+                    )->setName('main.jobs.match_dangling_dict_words');
+                }
+            );
+        }
 
         // auth
 
