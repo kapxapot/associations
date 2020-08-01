@@ -35,6 +35,11 @@ class User extends UserBase
         ];
     }
 
+    public function hasAge() : bool
+    {
+        return $this->age > 0;
+    }
+
     public function ageNow() : int
     {
         $yearsPassed = Date::age($this->createdAt)->y;

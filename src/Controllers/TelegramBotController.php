@@ -74,19 +74,7 @@ class TelegramBotController extends Controller
             'method' => 'sendMessage',
             'chat_id' => $chatId,
             'parse_mode' => 'html',
-            //'reply_to_message_id' => $messageId,
         ];
-
-        // if ($text == '/keyboard') {
-        //     $result['text'] = 'Hey...';
-        //     $result['reply_markup'] = [
-        //         'keyboard' => [['Пропустить']],
-        //         'one_time_keyboard' => true,
-        //         'resize_keyboard' => true
-        //     ];
-
-        //     return $result;
-        // }
 
         $text = trim($text);
 
@@ -98,7 +86,7 @@ class TelegramBotController extends Controller
                 $answer = implode(PHP_EOL . PHP_EOL, $answerParts);
             } catch (Exception $ex) {
                 $this->logger->error($ex->getMessage());
-                $answer = 'Что-то пошло не так. ☹';
+                $answer = 'Что-то пошло не так. 😐';
             }
         }
 
@@ -228,10 +216,6 @@ class TelegramBotController extends Controller
         ?string $noQuestionMessage = null
     ) : array
     {
-        Assert::true(
-            $question || $noQuestionMessage
-        );
-
         if (is_null($answer)) {
             return [
                 'Мне нечего сказать. 😥 Начинайте вы.'
@@ -240,16 +224,18 @@ class TelegramBotController extends Controller
 
         Assert::true($answer->isAiTurn());
 
-        $answerWord = mb_strtoupper($answer->word()->word);
+        $answerWord = $this->turnStr($answer);
 
         if (is_null($question)) {
-            return [
-                $noQuestionMessage,
-                '<b>' . $answerWord . '</b>'
-            ];
+            return array_filter(
+                [
+                    $noQuestionMessage,
+                    $answerWord
+                ]
+            );
         }
 
-        $questionWord = mb_strtoupper($question->word()->word);
+        $questionWord = $this->turnStr($question);
 
         $association = $answer->association();
 
@@ -257,8 +243,15 @@ class TelegramBotController extends Controller
             ? $association->sign()
             : Association::DEFAULT_SIGN;
 
+        $associationStr = $questionWord . ' <b>' . $sign . '</b> ' . $answerWord;
+
         return [
-            '<b>' . $questionWord . '</b> ' . $sign . ' <b>' . $answerWord . '</b>'
+            $associationStr
         ];
+    }
+
+    private function turnStr(Turn $turn) : string
+    {
+        return '<b>' . mb_strtoupper($turn->word()->word) . '</b>';
     }
 }
