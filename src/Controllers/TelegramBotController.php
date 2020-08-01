@@ -3,7 +3,9 @@
 namespace App\Controllers;
 
 use App\Exceptions\DuplicateWordException;
+use App\Models\Association;
 use App\Models\TelegramUser;
+use App\Models\Turn;
 use App\Services\GameService;
 use App\Services\TelegramUserService;
 use Exception;
@@ -67,7 +69,7 @@ class TelegramBotController extends Controller
         $result = [
             'method' => 'sendMessage',
             'chat_id' => $chatId,
-            'parse_mode' => 'markdown',
+            'parse_mode' => 'html',
             //'reply_to_message_id' => $messageId,
         ];
 
@@ -117,7 +119,7 @@ class TelegramBotController extends Controller
                 ? 'Добро пожаловать'
                 : 'С возвращением';
 
-            $greeting .= ', *' . $tgUser->privateName() . '*!';
+            $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
 
             $parts[] = $greeting;
             $parts[] = $isNewUser
@@ -131,9 +133,10 @@ class TelegramBotController extends Controller
             try {
                 $turns = $this->gameService->makeTurn($user, $game, $text);
             } catch (ValidationException $vEx) {
-                $error = $this->translate($vEx->getMessage());
+                //$this->logger->error($vEx->firstError(), $vEx->errors());
+                $error = $vEx->firstError();
             } catch (DuplicateWordException $dwEx) {
-                $error = 'Слово *' . mb_strtoupper($dwEx->word) . '* уже использовано в игре.';
+                $error = 'Слово <b>' . mb_strtoupper($dwEx->word) . '</b> уже использовано в игре.';
             }
 
             if ($error) {
@@ -142,7 +145,10 @@ class TelegramBotController extends Controller
 
             if ($turns->count() > 1) {
                 // continuing current game
-                [$question, $answer] = $turns->toArray();
+                /** @var Turn */
+                $question = $turns->first();
+                /** @var Turn */
+                $answer = $turns->skip(1)->first();
             } else {
                 // no answer, starting new game
                 $newGame = $this->gameService->createGameFor($user);
@@ -152,18 +158,27 @@ class TelegramBotController extends Controller
             }
         }
 
-        if ($answer) {
+        if (is_null($answer)) {
+            $parts[] = 'Мне нечего сказать. 😥 Начинайте вы.';
+        } else {
             Assert::true($answer->isAiTurn());
 
-            if ($question) {
-                $parts[] = 'Моя ассоциация:';
-                $parts[] = '*' . mb_strtoupper($question->word()->word) . '* → *' . mb_strtoupper($answer->word()->word) . '*';
-            } else {
+            $answerWord = mb_strtoupper($answer->word()->word);
+
+            if (is_null($question)) {
                 $parts[] = 'У меня нет ассоциаций. 😥 Начинаем заново!';
-                $parts[] = '*' . mb_strtoupper($answer->word()->word) . '*';
+                $parts[] = '<b>' . $answerWord . '</b>';
+            } else {
+                $questionWord = mb_strtoupper($question->word()->word);
+
+                $association = $answer->association();
+
+                $sign = $association
+                    ? $association->sign()
+                    : Association::DEFAULT_SIGN;
+
+                $parts[] = '<b>' . $questionWord . '</b> ' . $sign . ' <b>' . $answerWord . '</b>';
             }
-        } else {
-            $parts[] = 'Мне нечего сказать. ☹ Начинайте вы.';
         }
 
         return implode(PHP_EOL . PHP_EOL, $parts);

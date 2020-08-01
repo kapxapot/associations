@@ -17,6 +17,9 @@ use App\Collections\WordCollection;
  */
 class Association extends LanguageElement
 {
+    const DEFAULT_SIGN = '→';
+    const APPROVED_SIGN = '⇉';
+
     protected function requiredWiths(): array
     {
         return [
@@ -113,5 +116,12 @@ class Association extends LanguageElement
             ->any(
                 fn (Word $w) => $w->isMature()
             );
+    }
+
+    public function sign() : string
+    {
+        return $this->isApproved()
+            ? self::APPROVED_SIGN
+            : self::DEFAULT_SIGN;
     }
 }
