@@ -6,8 +6,10 @@ use App\Exceptions\DuplicateWordException;
 use App\Models\Association;
 use App\Models\TelegramUser;
 use App\Models\Turn;
+use App\Models\User;
 use App\Services\GameService;
 use App\Services\TelegramUserService;
+use App\Services\TurnService;
 use Exception;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
@@ -21,6 +23,7 @@ class TelegramBotController extends Controller
 {
     private GameService $gameService;
     private TelegramUserService $telegramUserService;
+    private TurnService $turnService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -28,6 +31,7 @@ class TelegramBotController extends Controller
 
         $this->gameService = $container->gameService;
         $this->telegramUserService = $container->telegramUserService;
+        $this->turnService = $container->turnService;
     }
 
     public function __invoke(
@@ -84,11 +88,18 @@ class TelegramBotController extends Controller
         //     return $result;
         // }
 
-        try {
-            $answer = $this->getAnswer($tgUser, $text);
-        } catch (Exception $ex) {
-            $this->logger->error($ex->getMessage());
-            $answer = 'Что-то пошло не так. ☹';
+        $text = trim($text);
+
+        if (strlen($text) == 0) {
+            $answer = '🧾 Я понимаю только сообщения с текстом.';
+        } else {
+            try {
+                $answerParts = $this->getAnswer($tgUser, $text);
+                $answer = implode(PHP_EOL . PHP_EOL, $answerParts);
+            } catch (Exception $ex) {
+                $this->logger->error($ex->getMessage());
+                $answer = 'Что-то пошло не так. ☹';
+            }
         }
 
         $result['text'] = $answer;
@@ -96,91 +107,158 @@ class TelegramBotController extends Controller
         return $result;
     }
 
-    private function getAnswer(TelegramUser $tgUser, ?string $text) : string
+    /**
+     * @return string[]
+     */
+    private function getAnswer(TelegramUser $tgUser, string $text) : array
     {
-        if (strlen($text) == 0) {
-            return '🧾 Я понимаю только сообщения с текстом.';
+        if (strpos($text, '/start') === 0) {
+            return $this->startCommand($tgUser);
         }
 
-        $parts = [];
+        if (strpos($text, '/skip') === 0) {
+            return $this->skipCommand($tgUser);
+        }
 
+        return $this->sayWord($tgUser, $text);
+    }
+
+    /**
+     * @return string[]
+     */
+    private function startCommand(TelegramUser $tgUser) : array
+    {
         $user = $tgUser->user();
         $isNewUser = $tgUser->isNew();
 
-        $game = $this->gameService->getOrCreateGameFor($tgUser->user());
+        $game = $this->gameService->getOrCreateGameFor($user);
 
         Assert::notNull($game);
 
         $answer = $game->lastTurn();
         $question = $game->beforeLastTurn();
 
-        if (strpos($text, '/start') === 0) {
-            $greeting = $isNewUser
-                ? 'Добро пожаловать'
-                : 'С возвращением';
+        $greeting = $isNewUser ? 'Добро пожаловать' : 'С возвращением';
+        $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
 
-            $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
+        return [
+            $greeting,
+            $isNewUser ? 'Начинаем игру...' : 'Продолжаем игру...',
+            ...$this->turnsToParts($question, $answer)
+        ];
+    }
 
-            $parts[] = $greeting;
-            $parts[] = $isNewUser
-                ? 'Начинаем игру...'
-                : 'Продолжаем игру...';
-        } else {
-            // word
-            /** @var string|null */
-            $error = null;
+    /**
+     * @return string[]
+     */
+    private function skipCommand(TelegramUser $tgUser) : array
+    {
+        $user = $tgUser->user();
+        $game = $user->currentGame();
 
-            try {
-                $turns = $this->gameService->makeTurn($user, $game, $text);
-            } catch (ValidationException $vEx) {
-                //$this->logger->error($vEx->firstError(), $vEx->errors());
-                $error = $vEx->firstError();
-            } catch (DuplicateWordException $dwEx) {
-                $error = 'Слово <b>' . mb_strtoupper($dwEx->word) . '</b> уже использовано в игре.';
-            }
+        Assert::notNull($game);
 
-            if ($error) {
-                return '❌ ' . $error;
-            }
+        $this->turnService->finishGame($game);
 
-            if ($turns->count() > 1) {
-                // continuing current game
-                /** @var Turn */
-                $question = $turns->first();
-                /** @var Turn */
-                $answer = $turns->skip(1)->first();
-            } else {
-                // no answer, starting new game
-                $newGame = $this->gameService->createGameFor($user);
+        return $this->newGame(
+            $user,
+            'Сдаетесь? 😏 Ок, начинаем заново!'
+        );
+    }
 
-                $question = null;
-                $answer = $newGame->lastTurn();
-            }
+    /**
+     * @return string[]
+     */
+    private function sayWord(TelegramUser $tgUser, string $text) : array
+    {
+        $user = $tgUser->user();
+        $game = $user->currentGame();
+
+        Assert::notNull($game);
+
+        try {
+            $turns = $this->gameService->makeTurn($user, $game, $text);
+        } catch (ValidationException $vEx) {
+            return [
+                '❌ ' . $vEx->firstError()
+            ];
+        } catch (DuplicateWordException $dwEx) {
+            $word = mb_strtoupper($dwEx->word);
+
+            return [
+                '❌ Слово <b>' . $word . '</b> уже использовано в игре.'
+            ];
         }
+
+        if ($turns->count() > 1) {
+            // continuing current game
+            return $this->turnsToParts(
+                $turns->first(),
+                $turns->skip(1)->first()
+            );
+        }
+
+        // no answer, starting new game
+        return $this->newGame(
+            $user,
+            'У меня нет ассоциаций. 😥 Начинаем заново!'
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function newGame(User $user, string $message) : array
+    {
+        $newGame = $this->gameService->createGameFor($user);
+
+        return $this->turnsToParts(
+            null,
+            $newGame->lastTurn(),
+            $message
+        );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function turnsToParts(
+        ?Turn $question,
+        ?Turn $answer,
+        ?string $noQuestionMessage = null
+    ) : array
+    {
+        Assert::true(
+            $question || $noQuestionMessage
+        );
 
         if (is_null($answer)) {
-            $parts[] = 'Мне нечего сказать. 😥 Начинайте вы.';
-        } else {
-            Assert::true($answer->isAiTurn());
-
-            $answerWord = mb_strtoupper($answer->word()->word);
-
-            if (is_null($question)) {
-                $parts[] = 'У меня нет ассоциаций. 😥 Начинаем заново!';
-                $parts[] = '<b>' . $answerWord . '</b>';
-            } else {
-                $questionWord = mb_strtoupper($question->word()->word);
-
-                $association = $answer->association();
-
-                $sign = $association
-                    ? $association->sign()
-                    : Association::DEFAULT_SIGN;
-
-                $parts[] = '<b>' . $questionWord . '</b> ' . $sign . ' <b>' . $answerWord . '</b>';
-            }
+            return [
+                'Мне нечего сказать. 😥 Начинайте вы.'
+            ];
         }
 
-        return implode(PHP_EOL . PHP_EOL, $parts);
+        Assert::true($answer->isAiTurn());
+
+        $answerWord = mb_strtoupper($answer->word()->word);
+
+        if (is_null($question)) {
+            return [
+                $noQuestionMessage,
+                '<b>' . $answerWord . '</b>'
+            ];
+        }
+
+        $questionWord = mb_strtoupper($question->word()->word);
+
+        $association = $answer->association();
+
+        $sign = $association
+            ? $association->sign()
+            : Association::DEFAULT_SIGN;
+
+        return [
+            '<b>' . $questionWord . '</b> ' . $sign . ' <b>' . $answerWord . '</b>'
+        ];
     }
 }
