@@ -7,6 +7,8 @@ use App\Models\Association;
 use App\Models\TelegramUser;
 use App\Models\Turn;
 use App\Models\User;
+use App\Models\Validation\AgeValidation;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\GameService;
 use App\Services\TelegramUserService;
 use App\Services\TurnService;
@@ -21,17 +23,25 @@ use Webmozart\Assert\Assert;
 
 class TelegramBotController extends Controller
 {
+    private UserRepositoryInterface $userRepository;
+
     private GameService $gameService;
     private TelegramUserService $telegramUserService;
     private TurnService $turnService;
+
+    private AgeValidation $ageValidation;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
+        $this->userRepository = $container->userRepository;
+
         $this->gameService = $container->gameService;
         $this->telegramUserService = $container->telegramUserService;
         $this->turnService = $container->turnService;
+
+        $this->ageValidation = $container->ageValidation;
     }
 
     public function __invoke(
@@ -62,7 +72,6 @@ class TelegramBotController extends Controller
     {
         $result = [];
 
-        $messageId = $message['message_id'];
         $chatId = $message['chat']['id'];
         $text = $message['text'] ?? null;
 
@@ -104,6 +113,12 @@ class TelegramBotController extends Controller
             return $this->startCommand($tgUser);
         }
 
+        $user = $tgUser->user();
+
+        if (!$user->hasAge()) {
+            return $this->readAge($tgUser, $text);
+        }
+
         if (strpos($text, '/skip') === 0) {
             return $this->skipCommand($tgUser);
         }
@@ -117,22 +132,61 @@ class TelegramBotController extends Controller
     private function startCommand(TelegramUser $tgUser) : array
     {
         $user = $tgUser->user();
-        $isNewUser = $tgUser->isNew();
 
-        $game = $this->gameService->getOrCreateGameFor($user);
-
-        Assert::notNull($game);
-
-        $answer = $game->lastTurn();
-        $question = $game->beforeLastTurn();
-
-        $greeting = $isNewUser ? 'Добро пожаловать' : 'С возвращением';
+        $greeting = $tgUser->isNew() ? 'Добро пожаловать' : 'С возвращением';
         $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
+
+        if (!$user->hasAge()) {
+            return [
+                $greeting,
+                ...$this->askAge()
+            ];
+        }
 
         return [
             $greeting,
-            $isNewUser ? 'Начинаем игру...' : 'Продолжаем игру...',
-            ...$this->turnsToParts($question, $answer)
+            ...$this->startGame($tgUser)
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function readAge(TelegramUser $tgUser, string $text) : array
+    {
+        $validationData = ['age' => $text];
+        $rules = $this->ageValidation->getRules($validationData);
+
+        $validationResult = $this
+            ->validator
+            ->validateArray($validationData, $rules);
+
+        $ageIsOk = $validationResult->isSuccess();
+
+        if (!$ageIsOk) {
+            return [
+                'Вы написали что-то не то. 🤔',
+                ...$this->askAge()
+            ];
+        }
+
+        $user = $tgUser->user();
+        $user->age = intval($text);
+        $this->userRepository->save($user);
+
+        return [
+            'Спасибо, ваш возраст сохранен. 👌',
+            ...$this->startGame($tgUser)
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    private function askAge() : array
+    {
+        return [
+            'Пожалуйста, укажите ваш возраст (цифрами):'
         ];
     }
 
@@ -191,6 +245,27 @@ class TelegramBotController extends Controller
             $user,
             'У меня нет ассоциаций. 😥 Начинаем заново!'
         );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function startGame(TelegramUser $tgUser) : array
+    {
+        $user = $tgUser->user();
+        $isNewUser = $tgUser->isNew();
+
+        $game = $this->gameService->getOrCreateGameFor($user);
+
+        Assert::notNull($game);
+
+        return [
+            $isNewUser ? 'Начинаем игру...' : 'Продолжаем игру...',
+            ...$this->turnsToParts(
+                $game->beforeLastTurn(),
+                $game->lastTurn()
+            )
+        ];
     }
 
     /**

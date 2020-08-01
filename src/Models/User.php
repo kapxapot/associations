@@ -6,6 +6,7 @@ use Plasticode\Models\User as UserBase;
 use Plasticode\Util\Date;
 
 /**
+ * @property integer $age
  * @method Game|null currentGame()
  * @method bool isMature()
  * @method Game|null lastGame()

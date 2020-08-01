@@ -36,6 +36,7 @@ use App\Hydrators\WordHydrator;
 use App\Hydrators\YandexDictWordHydrator;
 use App\Models\News;
 use App\Models\Page;
+use App\Models\Validation\AgeValidation;
 use App\Models\Validation\UserValidation;
 use App\Repositories\AssociationFeedbackRepository;
 use App\Repositories\AssociationRepository;
@@ -329,9 +330,15 @@ class Bootstrap extends BootstrapBase
             return $config;
         };
 
+        $map['ageValidation'] = fn (CI $c) =>
+            new AgeValidation(
+                $c->validationRules
+            );
+
         $map['userValidation'] = fn (CI $c) =>
             new UserValidation(
                 $c->validationRules,
+                $c->ageValidation,
                 $c->userRepository
             );
 
