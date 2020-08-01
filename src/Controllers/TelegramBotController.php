@@ -318,7 +318,7 @@ class TelegramBotController extends Controller
             ? $association->sign()
             : Association::DEFAULT_SIGN;
 
-        $associationStr = $questionWord . ' <b>' . $sign . '</b> ' . $answerWord;
+        $associationStr = $questionWord . ' ' . $sign . ' ' . $answerWord;
 
         return [
             $associationStr
@@ -327,6 +327,6 @@ class TelegramBotController extends Controller
 
     private function turnStr(Turn $turn) : string
     {
-        return '<b>' . mb_strtoupper($turn->word()->word) . '</b>';
+        return '<b>' . $turn->word()->word . '</b>';
     }
 }
