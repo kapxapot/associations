@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Brightwood\StoryStatus;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
@@ -13,7 +14,9 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @property string $username
  * @property string|null $firstName
  * @property string|null $lastName
+ * @method StoryStatus|null storyStatus()
  * @method User|null user()
+ * @method static withStoryStatus(StoryStatus|callable|null $storyStatus)
  * @method static withUser(User|callable|null $user)
  */
 class TelegramUser extends DbModel
@@ -23,7 +26,10 @@ class TelegramUser extends DbModel
 
     protected function requiredWiths(): array
     {
-        return ['user'];
+        return [
+            'storyStatus',
+            'user'
+        ];
     }
 
     public function isValid() : bool
@@ -55,5 +61,13 @@ class TelegramUser extends DbModel
         return (strlen($fullName) > 0)
             ? $fullName
             : $this->username;
+    }
+
+    /**
+     * Returns true, if the Telegram user started to read a story.
+     */
+    public function isReader() : bool
+    {
+        return $this->storyStatus() !== null;
     }
 }

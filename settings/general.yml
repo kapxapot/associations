@@ -76,6 +76,7 @@ yandex_dict:
 telegram:
   bot_name: AssociRuBot
   bot_token: {TELEGRAM_BOT_TOKEN}
+  brightwood_bot_token: {BRIGHTWOOD_BOT_TOKEN}
 
 jobs:
   secret: {JOBS_SECRET}

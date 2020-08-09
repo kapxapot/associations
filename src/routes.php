@@ -1,6 +1,7 @@
 <?php
 
 use App\Controllers\AssociationController;
+use App\Controllers\Brightwood\BrightwoodBotController;
 use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
 use App\Controllers\IndexController;
@@ -221,6 +222,15 @@ $app->group(
             $this->post(
                 '/bots/telegram/' . $telegramBotToken,
                 TelegramBotController::class
+            );
+        }
+
+        $brightwoodBotToken = $settings['telegram']['brightwood_bot_token'];
+
+        if (strlen($brightwoodBotToken) > 0) {
+            $this->post(
+                '/bots/telegram/' . $brightwoodBotToken,
+                BrightwoodBotController::class
             );
         }
 

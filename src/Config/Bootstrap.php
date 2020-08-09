@@ -24,6 +24,7 @@ use App\Factories\UpdateWordsJobFactory;
 use App\Handlers\NotFoundHandler;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
+use App\Hydrators\Brightwood\StoryStatusHydrator;
 use App\Hydrators\GameHydrator;
 use App\Hydrators\LanguageHydrator;
 use App\Hydrators\NewsHydrator;
@@ -40,6 +41,8 @@ use App\Models\Validation\AgeValidation;
 use App\Models\Validation\UserValidation;
 use App\Repositories\AssociationFeedbackRepository;
 use App\Repositories\AssociationRepository;
+use App\Repositories\Brightwood\StoryRepository;
+use App\Repositories\Brightwood\StoryStatusRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\LanguageRepository;
 use App\Repositories\NewsRepository;
@@ -191,12 +194,27 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
+        $map['storyRepository'] = fn (CI $c) =>
+            new StoryRepository();
+
+        $map['storyStatusRepository'] = fn (CI $c) =>
+            new StoryStatusRepository(
+                $c->repositoryContext,
+                new ObjectProxy(
+                    fn () =>
+                    new StoryStatusHydrator(
+                        $c->telegramUserRepository
+                    )
+                )
+            );
+
         $map['telegramUserRepository'] = fn (CI $c) =>
             new TelegramUserRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
                     fn () =>
                     new TelegramUserHydrator(
+                        $c->storyStatusRepository,
                         $c->userRepository
                     )
                 )
