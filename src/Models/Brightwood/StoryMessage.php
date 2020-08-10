@@ -61,6 +61,14 @@ class StoryMessage
     /**
      * @return static
      */
+    public function prependLines(string ...$lines) : self
+    {
+        return (new static(0, $lines))->merge($this);
+    }
+
+    /**
+     * @return static
+     */
     public function withActions(string ...$actions) : self
     {
         return $this->merge(

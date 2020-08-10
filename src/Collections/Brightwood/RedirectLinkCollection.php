@@ -21,6 +21,10 @@ class RedirectLinkCollection extends StoryLinkCollection
             return null;
         }
 
+        if ($this->count() == 1) {
+            return $this->first();
+        }
+
         $totalWeight = $this->scalarize($weightFunc)->sum();
 
         $rand = mt_rand();

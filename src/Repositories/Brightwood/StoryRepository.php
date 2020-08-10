@@ -4,8 +4,10 @@ namespace App\Repositories\Brightwood;
 
 use App\Collections\Brightwood\StoryCollection;
 use App\Models\Brightwood\Links\ActionLink;
+use App\Models\Brightwood\Links\RedirectLink;
 use App\Models\Brightwood\Nodes\ActionNode;
 use App\Models\Brightwood\Nodes\FinishNode;
+use App\Models\Brightwood\Nodes\RedirectNode;
 use App\Models\Brightwood\Nodes\StartNode;
 use App\Models\Brightwood\Story;
 use App\Repositories\Brightwood\Interfaces\StoryRepositoryInterface;
@@ -40,16 +42,59 @@ class StoryRepository implements StoryRepositoryInterface
         $story->setStartNode(
             new ActionNode(
                 1,
-                'Вы гуляли по лесу и заблудились.',
-                new ActionLink(2, 'Сесть на пенек и заплакать'),
-                new ActionLink(1, 'Попытаться найти выход')
+                'Вы гуляли по лесу 🌲🌲🌲 и заблудились. 😮',
+                new ActionLink(5, 'Сесть на пенек и заплакать'),
+                new ActionLink(3, 'Попытаться найти выход')
             )
         );
 
         $story->addNode(
             new FinishNode(
                 2,
-                'Вы умерли от голода.'
+                'Вы умерли от <b>голода</b>. 💀'
+            )
+        );
+
+        $story->addNode(
+            new RedirectNode(
+                3,
+                'Вы долго бродили по лесу 🌲🌲🌲 в поисках выхода.',
+                new RedirectLink(1, 4),
+                new RedirectLink(4, 1)
+            )
+        );
+
+        $story->addNode(
+            new FinishNode(
+                4,
+                'Вы нашли дорогу и выбрались из леса. 🎉🎉🎉'
+            )
+        );
+
+        $story->addNode(
+            new RedirectNode(
+                5,
+                'Вы сели на пенек, проплакали весь день и уснули. 😴',
+                new RedirectLink(6, 3),
+                new RedirectLink(7, 1),
+                new RedirectLink(2, 1)
+            )
+        );
+
+        $story->addNode(
+            new ActionNode(
+                6,
+                'Проснувшись, вы обнаружили, что вы все еще не знаете, где выход из леса. 😕',
+                new ActionLink(5, 'Сесть на пенек и заплакать'),
+                new ActionLink(3, 'Попытаться найти выход')
+            )
+        );
+
+        $story->addNode(
+            new RedirectNode(
+                7,
+                'Вас разбудила <b>избирательная комиссия</b> 🙍‍♀️🙍‍♀️🙍‍♀️, которой понадобился ваш пенек. 🤔 Вам пришлось уйти.',
+                new RedirectLink(1)
             )
         );
 

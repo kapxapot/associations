@@ -3,7 +3,12 @@
 namespace App\Controllers\Brightwood;
 
 use App\Controllers\Controller;
+use App\Models\Brightwood\Links\ActionLink;
+use App\Models\Brightwood\Nodes\ActionNode;
+use App\Models\Brightwood\Nodes\FinishNode;
+use App\Models\Brightwood\Story;
 use App\Models\Brightwood\StoryMessage;
+use App\Models\Brightwood\StoryStatus;
 use App\Models\TelegramUser;
 use App\Repositories\Brightwood\Interfaces\StoryRepositoryInterface;
 use App\Repositories\Brightwood\Interfaces\StoryStatusRepositoryInterface;
@@ -25,6 +30,7 @@ class BrightwoodBotController extends Controller
 
     // temp default
     private int $storyId = 1;
+    private string $restartAction = 'Начать заново';
 
     public function __construct(ContainerInterface $container)
     {
@@ -85,7 +91,9 @@ class BrightwoodBotController extends Controller
             try {
                 $message = $this->getAnswer($tgUser, $text);
 
-                Assert::notEmpty($message->actions());
+                $actions = empty($message->actions())
+                    ? ['Бот сломался! Почините!']
+                    : $message->actions();
 
                 $result['text'] = implode(
                     PHP_EOL . PHP_EOL,
@@ -93,7 +101,7 @@ class BrightwoodBotController extends Controller
                 );
 
                 $result['reply_markup'] = [
-                    'keyboard' => [$message->actions()],
+                    'keyboard' => [$actions],
                     'resize_keyboard' => true
                 ];
             } catch (Exception $ex) {
@@ -124,13 +132,15 @@ class BrightwoodBotController extends Controller
         $status = $tgUser->storyStatus();
 
         if ($status) {
-            $story = $this->storyRepository->get($status->storyId);
-            $node = $story->getNode($status->stepId);
-            $message = $node->getMessage();
+            $message = $this->statusToMessage($status);
         } else {
             $story = $this->storyRepository->get($this->storyId);
             $node = $story->startNode();
-             $message = $node->getMessage();
+
+            $message = $this->checkForFinish(
+                $story,
+                $node->getMessage()
+            );
 
             $status = $this->storyStatusRepository->store(
                 [
@@ -141,19 +151,79 @@ class BrightwoodBotController extends Controller
             );
         }
 
-        $baseMessage = new StoryMessage(
-            0,
-            [
-                $greeting,
-                $isReader ? 'Итак, продолжим...' : 'Итак, начнем...'
-            ]
+        return $message->prependLines(
+            $greeting,
+            $isReader ? 'Итак, продолжим...' : 'Итак, начнем...'
         );
-
-        return $baseMessage->merge($message);
     }
 
     private function nextStep(TelegramUser $tgUser, string $text) : StoryMessage
     {
-        return new StoryMessage(0, ['Ждите... Идет разработка!'], ['Ждать']);
+        $status = $tgUser->storyStatus();
+
+        Assert::notNull($status);
+
+        $story = $this->storyRepository->get($status->storyId);
+
+        $node = $story->getNode($status->stepId);
+
+        /** @var StoryNode|null */
+        $nextNode = null;
+
+        if ($node instanceof ActionNode) {
+            /** @var ActionLink */
+            foreach ($node->links() as $link) {
+                if ($link->action() !== $text) {
+                    continue;
+                }
+
+                $nextNode = $story->getNode(
+                    $link->nodeId()
+                );
+
+                if ($nextNode) {
+                    break;
+                }
+            }
+        } elseif ($node instanceof FinishNode) {
+            if ($this->restartAction === $text) {
+                $nextNode = $story->startNode();
+            }
+        } else {
+            throw new \Exception('Incorrect node type: ' . get_class($node));
+        }
+
+        if ($nextNode) {
+            $message = $nextNode->getMessage();
+
+            $status->stepId = $message->nodeId();
+            $this->storyStatusRepository->save($status);
+
+            return $this->checkForFinish($story, $message);
+        }
+
+        return $this->statusToMessage($status)->prependLines(
+            'Что-что? Повторите-ка... 🧐'
+        );
+    }
+
+    private function statusToMessage(StoryStatus $status) : StoryMessage
+    {
+        $story = $this->storyRepository->get($status->storyId);
+        $node = $story->getNode($status->stepId);
+
+        return $this->checkForFinish(
+            $story,
+            $node->getMessage()
+        );
+    }
+
+    private function checkForFinish(Story $story, StoryMessage $message) : StoryMessage
+    {
+        $messageNode = $story->getNode($message->nodeId());
+
+        return $messageNode->isFinish()
+            ? $message->withActions($this->restartAction)
+            : $message;
     }
 }
