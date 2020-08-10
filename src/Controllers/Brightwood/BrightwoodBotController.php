@@ -94,7 +94,6 @@ class BrightwoodBotController extends Controller
 
                 $result['reply_markup'] = [
                     'keyboard' => [$message->actions()],
-                    'one_time_keyboard' => true,
                     'resize_keyboard' => true
                 ];
             } catch (Exception $ex) {
