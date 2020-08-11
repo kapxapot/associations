@@ -11,17 +11,26 @@ class ActionNode extends LinkedNode
 {
     private ActionLinkCollection $links;
 
+    /**
+     * @param array<int, string> $links NodeId -> Text
+     */
     public function __construct(
         int $id,
         string $text,
-        ActionLink ...$links
+        array $links
     )
     {
         parent::__construct($id, $text);
 
         Assert::notEmpty($links);
 
-        $this->links = ActionLinkCollection::make($links);
+        $this->links = ActionLinkCollection::make(
+            array_map(
+                fn (int $nodeId, string $text) => new ActionLink($nodeId, $text),
+                array_keys($links),
+                $links
+            )
+        );
     }
 
     public function links() : ActionLinkCollection
