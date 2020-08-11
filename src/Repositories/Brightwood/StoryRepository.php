@@ -8,6 +8,7 @@ use App\Models\Brightwood\Links\RedirectLink;
 use App\Models\Brightwood\Nodes\ActionNode;
 use App\Models\Brightwood\Nodes\FinishNode;
 use App\Models\Brightwood\Nodes\RedirectNode;
+use App\Models\Brightwood\Nodes\SkipNode;
 use App\Models\Brightwood\Nodes\StartNode;
 use App\Models\Brightwood\Story;
 use App\Repositories\Brightwood\Interfaces\StoryRepositoryInterface;
@@ -49,35 +50,33 @@ class StoryRepository implements StoryRepositoryInterface
         );
 
         $story->addNode(
-            new FinishNode(
-                2,
-                'Вы умерли от <b>голода</b>. 💀'
-            )
+            new FinishNode(2, 'Вы умерли от <b>голода</b>. 💀')
         );
 
         $story->addNode(
             new RedirectNode(
                 3,
                 'Вы долго бродили по лесу 🌲🌲🌲 в поисках выхода.',
-                new RedirectLink(1, 4),
-                new RedirectLink(4, 1)
+                [
+                    1 => 4,
+                    4 => 1
+                ]
             )
         );
 
         $story->addNode(
-            new FinishNode(
-                4,
-                'Вы нашли дорогу и выбрались из леса. 🎉🎉🎉'
-            )
+            new FinishNode(4, 'Вы нашли дорогу и выбрались из леса. 🎉🎉🎉')
         );
 
         $story->addNode(
             new RedirectNode(
                 5,
                 'Вы сели на пенек, проплакали весь день и уснули. 😴',
-                new RedirectLink(6, 3),
-                new RedirectLink(7, 1),
-                new RedirectLink(2, 1)
+                [
+                    6 => 3,
+                    7 => 1,
+                    2 => 1
+                ]
             )
         );
 
@@ -91,10 +90,10 @@ class StoryRepository implements StoryRepositoryInterface
         );
 
         $story->addNode(
-            new RedirectNode(
+            new SkipNode(
                 7,
-                'Вас разбудила <b>избирательная комиссия</b> 🙍‍♀️🙍‍♀️🙍‍♀️, которой понадобился ваш пенек. 🤔 Вам пришлось уйти.',
-                new RedirectLink(1)
+                'Вас разбудила <b>избирательная комиссия</b> 👩‍👩‍👧‍👧, которой понадобился ваш пенек. 🤔 Вам пришлось уйти.',
+                1
             )
         );
 

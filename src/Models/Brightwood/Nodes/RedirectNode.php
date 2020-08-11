@@ -11,17 +11,26 @@ class RedirectNode extends LinkedNode
 {
     private RedirectLinkCollection $links;
 
+    /**
+     * @param array<int, float|null> $links
+     */
     public function __construct(
         int $id,
         string $text,
-        RedirectLink ...$links
+        array $links
     )
     {
         parent::__construct($id, $text);
 
         Assert::notEmpty($links);
 
-        $this->links = RedirectLinkCollection::make($links);
+        $this->links = RedirectLinkCollection::make(
+            array_map(
+                fn (int $nodeId, ?float $weight) => new RedirectLink($nodeId, $weight),
+                array_keys($links),
+                $links
+            )
+        );
     }
 
     public function links() : RedirectLinkCollection
