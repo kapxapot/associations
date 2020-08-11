@@ -2,7 +2,7 @@
 
 namespace App\Repositories\Brightwood\Interfaces;
 
-use App\Models\Brightwood\Story;
+use App\Models\Brightwood\Stories\Story;
 
 interface StoryRepositoryInterface
 {

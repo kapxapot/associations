@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Models\Brightwood;
+namespace App\Models\Brightwood\Stories;
 
 use App\Collections\Brightwood\StoryNodeCollection;
-use App\Models\Brightwood\Nodes\ActionNode;
 use App\Models\Brightwood\Nodes\StoryNode;
 use Webmozart\Assert\Assert;
 
-class Story
+abstract class Story
 {
     private int $id;
     private StoryNodeCollection $nodes;
@@ -19,6 +18,9 @@ class Story
     {
         $this->id = $id;
         $this->nodes = StoryNodeCollection::empty();
+
+        $this->build();
+        $this->checkIntegrity();
     }
 
     public function id() : int
@@ -30,6 +32,8 @@ class Story
     {
         return $this->nodes;
     }
+
+    abstract protected function build() : void;
 
     /**
      * @return static

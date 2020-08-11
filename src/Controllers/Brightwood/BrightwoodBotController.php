@@ -6,7 +6,7 @@ use App\Controllers\Controller;
 use App\Models\Brightwood\Links\ActionLink;
 use App\Models\Brightwood\Nodes\ActionNode;
 use App\Models\Brightwood\Nodes\FinishNode;
-use App\Models\Brightwood\Story;
+use App\Models\Brightwood\Stories\Story;
 use App\Models\Brightwood\StoryMessage;
 use App\Models\Brightwood\StoryStatus;
 use App\Models\TelegramUser;
@@ -29,7 +29,7 @@ class BrightwoodBotController extends Controller
     private TelegramUserService $telegramUserService;
 
     // temp default
-    private int $storyId = 1;
+    private int $defaultStoryId = 1;
     private string $restartAction = 'Начать заново';
 
     public function __construct(ContainerInterface $container)
@@ -134,7 +134,7 @@ class BrightwoodBotController extends Controller
         if ($status) {
             $message = $this->statusToMessage($status);
         } else {
-            $story = $this->storyRepository->get($this->storyId);
+            $story = $this->storyRepository->get($this->defaultStoryId);
             $node = $story->startNode();
 
             $message = $this->checkForFinish(

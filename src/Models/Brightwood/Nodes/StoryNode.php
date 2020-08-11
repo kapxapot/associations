@@ -2,7 +2,7 @@
 
 namespace App\Models\Brightwood\Nodes;
 
-use App\Models\Brightwood\Story;
+use App\Models\Brightwood\Stories\Story;
 use App\Models\Brightwood\StoryMessage;
 
 abstract class StoryNode
