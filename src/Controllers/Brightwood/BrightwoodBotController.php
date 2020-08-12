@@ -51,7 +51,11 @@ class BrightwoodBotController extends Controller
         $data = $request->getParsedBody();
 
         if (!empty($data)) {
-            $this->logger->info('Got BRIGHTWOOD request', $data);
+            $logEnabled = $this->getSettings('telegram.brightwood_bot_log', false);
+
+            if ($logEnabled === true) {
+                $this->logger->info('Got BRIGHTWOOD request', $data);
+            }
         }
 
         $message = $data['message'] ?? null;

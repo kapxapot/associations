@@ -52,7 +52,11 @@ class TelegramBotController extends Controller
         $data = $request->getParsedBody();
 
         if (!empty($data)) {
-            $this->logger->info('Got request', $data);
+            $logEnabled = $this->getSettings('telegram.bot_log', false);
+
+            if ($logEnabled === true) {
+                $this->logger->info('Got request', $data);
+            }
         }
 
         $message = $data['message'] ?? null;
