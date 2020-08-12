@@ -16,6 +16,7 @@ use App\Services\TelegramUserService;
 use Exception;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
+use Plasticode\Util\Text;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -29,7 +30,7 @@ class BrightwoodBotController extends Controller
     private TelegramUserService $telegramUserService;
 
     // temp default
-    private int $defaultStoryId = 1;
+    private int $defaultStoryId = 2;
     private string $restartAction = 'Начать заново';
 
     public function __construct(ContainerInterface $container)
@@ -95,8 +96,7 @@ class BrightwoodBotController extends Controller
                     ? ['Бот сломался! Почините!']
                     : $message->actions();
 
-                $result['text'] = implode(
-                    PHP_EOL . PHP_EOL,
+                $result['text'] = Text::sparseJoin(
                     $message->lines()
                 );
 
@@ -117,6 +117,21 @@ class BrightwoodBotController extends Controller
     {
         if (strpos($text, '/start') === 0) {
             return $this->startCommand($tgUser);
+        }
+
+        if (preg_match("#^/story\s+(\d+)$#i", $text, $matches)) {
+            $storyId = $matches[1];
+
+            $story = $this->storyRepository->get($storyId);
+
+            if ($story) {
+                return $this->switchToStory($tgUser, $story);
+            }
+
+            return $this->currentStatusMessage(
+                $tgUser,
+                'История с id = ' . $storyId . ' не найдена.'
+            );
         }
 
         return $this->nextStep($tgUser, $text);
@@ -202,9 +217,41 @@ class BrightwoodBotController extends Controller
             return $this->checkForFinish($story, $message);
         }
 
-        return $this->statusToMessage($status)->prependLines(
+        return $this->currentStatusMessage(
+            $tgUser,
             'Что-что? Повторите-ка... 🧐'
         );
+    }
+
+    private function switchToStory(TelegramUser $tgUser, Story $story) : StoryMessage
+    {
+        $node = $story->startNode();
+        $message = $node->getMessage();
+
+        $status = $tgUser->storyStatus();
+
+        Assert::notNull($status);
+
+        $status->storyId = $story->id();
+        $status->stepId = $message->nodeId();
+
+        $this->storyStatusRepository->save($status);
+
+        return $this->checkForFinish($story, $message);
+    }
+
+    private function currentStatusMessage(
+        TelegramUser $tgUser,
+        string ...$prependLines
+    ) : StoryMessage
+    {
+        $status = $tgUser->storyStatus();
+
+        Assert::notNull($status);
+
+        return $this
+            ->statusToMessage($status)
+            ->prependLines(...$prependLines);
     }
 
     private function statusToMessage(StoryStatus $status) : StoryMessage
