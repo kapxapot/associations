@@ -6,6 +6,7 @@ use App\Models\Brightwood\StoryStatus;
 use App\Models\TelegramUser;
 use App\Repositories\Brightwood\Interfaces\StoryStatusRepositoryInterface;
 use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
+use Plasticode\Util\Date;
 
 class StoryStatusRepository extends IdiormRepository implements StoryStatusRepositoryInterface
 {
@@ -27,6 +28,10 @@ class StoryStatusRepository extends IdiormRepository implements StoryStatusRepos
 
     public function save(StoryStatus $storyStatus) : StoryStatus
     {
+        if ($storyStatus->isPersisted()) {
+            $storyStatus->updatedAt = Date::dbNow();
+        }
+
         return $this->saveEntity($storyStatus);
     }
 
