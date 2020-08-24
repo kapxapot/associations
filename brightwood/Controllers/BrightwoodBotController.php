@@ -10,6 +10,7 @@ use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Stories\Story;
 use Brightwood\Models\StoryMessage;
 use Brightwood\Models\StoryStatus;
+use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Plasticode\Controllers\Controller;
@@ -141,9 +142,7 @@ class BrightwoodBotController extends Controller
             $actions = ['Бот сломался! Почините!'];
         }
 
-        $result['text'] = Text::sparseJoin(
-            $message->lines()
-        );
+        $result['text'] = $this->messageToText($tgUser, $message);
 
         $result['reply_markup'] = [
             'keyboard' => [$actions],
@@ -151,6 +150,18 @@ class BrightwoodBotController extends Controller
         ];
 
         return $result;
+    }
+
+    private function messageToText(TelegramUser $tgUser, StoryMessage $message) : string
+    {
+        $parser = new StoryParser($tgUser);
+
+        $lines = array_map(
+            fn (string $line) => $parser->parse($line),
+            $message->lines()
+        );
+
+        return Text::sparseJoin($lines);
     }
 
     private function getAnswer(TelegramUser $tgUser, string $text) : StoryMessage
