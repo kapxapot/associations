@@ -6,8 +6,10 @@ use App\Models\Brightwood\StoryStatus;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
+use Plasticode\Util\Cases;
 
 /**
+ * @property integer|null $genderId
  * @property integer $id
  * @property int|null $userId
  * @property integer $telegramId
@@ -69,5 +71,10 @@ class TelegramUser extends DbModel
     public function isReader() : bool
     {
         return $this->storyStatus() !== null;
+    }
+
+    public function gender() : int
+    {
+        return $this->genderId ?? Cases::MAS;
     }
 }
