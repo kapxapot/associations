@@ -2,7 +2,7 @@
 
 namespace App\Tests\Models;
 
-use App\Repositories\Brightwood\StoryRepository;
+use Brightwood\Repositories\StoryRepository;
 use PHPUnit\Framework\TestCase;
 
 class StoryTest extends TestCase

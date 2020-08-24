@@ -1,7 +1,6 @@
 <?php
 
 use App\Controllers\AssociationController;
-use App\Controllers\Brightwood\BrightwoodBotController;
 use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
 use App\Controllers\IndexController;
@@ -15,6 +14,7 @@ use App\Controllers\TelegramBotController;
 use App\Controllers\TestController;
 use App\Controllers\TurnController;
 use App\Controllers\WordController;
+use Brightwood\Controllers\BrightwoodBotController;
 use Plasticode\Controllers\Auth\AuthController;
 use Plasticode\Controllers\Auth\PasswordController;
 use Plasticode\Controllers\ParserController;
