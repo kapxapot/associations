@@ -78,7 +78,11 @@ class BrightwoodBotController extends Controller
         $chatId = $message['chat']['id'];
         $text = $message['text'] ?? null;
 
-        $tgUser = $this->telegramUserService->getOrCreateTelegramUser($message['from']);
+        $tgUser = $this
+            ->telegramUserService
+            ->getOrCreateTelegramUser(
+                $message['from']
+            );
 
         Assert::true($tgUser->isValid());
 
@@ -93,26 +97,59 @@ class BrightwoodBotController extends Controller
         if (strlen($text) == 0) {
             $result['text'] = '🧾 Я понимаю только сообщения с текстом.';
         } else {
-            try {
-                $message = $this->getAnswer($tgUser, $text);
-
-                $actions = empty($message->actions())
-                    ? ['Бот сломался! Почините!']
-                    : $message->actions();
-
-                $result['text'] = Text::sparseJoin(
-                    $message->lines()
-                );
-
-                $result['reply_markup'] = [
-                    'keyboard' => [$actions],
-                    'resize_keyboard' => true
-                ];
-            } catch (Exception $ex) {
-                $this->logger->error($ex->getMessage());
-                $result['text'] = 'Что-то пошло не так. 😐';
-            }
+            $result = $this->tryParseText($result, $tgUser, $text);
         }
+
+        return $result;
+    }
+
+    /**
+     * @param array<string, mixed> $result
+     * @return array<string, mixed>
+     */
+    private function tryParseText(
+        array $result,
+        TelegramUser $tgUser,
+        string $text
+    ) : array
+    {
+        try {
+            $result = $this->parseText($result, $tgUser, $text);
+        } catch (Exception $ex) {
+            $this->logger->error($ex->getMessage());
+            $result['text'] = 'Что-то пошло не так. 😐';
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array<string, mixed> $result
+     * @return array<string, mixed>
+     * 
+     * @throws \Exception
+     */
+    private function parseText(
+        array $result,
+        TelegramUser $tgUser,
+        string $text
+    ) : array
+    {
+        $message = $this->getAnswer($tgUser, $text);
+        $actions = $message->actions();
+
+        if (empty($actions)) {
+            $actions = ['Бот сломался! Почините!'];
+        }
+
+        $result['text'] = Text::sparseJoin(
+            $message->lines()
+        );
+
+        $result['reply_markup'] = [
+            'keyboard' => [$actions],
+            'resize_keyboard' => true
+        ];
 
         return $result;
     }
