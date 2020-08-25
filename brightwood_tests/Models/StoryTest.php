@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Models;
+namespace Brightwood\Tests\Models;
 
 use Brightwood\Repositories\StoryRepository;
 use PHPUnit\Framework\TestCase;

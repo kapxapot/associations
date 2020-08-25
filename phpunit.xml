@@ -4,10 +4,14 @@
         <testsuite name="Associations">
             <directory>tests</directory>
         </testsuite>
+        <testsuite name="Brightwood">
+            <directory>brightwood_tests</directory>
+        </testsuite>
     </testsuites>
     <filter>
         <whitelist>
             <directory>src</directory>
+            <directory>brightwood</directory>
             <exclude>
                 <directory suffix="Interface.php">.</directory>
             </exclude>

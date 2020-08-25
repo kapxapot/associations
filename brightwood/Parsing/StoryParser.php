@@ -6,16 +6,7 @@ use App\Models\TelegramUser;
 
 class StoryParser
 {
-    private TelegramUser $tgUser;
-
-    public function __construct(
-        TelegramUser $tgUser
-    )
-    {
-        $this->tgUser = $tgUser;
-    }
-
-    public function parse(string $text) : string
+    public function parseFor(TelegramUser $tgUser, string $text) : string
     {
         return $text;
     }

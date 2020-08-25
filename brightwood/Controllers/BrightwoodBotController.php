@@ -29,6 +29,8 @@ class BrightwoodBotController extends Controller
 
     private TelegramUserService $telegramUserService;
 
+    private StoryParser $parser;
+
     // temp default
     private int $defaultStoryId = 2;
     private string $restartAction = 'Начать заново';
@@ -41,6 +43,8 @@ class BrightwoodBotController extends Controller
         $this->storyRepository = $container->storyRepository;
 
         $this->telegramUserService = $container->telegramUserService;
+
+        $this->parser = new StoryParser();
     }
 
     public function __invoke(
@@ -154,10 +158,8 @@ class BrightwoodBotController extends Controller
 
     private function messageToText(TelegramUser $tgUser, StoryMessage $message) : string
     {
-        $parser = new StoryParser($tgUser);
-
         $lines = array_map(
-            fn (string $line) => $parser->parse($line),
+            fn (string $line) => $this->parser->parseFor($tgUser, $line),
             $message->lines()
         );
 

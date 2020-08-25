@@ -69,9 +69,7 @@ use App\Services\WordService;
 use App\Services\YandexDictService;
 use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
-use Brightwood\Hydrators\StoryStatusHydrator;
-use Brightwood\Repositories\StoryRepository;
-use Brightwood\Repositories\StoryStatusRepository;
+use Brightwood\Config\Bootstrap as BrightwoodBootstrap;
 use Plasticode\Config\Bootstrap as BootstrapBase;
 use Plasticode\Config\TagsConfig;
 use Plasticode\Events\EventDispatcher;
@@ -538,21 +536,12 @@ class Bootstrap extends BootstrapBase
 
     private function addBrightwood(array $map) : array
     {
-        $map['storyRepository'] = fn (CI $c) =>
-            new StoryRepository();
+        $brightwoodBootstrap = new BrightwoodBootstrap();
 
-        $map['storyStatusRepository'] = fn (CI $c) =>
-            new StoryStatusRepository(
-                $c->repositoryContext,
-                new ObjectProxy(
-                    fn () =>
-                    new StoryStatusHydrator(
-                        $c->telegramUserRepository
-                    )
-                )
-            );
-
-        return $map;
+        return array_merge(
+            $map,
+            $brightwoodBootstrap->getMappings()
+        );
     }
 
     public function registerEventHandlers(CI $c)
