@@ -12,11 +12,12 @@ class ActionNode extends LinkedNode
     private ActionLinkCollection $links;
 
     /**
+     * @param string[] $text
      * @param array<int, string> $links NodeId -> Text
      */
     public function __construct(
         int $id,
-        string $text,
+        array $text,
         array $links
     )
     {

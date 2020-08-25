@@ -4,9 +4,12 @@ namespace Brightwood\Models\Nodes;
 
 class SkipNode extends RedirectNode
 {
+    /**
+     * @param string[] $text
+     */
     public function __construct(
         int $id,
-        string $text,
+        array $text,
         int $redirectId
     )
     {

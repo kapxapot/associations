@@ -56,4 +56,19 @@ final class StoryParserTest extends TestCase
             $this->parser->parseFor($this->default, $text)
         );
     }
+
+    public function testGenderedText() : void
+    {
+        $text = 'hello, {male|female} friend';
+
+        $this->assertEquals(
+            'hello, male friend',
+            $this->parser->parseFor($this->male, $text)
+        );
+
+        $this->assertEquals(
+            'hello, female friend',
+            $this->parser->parseFor($this->female, $text)
+        );
+    }
 }

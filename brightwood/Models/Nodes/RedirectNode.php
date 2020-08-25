@@ -12,11 +12,12 @@ class RedirectNode extends LinkedNode
     private RedirectLinkCollection $links;
 
     /**
+     * @param string[] $text
      * @param array<int, float|null> $links NodeId -> Weight
      */
     public function __construct(
         int $id,
-        string $text,
+        array $text,
         array $links
     )
     {

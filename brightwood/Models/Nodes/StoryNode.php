@@ -10,11 +10,16 @@ abstract class StoryNode
 {
     protected ?Story $story = null;
     protected int $id;
-    protected string $text;
 
+    /** @var string[] */
+    protected array $text;
+
+    /**
+     * @param string[] $text
+     */
     public function __construct(
         int $id,
-        string $text
+        array $text
     )
     {
         $this->id = $id;
@@ -26,7 +31,10 @@ abstract class StoryNode
         return $this->id;
     }
 
-    public function text() : string
+    /**
+     * @return string[]
+     */
+    public function text() : array
     {
         return $this->text;
     }
@@ -46,7 +54,7 @@ abstract class StoryNode
     {
         return new StoryMessage(
             $this->id,
-            [$this->text]
+            $this->text
         );
     }
 
