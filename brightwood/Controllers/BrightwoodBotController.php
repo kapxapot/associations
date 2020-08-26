@@ -3,12 +3,15 @@
 namespace Brightwood\Controllers;
 
 use App\Models\TelegramUser;
+use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
 use Brightwood\Models\Links\ActionLink;
+use Brightwood\Models\Messages\Interfaces\MessageInterface;
+use Brightwood\Models\Messages\Message;
+use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Stories\Story;
-use Brightwood\Models\StoryMessage;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
@@ -16,6 +19,7 @@ use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Plasticode\Controllers\Controller;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
+use Plasticode\Util\Cases;
 use Plasticode\Util\Text;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -26,6 +30,7 @@ class BrightwoodBotController extends Controller
 {
     private StoryRepositoryInterface $storyRepository;
     private StoryStatusRepositoryInterface $storyStatusRepository;
+    private TelegramUserRepositoryInterface $telegramUserRepository;
 
     private TelegramUserService $telegramUserService;
 
@@ -33,7 +38,11 @@ class BrightwoodBotController extends Controller
 
     // temp default
     private int $defaultStoryId = 2;
+
+    // actions
     private string $restartAction = 'Начать заново';
+    private string $masAction = 'Мальчик 👦';
+    private string $femAction = 'Девочка 👧';
 
     public function __construct(ContainerInterface $container)
     {
@@ -41,6 +50,7 @@ class BrightwoodBotController extends Controller
 
         $this->storyStatusRepository = $container->storyStatusRepository;
         $this->storyRepository = $container->storyRepository;
+        $this->telegramUserRepository = $container->telegramUserRepository;
 
         $this->telegramUserService = $container->telegramUserService;
 
@@ -156,7 +166,7 @@ class BrightwoodBotController extends Controller
         return $result;
     }
 
-    private function messageToText(TelegramUser $tgUser, StoryMessage $message) : string
+    private function messageToText(TelegramUser $tgUser, MessageInterface $message) : string
     {
         $lines = array_map(
             fn (string $line) => $this->parser->parseFor($tgUser, $line),
@@ -166,12 +176,19 @@ class BrightwoodBotController extends Controller
         return Text::sparseJoin($lines);
     }
 
-    private function getAnswer(TelegramUser $tgUser, string $text) : StoryMessage
+    private function getAnswer(TelegramUser $tgUser, string $text) : MessageInterface
     {
+        // start command
         if (strpos($text, '/start') === 0) {
             return $this->startCommand($tgUser);
         }
 
+        // check gender
+        if (!$tgUser->hasGender()) {
+            return $this->readGender($tgUser, $text);
+        }
+
+        // story command
         if (preg_match("#^/story\s+(\d+)$#i", $text, $matches)) {
             $storyId = $matches[1];
 
@@ -187,6 +204,7 @@ class BrightwoodBotController extends Controller
             );
         }
 
+        // default - next step
         return $this->nextStep($tgUser, $text);
     }
 
@@ -198,30 +216,93 @@ class BrightwoodBotController extends Controller
         $greeting = $isReader ? 'С возвращением' : 'Добро пожаловать';
         $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
 
-        if ($status) {
-            $message = $this->statusToMessage($status);
-        } else {
-            $story = $this->storyRepository->get($this->defaultStoryId);
-            $node = $story->startNode();
-
-            $message = $this->checkForFinish(
-                $story,
-                $node->getMessage()
-            );
-
-            $status = $this->storyStatusRepository->store(
-                [
-                    'telegram_user_id' => $tgUser->getId(),
-                    'story_id' => $story->id(),
-                    'step_id' => $message->nodeId(),
-                ]
-            );
-        }
+        $message = $this->getCurrentStoryMessage($tgUser);
 
         return $message->prependLines(
             $greeting,
             $isReader ? 'Итак, продолжим...' : 'Итак, начнем...'
         );
+    }
+
+    private function readGender(TelegramUser $tgUser, string $text) : MessageInterface
+    {
+        /** @var integer|null */
+        $gender = null;
+
+        switch ($text) {
+            case $this->masAction:
+                $gender = Cases::MAS;
+                break;
+
+            case $this->femAction:
+                $gender = Cases::FEM;
+                break;
+        }
+
+        $genderIsOk = ($gender !== null);
+
+        if (!$genderIsOk) {
+            return $this->askGender()->prependLines(
+                'Вы написали что-то не то. 🤔'
+            );
+        }
+
+        $tgUser->genderId = $gender;
+        $this->telegramUserRepository->save($tgUser);
+
+        $msg = $this->parser->parseFor(
+            $tgUser,
+            'Спасибо, {уважаемый 👦|уважаемая 👧}, ваш пол сохранен и теперь будет учитываться. 👌'
+        );
+
+        return $this
+            ->getCurrentStoryMessage($tgUser)
+            ->prependLines($msg);
+    }
+
+    private function askGender() : MessageInterface
+    {
+        return new Message(
+            [
+                'Для корректного текста историй, пожалуйста, укажите ваш <b>пол</b>:'
+            ],
+            [
+                $this->masAction,
+                $this->femAction
+            ]
+        );
+    }
+
+    private function getCurrentStoryMessage(TelegramUser $tgUser) : StoryMessage
+    {
+        $status = $this->getStatus($tgUser);
+
+        if ($status) {
+            return $this->statusToMessage($status);
+        }
+
+        return $this->startStory($tgUser);
+    }
+
+    private function startStory(TelegramUser $tgUser) : StoryMessage
+    {
+        $story = $this->storyRepository->get($this->defaultStoryId);
+        $node = $story->startNode();
+
+        $message = $this->checkForFinish(
+            $story,
+            $node->getMessage()
+        );
+
+        $this->storyStatusRepository->store(
+            [
+                'telegram_user_id' => $tgUser->getId(),
+                'story_id' => $story->id(),
+                'step_id' => $message->nodeId(),
+            ]
+        );
+
+        return $message;
     }
 
     private function nextStep(TelegramUser $tgUser, string $text) : StoryMessage

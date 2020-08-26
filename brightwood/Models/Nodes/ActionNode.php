@@ -4,7 +4,7 @@ namespace Brightwood\Models\Nodes;
 
 use Brightwood\Collections\ActionLinkCollection;
 use Brightwood\Models\Links\ActionLink;
-use Brightwood\Models\StoryMessage;
+use Brightwood\Models\Messages\StoryMessage;
 use Webmozart\Assert\Assert;
 
 class ActionNode extends LinkedNode

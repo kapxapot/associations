@@ -1,16 +1,10 @@
 <?php
 
-namespace Brightwood\Models;
+namespace Brightwood\Models\Messages;
 
-class StoryMessage
+class StoryMessage extends Message
 {
     private int $nodeId;
-
-    /** @var string[] */
-    private array $lines;
-
-    /** @var string[] */
-    private array $actions;
 
     /**
      * @param string[] $lines
@@ -22,30 +16,14 @@ class StoryMessage
         ?array $actions = null
     )
     {
+        parent::__construct($lines, $actions);
+
         $this->nodeId = $nodeId;
-        $this->lines = $lines ?? [];
-        $this->actions = $actions ?? [];
     }
 
     public function nodeId() : int
     {
         return $this->nodeId;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function lines() : array
-    {
-        return $this->lines;
-    }
-
-    /**
-     * @return string[]
-     */
-    public function actions() : array
-    {
-        return $this->actions;
     }
 
     /**

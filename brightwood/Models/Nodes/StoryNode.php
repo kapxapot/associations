@@ -2,8 +2,8 @@
 
 namespace Brightwood\Models\Nodes;
 
+use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Stories\Story;
-use Brightwood\Models\StoryMessage;
 use Webmozart\Assert\Assert;
 
 abstract class StoryNode

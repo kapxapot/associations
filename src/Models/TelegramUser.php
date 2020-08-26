@@ -59,6 +59,14 @@ class TelegramUser extends DbModel
             : $this->username;
     }
 
+    public function hasGender() : bool
+    {
+        return !is_null($this->genderId);
+    }
+
+    /**
+     * Returns gender or default (MAS).
+     */
     public function gender() : int
     {
         return $this->genderId ?? Cases::MAS;

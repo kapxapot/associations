@@ -4,7 +4,7 @@ namespace Brightwood\Models\Nodes;
 
 use Brightwood\Collections\RedirectLinkCollection;
 use Brightwood\Models\Links\RedirectLink;
-use Brightwood\Models\StoryMessage;
+use Brightwood\Models\Messages\StoryMessage;
 use Webmozart\Assert\Assert;
 
 class RedirectNode extends LinkedNode
