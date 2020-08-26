@@ -11,9 +11,9 @@ class InitTelegramUsers extends AbstractMigration
         $table
             ->addColumn('user_id', 'integer', ['null' => true])
             ->addColumn('telegram_id', 'biginteger')
-            ->addColumn('username', 'string', ['limit' => 32, 'null' => true])
-            ->addColumn('first_name', 'string', ['limit' => 64, 'null' => true])
-            ->addColumn('last_name', 'string', ['limit' => 64, 'null' => true])
+            ->addColumn('username', 'text', ['null' => true])
+            ->addColumn('first_name', 'text', ['null' => true])
+            ->addColumn('last_name', 'text', ['null' => true])
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addForeignKey('user_id', 'users', 'id', ['delete' => 'SET NULL', 'update' => 'CASCADE'])
