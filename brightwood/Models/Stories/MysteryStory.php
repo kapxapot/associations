@@ -5,7 +5,6 @@ namespace Brightwood\Models\Stories;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\SkipNode;
-use Plasticode\Util\Text;
 
 class MysteryStory extends Story
 {
