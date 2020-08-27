@@ -208,7 +208,7 @@ class BrightwoodBotController extends Controller
         return $this->nextStep($tgUser, $text);
     }
 
-    private function startCommand(TelegramUser $tgUser) : StoryMessage
+    private function startCommand(TelegramUser $tgUser) : MessageInterface
     {
         $status = $this->getStatus($tgUser);
         $isReader = !is_null($status);
@@ -216,12 +216,15 @@ class BrightwoodBotController extends Controller
         $greeting = $isReader ? 'С возвращением' : 'Добро пожаловать';
         $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
 
-        $message = $this->getCurrentStoryMessage($tgUser);
+        if (!$tgUser->hasGender()) {
+            return $this
+                ->askGender()
+                ->prependLines($greeting);
+        }
 
-        return $message->prependLines(
-            $greeting,
-            $isReader ? 'Итак, продолжим...' : 'Итак, начнем...'
-        );
+        return $this
+            ->startStory($tgUser)
+            ->prependLines($greeting);
     }
 
     private function readGender(TelegramUser $tgUser, string $text) : MessageInterface
@@ -242,9 +245,9 @@ class BrightwoodBotController extends Controller
         $genderIsOk = ($gender !== null);
 
         if (!$genderIsOk) {
-            return $this->askGender()->prependLines(
-                'Вы написали что-то не то. 🤔'
-            );
+            return $this
+                ->askGender()
+                ->prependLines('Вы написали что-то не то. 🤔');
         }
 
         $tgUser->genderId = $gender;
@@ -256,7 +259,7 @@ class BrightwoodBotController extends Controller
         );
 
         return $this
-            ->getCurrentStoryMessage($tgUser)
+            ->startStory($tgUser)
             ->prependLines($msg);
     }
 
@@ -273,19 +276,16 @@ class BrightwoodBotController extends Controller
         );
     }
 
-    private function getCurrentStoryMessage(TelegramUser $tgUser) : StoryMessage
+    private function startStory(TelegramUser $tgUser) : StoryMessage
     {
         $status = $this->getStatus($tgUser);
 
         if ($status) {
-            return $this->statusToMessage($status);
+            return $this
+                ->statusToMessage($status)
+                ->prependLines('Итак, продолжим...');
         }
 
-        return $this->startStory($tgUser);
-    }
-
-    private function startStory(TelegramUser $tgUser) : StoryMessage
-    {
         $story = $this->storyRepository->get($this->defaultStoryId);
         $node = $story->startNode();
 
@@ -302,7 +302,7 @@ class BrightwoodBotController extends Controller
             ]
         );
 
-        return $message;
+        return $message->prependLines('Итак, начнем...');
     }
 
     private function nextStep(TelegramUser $tgUser, string $text) : StoryMessage
