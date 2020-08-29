@@ -2,12 +2,26 @@
 
 namespace Brightwood\Models\Stories;
 
+use Brightwood\Models\Data\MysteryData;
+use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\SkipNode;
 
 class MysteryStory extends Story
 {
+    public function __construct(
+        int $id
+    )
+    {
+        parent::__construct($id, 'Тайная местность');
+    }
+
+    public static function initData() : StoryData
+    {
+        return new MysteryData();
+    }
+
     protected function build() : void
     {
         $this->setStartNode(

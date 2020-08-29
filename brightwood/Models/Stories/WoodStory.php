@@ -2,13 +2,26 @@
 
 namespace Brightwood\Models\Stories;
 
+use Brightwood\Models\Data\WoodData;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\RedirectNode;
 use Brightwood\Models\Nodes\SkipNode;
 
-class DemoStory extends Story
+class WoodStory extends Story
 {
+    public function __construct(
+        int $id
+    )
+    {
+        parent::__construct($id, 'Лес');
+    }
+
+    public static function initData() : WoodData
+    {
+        return new WoodData();
+    }
+
     protected function build() : void
     {
         $this->setStartNode(

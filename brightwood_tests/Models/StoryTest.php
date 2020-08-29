@@ -5,7 +5,7 @@ namespace Brightwood\Tests\Models;
 use Brightwood\Repositories\StoryRepository;
 use PHPUnit\Framework\TestCase;
 
-class StoryTest extends TestCase
+final class StoryTest extends TestCase
 {
     public function testGetMessage() : void
     {

@@ -3,9 +3,9 @@
 namespace Brightwood\Repositories;
 
 use Brightwood\Collections\StoryCollection;
-use Brightwood\Models\Stories\DemoStory;
 use Brightwood\Models\Stories\MysteryStory;
 use Brightwood\Models\Stories\Story;
+use Brightwood\Models\Stories\WoodStory;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 
 /**
@@ -19,7 +19,7 @@ class StoryRepository implements StoryRepositoryInterface
     {
         $this->stories = StoryCollection::make(
             [
-                new DemoStory(1),
+                new WoodStory(1),
                 new MysteryStory(2)
             ]
         );

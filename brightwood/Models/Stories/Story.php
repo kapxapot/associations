@@ -3,20 +3,24 @@
 namespace Brightwood\Models\Stories;
 
 use Brightwood\Collections\StoryNodeCollection;
+use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Nodes\StoryNode;
 use Webmozart\Assert\Assert;
 
 abstract class Story
 {
     private int $id;
+    private string $name;
     private StoryNodeCollection $nodes;
     private ?StoryNode $startNode = null;
 
     public function __construct(
-        int $id
+        int $id,
+        string $name
     )
     {
         $this->id = $id;
+        $this->name = $name;
         $this->nodes = StoryNodeCollection::empty();
 
         $this->build();
@@ -28,10 +32,17 @@ abstract class Story
         return $this->id;
     }
 
+    public function name() : string
+    {
+        return $this->name;
+    }
+
     public function nodes() : StoryNodeCollection
     {
         return $this->nodes;
     }
+
+    abstract public static function initData() : StoryData;
 
     abstract protected function build() : void;
 

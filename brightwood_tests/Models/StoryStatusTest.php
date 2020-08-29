@@ -5,7 +5,7 @@ namespace Brightwood\Tests\Models;
 use Brightwood\Models\StoryStatus;
 use PHPUnit\Framework\TestCase;
 
-class StoryStatusTest extends TestCase
+final class StoryStatusTest extends TestCase
 {
     public function testPluralAlias() : void
     {
