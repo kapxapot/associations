@@ -3,7 +3,6 @@
 namespace Brightwood\Models\Stories;
 
 use Brightwood\Models\Data\MysteryData;
-use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\SkipNode;
@@ -17,7 +16,7 @@ class MysteryStory extends Story
         parent::__construct($id, 'Тайная местность');
     }
 
-    public static function initData() : StoryData
+    public static function initData() : MysteryData
     {
         return new MysteryData();
     }

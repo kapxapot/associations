@@ -3,6 +3,8 @@
 namespace Brightwood\Tests;
 
 use App\Models\TelegramUser;
+use Brightwood\Models\Data\StoryData;
+use Brightwood\Models\Data\WoodData;
 use Brightwood\Parsing\StoryParser;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Util\Cases;
@@ -53,7 +55,7 @@ final class StoryParserTest extends TestCase
 
         $this->assertEquals(
             $text,
-            $this->parser->parseFor($this->default, $text)
+            $this->parser->parse($this->default, $text)
         );
     }
 
@@ -63,12 +65,38 @@ final class StoryParserTest extends TestCase
 
         $this->assertEquals(
             'hello, male friend',
-            $this->parser->parseFor($this->male, $text)
+            $this->parser->parse($this->male, $text)
         );
 
         $this->assertEquals(
             'hello, female friend',
-            $this->parser->parseFor($this->female, $text)
+            $this->parser->parse($this->female, $text)
+        );
+    }
+
+    public function testValidVar() : void
+    {
+        $text = 'День: {day}, Здоровье: {hp}';
+
+        $data = new StoryData();
+        $data->day = 1;
+        $data->hp = 10;
+
+        $this->assertEquals(
+            'День: 1, Здоровье: 10',
+            $this->parser->parse($this->default, $text, $data)
+        );
+    }
+
+    public function testInvalidVar() : void
+    {
+        $text = 'День: {day}, Здоровье: {hp}';
+
+        $data = new StoryData();
+
+        $this->assertEquals(
+            'День: day, Здоровье: hp',
+            $this->parser->parse($this->default, $text, $data)
         );
     }
 }

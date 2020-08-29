@@ -169,7 +169,7 @@ class BrightwoodBotController extends Controller
     private function messageToText(TelegramUser $tgUser, MessageInterface $message) : string
     {
         $lines = array_map(
-            fn (string $line) => $this->parser->parseFor($tgUser, $line),
+            fn (string $line) => $this->parser->parse($tgUser, $line),
             $message->lines()
         );
 
@@ -253,14 +253,11 @@ class BrightwoodBotController extends Controller
         $tgUser->genderId = $gender;
         $this->telegramUserRepository->save($tgUser);
 
-        $msg = $this->parser->parseFor(
-            $tgUser,
-            'Спасибо, {уважаемый 👦|уважаемая 👧}, ваш пол сохранен и теперь будет учитываться. 👌'
-        );
-
         return $this
             ->startStory($tgUser)
-            ->prependLines($msg);
+            ->prependLines(
+                'Спасибо, {уважаемый 👦|уважаемая 👧}, ваш пол сохранен и теперь будет учитываться. 👌'
+            );
     }
 
     private function askGender() : MessageInterface
