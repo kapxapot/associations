@@ -81,7 +81,7 @@ class WoodStory extends Story
                     7 => 1,
                     2 => 1
                 ]
-            ))->withMutator(
+            ))->do(
                 fn (WoodData $d) => $d->nextDay()
             )
         );

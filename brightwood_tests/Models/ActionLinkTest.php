@@ -37,7 +37,7 @@ final class ActionLinkTest extends TestCase
     {
         $link =
             (new ActionLink(0, 'some action'))
-            ->withMutator(
+            ->do(
                 fn (TestData $d) => $d->nextDay()
             );
 
@@ -55,7 +55,7 @@ final class ActionLinkTest extends TestCase
 
         $link =
             (new ActionLink(0, 'some action'))
-            ->withMutator(
+            ->do(
                 fn (TestData $d) => $d->nextDay()
             );
 

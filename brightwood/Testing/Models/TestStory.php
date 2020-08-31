@@ -81,7 +81,7 @@ class TestStory extends Story
                     7 => 1,
                     2 => 1
                 ]
-            ))->withMutator(
+            ))->do(
                 fn (TestData $d) => $d->nextDay()
             )
         );

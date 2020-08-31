@@ -3,9 +3,10 @@
 namespace Brightwood\Models\Links;
 
 use Brightwood\Models\Data\StoryData;
+use Brightwood\Models\Interfaces\ConditionalInterface;
 use Brightwood\Models\Interfaces\MutatorInterface;
 
-abstract class StoryLink implements MutatorInterface
+abstract class StoryLink implements ConditionalInterface, MutatorInterface
 {
     protected int $nodeId;
 
@@ -44,6 +45,16 @@ abstract class StoryLink implements MutatorInterface
     }
 
     /**
+     * Alias for withMutator().
+     * 
+     * @return static
+     */
+    public function do(callable $func) : self
+    {
+        return $this->withMutator($func);
+    }
+
+    /**
      * @return static
      */
     public function withCondition(callable $condition) : self
@@ -59,5 +70,13 @@ abstract class StoryLink implements MutatorInterface
         }
 
         return ($this->condition)($data);
+    }
+
+    /**
+     * Alias for withCondition().
+     */
+    public function if(callable $condition) : self
+    {
+        return $this->withCondition($condition);
     }
 }

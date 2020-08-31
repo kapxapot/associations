@@ -69,6 +69,16 @@ abstract class StoryNode implements MutatorInterface
             : $data;
     }
 
+    /**
+     * Alias for withMutator().
+     * 
+     * @return static
+     */
+    public function do(callable $func) : self
+    {
+        return $this->withMutator($func);
+    }
+
     abstract public function isFinish() : bool;
 
     public function getMessage(?StoryData $data = null) : StoryMessage
