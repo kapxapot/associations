@@ -15,7 +15,7 @@ class WoodData extends StoryData
     public const MAX_HP = 6;
     public const MAX_SHOES = 2;
 
-    public function __construct()
+    protected function init() : void
     {
         $this->day = 1;
         $this->hp = self::MAX_HP;
@@ -51,9 +51,10 @@ class WoodData extends StoryData
     /**
      * Increments the current day.
      */
-    public function nextDay() : void
+    public function nextDay() : self
     {
         $this->day++;
+        return $this;
     }
 
     /**
@@ -63,13 +64,15 @@ class WoodData extends StoryData
      * 
      * @throws InvalidOperationException
      */
-    public function removeShoe() : void
+    public function removeShoe() : self
     {
         if (!$this->hasShoes()) {
             throw new InvalidOperationException('No shows to remove.');
         }
 
         $this->shoes--;
+
+        return $this;
     }
 
     /**
@@ -78,7 +81,7 @@ class WoodData extends StoryData
      * @param int $amount Must be non-negative.
      * @throws \InvalidArgumentException
      */
-    public function hit(int $amount) : void
+    public function hit(int $amount) : self
     {
         Assert::natural($amount);
 
@@ -86,6 +89,8 @@ class WoodData extends StoryData
             $this->hp - $amount,
             0
         );
+
+        return $this;
     }
 
     /**
@@ -96,17 +101,19 @@ class WoodData extends StoryData
      * @param int $amount Must be non-negative int.
      * @throws \InvalidArgumentException
      */
-    public function heal(int $amount) : void
+    public function heal(int $amount) : self
     {
         Assert::natural($amount);
 
         if ($this->isDead()) {
-            return;
+            return $this;
         }
 
         $this->hp = min(
             $this->hp + $amount,
             self::MAX_HP
         );
+
+        return $this;
     }
 }

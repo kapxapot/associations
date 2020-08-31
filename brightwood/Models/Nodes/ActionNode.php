@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Nodes;
 
 use Brightwood\Collections\ActionLinkCollection;
+use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
 use Brightwood\Models\Messages\StoryMessage;
 use Webmozart\Assert\Assert;
@@ -39,10 +40,13 @@ class ActionNode extends LinkedNode
         return $this->links;
     }
 
-    public function getMessage() : StoryMessage
+    public function getMessage(?StoryData $data = null) : StoryMessage
     {
-        return parent::getMessage()->withActions(
-            ...$this->links->actions()
+        $message = parent::getMessage($data);
+        $data = $message->data();
+
+        return $message->withActions(
+            ...$this->links->satisfying($data)->actions()
         );
     }
 

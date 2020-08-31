@@ -3,9 +3,8 @@
 namespace Brightwood\Tests;
 
 use App\Models\TelegramUser;
-use Brightwood\Models\Data\StoryData;
-use Brightwood\Models\Data\WoodData;
 use Brightwood\Parsing\StoryParser;
+use Brightwood\Testing\Models\TestData;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Util\Cases;
 
@@ -76,26 +75,24 @@ final class StoryParserTest extends TestCase
 
     public function testValidVar() : void
     {
-        $text = 'День: {day}, Здоровье: {hp}';
+        $text = 'День: {day}';
 
-        $data = new StoryData();
-        $data->day = 1;
-        $data->hp = 10;
+        $data = new TestData();
 
         $this->assertEquals(
-            'День: 1, Здоровье: 10',
+            'День: 1',
             $this->parser->parse($this->default, $text, $data)
         );
     }
 
     public function testInvalidVar() : void
     {
-        $text = 'День: {day}, Здоровье: {hp}';
+        $text = 'Здоровье: {hp}';
 
-        $data = new StoryData();
+        $data = new TestData();
 
         $this->assertEquals(
-            'День: day, Здоровье: hp',
+            'Здоровье: hp',
             $this->parser->parse($this->default, $text, $data)
         );
     }

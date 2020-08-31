@@ -16,9 +16,9 @@ class MysteryStory extends Story
         parent::__construct($id, 'Тайная местность');
     }
 
-    public static function initData() : MysteryData
+    public function makeData(?array $data = null) : MysteryData
     {
-        return new MysteryData();
+        return new MysteryData($data);
     }
 
     protected function build() : void

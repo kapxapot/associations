@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Messages;
 
+use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 
 class Message implements MessageInterface
@@ -39,6 +40,11 @@ class Message implements MessageInterface
     public function actions() : array
     {
         return $this->actions;
+    }
+
+    public function data() : ?StoryData
+    {
+        return null;
     }
 
     public function prependLines(string ...$lines) : self

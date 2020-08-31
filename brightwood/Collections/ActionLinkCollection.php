@@ -2,6 +2,7 @@
 
 namespace Brightwood\Collections;
 
+use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
 
 class ActionLinkCollection extends StoryLinkCollection

@@ -2,9 +2,13 @@
 
 namespace Brightwood\Models\Messages;
 
+use Brightwood\Models\Data\StoryData;
+
 class StoryMessage extends Message
 {
     private int $nodeId;
+
+    protected ?StoryData $data = null;
 
     /**
      * @param string[] $lines
@@ -26,6 +30,11 @@ class StoryMessage extends Message
         return $this->nodeId;
     }
 
+    public function data() : ?StoryData
+    {
+        return $this->data;
+    }
+
     /**
      * @return static
      */
@@ -34,6 +43,15 @@ class StoryMessage extends Message
         return $this->merge(
             new static($this->nodeId, $lines)
         );
+    }
+
+    /**
+     * @return static
+     */
+    public function withData(?StoryData $data) : self
+    {
+        $this->data = $data;
+        return $this;
     }
 
     /**
@@ -68,13 +86,20 @@ class StoryMessage extends Message
         /** @var string[] */
         $actions = $this->actions;
 
+        $data = $this->data;
+
         /** @var static */
         foreach ($messages as $message) {
             $nodeId = $message->nodeId();
             $lines = array_merge($lines, $message->lines());
             $actions = array_merge($actions, $message->actions());
+
+            if ($message->data()) {
+                $data = $message->data();
+            }
         }
 
-        return new static($nodeId, $lines, $actions);
+        return (new static($nodeId, $lines, $actions))
+            ->withData($data);
     }
 }

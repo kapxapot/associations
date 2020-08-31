@@ -1,14 +1,14 @@
 <?php
 
-namespace Brightwood\Models\Stories;
+namespace Brightwood\Testing\Models;
 
-use Brightwood\Models\Data\WoodData;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\RedirectNode;
 use Brightwood\Models\Nodes\SkipNode;
+use Brightwood\Models\Stories\Story;
 
-class WoodStory extends Story
+class TestStory extends Story
 {
     public function __construct(
         int $id
@@ -17,9 +17,9 @@ class WoodStory extends Story
         parent::__construct($id, 'Лес');
     }
 
-    public function makeData(?array $data = null) : WoodData
+    public function makeData(?array $data = null) : TestData
     {
-        return new WoodData($data);
+        return new TestData($data);
     }
 
     protected function build() : void
@@ -82,7 +82,7 @@ class WoodStory extends Story
                     2 => 1
                 ]
             ))->withMutator(
-                fn (WoodData $d) => $d->nextDay()
+                fn (TestData $d) => $d->nextDay()
             )
         );
 

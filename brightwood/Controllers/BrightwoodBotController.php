@@ -5,12 +5,9 @@ namespace Brightwood\Controllers;
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
-use Brightwood\Models\Links\ActionLink;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\StoryMessage;
-use Brightwood\Models\Nodes\ActionNode;
-use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Stories\Story;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Parsing\StoryParser;
@@ -40,7 +37,6 @@ class BrightwoodBotController extends Controller
     private int $defaultStoryId = 2;
 
     // actions
-    private string $restartAction = 'Начать заново';
     private string $masAction = 'Мальчик 👦';
     private string $femAction = 'Девочка 👧';
 
@@ -169,7 +165,7 @@ class BrightwoodBotController extends Controller
     private function messageToText(TelegramUser $tgUser, MessageInterface $message) : string
     {
         $lines = array_map(
-            fn (string $line) => $this->parser->parse($tgUser, $line),
+            fn (string $line) => $this->parser->parse($tgUser, $line, $message->data()),
             $message->lines()
         );
 
@@ -223,7 +219,7 @@ class BrightwoodBotController extends Controller
         }
 
         return $this
-            ->startStory($tgUser)
+            ->startOrContinueStory($tgUser)
             ->prependLines($greeting);
     }
 
@@ -254,7 +250,7 @@ class BrightwoodBotController extends Controller
         $this->telegramUserRepository->save($tgUser);
 
         return $this
-            ->startStory($tgUser)
+            ->startOrContinueStory($tgUser)
             ->prependLines(
                 'Спасибо, {уважаемый 👦|уважаемая 👧}, ваш пол сохранен и теперь будет учитываться. 👌'
             );
@@ -273,29 +269,42 @@ class BrightwoodBotController extends Controller
         );
     }
 
-    private function startStory(TelegramUser $tgUser) : StoryMessage
+    /**
+     * Starts the default story or continues the current one.
+     */
+    private function startOrContinueStory(TelegramUser $tgUser) : StoryMessage
     {
         $status = $this->getStatus($tgUser);
 
         if ($status) {
-            return $this
-                ->statusToMessage($status)
-                ->prependLines('Итак, продолжим...');
+            return $this->continueStory($status);
         }
 
-        $story = $this->storyRepository->get($this->defaultStoryId);
-        $node = $story->startNode();
-
-        $message = $this->checkForFinish(
-            $story,
-            $node->getMessage()
+        return $this->startStory(
+            $tgUser,
+            $this->defaultStoryId
         );
+    }
+
+    private function continueStory(StoryStatus $status) : StoryMessage
+    {
+        return $this
+            ->statusToMessage($status)
+            ->prependLines('Итак, продолжим...');
+    }
+
+    private function startStory(TelegramUser $tgUser, int $storyId) : StoryMessage
+    {
+        $story = $this->storyRepository->get($storyId);
+
+        $message = $story->start();
 
         $this->storyStatusRepository->store(
             [
                 'telegram_user_id' => $tgUser->getId(),
                 'story_id' => $story->id(),
                 'step_id' => $message->nodeId(),
+                'json_data' => json_encode($message->data())
             ]
         );
 
@@ -309,42 +318,20 @@ class BrightwoodBotController extends Controller
         Assert::notNull($status);
 
         $story = $this->storyRepository->get($status->storyId);
-
         $node = $story->getNode($status->stepId);
 
-        /** @var StoryNode|null */
-        $nextNode = null;
+        Assert::notNull($node);
 
-        if ($node instanceof ActionNode) {
-            /** @var ActionLink */
-            foreach ($node->links() as $link) {
-                if ($link->action() !== $text) {
-                    continue;
-                }
+        $data = $story->makeData($status->data());
+        $message = $story->go($node, $text, $data);
 
-                $nextNode = $story->getNode(
-                    $link->nodeId()
-                );
-
-                if ($nextNode) {
-                    break;
-                }
-            }
-        } elseif ($node instanceof FinishNode) {
-            if ($this->restartAction === $text) {
-                $nextNode = $story->startNode();
-            }
-        } else {
-            throw new \Exception('Incorrect node type: ' . get_class($node));
-        }
-
-        if ($nextNode) {
-            $message = $nextNode->getMessage();
-
+        if ($message) {
             $status->stepId = $message->nodeId();
+            $status->jsonData = json_encode($message->data());
+
             $this->storyStatusRepository->save($status);
 
-            return $this->checkForFinish($story, $message);
+            return $message;
         }
 
         return $this->currentStatusMessage(
@@ -359,14 +346,15 @@ class BrightwoodBotController extends Controller
 
         Assert::notNull($status);
 
-        $message = $story->startNode()->getMessage();
+        $message = $story->start();
 
         $status->storyId = $story->id();
         $status->stepId = $message->nodeId();
+        $status->jsonData = json_encode($message->data());
 
         $this->storyStatusRepository->save($status);
 
-        return $this->checkForFinish($story, $message);
+        return $message;
     }
 
     private function currentStatusMessage(
@@ -387,20 +375,9 @@ class BrightwoodBotController extends Controller
     {
         $story = $this->storyRepository->get($status->storyId);
         $node = $story->getNode($status->stepId);
+        $data = $story->makeData($status->data());
 
-        return $this->checkForFinish(
-            $story,
-            $node->getMessage()
-        );
-    }
-
-    private function checkForFinish(Story $story, StoryMessage $message) : StoryMessage
-    {
-        $messageNode = $story->getNode($message->nodeId());
-
-        return $messageNode->isFinish()
-            ? $message->withActions($this->restartAction)
-            : $message;
+        return $story->renderNode($node, $data);
     }
 
     private function getStatus(TelegramUser $tgUser) : ?StoryStatus

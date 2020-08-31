@@ -2,17 +2,22 @@
 
 namespace Brightwood\Models\Nodes;
 
+use Brightwood\Models\Data\StoryData;
+use Brightwood\Models\Interfaces\MutatorInterface;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Stories\Story;
 use Webmozart\Assert\Assert;
 
-abstract class StoryNode
+abstract class StoryNode implements MutatorInterface
 {
     protected ?Story $story = null;
     protected int $id;
 
     /** @var string[] */
     protected array $text;
+
+    /** @var callable|null */
+    protected $mutator = null;
 
     /**
      * @param string[] $text
@@ -48,13 +53,31 @@ abstract class StoryNode
         return $this;
     }
 
+    /**
+     * @return static
+     */
+    public function withMutator(callable $func) : self
+    {
+        $this->mutator = $func;
+        return $this;
+    }
+
+    public function mutate(?StoryData $data) : ?StoryData
+    {
+        return ($data && $this->mutator)
+            ? ($this->mutator)($data)
+            : $data;
+    }
+
     abstract public function isFinish() : bool;
 
-    public function getMessage() : StoryMessage
+    public function getMessage(?StoryData $data = null) : StoryMessage
     {
-        return new StoryMessage(
+        return (new StoryMessage(
             $this->id,
             $this->text
+        ))->withData(
+            $this->mutate($data)
         );
     }
 
