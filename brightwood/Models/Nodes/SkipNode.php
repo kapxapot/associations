@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Nodes;
 
-class SkipNode extends RedirectNode
+class SkipNode extends SimpleRedirectNode
 {
     /**
      * @param string[] $text

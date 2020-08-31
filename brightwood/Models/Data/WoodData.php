@@ -49,12 +49,13 @@ class WoodData extends StoryData
     }
 
     /**
-     * Increments the current day.
+     * Increments the current day and decrements hp.
      */
     public function nextDay() : self
     {
         $this->day++;
-        return $this;
+
+        return $this->hit(1);
     }
 
     /**

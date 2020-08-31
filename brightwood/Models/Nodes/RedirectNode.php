@@ -14,7 +14,7 @@ class RedirectNode extends LinkedNode
 
     /**
      * @param string[] $text
-     * @param array<int, float|null> $links NodeId -> Weight
+     * @param RedirectLink[] $links
      */
     public function __construct(
         int $id,
@@ -26,13 +26,7 @@ class RedirectNode extends LinkedNode
 
         Assert::notEmpty($links);
 
-        $this->links = RedirectLinkCollection::make(
-            array_map(
-                fn (int $nodeId, ?float $weight) => new RedirectLink($nodeId, $weight),
-                array_keys($links),
-                $links
-            )
-        );
+        $this->links = RedirectLinkCollection::make($links);
     }
 
     public function links() : RedirectLinkCollection

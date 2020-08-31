@@ -3,9 +3,11 @@
 namespace Brightwood\Models\Stories;
 
 use Brightwood\Models\Data\WoodData;
+use Brightwood\Models\Links\RedirectLink;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\RedirectNode;
+use Brightwood\Models\Nodes\SimpleRedirectNode;
 use Brightwood\Models\Nodes\SkipNode;
 
 class WoodStory extends Story
@@ -49,7 +51,7 @@ class WoodStory extends Story
         );
 
         $this->addNode(
-            new RedirectNode(
+            new SimpleRedirectNode(
                 3,
                 [
                     'Вы долго бродили по лесу 🌲🌲🌲 в поисках выхода.'
@@ -77,9 +79,15 @@ class WoodStory extends Story
                     'Вы сели на пенек, проплакали весь день и уснули. 😴'
                 ],
                 [
-                    6 => 3,
-                    7 => 1,
-                    2 => 1
+                    (new RedirectLink(6, 3))->if(
+                        fn (WoodData $d) => $d->isAlive()
+                    ),
+                    (new RedirectLink(7, 1))->if(
+                        fn (WoodData $d) => $d->isAlive()
+                    ),
+                    (new RedirectLink(2, 1))->if(
+                        fn (WoodData $d) => $d->isDead()
+                    )
                 ]
             ))->do(
                 fn (WoodData $d) => $d->nextDay()
