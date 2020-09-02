@@ -9,17 +9,23 @@ use Webmozart\Assert\Assert;
  * @property int $day Current day number.
  * @property int $hp Player's HP.
  * @property int $shoes The number of player's shoes.
+ * @property int $wandered Times the player wandered in search of the exit.
+ * @property int $wanderedToday Times the player wandered this day.
  */
 class WoodData extends StoryData
 {
     public const MAX_HP = 6;
     public const MAX_SHOES = 2;
+    public const WANDERED_ENOUGH = 15;
+    public const MAX_WANDERS_PER_DAY = 3;
 
     protected function init() : void
     {
         $this->day = 1;
         $this->hp = self::MAX_HP;
         $this->shoes = self::MAX_SHOES;
+        $this->wandered = 0;
+        $this->wanderedToday = 0;
     }
 
     /**
@@ -54,6 +60,7 @@ class WoodData extends StoryData
     public function nextDay() : self
     {
         $this->day++;
+        $this->wanderedToday = 0;
 
         return $this->hit(1);
     }
@@ -72,6 +79,16 @@ class WoodData extends StoryData
         }
 
         $this->shoes--;
+
+        return $this;
+    }
+
+    /**
+     * Brutally beats the player to death.
+     */
+    public function kill() : self
+    {
+        $this->hp = 0;
 
         return $this;
     }
@@ -116,5 +133,24 @@ class WoodData extends StoryData
         );
 
         return $this;
+    }
+
+    /**
+     * Wander in the woods.
+     */
+    public function wander() : self
+    {
+        $this->wandered++;
+        $this->wanderedToday;
+
+        return $this;
+    }
+
+    /**
+     * Has the player wandered enough to find the exit.
+     */
+    public function hasWanderedEnough() : bool
+    {
+        return $this->wandered >= self::WANDERED_ENOUGH;
     }
 }
