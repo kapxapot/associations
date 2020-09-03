@@ -18,7 +18,7 @@ class WoodStory extends Story
     private const STUMP_WEEPING = 5;
     private const CLEARING_WAKE_UP = 6;
     private const PUTIN_BITCHES = 7;
-    private const EATEN_BY_BEAR_IN_SLEEP = 8;
+    private const EATEN_IN_SLEEP = 8;
     private const CLEARING = 9;
     private const FELL_IN_PIT = 10;
     private const FOUND_BERRIES = 11;
@@ -126,7 +126,7 @@ class WoodStory extends Story
             new ActionNode(
                 self::FOUND_BERRIES,
                 [
-                    'Вы нашли какие-то неизвестные ягоды. 🍓'
+                    'Вы нашли какие-то неизвестные ягоды. 🍒'
                 ],
                 [
                     self::EAT_BERRIES => 'Есть',
@@ -207,13 +207,13 @@ class WoodStory extends Story
                     'Вы сели на пенек, проплакали весь день и уснули. 😴'
                 ],
                 [
-                    (new RedirectLink(self::CLEARING_WAKE_UP, 4))->if(
+                    (new RedirectLink(self::CLEARING_WAKE_UP, 2))->if(
                         fn (WoodData $d) => $d->isAlive()
                     ),
-                    (new RedirectLink(self::PUTIN_BITCHES, 1))->if(
+                    (new RedirectLink(self::PUTIN_BITCHES, 2))->if(
                         fn (WoodData $d) => $d->isAlive()
                     ),
-                    (new RedirectLink(self::EATEN_BY_BEAR_IN_SLEEP, 1))->if(
+                    (new RedirectLink(self::EATEN_IN_SLEEP, 1))->if(
                         fn (WoodData $d) => $d->isAlive()
                     ),
                     (new RedirectLink(self::STARVED))->if(
@@ -229,7 +229,7 @@ class WoodStory extends Story
             new SkipNode(
                 self::CLEARING_WAKE_UP,
                 [
-                    'Проснувшись, вы осознали, что вы все еще не знаете, где выход из леса. 😕'
+                    'Проснувшись, вы вспомнили, что заблудились в лесу. 😕'
                 ],
                 self::CLEARING
             )
@@ -247,9 +247,9 @@ class WoodStory extends Story
 
         $this->addNode(
             (new FinishNode(
-                self::EATEN_BY_BEAR_IN_SLEEP,
+                self::EATEN_IN_SLEEP,
                 [
-                    'Пока вы спали, пришел <b>медведь</b> 🐻 и съел вас. 💀'
+                    'Пока вы спали, пришли <b>волки</b> 🐺🐺🐺 и съели вас. 💀'
                 ]
             ))->do(
                 fn (WoodData $d) => $d->kill()
