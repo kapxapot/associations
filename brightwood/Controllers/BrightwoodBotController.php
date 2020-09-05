@@ -34,7 +34,7 @@ class BrightwoodBotController extends Controller
     private StoryParser $parser;
 
     // temp default
-    private int $defaultStoryId = 2;
+    private int $defaultStoryId = 1;
 
     // actions
     private string $masAction = 'Мальчик 👦';
