@@ -7,6 +7,7 @@ use Brightwood\Models\Links\RedirectLink;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\RedirectNode;
+use Brightwood\Models\Nodes\SimpleRedirectNode;
 use Brightwood\Models\Nodes\SkipNode;
 
 class WoodStory extends Story
@@ -29,6 +30,16 @@ class WoodStory extends Story
     private const EAT_BERRIES = 16;
     private const EAT_MUSHROOMS = 17;
     private const AIMLESS_WANDER = 18;
+    private const ASSAULT_BEAR = 19;
+    private const CLIMB_TREE = 20;
+    private const RUN_AWAY = 21;
+    private const BEAR_SCARED = 22;
+    private const BEAR_NOT_SCARED = 23;
+    private const TREE_JUMP = 24;
+    private const KICK_BEAR = 25;
+    private const ON_A_TREE = 26;
+    private const KICK_SUCCESS = 27;
+    private const KICK_FAIL = 28;
 
     public function __construct(
         int $id
@@ -86,7 +97,7 @@ class WoodStory extends Story
                     new RedirectLink(self::FELL_IN_PIT),
                     new RedirectLink(self::FOUND_BERRIES),
                     new RedirectLink(self::FOUND_MUSHROOMS),
-                    new RedirectLink(self::MET_BEAR, 0.5),
+                    new RedirectLink(self::MET_BEAR),
                     (new RedirectLink(self::EXIT))->if(
                         fn (WoodData $d) => $d->hasWanderedEnough()
                     )
@@ -279,10 +290,138 @@ class WoodStory extends Story
                 self::MET_BEAR,
                 [
                     'Вы встретили 🐻 <b>медведя</b>. Похоже, он настроен недружелюбно.',
-                    'Ваши действия?'
+                    'Вы можете попытаться напугать зверя, залезть на 🌲 <b>дерево</b> или убежать.'
                 ],
                 [
-                    self::GENERIC_DEATH => '💀 Умереть'
+                    self::ASSAULT_BEAR => 'Напугать',
+                    self::CLIMB_TREE => '🌲 Лезть на дерево',
+                    self::RUN_AWAY => '🏃‍♂️ Убежать'
+                ]
+            )
+        );
+
+        $this->addNode(
+            new SimpleRedirectNode(
+                self::ASSAULT_BEAR,
+                [
+                    'Вы подняли руки вверх и громко зарычали.'
+                ],
+                [
+                    self::BEAR_SCARED => 3,
+                    self::BEAR_NOT_SCARED => 1
+                ]
+            )
+        );
+
+        $this->addNode(
+            new SkipNode(
+                self::BEAR_SCARED,
+                [
+                    'Это сработало! 🐻 <b>медведь</b> убрался восвояси.'
+                ],
+                self::AIMLESS_WANDER
+            )
+        );
+
+        $this->addNode(
+            new ActionNode(
+                self::BEAR_NOT_SCARED,
+                [
+                    'Упс! 🐻 <b>медведь</b> все еще желает вами перекусить.',
+                    'Что будем делать?'
+                ],
+                [
+                    self::CLIMB_TREE => '🌲 Лезть на дерево',
+                    self::RUN_AWAY => '🏃‍♂️ Убежать'
+                ]
+            )
+        );
+
+        $this->addNode(
+            new SkipNode(
+                self::CLIMB_TREE,
+                [
+                    'Лезть на 🌲 <b>дерево</b> от 🐻 <b>медведя</b>? Точно?',
+                    '🐻 <b>медведь</b> полез за вами!'
+                ],
+                self::ON_A_TREE
+            )
+        );
+
+        $this->addNode(
+            new ActionNode(
+                self::ON_A_TREE,
+                [
+                    'Вы можете прыгнуть на другое 🌲 <b>дерево</b> или пнуть 🐻 <b>медведя</b>.'
+                ],
+                [
+                    self::TREE_JUMP => 'Прыгнуть',
+                    self::KICK_BEAR => 'Пнуть'
+                ]
+            )
+        );
+
+        $this->addNode(
+            new SkipNode(
+                self::TREE_JUMP,
+                [
+                    'Вам удалось перепрыгнуть на другое 🌲 <b>дерево</b>, но...',
+                    '🐻 <b>медведь</b> прыгнул за вами! 😮'
+                ],
+                self::ON_A_TREE
+            )
+        );
+
+        $this->addNode(
+            new RedirectNode(
+                self::KICK_BEAR,
+                [
+                    'Вы со всей силы пнули 🐻 <b>медведя</b>.'
+                ],
+                [
+                    (new RedirectLink(self::KICK_SUCCESS))->if(
+                        fn (WoodData $d) => $d->hasShoes()
+                    ),
+                    (new RedirectLink(self::KICK_FAIL))->if(
+                        fn (WoodData $d) => !$d->hasShoes()
+                    )
+                ]
+            )
+        );
+
+        $this->addNode(
+            (new SkipNode(
+                self::KICK_SUCCESS,
+                [
+                    '🐻 <b>медведь</b> схватил ваш 👟 <b>кроссовок</b> и скрылся в подлеске.',
+                    'Спустя несколько минут вы спустились и быстро убежали.'
+                ],
+                self::AIMLESS_WANDER
+            ))->do(
+                fn (WoodData $d) => $d->removeShoe()
+            )
+        );
+
+        $this->addNode(
+            new SkipNode(
+                self::KICK_FAIL,
+                [
+                    'У вас не осталось обуви, поэтому 🐻 <b>медведь</b> схватил вас за ногу и сбросил с 🌲 <b>дерева</b>.'
+                ],
+                self::GENERIC_DEATH
+            )
+        );
+
+        $this->addNode(
+            new ActionNode(
+                self::RUN_AWAY,
+                [
+                    '🐻 <b>медведь</b> бежит за вами.',
+                    'Медведи бегают довольно быстро и очень выносливы...'
+                ],
+                [
+                    self::CLIMB_TREE => '🌲 Лезть на дерево',
+                    self::RUN_AWAY => '🏃‍♂️ Бежать дальше'
                 ]
             )
         );

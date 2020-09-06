@@ -71,7 +71,7 @@ class BrightwoodBotController extends Controller
         $message = $data['message'] ?? null;
 
         $processed = $message
-            ? $this->processMessage($message, $response)
+            ? $this->processIncomingMessage($message, $response)
             : null;
 
         if ($processed) {
@@ -81,7 +81,7 @@ class BrightwoodBotController extends Controller
         throw new BadRequestException();
     }
 
-    private function processMessage(array $message) : ?array
+    private function processIncomingMessage(array $message) : ?array
     {
         $result = [];
 
@@ -146,13 +146,15 @@ class BrightwoodBotController extends Controller
     ) : array
     {
         $message = $this->getAnswer($tgUser, $text);
+        $message = $this->parseMessage($tgUser, $message);
+
         $actions = $message->actions();
 
         if (empty($actions)) {
             $actions = ['Бот сломался! Почините!'];
         }
 
-        $result['text'] = $this->messageToText($tgUser, $message);
+        $result['text'] = $this->messageToText($message);
 
         $result['reply_markup'] = [
             'keyboard' => [$actions],
@@ -162,14 +164,27 @@ class BrightwoodBotController extends Controller
         return $result;
     }
 
-    private function messageToText(TelegramUser $tgUser, MessageInterface $message) : string
+    private function parseMessage(
+        TelegramUser $tgUser,
+        MessageInterface $message
+    ) : MessageInterface
     {
         $lines = array_map(
             fn (string $line) => $this->parser->parse($tgUser, $line, $message->data()),
             $message->lines()
         );
 
-        return Text::sparseJoin($lines);
+        $actions = array_map(
+            fn (string $action) => $this->parser->parse($tgUser, $action, $message->data()),
+            $message->actions()
+        );
+
+        return new Message($lines, $actions);
+    }
+
+    private function messageToText(MessageInterface $message) : string
+    {
+        return Text::sparseJoin($message->lines());
     }
 
     private function getAnswer(TelegramUser $tgUser, string $text) : MessageInterface

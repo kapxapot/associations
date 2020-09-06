@@ -16,7 +16,7 @@ class WoodData extends StoryData
 {
     public const MAX_HP = 6;
     public const MAX_SHOES = 2;
-    public const WANDERED_ENOUGH = 5;
+    public const WANDERED_ENOUGH = 10;
     public const MAX_WANDERS_PER_DAY = 3;
 
     protected function init() : void
