@@ -13,7 +13,7 @@ class MysteryStory extends Story
         int $id
     )
     {
-        parent::__construct($id, 'Тайная местность');
+        parent::__construct($id, '🏰 Тайная местность', true);
     }
 
     public function makeData(?array $data = null) : MysteryData

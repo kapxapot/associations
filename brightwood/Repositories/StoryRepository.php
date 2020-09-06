@@ -31,4 +31,11 @@ class StoryRepository implements StoryRepositoryInterface
             fn (Story $s) => $s->id() == $id
         );
     }
+
+    public function getAllPublished(): StoryCollection
+    {
+        return $this->stories->where(
+            fn (Story $s) => $s->isPublished()
+        );
+    }
 }

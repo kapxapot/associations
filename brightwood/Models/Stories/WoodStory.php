@@ -45,7 +45,7 @@ class WoodStory extends Story
         int $id
     )
     {
-        parent::__construct($id, 'Лес');
+        parent::__construct($id, '🌲 Лес', true);
     }
 
     public function makeData(?array $data = null) : WoodData
@@ -304,7 +304,7 @@ class WoodStory extends Story
             new SimpleRedirectNode(
                 self::ASSAULT_BEAR,
                 [
-                    'Вы подняли руки вверх и громко зарычали.'
+                    'Вы подняли руки вверх и громко зарычали. Точнее, закричали. 😱'
                 ],
                 [
                     self::BEAR_SCARED => 3,

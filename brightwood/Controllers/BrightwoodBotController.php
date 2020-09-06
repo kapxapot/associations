@@ -40,6 +40,8 @@ class BrightwoodBotController extends Controller
     private string $masAction = 'Мальчик 👦';
     private string $femAction = 'Девочка 👧';
 
+    private string $selectStoryAction = '📚 Выбрать историю';
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container->appContext);
@@ -154,6 +156,10 @@ class BrightwoodBotController extends Controller
             $actions = ['Бот сломался! Почините!'];
         }
 
+        if (count($actions) == 1 && $actions[0] == Story::RESTART_ACTION) {
+            $actions[] = $this->selectStoryAction;
+        }
+
         $result['text'] = $this->messageToText($message);
 
         $result['reply_markup'] = [
@@ -199,8 +205,12 @@ class BrightwoodBotController extends Controller
             return $this->readGender($tgUser, $text);
         }
 
+        if ($this->selectStoryAction == $text) {
+            return $this->storySelection();
+        }
+
         // story command
-        if (preg_match("#^/story\s+(\d+)$#i", $text, $matches)) {
+        if (preg_match("#^/story(?:\s+|_)(\d+)$#i", $text, $matches)) {
             $storyId = $matches[1];
 
             $story = $this->storyRepository->get($storyId);
@@ -324,6 +334,31 @@ class BrightwoodBotController extends Controller
         );
 
         return $message->prependLines('Итак, начнем...');
+    }
+
+    public function storySelection() : MessageInterface
+    {
+        $actions = [Story::RESTART_ACTION];
+
+        $stories = $this->storyRepository->getAllPublished();
+
+        if ($stories->isEmpty()) {
+            return new Message(
+                [
+                    'Историй нет. Как вы вообще сюда попали?'
+                ],
+                $actions
+            );
+        }
+
+        $storyLines = $stories->scalarize(
+            fn (Story $s) => '/story_' . $s->id() . ' ' . $s->name()
+        );
+
+        return new Message(
+            $storyLines->toArray(),
+            $actions
+        );
     }
 
     private function nextStep(TelegramUser $tgUser, string $text) : StoryMessage

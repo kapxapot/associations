@@ -13,10 +13,12 @@ use Webmozart\Assert\Assert;
 
 abstract class Story
 {
-    private const RESTART_ACTION = 'Начать заново';
+    public const RESTART_ACTION = '♻ Начать заново';
 
     private int $id;
     private string $name;
+    private bool $published;
+
     private StoryNodeCollection $nodes;
     private ?StoryNode $startNode = null;
 
@@ -24,11 +26,14 @@ abstract class Story
 
     public function __construct(
         int $id,
-        string $name
+        string $name,
+        bool $published = false
     )
     {
         $this->id = $id;
         $this->name = $name;
+        $this->published = $published;
+
         $this->nodes = StoryNodeCollection::empty();
 
         $this->build();
@@ -43,6 +48,11 @@ abstract class Story
     public function name() : string
     {
         return $this->name;
+    }
+
+    public function isPublished() : bool
+    {
+        return $this->published;
     }
 
     public function nodes() : StoryNodeCollection
