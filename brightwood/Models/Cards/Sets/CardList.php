@@ -8,7 +8,7 @@ use Webmozart\Assert\Assert;
 
 class CardList
 {
-    private CardCollection $cards;
+    protected CardCollection $cards;
 
     public function __construct(CardCollection $cards)
     {

@@ -40,6 +40,7 @@ class WoodStory extends Story
     private const ON_A_TREE = 26;
     private const KICK_SUCCESS = 27;
     private const KICK_FAIL = 28;
+    private const GUMMY_BEARS = 29;
 
     public function __construct(
         int $id
@@ -98,6 +99,7 @@ class WoodStory extends Story
                     new RedirectLink(self::FOUND_BERRIES),
                     new RedirectLink(self::FOUND_MUSHROOMS),
                     new RedirectLink(self::MET_BEAR),
+                    new RedirectLink(self::GUMMY_BEARS, 0.3),
                     (new RedirectLink(self::EXIT))->if(
                         fn (WoodData $d) => $d->hasWanderedEnough()
                     )
@@ -295,7 +297,7 @@ class WoodStory extends Story
                 [
                     self::ASSAULT_BEAR => 'Напугать',
                     self::CLIMB_TREE => '🌲 Лезть на дерево',
-                    self::RUN_AWAY => '🏃‍♂️ Убежать'
+                    self::RUN_AWAY => '🏃 Убежать'
                 ]
             )
         );
@@ -332,7 +334,7 @@ class WoodStory extends Story
                 ],
                 [
                     self::CLIMB_TREE => '🌲 Лезть на дерево',
-                    self::RUN_AWAY => '🏃‍♂️ Убежать'
+                    self::RUN_AWAY => '🏃 Убежать'
                 ]
             )
         );
@@ -421,8 +423,21 @@ class WoodStory extends Story
                 ],
                 [
                     self::CLIMB_TREE => '🌲 Лезть на дерево',
-                    self::RUN_AWAY => '🏃‍♂️ Бежать дальше'
+                    self::RUN_AWAY => '🏃 Бежать дальше'
                 ]
+            )
+        );
+
+        $this->addNode(
+            new SkipNode(
+                self::GUMMY_BEARS,
+                [
+                    'Наступив на кочку, вы внезапно улетели в небеса. ☁',
+                    'Вы увидели 🌲 <b>лес</b> как на ладони и узнали, где выход.',
+                    'Упав с большой высоты, вы разбились. 💥',
+                    'Последней вашей мыслью было <i>«Неужели мишки Гамми...»</i> 🤔'
+                ],
+                self::GENERIC_DEATH
             )
         );
     }

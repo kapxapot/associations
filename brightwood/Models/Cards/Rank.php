@@ -104,7 +104,7 @@ class Rank
 
     public static function all() : RankCollection
     {
-        self::$ranks ??= new RankCollection(
+        self::$ranks ??= RankCollection::make(
             [
                 new self(self::ACE, 'A', 'ace', 'туз', 'Т'),
                 new self(self::TWO, 2, 'two', 'двойка'),
@@ -137,7 +137,7 @@ class Rank
 
     public static function three() : self
     {
-        return self::all()->get(self::ACE);
+        return self::all()->get(self::THREE);
     }
 
     public static function four() : self

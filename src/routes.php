@@ -15,6 +15,7 @@ use App\Controllers\TestController;
 use App\Controllers\TurnController;
 use App\Controllers\WordController;
 use Brightwood\Controllers\BrightwoodBotController;
+use Brightwood\Controllers\CardsTestController;
 use Plasticode\Controllers\Auth\AuthController;
 use Plasticode\Controllers\Auth\PasswordController;
 use Plasticode\Controllers\ParserController;
@@ -208,6 +209,11 @@ $app->group(
                 '/test',
                 TestController::class . ':index'
             )->setName('main.test');
+
+            $this->get(
+                '/test/deck',
+                CardsTestController::class . ':deck'
+            );
         }
 
         $this->get('/news/{id:\d+}', NewsController::class . ':get')

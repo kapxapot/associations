@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Collections\WordCollection;
-use App\Events\Feedback\WordFeedbackCreatedEvent;
 use App\Models\Association;
 use App\Models\Word;
 use App\Services\WordService;

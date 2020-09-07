@@ -66,7 +66,7 @@ class Suit
 
     public static function all() : SuitCollection
     {
-        self::$suits ??= new SuitCollection(
+        self::$suits ??= SuitCollection::make(
             [
                 new self(self::SPADES, '♠', 'spades', 'пики', 'пик'),
                 new self(self::CLUBS, '♣', 'clubs', 'трефы', 'треф'),

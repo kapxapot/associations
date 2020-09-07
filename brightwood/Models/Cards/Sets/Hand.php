@@ -35,16 +35,23 @@ class Hand
     }
 
     /**
+     * Removes the card from the hand.
+     * If the card is absent, throws {@see \InvalidArgumentException}.
+     * 
      * @throws \InvalidArgumentException
      */
     public function remove(Card $card) : self
     {
-        $foundCards = $this->cards->where(
+        Assert::true(
+            $this->cards->any(
+                fn (Card $c) => $c->equals($card)
+            )
+        );
+
+        $this->cards = $this->cards->removeFirst(
             fn (Card $c) => $c->equals($card)
         );
 
-        Assert::notEmpty($foundCards);
-
-        
+        return $this;
     }
 }

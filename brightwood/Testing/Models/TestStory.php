@@ -4,7 +4,7 @@ namespace Brightwood\Testing\Models;
 
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
-use Brightwood\Models\Nodes\RedirectNode;
+use Brightwood\Models\Nodes\SimpleRedirectNode;
 use Brightwood\Models\Nodes\SkipNode;
 use Brightwood\Models\Stories\Story;
 
@@ -49,7 +49,7 @@ class TestStory extends Story
         );
 
         $this->addNode(
-            new RedirectNode(
+            new SimpleRedirectNode(
                 3,
                 [
                     'Вы долго бродили по лесу 🌲🌲🌲 в поисках выхода.'
@@ -71,7 +71,7 @@ class TestStory extends Story
         );
 
         $this->addNode(
-            (new RedirectNode(
+            (new SimpleRedirectNode(
                 5,
                 [
                     'Вы сели на пенек, проплакали весь день и уснули. 😴'
