@@ -2,40 +2,16 @@
 
 namespace Brightwood\Models\Cards\Sets;
 
-use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Webmozart\Assert\Assert;
 
-class Hand
+/**
+ * An extendable card list that allows removing cards (by 1).
+ */
+final class Hand extends ExtendableCardList
 {
-    private CardCollection $cards;
-
-    public function __construct(CardCollection $cards)
-    {
-        $this->cards = $cards;
-    }
-
-    public function cards() : CardCollection
-    {
-        return $this->cards;
-    }
-
-    public function add(Card $card) : self
-    {
-        $this->cards = $this->cards->add($card);
-
-        return $this;
-    }
-
-    public function addMany(CardCollection $newCards) : self
-    {
-        $this->cards = $this->cards->concat($newCards);
-
-        return $this;
-    }
-
     /**
-     * Removes the card from the hand.
+     * Removes the card from the set.
      * If the card is absent, throws {@see \InvalidArgumentException}.
      * 
      * @throws \InvalidArgumentException

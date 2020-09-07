@@ -3,16 +3,17 @@
 namespace Brightwood\Models\Cards\Sets;
 
 use Brightwood\Collections\Cards\CardCollection;
-use Brightwood\Models\Cards\Card;
-use Webmozart\Assert\Assert;
 
-class CardList
+/**
+ * Just a bunch of cards.
+ */
+abstract class CardList
 {
     protected CardCollection $cards;
 
-    public function __construct(CardCollection $cards)
+    public function __construct(?CardCollection $cards = null)
     {
-        $this->cards = $cards;
+        $this->cards = $cards ?? CardCollection::empty();
     }
 
     public function cards() : CardCollection
@@ -20,46 +21,23 @@ class CardList
         return $this->cards;
     }
 
-    /**
-     * @return static
-     */
-    public function shuffle() : self
-    {
-        $this->cards = $this->cards->shuffle();
-
-        return $this;
-    }
-
     public function size() : int
     {
         return $this->cards->count();
     }
 
-    public function draw() : ?Card
+    public function isEmpty() : bool
     {
-        return $this->drawMany(1)->first();
+        return $this->size() == 0;
     }
 
-    /**
-     * @throws \InvalidArgumentException
-     */
-    public function drawMany(int $count) : CardCollection
+    public function __toString()
     {
-        Assert::greaterThan($count, 0);
-
-        $drawn = $this->cards->take($count);
-        $this->cards = $this->cards->skip($count);
-
-        return $drawn;
+        return $this->toString();
     }
 
-    /**
-     * @return static
-     */
-    public function reverse() : self
+    public function toString() : string
     {
-        $this->cards = $this->cards->reverse();
-
-        return $this;
+        return $this->cards->toString();
     }
 }
