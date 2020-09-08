@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Cards\Sets;
 
 use Brightwood\Collections\Cards\CardCollection;
+use Brightwood\Models\Cards\Card;
 
 /**
  * Just a bunch of cards.
@@ -29,6 +30,11 @@ abstract class CardList
     public function isEmpty() : bool
     {
         return $this->size() == 0;
+    }
+
+    public function contains(Card $card) : bool
+    {
+        return $this->cards->contains($card);
     }
 
     public function __toString()

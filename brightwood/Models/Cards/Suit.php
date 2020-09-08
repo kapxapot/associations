@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\SuitCollection;
+use Webmozart\Assert\Assert;
 
 class Suit
 {
@@ -59,9 +60,9 @@ class Suit
         return $this->nameRuGen;
     }
 
-    public function equals(self $suit) : bool
+    public function equals(?self $suit) : bool
     {
-        return $this->id() == $suit->id();
+        return $suit && ($this->id() == $suit->id());
     }
 
     public static function all() : SuitCollection
@@ -96,5 +97,15 @@ class Suit
     public static function diamonds() : self
     {
         return self::all()->get(self::DIAMONDS);
+    }
+
+    /**
+     * Tries to parse suit. If not successful, returns null.
+     */
+    public static function tryParse(?string $str) : ?self
+    {
+        return self::all()->first(
+            fn (self $s) => $s->symbol == $str
+        );
     }
 }

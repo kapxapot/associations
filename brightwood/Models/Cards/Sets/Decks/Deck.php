@@ -5,8 +5,6 @@ namespace Brightwood\Models\Cards\Sets\Decks;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Sets\CardList;
-use Brightwood\Models\Cards\Sets\ExtendableCardList;
-use Brightwood\Models\Cards\Sets\Pile;
 use Webmozart\Assert\Assert;
 
 /**
@@ -21,6 +19,8 @@ abstract class Deck extends CardList
         parent::__construct(
             $this->build()
         );
+
+        Assert::false($this->isEmpty());
 
         if ($shuffle) {
             $this->shuffle();
@@ -40,54 +40,26 @@ abstract class Deck extends CardList
     }
 
     /**
-     * Tries to deal $amount cards to every hand.
-     * If there is not enough cards in deck or the amount isn't specified, deals all cards.
-     * 
-     * @param ExtendableCardList[] $hands
-     * @return static
-     */
-    public function deal(array $hands, ?int $amount = null) : self
-    {
-        Assert::notEmpty($hands);
-
-        $dealed = 0;
-        $amount ??= $this->size(); // in case of null deal all deck
-
-        while ($dealed < $amount) {
-            foreach ($hands as $hand) {
-                $card = $this->draw();
-
-                if (!$card) {
-                    break;
-                }
-
-                $hand->add($card);
-            }
-
-            if ($this->isEmpty()) {
-                break;
-            }
-
-            $dealed++;
-        }
-
-        return $this;
-    }
-
-    /**
      * Removes first card from deck and returns it.
      * Returns null in case of empty deck.
      */
-    private function draw() : ?Card
+    public function draw() : ?Card
     {
-        $card = $this->cards->first();
-        $this->cards = $this->cards->skip(1);
-
-        return $card;
+        return $this->drawMany(1)->first();
     }
 
-    public function toPile() : Pile
+    /**
+     * Removes up to $amount first cards from deck and returns them.
+     * 
+     * @throws \InvalidArgumentException
+     */
+    public function drawMany(int $amount) : CardCollection
     {
-        return new Pile($this->cards);
+        Assert::greaterThan($amount, 0);
+
+        $taken = $this->cards->take($amount);
+        $this->cards = $this->cards->skip($amount);
+
+        return $taken;
     }
 }

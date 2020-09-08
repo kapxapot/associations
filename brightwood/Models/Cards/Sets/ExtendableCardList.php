@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Cards\Sets;
 
+use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 
 /**
@@ -16,11 +17,9 @@ abstract class ExtendableCardList extends CardList
         return $this;
     }
 
-    public function merge(CardList $list) : self
+    public function addMany(CardCollection $cards) : self
     {
-        $this->cards = $this->cards->concat(
-            $list->cards()
-        );
+        $this->cards = $this->cards->concat($cards);
 
         return $this;
     }

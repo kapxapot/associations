@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\RankCollection;
+use Webmozart\Assert\Assert;
 
 class Rank
 {
@@ -97,9 +98,9 @@ class Rank
         return $this->valueRu;
     }
 
-    public function equals(self $rank) : bool
+    public function equals(?self $rank) : bool
     {
-        return $this->id() == $rank->id();
+        return $rank && ($this->id() == $rank->id());
     }
 
     public static function all() : RankCollection
@@ -188,5 +189,15 @@ class Rank
     public static function king() : self
     {
         return self::all()->get(self::KING);
+    }
+
+    /**
+     * Tries to parse rank. If not successful, returns null.
+     */
+    public static function tryParse(?string $str) : ?self
+    {
+        return self::all()->first(
+            fn (self $r) => $r->code === $str || (string)$r->value === $str
+        );
     }
 }

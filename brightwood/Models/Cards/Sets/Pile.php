@@ -2,49 +2,48 @@
 
 namespace Brightwood\Models\Cards\Sets;
 
+use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Webmozart\Assert\Assert;
 
 /**
  * A stack of cards that allows to put and take cards.
+ * Starts empty.
  */
 final class Pile extends ExtendableCardList
 {
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
     public function take() : ?Card
     {
-        return $this->takeMany(1)->cards()->first();
+        return $this->takeMany(1)->first();
     }
 
     /**
      * @throws \InvalidArgumentException
      */
-    public function takeMany(int $count) : CardList
+    public function takeMany(int $amount) : CardCollection
     {
-        Assert::greaterThan($count, 0);
+        Assert::greaterThan($amount, 0);
 
-        $taken = $this->cards->take(-$count);
-        $this->cards = $this->cards->skip(-$count);
+        $taken = $this->cards->tail($amount);
+        $this->cards = $this->cards->trimTail($amount);
 
-        return new CardList($taken);
+        return $taken;
     }
 
-    public function put(Card $card) : self
-    {
-        return $this->add($card);
-    }
-
-    public function putMany(CardList $list) : self
-    {
-        return $this->merge($list);
-    }
-
-    /**
-     * @return static
-     */
     public function flip() : self
     {
         $this->cards = $this->cards->reverse();
 
         return $this;
+    }
+
+    public function toString(): string
+    {
+        return $this->cards->reverse()->toString();
     }
 }

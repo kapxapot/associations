@@ -9,6 +9,13 @@ class CardCollection extends TypedCollection
 {
     protected string $class = Card::class;
 
+    public function contains(Card $card) : bool
+    {
+        return $this->anyFirst(
+            fn (Card $c) => $c->equals($card)
+        );
+    }
+
     public function __toString()
     {
         return $this->toString();

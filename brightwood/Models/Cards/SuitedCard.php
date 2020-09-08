@@ -2,6 +2,8 @@
 
 namespace Brightwood\Models\Cards;
 
+use Webmozart\Assert\Assert;
+
 class SuitedCard extends Card
 {
     private Suit $suit;
@@ -71,5 +73,29 @@ class SuitedCard extends Card
         return
             $this->suit->equals($card->suit())
             && $this->rank->equals($card->rank());
+    }
+
+    /**
+     * Tries to parse suited card. If unsuccessful, returns null.
+     * 
+     * ♥8
+     */
+    public static function tryParse(?string $str) : ?self
+    {
+        if (mb_strlen($str) < 2) {
+            return null;
+        }
+
+        $suitStr = mb_substr($str, 0, 1);
+        $rankStr = mb_substr($str, 1);
+
+        $suit = Suit::tryParse($suitStr);
+        $rank = Rank::tryParse($rankStr);
+
+        if (is_null($suit) || is_null($rank)) {
+            return null;
+        }
+
+        return new self($suit, $rank);
     }
 }

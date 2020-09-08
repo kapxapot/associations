@@ -2,10 +2,12 @@
 
 namespace Brightwood\Controllers;
 
-use Brightwood\Models\Cards\Card;
+use Brightwood\Collections\Cards\PlayerCollection;
+use Brightwood\Models\Cards\Games\CardGame;
+use Brightwood\Models\Cards\Players\Bot;
+use Brightwood\Models\Cards\Players\Player;
+use Brightwood\Models\Cards\Sets\CardList;
 use Brightwood\Models\Cards\Sets\Decks\FullDeck;
-use Brightwood\Models\Cards\Sets\Hand;
-use Brightwood\Models\Cards\Sets\Pile;
 use Plasticode\Core\Response;
 use Plasticode\Util\Text;
 use Psr\Http\Message\ResponseInterface;
@@ -18,43 +20,70 @@ class CardsTestController
         ResponseInterface $response
     )
     {
-        $deck = new FullDeck();
+        $bot1 = new Bot('Bot1');
+        $bot2 = new Bot('Bot2');
 
-        $lines = [
-            '<b>Deck:</b>',
-            $deck->toString()
-        ];
-
-        $player1 = new Hand();
-        $dealer = new Hand();
-
-        $deck->deal([$player1, $dealer], 7);
-
-        $discardPile = new Pile();
-        $deck->deal([$discardPile], 1);
-
-        $stockPile = $deck->toPile();
-
-        $lines = [
-            ...$lines,
-            '<b>Player1\'s hand:</b>',
-            $player1->toString(),
-            '<b>Dealer\'s hand:</b>',
-            $dealer->toString(),
-            '<b>Discard pile:</b>',
-            $discardPile->toString(),
-            '<b>Stockpile:</b>',
-            $stockPile->toString()
-        ];
-
-        $lines = array_map(
-            fn ($l) => '<div>' . $l . '</div>',
-            $lines
+        $game = new CardGame(
+            new FullDeck(),
+            PlayerCollection::make([$bot1, $bot2])
         );
+
+        $lines = [
+            $this->cardsStr($game->deck(), 'Starting deck')
+        ];
+
+        $lines[] = $this->wrap(
+            'Dealing 7 cards to every player, drawing 1 card to discard...'
+        );
+
+        $game->deal(7);
+        $game->drawToDiscard();
+        $lines = array_merge($lines, $this->status($game));
+
+        $lines[] = $this->wrap('One card from deck to discard...');
+        $game->drawToDiscard();
+        $lines = array_merge($lines, $this->status($game));
+
+        $lines[] = $this->wrap('Bot1 draws 2 cards from deck...');
+        $game->drawToHand($bot1, 2);
+        $lines = array_merge($lines, $this->status($game));
+
+        $lines[] = $this->wrap('Bot2 takes 1 card from discard...');
+        $game->takeFromDiscard($bot2);
+        $lines = array_merge($lines, $this->status($game));
 
         return Response::text(
             $response,
             Text::join($lines)
         );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function status(CardGame $game) : array
+    {
+        return [
+            ...$game
+                ->players()
+                ->map(
+                    fn (Player $p) => $this->cardsStr($p->hand(), $p->name() . '\'s hand')
+                )
+                ->toArray(),
+            $this->cardsStr($game->discard(), 'Discard pile'),
+            $this->cardsStr($game->deck(), 'Deck'),
+        ];
+    }
+
+    private function cardsStr(CardList $list, string $label) : string
+    {
+        return $this->wrap(
+            '<b>' . $label . ' (' . $list->size() . '):</b><br/>' . $list
+        );
+    }
+
+    private function wrap(string $line) : string
+    {
+        return '<div>' . $line . '</div><br />';
     }
 }
