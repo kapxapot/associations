@@ -98,4 +98,18 @@ class SuitedCard extends Card
 
         return new self($suit, $rank);
     }
+
+    public function isSameSuit(self $card) : bool
+    {
+        return $this->suit->equals(
+            $card->suit()
+        );
+    }
+
+    public function isSameRank(self $card) : bool
+    {
+        return $this->rank->equals(
+            $card->rank()
+        );
+    }
 }

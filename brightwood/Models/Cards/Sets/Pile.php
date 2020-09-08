@@ -17,6 +17,11 @@ final class Pile extends ExtendableCardList
         parent::__construct();
     }
 
+    public function top() : ?Card
+    {
+        return $this->cards->last();
+    }
+
     public function take() : ?Card
     {
         return $this->takeMany(1)->first();

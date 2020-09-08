@@ -20,4 +20,9 @@ abstract class Card
     abstract public function fullName(?string $lang = null) : string;
 
     abstract public function equals(?Card $card) : bool;
+
+    public static function is(self $card) : bool
+    {
+        return $card instanceof static;
+    }
 }

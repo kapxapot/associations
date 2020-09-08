@@ -18,10 +18,11 @@ class CardGame
     protected Pile $trash;
 
     protected PlayerCollection $players;
+    protected array $nextPlayers;
 
     public function __construct(
         Deck $deck,
-        PlayerCollection $players
+        Player ...$players
     )
     {
         Assert::notEmpty($players);
@@ -30,7 +31,30 @@ class CardGame
         $this->discard = new Pile();
         $this->trash = new Pile();
 
-        $this->players = $players;
+        $this->players = PlayerCollection::make($players);
+
+        $this->initNextPlayers();
+    }
+
+    private function initNextPlayers()
+    {
+        /** @var Player|null */
+        $prev = null;
+
+        foreach ($this->players as $player) {
+            if ($prev) {
+                $this->nextPlayers[$prev->id()] = $player;
+            }
+
+            $prev = $player;
+        }
+
+        $this->nextPlayers[$prev->id()] = $this->players->first();
+    }
+
+    protected function nextPlayer(Player $player) : Player
+    {
+        return $this->nextPlayers[$player->id()];
     }
 
     public function deck() : CardList
@@ -73,6 +97,13 @@ class CardGame
         return $this->discardSize() == 0;
     }
 
+    protected function isValidPlayer(Player $player) : bool
+    {
+        return $this->players->any(
+            fn (Player $p) => $p->equals($player)
+        );
+    }
+
     /**
      * Tries to deal $amount cards to every player.
      * If there is not enough cards in deck or the amount = 0, deals all cards.
@@ -108,6 +139,7 @@ class CardGame
      */
     public function drawToHand(Player $player, int $amount = 1) : CardCollection
     {
+        Assert::true($this->isValidPlayer($player));
         Assert::false($this->isDeckEmpty());
 
         $drawn = $this->deck->drawMany($amount);
@@ -137,6 +169,7 @@ class CardGame
      */
     public function takeFromDiscard(Player $player, int $amount = 1) : CardCollection
     {
+        Assert::true($this->isValidPlayer($player));
         Assert::false($this->isDiscardEmpty());
 
         $taken = $this->discard->takeMany($amount);
@@ -153,6 +186,7 @@ class CardGame
      */
     public function discardFromHand(Player $player, Card $card) : void
     {
+        Assert::true($this->isValidPlayer($player));
         Assert::true($player->hasCard($card));
 
         $player->removeCard($card);
@@ -164,6 +198,7 @@ class CardGame
      */
     public function trashFromHand(Player $player, Card $card) : void
     {
+        Assert::true($this->isValidPlayer($player));
         Assert::true($player->hasCard($card));
 
         $player->removeCard($card);

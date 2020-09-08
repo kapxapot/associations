@@ -2,7 +2,6 @@
 
 namespace Brightwood\Controllers;
 
-use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\Player;
@@ -25,7 +24,8 @@ class CardsTestController
 
         $game = new CardGame(
             new TestDeck(false),
-            PlayerCollection::make([$bot1, $bot2])
+            $bot1,
+            $bot2
         );
 
         $lines = [

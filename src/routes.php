@@ -16,6 +16,7 @@ use App\Controllers\TurnController;
 use App\Controllers\WordController;
 use Brightwood\Controllers\BrightwoodBotController;
 use Brightwood\Controllers\CardsTestController;
+use Brightwood\Controllers\EightsTestController;
 use Plasticode\Controllers\Auth\AuthController;
 use Plasticode\Controllers\Auth\PasswordController;
 use Plasticode\Controllers\ParserController;
@@ -213,6 +214,11 @@ $app->group(
             $this->get(
                 '/test/deck',
                 CardsTestController::class . ':deck'
+            );
+
+            $this->get(
+                '/test/eights',
+                EightsTestController::class . ':play'
             );
         }
 
