@@ -7,7 +7,7 @@ use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Sets\CardList;
-use Brightwood\Models\Cards\Sets\Decks\FullDeck;
+use Brightwood\Testing\Models\TestDeck;
 use Plasticode\Core\Response;
 use Plasticode\Util\Text;
 use Psr\Http\Message\ResponseInterface;
@@ -24,7 +24,7 @@ class CardsTestController
         $bot2 = new Bot('Bot2');
 
         $game = new CardGame(
-            new FullDeck(),
+            new TestDeck(false),
             PlayerCollection::make([$bot1, $bot2])
         );
 
@@ -33,10 +33,10 @@ class CardsTestController
         ];
 
         $lines[] = $this->wrap(
-            'Dealing 7 cards to every player, drawing 1 card to discard...'
+            'Dealing 3 cards to every player, drawing 1 card to discard...'
         );
 
-        $game->deal(7);
+        $game->deal(3);
         $game->drawToDiscard();
         $lines = array_merge($lines, $this->status($game));
 

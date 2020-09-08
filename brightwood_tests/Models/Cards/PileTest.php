@@ -5,7 +5,6 @@ namespace Brightwood\Tests\Models\Cards;
 use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Models\Cards\SuitedCard;
 use PHPUnit\Framework\TestCase;
-use Plasticode\Collections\Basic\Collection;
 
 final class PileTest extends TestCase
 {
