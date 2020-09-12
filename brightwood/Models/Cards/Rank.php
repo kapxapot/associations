@@ -3,9 +3,9 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\RankCollection;
-use Webmozart\Assert\Assert;
+use Brightwood\Models\Interfaces\EquatableInterface;
 
-class Rank
+class Rank implements EquatableInterface
 {
     private const ACE = 1;
     private const TWO = 2;
@@ -98,9 +98,12 @@ class Rank
         return $this->valueRu;
     }
 
-    public function equals(?self $rank) : bool
+    /**
+     * @param self|null $obj
+     */
+    public function equals(?EquatableInterface $obj) : bool
     {
-        return $rank && ($this->id() == $rank->id());
+        return $obj && ($this->id() == $obj->id());
     }
 
     public static function all() : RankCollection

@@ -3,9 +3,9 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\SuitCollection;
-use Webmozart\Assert\Assert;
+use Brightwood\Models\Interfaces\EquatableInterface;
 
-class Suit
+class Suit implements EquatableInterface
 {
     private const SPADES = 1;
     private const CLUBS = 2;
@@ -60,9 +60,12 @@ class Suit
         return $this->nameRuGen;
     }
 
-    public function equals(?self $suit) : bool
+    /**
+     * @param self|null $obj
+     */
+    public function equals(?EquatableInterface $obj) : bool
     {
-        return $suit && ($this->id() == $suit->id());
+        return $obj && ($this->id() == $obj->id());
     }
 
     public static function all() : SuitCollection

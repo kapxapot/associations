@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Interfaces\GenderedInterface;
+use App\Models\Interfaces\NamedInterface;
 use Plasticode\Models\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
@@ -18,7 +20,7 @@ use Plasticode\Util\Cases;
  * @method User|null user()
  * @method static withUser(User|callable|null $user)
  */
-class TelegramUser extends DbModel
+class TelegramUser extends DbModel implements GenderedInterface, NamedInterface
 {
     use CreatedAt;
     use UpdatedAt;
@@ -64,11 +66,20 @@ class TelegramUser extends DbModel
         return !is_null($this->genderId);
     }
 
+    // GenderedInterface
+
     /**
      * Returns gender or default (MAS).
      */
     public function gender() : int
     {
         return $this->genderId ?? Cases::MAS;
+    }
+
+    // NamedInterface
+
+    public function name() : string
+    {
+        return $this->publicName();
     }
 }

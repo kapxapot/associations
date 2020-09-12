@@ -6,12 +6,12 @@ use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Players\Player;
-use Brightwood\Models\Cards\Sets\CardList;
 use Brightwood\Models\Cards\Sets\Decks\Deck;
 use Brightwood\Models\Cards\Sets\Pile;
+use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Webmozart\Assert\Assert;
 
-class CardGame
+abstract class CardGame
 {
     protected Deck $deck;
     protected Pile $discard;
@@ -19,6 +19,9 @@ class CardGame
 
     protected PlayerCollection $players;
     protected array $nextPlayers;
+
+    protected Player $starter;
+    protected bool $started = false;
 
     public function __construct(
         Deck $deck,
@@ -33,11 +36,48 @@ class CardGame
 
         $this->players = PlayerCollection::make($players);
 
+        Assert::true($this->isValidPlayerCount());
+
+        $this->starter = $this->players->first();
+
         $this->initNextPlayers();
     }
 
+    private function isValidPlayerCount() : bool
+    {
+        $count = $this->players->count();
+
+        return $count >= static::minPlayers()
+            && $count <= static::maxPlayers();
+    }
+
+    /**
+     * Override this if needed.
+     */
+    public static function minPlayers() : int
+    {
+        return 2;
+    }
+
+    /**
+     * Provide this number in the *real* game.
+     */
+    abstract public static function maxPlayers() : int;
+
+    protected function isValidPlayer(Player $player) : bool
+    {
+        return $this->players->any(
+            fn (Player $p) => $p->equals($player)
+        );
+    }
+
+    /**
+     * Build a support array for quick next player retrieval.
+     */
     private function initNextPlayers()
     {
+        $this->nextPlayers = [];
+
         /** @var Player|null */
         $prev = null;
 
@@ -57,17 +97,50 @@ class CardGame
         return $this->nextPlayers[$player->id()];
     }
 
-    public function deck() : CardList
+    /**
+     * Who goes first?
+     */
+    public function starter() : Player
+    {
+        return $this->starter;
+    }
+
+    /**
+     * @return static
+     */
+    public function withStarter(Player $player) : self
+    {
+        Assert::true($this->isValidPlayer($player));
+
+        $this->starter = $player;
+
+        return $this;
+    }
+
+    public function isStarted() : bool
+    {
+        return $this->started;
+    }
+
+    public function deck() : Deck
     {
         return $this->deck;
     }
 
-    public function discard() : CardList
+    public function discard() : Pile
     {
         return $this->discard;
     }
 
-    public function trash() : CardList
+    /**
+     * Returns top card from discard pile. Null in case of no cards.
+     */
+    protected function topDiscard() : ?Card
+    {
+        return $this->discard->top();
+    }
+
+    public function trash() : Pile
     {
         return $this->trash;
     }
@@ -97,12 +170,19 @@ class CardGame
         return $this->discardSize() == 0;
     }
 
-    protected function isValidPlayer(Player $player) : bool
+    public function start() : MessageInterface
     {
-        return $this->players->any(
-            fn (Player $p) => $p->equals($player)
-        );
+        Assert::false($this->started);
+        Assert::notNull($this->starter);
+
+        $message = $this->dealing();
+
+        $this->started = true;
+
+        return $message;
     }
+
+    abstract protected function dealing() : MessageInterface;
 
     /**
      * Tries to deal $amount cards to every player.

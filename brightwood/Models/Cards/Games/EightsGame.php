@@ -2,24 +2,38 @@
 
 namespace Brightwood\Models\Cards\Games;
 
+use Brightwood\Collections\Cards\RankCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Joker;
+use Brightwood\Models\Cards\Moves\Actions\GiftAction;
+use Brightwood\Models\Cards\Moves\Actions\RestrictingGiftAction;
 use Brightwood\Models\Cards\Players\Player;
+use Brightwood\Models\Cards\Rank;
 use Brightwood\Models\Cards\Sets\Decks\FullDeck;
+use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
+use Brightwood\Parsing\StoryParser;
+use Plasticode\Util\Cases;
 use Webmozart\Assert\Assert;
 
 class EightsGame extends CardGame
 {
-    private Player $starter;
-    private bool $started = false;
-
     private int $moves = 0;
     private int $maxMoves = 100; // temp. safeguard
 
+    private StoryParser $parser;
+    private Cases $cases;
+
+    /**
+     * Gift from the previous player.
+     */
+    private ?GiftAction $gift = null;
+
     public function __construct(
+        StoryParser $parser,
+        Cases $cases,
         Player ...$players
     )
     {
@@ -28,32 +42,13 @@ class EightsGame extends CardGame
             ...$players
         );
 
-        $this->starter = $this->players->first();
+        $this->parser = $parser;
+        $this->cases = $cases;
     }
 
-    /**
-     * Who goes first?
-     */
-    public function starter() : Player
+    public static function maxPlayers(): int
     {
-        return $this->starter;
-    }
-
-    /**
-     * @return static
-     */
-    public function withStarter(Player $player) : self
-    {
-        Assert::true($this->isValidPlayer($player));
-
-        $this->starter = $player;
-
-        return $this;
-    }
-
-    public function isStarted() : bool
-    {
-        return $this->started;
+        return 10;
     }
 
     public function isFinished() : bool
@@ -78,7 +73,9 @@ class EightsGame extends CardGame
 
             if ($this->hasWon($player)) {
                 $messages[] = new Message(
-                    [$player . ' {выиграл|выиграла}!']
+                    [
+                        $this->parser->parse($player, $player . ' {выиграл|выиграла}!')
+                    ]
                 );
 
                 break;
@@ -94,19 +91,7 @@ class EightsGame extends CardGame
         return $messages;
     }
 
-    public function start() : MessageInterface
-    {
-        Assert::false($this->started);
-        Assert::notNull($this->starter);
-
-        $message = $this->dealing();
-
-        $this->started = true;
-
-        return $message;
-    }
-
-    private function dealing() : MessageInterface
+    protected function dealing() : MessageInterface
     {
         $count = $this->players->count();
 
@@ -127,7 +112,9 @@ class EightsGame extends CardGame
 
         $this->deal($amount);
 
-        $lines[] = 'Раздаем по ' . $amount . ' карт';
+        $lines[] =
+            'Раздаем по ' . $amount . ' ' .
+            $this->cases->caseForNumber('карта', $amount);
 
         $cards = $this->drawToDiscard();
 
@@ -146,37 +133,36 @@ class EightsGame extends CardGame
         $lines = [];
 
         if ($this->hasWon($player)) {
-            $lines[] = $player . ' уже {выиграл|выиграла}!';
+            $lines[] = $this->parser->parse($player, $player . ' уже {выиграл|выиграла}!');
         }
 
         $this->moves++;
 
-        $lines[] = 'Ходит <b>' . $player . '</b> (' . $this->moves . ')';
+        $lines[] =
+            '[' . $this->moves . '] ' .
+            'Стол: ' . $this->topDiscard() . ', Колода: ' . $this->deckSize();;
+
+        $lines[] = '';
 
         $lines = array_merge(
             $lines,
-            $this->actualMove($player),
+            $this->actualMove($player)
+        );
+
+        $lines[] = '';
+
+        $lines[] = implode(
+            ', ',
             $this
                 ->players
                 ->map(
                     fn (Player $p) =>
-                    $p->name() . ' (' . $p->hand()->size() . '): ' . $p->hand()
+                    $p->name() . ' (' . $p->handSize() . ')'
                 )
                 ->toArray()
         );
 
-        $lines[] = 'Стол: ' . $this->topDiscard();
-        $lines[] = 'Колода: ' . $this->deckSize();
-
         return new Message($lines);
-    }
-
-    /**
-     * Returns top card from discard pile. Null in case of no cards.
-     */
-    private function topDiscard() : ?Card
-    {
-        return $this->discard->top();
     }
 
     /**
@@ -191,10 +177,14 @@ class EightsGame extends CardGame
 
             if ($putCard) {
                 $lines[] = $player . ' кладет ' . $putCard . ' на стол';
+
+                $this->gift = $this->toGift($player, $putCard);
+
                 break;
             }
 
             if ($this->isDeckEmpty()) {
+                $lines[] = $player . ' пропускает ход (нет карт)';
                 break;
             }
 
@@ -208,11 +198,59 @@ class EightsGame extends CardGame
         return $lines;
     }
 
+    private function toGift(Player $player, Card $card) : ?GiftAction
+    {
+        if (!($card instanceof SuitedCard)) {
+            return null;
+        }
+
+        // 6, 7, jack -> just return a gift
+
+        $giftRanks = RankCollection::make(
+            [
+                Rank::six(),
+                Rank::seven(),
+                Rank::jack()
+            ]
+        );
+
+        if ($giftRanks->contains($card->rank())) {
+            return new GiftAction($player, $card);
+        }
+
+        // 8?
+
+        if (!$card->isRank(Rank::eight())) {
+            return null;
+        }
+
+        $suit = $this->chooseSuit($player);
+
+        return new RestrictingGiftAction(
+            $player,
+            $card,
+            fn (Card $c) => ($c instanceof SuitedCard) && $c->isSuit($suit)
+        );
+    }
+
+    private function chooseSuit(Player $player) : Suit
+    {
+        // todo: extract this to strategy
+
+        $suited = $player->hand()->filterSuited();
+
+        return $suited->any()
+            ? $suited->random()
+            : Suit::all()->random();
+    }
+
     private function tryPutCard(Player $player) : ?Card
     {
         $topDiscard = $this->topDiscard();
 
         Assert::notNull($topDiscard);
+
+        // todo: extract this to strategy
 
         /** @var Card|null */
         $suitableCard = $player
@@ -232,16 +270,13 @@ class EightsGame extends CardGame
 
     public function compatible(Card $one, Card $two) : bool
     {
-        if (Joker::is($one) || Joker::is($two)) {
+        if (($one instanceof Joker) || ($two instanceof Joker)) {
             return true;
         }
 
-        if (!SuitedCard::is($one) || !SuitedCard::is($two)) {
+        if (!($one instanceof SuitedCard) || !($two instanceof SuitedCard)) {
             return false;
         }
-
-        /** @var SuitedCard $one */
-        /** @var SuitedCard $two */
 
         return $one->isSameSuit($two) || $one->isSameRank($two);
     }

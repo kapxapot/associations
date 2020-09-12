@@ -3,10 +3,9 @@
 namespace Brightwood\Collections\Cards;
 
 use Brightwood\Models\Cards\Suit;
-use Plasticode\Collections\Basic\TypedCollection;
 use Webmozart\Assert\Assert;
 
-class SuitCollection extends TypedCollection
+class SuitCollection extends EquatableCollection
 {
     protected string $class = Suit::class;
 

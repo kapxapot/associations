@@ -2,27 +2,27 @@
 
 namespace Brightwood\Parsing;
 
-use App\Models\TelegramUser;
+use App\Models\Interfaces\GenderedInterface;
 use Brightwood\Models\Data\StoryData;
 use Plasticode\Util\Cases;
 
 class StoryParser
 {
     public function parse(
-        TelegramUser $tgUser,
+        GenderedInterface $gendered,
         string $text,
         ?StoryData $data = null
     ) : string
     {
         return preg_replace_callback(
             "/{(.+)}/Us",
-            fn (array $m) => $this->parseMatch($tgUser, $m[1], $data),
+            fn (array $m) => $this->parseMatch($gendered, $m[1], $data),
             $text
         );
     }
 
     private function parseMatch(
-        TelegramUser $tgUser,
+        GenderedInterface $gendered,
         string $match,
         ?StoryData $data
     ) : string
@@ -35,7 +35,7 @@ class StoryParser
             }
         }
 
-        return $this->parseGenders($match, $tgUser);
+        return $this->parseGenders($match, $gendered);
     }
 
     private function parseVar(string $var, StoryData $data) : ?string
@@ -43,7 +43,7 @@ class StoryParser
         return $data[$var];
     }
 
-    private function parseGenders(string $str, TelegramUser $tgUser) : string
+    private function parseGenders(string $str, GenderedInterface $gendered) : string
     {
         $parts = explode('|', $str);
 
@@ -54,9 +54,8 @@ class StoryParser
         $mas = $parts[0];
         $fem = $parts[1];
 
-        $gender = $tgUser->gender();
 
-        return $gender == Cases::MAS
+        return $gendered->gender() == Cases::MAS
             ? $mas
             : $fem;
     }

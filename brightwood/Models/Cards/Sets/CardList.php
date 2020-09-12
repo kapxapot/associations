@@ -3,7 +3,10 @@
 namespace Brightwood\Models\Cards\Sets;
 
 use Brightwood\Collections\Cards\CardCollection;
+use Brightwood\Collections\Cards\SuitCollection;
+use Brightwood\Collections\Cards\SuitedCardCollection;
 use Brightwood\Models\Cards\Card;
+use Brightwood\Models\Cards\SuitedCard;
 
 /**
  * Just a bunch of cards.
@@ -35,6 +38,15 @@ abstract class CardList
     public function contains(Card $card) : bool
     {
         return $this->cards->contains($card);
+    }
+
+    public function filterSuited() : SuitedCardCollection
+    {
+        return SuitedCardCollection::from(
+            $this->cards->where(
+                fn (Card $c) => $c instanceof SuitedCard
+            )
+        );
     }
 
     public function __toString()

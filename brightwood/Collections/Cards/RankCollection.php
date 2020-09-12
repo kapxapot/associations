@@ -3,10 +3,9 @@
 namespace Brightwood\Collections\Cards;
 
 use Brightwood\Models\Cards\Rank;
-use Plasticode\Collections\Basic\TypedCollection;
 use Webmozart\Assert\Assert;
 
-class RankCollection extends TypedCollection
+class RankCollection extends EquatableCollection
 {
     protected string $class = Rank::class;
 

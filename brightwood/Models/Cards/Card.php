@@ -2,7 +2,9 @@
 
 namespace Brightwood\Models\Cards;
 
-abstract class Card
+use Brightwood\Models\Interfaces\EquatableInterface;
+
+abstract class Card implements EquatableInterface
 {
     public function __toString()
     {
@@ -19,10 +21,5 @@ abstract class Card
      */
     abstract public function fullName(?string $lang = null) : string;
 
-    abstract public function equals(?Card $card) : bool;
-
-    public static function is(self $card) : bool
-    {
-        return $card instanceof static;
-    }
+    abstract public function equals(?EquatableInterface $obj) : bool;
 }

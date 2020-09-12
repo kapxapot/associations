@@ -2,12 +2,15 @@
 
 namespace Brightwood\Models\Cards\Players;
 
+use App\Models\Interfaces\GenderedInterface;
+use App\Models\Interfaces\NamedInterface;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Sets\Hand;
+use Brightwood\Models\Interfaces\EquatableInterface;
 use Plasticode\Core\Security;
 
-abstract class Player
+abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface
 {
     protected string $id;
     protected Hand $hand;
@@ -15,7 +18,6 @@ abstract class Player
     public function __construct()
     {
         $this->id = Security::generateToken(10);
-
         $this->hand = new Hand();
     }
 
@@ -24,11 +26,14 @@ abstract class Player
         return $this->id;
     }
 
-    abstract public function name() : string;
-
     public function hand() : Hand
     {
         return $this->hand;
+    }
+
+    public function handSize() : int
+    {
+        return $this->hand->size();
     }
 
     abstract public function isBot() : bool;
@@ -48,10 +53,23 @@ abstract class Player
         return $this->hand->contains($card);
     }
 
-    public function equals(?self $other) : bool
+    public function equals(?EquatableInterface $obj) : bool
     {
-        return $other && ($this->id === $other->id());
+        return
+            $obj
+            && ($obj instanceof self)
+            && ($this->id === $obj->id());
     }
+
+    // NamedInterface
+
+    abstract public function name() : string;
+
+    // GenderedInterface
+
+    abstract public function gender() : int;
+
+    // toString
 
     public function __toString()
     {

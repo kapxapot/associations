@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Cards\Players;
 
 use App\Models\TelegramUser;
+use Plasticode\Util\Cases;
 
 class Human extends Player
 {
@@ -17,11 +18,6 @@ class Human extends Player
         $this->tgUser = $tgUser;
     }
 
-    public function name() : string
-    {
-        return $this->tgUser->publicName();
-    }
-
     public function tgUser() : TelegramUser
     {
         return $this->tgUser;
@@ -30,5 +26,23 @@ class Human extends Player
     public function isBot() : bool
     {
         return false;
+    }
+
+    // NamedInterface
+
+    public function name() : string
+    {
+        $pic = $this->gender == Cases::MAS
+            ? '👦'
+            : '👧';
+
+        return $pic . ' ' . $this->tgUser->name();
+    }
+
+    // GenderedInterface
+
+    public function gender() : int
+    {
+        return $this->tgUser->gender();
     }
 }

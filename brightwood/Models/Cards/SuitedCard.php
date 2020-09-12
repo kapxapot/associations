@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Cards;
 
-use Webmozart\Assert\Assert;
+use Brightwood\Models\Interfaces\EquatableInterface;
 
 class SuitedCard extends Card
 {
@@ -60,19 +60,13 @@ class SuitedCard extends Card
         }
     }
 
-    public function equals(?Card $card) : bool
+    public function equals(?EquatableInterface $obj) : bool
     {
-        if (is_null($card)) {
-            return false;
-        }
-
-        if (!($card instanceof self)) {
-            return false;
-        }
-
         return
-            $this->suit->equals($card->suit())
-            && $this->rank->equals($card->rank());
+            $obj
+            && ($obj instanceof self)
+            && $this->suit->equals($obj->suit())
+            && $this->rank->equals($obj->rank());
     }
 
     /**
@@ -101,15 +95,25 @@ class SuitedCard extends Card
 
     public function isSameSuit(self $card) : bool
     {
-        return $this->suit->equals(
+        return $this->isSuit(
             $card->suit()
         );
     }
 
     public function isSameRank(self $card) : bool
     {
-        return $this->rank->equals(
+        return $this->isRank(
             $card->rank()
         );
+    }
+
+    public function isSuit(Suit $suit) : bool
+    {
+        return $this->suit->equals($suit);
+    }
+
+    public function isRank(Rank $rank) : bool
+    {
+        return $this->rank->equals($rank);
     }
 }

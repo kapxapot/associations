@@ -2,6 +2,8 @@
 
 namespace Brightwood\Models\Cards;
 
+use Brightwood\Models\Interfaces\EquatableInterface;
+
 class Joker extends Card
 {
     /**
@@ -28,8 +30,8 @@ class Joker extends Card
         }
     }
 
-    public function equals(?Card $card) : bool
+    public function equals(?EquatableInterface $obj) : bool
     {
-        return $card && ($card instanceof self);
+        return $obj && ($obj instanceof self);
     }
 }
