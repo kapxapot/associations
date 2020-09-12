@@ -8,15 +8,15 @@ use Brightwood\Models\Cards\Players\Player;
 class GiftAction extends Action
 {
     private Player $sender;
-    private Card $gift;
+    private Card $card;
 
     public function __construct(
         Player $sender,
-        Card $gift
+        Card $card
     )
     {
         $this->sender = $sender;
-        $this->gift = $gift;
+        $this->card = $card;
     }
 
     public function sender() : Player
@@ -24,8 +24,8 @@ class GiftAction extends Action
         return $this->sender;
     }
 
-    public function gift() : Card
+    public function card() : Card
     {
-        return $this->gift;
+        return $this->card;
     }
 }

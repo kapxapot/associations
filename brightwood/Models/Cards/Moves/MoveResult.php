@@ -36,12 +36,12 @@ class MoveResult
         return $this->giftAction() !== null;
     }
 
-    public function gift() : ?Card
+    public function giftCard() : ?Card
     {
         $ga = $this->giftAction();
 
         return $ga
-            ? $ga->gift()
+            ? $ga->card()
             : null;
     }
 

@@ -8,6 +8,11 @@ abstract class Card implements EquatableInterface
 {
     public function __toString()
     {
+        return $this->toString();
+    }
+
+    public function toString() : string
+    {
         return $this->name();
     }
 
@@ -22,4 +27,24 @@ abstract class Card implements EquatableInterface
     abstract public function fullName(?string $lang = null) : string;
 
     abstract public function equals(?EquatableInterface $obj) : bool;
+
+    public function isJoker() : bool
+    {
+        return false;
+    }
+
+    public function isSuited() : bool
+    {
+        return false;
+    }
+
+    public function isSuit(Suit $suit) : bool
+    {
+        return false;
+    }
+
+    public function isRank(Rank $rank) : bool
+    {
+        return false;
+    }
 }

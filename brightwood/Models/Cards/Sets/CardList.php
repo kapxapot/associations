@@ -40,13 +40,9 @@ abstract class CardList
         return $this->cards->contains($card);
     }
 
-    public function filterSuited() : SuitedCardCollection
+    public function suitedCards() : SuitedCardCollection
     {
-        return SuitedCardCollection::from(
-            $this->cards->where(
-                fn (Card $c) => $c instanceof SuitedCard
-            )
-        );
+        return $this->cards->filterSuited();
     }
 
     public function __toString()

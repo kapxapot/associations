@@ -82,6 +82,11 @@ class Suit implements EquatableInterface
         return self::$suits;
     }
 
+    public static function random() : self
+    {
+        return self::all()->random();
+    }
+
     public static function spades() : self
     {
         return self::all()->get(self::SPADES);

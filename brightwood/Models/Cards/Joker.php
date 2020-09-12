@@ -34,4 +34,9 @@ class Joker extends Card
     {
         return $obj && ($obj instanceof self);
     }
+
+    public function isJoker() : bool
+    {
+        return true;
+    }
 }

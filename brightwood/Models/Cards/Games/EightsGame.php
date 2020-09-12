@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Cards\Games;
 
+use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\RankCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Joker;
@@ -54,6 +55,37 @@ class EightsGame extends CardGame
     public function isFinished() : bool
     {
         return $this->isStarted() && ($this->hasWinner() || $this->isDraw());
+    }
+
+    /**
+     * If some jokers are on the top, the actual top is underneath them.
+     */
+    private function actualTopDiscard() : ?Card
+    {
+        $cards = $this->discard->cards();
+
+        $actual = $cards->last(
+            fn (Card $c) => !($c instanceof Joker)
+        );
+
+        return $actual ?? $cards->last();
+    }
+
+    private function topDiscardStr() : ?string
+    {
+        $top = $this->topDiscard();
+
+        if (is_null($top)) {
+            return null;
+        }
+
+        $actual = $this->actualTopDiscard();
+
+        if ($top->equals($actual)) {
+            return $top->toString();
+        }
+
+        return $top . ' (' . $actual . ')';
     }
 
     /**
@@ -140,7 +172,7 @@ class EightsGame extends CardGame
 
         $lines[] =
             '[' . $this->moves . '] ' .
-            'Стол: ' . $this->topDiscard() . ', Колода: ' . $this->deckSize();;
+            'Стол: ' . $this->topDiscardStr() . ', Колода: ' . $this->deckSize();;
 
         $lines[] = '';
 
@@ -178,7 +210,13 @@ class EightsGame extends CardGame
             if ($putCard) {
                 $lines[] = $player . ' кладет ' . $putCard . ' на стол';
 
-                $this->gift = $this->toGift($player, $putCard);
+                $gift = $this->toGift($player, $putCard);
+
+                if ($gift) {
+                    $this->gift = $gift;
+
+                    $lines[] = $player . ' дарит следующему игроку: ' . $gift->card();
+                }
 
                 break;
             }
@@ -237,19 +275,15 @@ class EightsGame extends CardGame
     {
         // todo: extract this to strategy
 
-        $suited = $player->hand()->filterSuited();
+        $suited = $player->hand()->suitedCards();
 
         return $suited->any()
-            ? $suited->random()
-            : Suit::all()->random();
+            ? $suited->suits()->random()
+            : Suit::random();
     }
 
     private function tryPutCard(Player $player) : ?Card
     {
-        $topDiscard = $this->topDiscard();
-
-        Assert::notNull($topDiscard);
-
         // todo: extract this to strategy
 
         /** @var Card|null */
@@ -257,7 +291,7 @@ class EightsGame extends CardGame
             ->hand()
             ->cards()
             ->where(
-                fn (Card $c) => $this->compatible($c, $topDiscard)
+                fn (Card $c) => $this->canBeDiscarded($c)
             )
             ->random();
 
@@ -268,17 +302,25 @@ class EightsGame extends CardGame
         return $suitableCard;
     }
 
-    public function compatible(Card $one, Card $two) : bool
+    public function canBeDiscarded(Card $card) : bool
     {
-        if (($one instanceof Joker) || ($two instanceof Joker)) {
+        $topDiscard = $this->actualTopDiscard();
+
+        if (
+            is_null($topDiscard)
+            || $topDiscard->isJoker()
+            || $card->isJoker()
+            || $card->isRank(Rank::eight())
+        ) {
             return true;
         }
 
-        if (!($one instanceof SuitedCard) || !($two instanceof SuitedCard)) {
+        // currently, at this point both cards can be only suited here
+        if (!($topDiscard instanceof SuitedCard) || !($card instanceof SuitedCard)) {
             return false;
         }
 
-        return $one->isSameSuit($two) || $one->isSameRank($two);
+        return $topDiscard->isSameSuit($card) || $topDiscard->isSameRank($card);
     }
 
     public function winner() : ?Player
