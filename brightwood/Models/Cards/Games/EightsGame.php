@@ -2,12 +2,15 @@
 
 namespace Brightwood\Models\Cards\Games;
 
-use Brightwood\Collections\Cards\CardCollection;
-use Brightwood\Collections\Cards\RankCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Joker;
+use Brightwood\Models\Cards\Moves\Actions\Eights\SevenGiftAction;
+use Brightwood\Models\Cards\Moves\Actions\Eights\SixGiftAction;
 use Brightwood\Models\Cards\Moves\Actions\GiftAction;
-use Brightwood\Models\Cards\Moves\Actions\RestrictingGiftAction;
+use Brightwood\Models\Cards\Moves\Actions\Interfaces\ApplicableActionInterface;
+use Brightwood\Models\Cards\Moves\Actions\Interfaces\SkipActionInterface;
+use Brightwood\Models\Cards\Moves\Actions\SkipGiftAction;
+use Brightwood\Models\Cards\Moves\Actions\SuitRestrictingGiftAction;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Rank;
 use Brightwood\Models\Cards\Sets\Decks\FullDeck;
@@ -50,6 +53,11 @@ class EightsGame extends CardGame
     public static function maxPlayers(): int
     {
         return 10;
+    }
+
+    public function parseFor(Player $player, string $text) : string
+    {
+        return $this->parser->parse($player, $text);
     }
 
     public function isFinished() : bool
@@ -106,7 +114,7 @@ class EightsGame extends CardGame
             if ($this->hasWon($player)) {
                 $messages[] = new Message(
                     [
-                        $this->parser->parse($player, $player . ' {выиграл|выиграла}!')
+                        $this->parseFor($player, $player . ' {выиграл|выиграла}!')
                     ]
                 );
 
@@ -165,7 +173,7 @@ class EightsGame extends CardGame
         $lines = [];
 
         if ($this->hasWon($player)) {
-            $lines[] = $this->parser->parse($player, $player . ' уже {выиграл|выиграла}!');
+            $lines[] = $this->parseFor($player, $player . ' уже {выиграл|выиграла}!');
         }
 
         $this->moves++;
@@ -204,18 +212,41 @@ class EightsGame extends CardGame
     {
         $lines = [];
 
+        $gift = $this->gift;
+
+        if ($gift) {
+            if ($gift instanceof ApplicableActionInterface) {
+                $lines = array_merge(
+                    $lines,
+                    $gift->applyTo($this, $player)
+                );
+            }
+
+            $this->gift = null;
+
+            if ($gift instanceof SkipActionInterface) {
+                $lines[] = $player . ' пропускает ход';
+
+                return $lines;
+            }
+        }
+
+        // drawing & trying to put a card
         while (true) {
             $putCard = $this->tryPutCard($player);
 
             if ($putCard) {
                 $lines[] = $player . ' кладет ' . $putCard . ' на стол';
 
-                $gift = $this->toGift($player, $putCard);
+                // if we already have a winner, no need to make gifts
+                if (!$this->hasWinner()) {
+                    $gift = $this->toGift($player, $putCard);
 
-                if ($gift) {
-                    $this->gift = $gift;
+                    if ($gift) {
+                        $this->gift = $gift;
 
-                    $lines[] = $player . ' дарит следующему игроку: ' . $gift->card();
+                        $lines[] = $gift->getMessage();
+                    }
                 }
 
                 break;
@@ -229,7 +260,7 @@ class EightsGame extends CardGame
             $drawn = $this->drawToHand($player);
 
             if ($drawn->any()) {
-                $lines[] = $player . ' берет ' . $drawn . ' из колоды';
+                $lines[] = $player . ' тянет ' . $drawn . ' из колоды';
             }
         }
 
@@ -242,33 +273,33 @@ class EightsGame extends CardGame
             return null;
         }
 
-        // 6, 7, jack -> just return a gift
-
-        $giftRanks = RankCollection::make(
-            [
-                Rank::six(),
-                Rank::seven(),
-                Rank::jack()
-            ]
-        );
-
-        if ($giftRanks->contains($card->rank())) {
-            return new GiftAction($player, $card);
+        // 6
+        
+        if ($card->isRank(Rank::six())) {
+            return new SixGiftAction($player, $card);
         }
 
-        // 8?
+        // 7
 
-        if (!$card->isRank(Rank::eight())) {
-            return null;
+        if ($card->isRank(Rank::seven())) {
+            return new SevenGiftAction($player, $card);
         }
 
-        $suit = $this->chooseSuit($player);
+        // jack
 
-        return new RestrictingGiftAction(
-            $player,
-            $card,
-            fn (Card $c) => ($c instanceof SuitedCard) && $c->isSuit($suit)
-        );
+        if ($card->isRank(Rank::jack())) {
+            return new SkipGiftAction($player, $card);
+        }
+
+        // 8
+
+        if ($card->isRank(Rank::eight())) {
+            $suit = $this->chooseSuit($player);
+
+            return new SuitRestrictingGiftAction($player, $card, $suit);
+        }
+
+        return null;
     }
 
     private function chooseSuit(Player $player) : Suit

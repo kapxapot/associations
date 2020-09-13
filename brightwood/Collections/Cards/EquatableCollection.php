@@ -2,7 +2,7 @@
 
 namespace Brightwood\Collections\Cards;
 
-use Brightwood\Models\Interfaces\EquatableInterface;
+use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 use Plasticode\Collections\Basic\TypedCollection;
 
 class EquatableCollection extends TypedCollection

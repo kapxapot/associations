@@ -3,9 +3,10 @@
 namespace Brightwood\Models\Cards\Moves\Actions;
 
 use Brightwood\Models\Cards\Card;
+use Brightwood\Models\Cards\Interfaces\RestrictingInterface;
 use Brightwood\Models\Cards\Players\Player;
 
-class RestrictingGiftAction extends GiftAction
+class RestrictingGiftAction extends GiftAction implements RestrictingInterface
 {
     /** @var callable */
     private $restriction;
@@ -25,7 +26,15 @@ class RestrictingGiftAction extends GiftAction
         $this->restriction = $restriction;
     }
 
-    public function isAllowed(Card $card) : bool
+    public function restriction() : callable
+    {
+        return $this->restriction;
+    }
+
+    /**
+     * Returns true if the card falls under the restriction.
+     */
+    public function isEligible(Card $card) : bool
     {
         return ($this->restriction)($card);
     }

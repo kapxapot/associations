@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Models\Interfaces;
+namespace Brightwood\Models\Cards\Interfaces;
 
 interface EquatableInterface
 {

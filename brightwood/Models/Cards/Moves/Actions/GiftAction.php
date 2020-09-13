@@ -7,8 +7,8 @@ use Brightwood\Models\Cards\Players\Player;
 
 class GiftAction extends Action
 {
-    private Player $sender;
-    private Card $card;
+    protected Player $sender;
+    protected Card $card;
 
     public function __construct(
         Player $sender,
@@ -27,5 +27,10 @@ class GiftAction extends Action
     public function card() : Card
     {
         return $this->card;
+    }
+
+    public function getMessage() : string
+    {
+        return 'Here is a gift for... someone';
     }
 }

@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\SuitCollection;
-use Brightwood\Models\Interfaces\EquatableInterface;
+use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 
 class Suit implements EquatableInterface
 {
@@ -115,5 +115,15 @@ class Suit implements EquatableInterface
         return self::all()->first(
             fn (self $s) => $s->symbol == $str
         );
+    }
+
+    public function toString() : string
+    {
+        return $this->symbol;
+    }
+
+    public function __toString()
+    {
+        return $this->toString();
     }
 }

@@ -7,7 +7,7 @@ use App\Models\Interfaces\NamedInterface;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Sets\Hand;
-use Brightwood\Models\Interfaces\EquatableInterface;
+use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 use Plasticode\Core\Security;
 
 abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface

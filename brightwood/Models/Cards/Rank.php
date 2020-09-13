@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\RankCollection;
-use Brightwood\Models\Interfaces\EquatableInterface;
+use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 
 class Rank implements EquatableInterface
 {
@@ -202,5 +202,15 @@ class Rank implements EquatableInterface
         return self::all()->first(
             fn (self $r) => $r->code === $str || (string)$r->value === $str
         );
+    }
+
+    public function toString() : string
+    {
+        return $this->value();
+    }
+
+    public function __toString()
+    {
+        return $this->toString();
     }
 }

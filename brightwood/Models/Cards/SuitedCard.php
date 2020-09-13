@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Cards;
 
-use Brightwood\Models\Interfaces\EquatableInterface;
+use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 
 class SuitedCard extends Card
 {
