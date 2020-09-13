@@ -6,8 +6,13 @@ use Brightwood\Models\Cards\Moves\Actions\Interfaces\SkipActionInterface;
 
 class SkipGiftAction extends GiftAction implements SkipActionInterface
 {
-    public function getMessage() : string
+    /**
+     * @return string[] Message lines.
+     */
+    public function getMessages() : array
     {
-        return 'Следующий игрок пропускает ход';
+        return [
+            'Следующий игрок пропускает ход'
+        ];
     }
 }

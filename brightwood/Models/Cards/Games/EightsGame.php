@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Cards\Games;
 
 use Brightwood\Models\Cards\Card;
+use Brightwood\Models\Cards\Interfaces\RestrictingInterface;
 use Brightwood\Models\Cards\Joker;
 use Brightwood\Models\Cards\Moves\Actions\Eights\SevenGiftAction;
 use Brightwood\Models\Cards\Moves\Actions\Eights\SixGiftAction;
@@ -25,7 +26,7 @@ use Webmozart\Assert\Assert;
 class EightsGame extends CardGame
 {
     private int $moves = 0;
-    private int $maxMoves = 100; // temp. safeguard
+    private int $maxMoves = 1000; // safeguard
 
     private StoryParser $parser;
     private Cases $cases;
@@ -34,6 +35,11 @@ class EightsGame extends CardGame
      * Gift from the previous player.
      */
     private ?GiftAction $gift = null;
+
+    /**
+     * Accumulates the count of players in a row who have no cards to put.
+     */
+    private int $noCardsInARow = 0;
 
     public function __construct(
         StoryParser $parser,
@@ -125,7 +131,12 @@ class EightsGame extends CardGame
         }
 
         if ($this->isDraw()) {
-            $messages[] = new Message(['Ничья!']);
+            $messages[] = new Message(
+                [
+                    $this->drawReason(),
+                    'Ничья!'
+                ]
+            );
         }
 
         return $messages;
@@ -214,6 +225,11 @@ class EightsGame extends CardGame
 
         $gift = $this->gift;
 
+        /** @var RestrictingInterface|null */
+        $discardOverride = ($gift instanceof RestrictingInterface)
+            ? $gift
+            : null;
+
         if ($gift) {
             if ($gift instanceof ApplicableActionInterface) {
                 $lines = array_merge(
@@ -233,7 +249,7 @@ class EightsGame extends CardGame
 
         // drawing & trying to put a card
         while (true) {
-            $putCard = $this->tryPutCard($player);
+            $putCard = $this->tryPutCard($player, $discardOverride);
 
             if ($putCard) {
                 $lines[] = $player . ' кладет ' . $putCard . ' на стол';
@@ -245,7 +261,10 @@ class EightsGame extends CardGame
                     if ($gift) {
                         $this->gift = $gift;
 
-                        $lines[] = $gift->getMessage();
+                        $lines = array_merge(
+                            $lines,
+                            $gift->getMessages()
+                        );
                     }
                 }
 
@@ -254,13 +273,16 @@ class EightsGame extends CardGame
 
             if ($this->isDeckEmpty()) {
                 $lines[] = $player . ' пропускает ход (нет карт)';
+
+                $this->noCardsInARow++;
+
                 break;
             }
 
             $drawn = $this->drawToHand($player);
 
             if ($drawn->any()) {
-                $lines[] = $player . ' тянет ' . $drawn . ' из колоды';
+                $lines[] = $player . ' берет ' . $drawn . ' из колоды';
             }
         }
 
@@ -313,7 +335,10 @@ class EightsGame extends CardGame
             : Suit::random();
     }
 
-    private function tryPutCard(Player $player) : ?Card
+    private function tryPutCard(
+        Player $player,
+        ?RestrictingInterface $discardOverride = null
+    ) : ?Card
     {
         // todo: extract this to strategy
 
@@ -322,7 +347,9 @@ class EightsGame extends CardGame
             ->hand()
             ->cards()
             ->where(
-                fn (Card $c) => $this->canBeDiscarded($c)
+                fn (Card $c) => $discardOverride
+                    ? $discardOverride->isEligible($c)
+                    : $this->canBeDiscarded($c)
             )
             ->random();
 
@@ -377,6 +404,19 @@ class EightsGame extends CardGame
 
     private function isDraw() : bool
     {
-        return $this->moves >= $this->maxMoves;
+        return $this->drawReason() !== null;
+    }
+
+    private function drawReason() : ?string
+    {
+        if ($this->moves >= $this->maxMoves) {
+            return 'Превышено максимальное число ходов (' . $this->maxMoves . '), что-то явно не так!';
+        }
+
+        if ($this->noCardsInARow >= $this->players->count()) {
+            return 'Ни у кого из игроков нет карт для хода';
+        }
+
+        return null;
     }
 }

@@ -10,9 +10,14 @@ use Brightwood\Models\Cards\Players\Player;
 
 class SixGiftAction extends GiftAction implements ApplicableActionInterface, SkipActionInterface
 {
-    public function getMessage() : string
+    /**
+     * @return string[] Message lines.
+     */
+    public function getMessages() : array
     {
-        return 'Следующий игрок тянет 1 карту и пропускает ход';
+        return [
+            'Следующий игрок берет 1 карту и пропускает ход'
+        ];
     }
 
     /**
@@ -26,7 +31,7 @@ class SixGiftAction extends GiftAction implements ApplicableActionInterface, Ski
             $drawn = $game->drawToHand($player);
 
             if ($drawn->any()) {
-                $lines[] = $player . ' тянет ' . $drawn . ' из колоды';
+                $lines[] = $player . ' берет ' . $drawn . ' из колоды';
             }
         }
 

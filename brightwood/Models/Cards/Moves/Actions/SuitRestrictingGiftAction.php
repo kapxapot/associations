@@ -30,8 +30,16 @@ class SuitRestrictingGiftAction extends RestrictingGiftAction
         return $this->suit;
     }
 
-    public function getMessage(): string
+    /**
+     * @return string[] Message lines.
+     */
+    public function getMessages() : array
     {
-        return $this->sender . ' называет масть: ' . $this->suit();
+        $suitName = $this->suit()->fullNameRu();
+
+        return [
+            $this->sender . ' называет масть: <b>' . $suitName . '</b>',
+            'Следующий игрок должен положить ' . $suitName
+        ];
     }
 }

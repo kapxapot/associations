@@ -10,9 +10,14 @@ use Brightwood\Models\Cards\Players\Player;
 
 class SevenGiftAction extends GiftAction implements ApplicableActionInterface, SkipActionInterface
 {
-    public function getMessage() : string
+    /**
+     * @return string[] Message lines.
+     */
+    public function getMessages() : array
     {
-        return 'Следующий игрок тянет 2 карты и пропускает ход';
+        return [
+            'Следующий игрок берет 2 карты и пропускает ход'
+        ];
     }
 
     /**
@@ -31,7 +36,7 @@ class SevenGiftAction extends GiftAction implements ApplicableActionInterface, S
                 break;
             }
 
-            $lines[] = $player . ' тянет ' . $drawn . ' из колоды';
+            $lines[] = $player . ' берет ' . $drawn . ' из колоды';
 
             $toDraw--;
         }

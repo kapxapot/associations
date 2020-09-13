@@ -60,6 +60,16 @@ class Suit implements EquatableInterface
         return $this->nameRuGen;
     }
 
+    public function fullName() : string
+    {
+        return $this->name . ' ' . $this->symbol;
+    }
+
+    public function fullNameRu() : string
+    {
+        return $this->nameRu . ' ' . $this->symbol;
+    }
+
     /**
      * @param self|null $obj
      */

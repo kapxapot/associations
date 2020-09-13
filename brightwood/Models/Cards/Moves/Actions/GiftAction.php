@@ -29,8 +29,13 @@ class GiftAction extends Action
         return $this->card;
     }
 
-    public function getMessage() : string
+    /**
+     * @return string[] Message lines.
+     */
+    public function getMessages() : array
     {
-        return 'Here is a gift for... someone';
+        return [
+            'Here is a gift for... someone'
+        ];
     }
 }
