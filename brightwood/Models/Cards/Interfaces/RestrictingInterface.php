@@ -6,10 +6,13 @@ use Brightwood\Models\Cards\Card;
 
 interface RestrictingInterface
 {
-    function restriction() : callable;
-
     /**
      * Returns true if the card falls under the restriction.
      */
-    function isEligible(Card $card) : bool;
+    function isCompatible(Card $card) : bool;
+
+    /**
+     * String representation of the restriction.
+     */
+    function restrictionStr() : string;
 }

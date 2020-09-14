@@ -5,13 +5,13 @@ namespace Brightwood\Models\Cards\Games;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Interfaces\RestrictingInterface;
 use Brightwood\Models\Cards\Joker;
+use Brightwood\Models\Cards\Moves\Actions\Eights\EightGiftAction;
 use Brightwood\Models\Cards\Moves\Actions\Eights\SevenGiftAction;
 use Brightwood\Models\Cards\Moves\Actions\Eights\SixGiftAction;
 use Brightwood\Models\Cards\Moves\Actions\GiftAction;
 use Brightwood\Models\Cards\Moves\Actions\Interfaces\ApplicableActionInterface;
 use Brightwood\Models\Cards\Moves\Actions\Interfaces\SkipActionInterface;
 use Brightwood\Models\Cards\Moves\Actions\SkipGiftAction;
-use Brightwood\Models\Cards\Moves\Actions\SuitRestrictingGiftAction;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Rank;
 use Brightwood\Models\Cards\Sets\Decks\FullDeck;
@@ -95,11 +95,16 @@ class EightsGame extends CardGame
 
         $actual = $this->actualTopDiscard();
 
-        if ($top->equals($actual)) {
+        if ($top->equals($actual) && !$actual->hasRestriction()) {
             return $top->toString();
         }
 
-        return $top . ' (' . $actual . ')';
+        return
+            $top . ' ('
+            . ($actual->hasRestriction()
+                ? $actual->restriction()->restrictionStr()
+                : $actual)
+            . ')';
     }
 
     /**
@@ -224,11 +229,7 @@ class EightsGame extends CardGame
         $lines = [];
 
         $gift = $this->gift;
-
-        /** @var RestrictingInterface|null */
-        $discardOverride = ($gift instanceof RestrictingInterface)
-            ? $gift
-            : null;
+        $this->gift = null;
 
         if ($gift) {
             if ($gift instanceof ApplicableActionInterface) {
@@ -237,8 +238,6 @@ class EightsGame extends CardGame
                     $gift->applyTo($this, $player)
                 );
             }
-
-            $this->gift = null;
 
             if ($gift instanceof SkipActionInterface) {
                 $lines[] = $player . ' пропускает ход';
@@ -249,7 +248,7 @@ class EightsGame extends CardGame
 
         // drawing & trying to put a card
         while (true) {
-            $putCard = $this->tryPutCard($player, $discardOverride);
+            $putCard = $this->tryPutCard($player);
 
             if ($putCard) {
                 $lines[] = $player . ' кладет ' . $putCard . ' на стол';
@@ -267,6 +266,8 @@ class EightsGame extends CardGame
                         );
                     }
                 }
+
+                $this->noCardsInARow = 0;
 
                 break;
             }
@@ -317,8 +318,11 @@ class EightsGame extends CardGame
 
         if ($card->isRank(Rank::eight())) {
             $suit = $this->chooseSuit($player);
+            $action = new EightGiftAction($player, $card, $suit);
 
-            return new SuitRestrictingGiftAction($player, $card, $suit);
+            $card->addRestriction($action);
+
+            return $action;
         }
 
         return null;
@@ -335,10 +339,7 @@ class EightsGame extends CardGame
             : Suit::random();
     }
 
-    private function tryPutCard(
-        Player $player,
-        ?RestrictingInterface $discardOverride = null
-    ) : ?Card
+    private function tryPutCard(Player $player) : ?Card
     {
         // todo: extract this to strategy
 
@@ -347,9 +348,7 @@ class EightsGame extends CardGame
             ->hand()
             ->cards()
             ->where(
-                fn (Card $c) => $discardOverride
-                    ? $discardOverride->isEligible($c)
-                    : $this->canBeDiscarded($c)
+                fn (Card $c) => $this->canBeDiscarded($c)
             )
             ->random();
 
@@ -362,23 +361,35 @@ class EightsGame extends CardGame
 
     public function canBeDiscarded(Card $card) : bool
     {
+        if ($this->isSuperCard($card)) {
+            return true;
+        }
+
         $topDiscard = $this->actualTopDiscard();
 
         if (
             is_null($topDiscard)
             || $topDiscard->isJoker()
-            || $card->isJoker()
-            || $card->isRank(Rank::eight())
         ) {
             return true;
         }
 
-        // currently, at this point both cards can be only suited here
+        // for 8 suit
+        if ($topDiscard->hasRestriction()) {
+            return $topDiscard->restriction()->isCompatible($card);
+        }
+
+        // currently, at this point both cards can only be suited here
         if (!($topDiscard instanceof SuitedCard) || !($card instanceof SuitedCard)) {
             return false;
         }
 
         return $topDiscard->isSameSuit($card) || $topDiscard->isSameRank($card);
+    }
+
+    private function isSuperCard(Card $card) : bool
+    {
+        return $card->isJoker() || $card->isRank(Rank::eight());
     }
 
     public function winner() : ?Player

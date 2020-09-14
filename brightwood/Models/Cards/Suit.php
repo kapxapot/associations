@@ -62,12 +62,12 @@ class Suit implements EquatableInterface
 
     public function fullName() : string
     {
-        return $this->name . ' ' . $this->symbol;
+        return $this->symbol . ' ' . $this->name;
     }
 
     public function fullNameRu() : string
     {
-        return $this->nameRu . ' ' . $this->symbol;
+        return $this->symbol . ' ' . $this->nameRu;
     }
 
     /**

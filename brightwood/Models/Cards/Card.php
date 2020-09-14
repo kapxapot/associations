@@ -3,9 +3,12 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
+use Brightwood\Models\Cards\Interfaces\RestrictingInterface;
 
 abstract class Card implements EquatableInterface
 {
+    private ?RestrictingInterface $restriction = null;
+
     public function __toString()
     {
         return $this->toString();
@@ -46,5 +49,25 @@ abstract class Card implements EquatableInterface
     public function isRank(Rank $rank) : bool
     {
         return false;
+    }
+
+    /**
+     * @return static
+     */
+    public function addRestriction(RestrictingInterface $restriction) : self
+    {
+        $this->restriction = $restriction;
+
+        return $this;
+    }
+
+    public function hasRestriction() : bool
+    {
+        return $this->restriction !== null;
+    }
+
+    public function restriction() : ?RestrictingInterface
+    {
+        return $this->restriction;
     }
 }
