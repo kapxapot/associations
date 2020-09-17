@@ -3,6 +3,7 @@
 namespace Brightwood\Tests\Models\Cards;
 
 use Brightwood\Models\Cards\Players\Bot;
+use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Testing\Models\TestDeck;
 use Brightwood\Testing\Models\TestGame;
 use PHPUnit\Framework\TestCase;
@@ -16,6 +17,7 @@ final class CardGameTest extends TestCase
 
         $game = new TestGame(
             new TestDeck(false),
+            new Pile(),
             $bot1,
             $bot2
         );

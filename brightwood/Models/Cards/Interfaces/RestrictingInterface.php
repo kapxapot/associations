@@ -14,5 +14,5 @@ interface RestrictingInterface
     /**
      * String representation of the restriction.
      */
-    function restrictionStr() : string;
+    function toString() : string;
 }

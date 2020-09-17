@@ -31,10 +31,15 @@ class EightGiftAction extends GiftAction implements RestrictingInterface
         return $card->isSuit($this->suit);
     }
 
+    public function __toString()
+    {
+        return $this->toString();
+    }
+
     /**
      * String representation of the restriction.
      */
-    public function restrictionStr() : string
+    public function toString() : string
     {
         return $this->suit->fullNameRu();
     }

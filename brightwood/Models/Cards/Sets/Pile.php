@@ -10,7 +10,7 @@ use Webmozart\Assert\Assert;
  * A stack of cards that allows to put and take cards.
  * Starts empty.
  */
-final class Pile extends ExtendableCardList
+class Pile extends ExtendableCardList
 {
     public function __construct()
     {

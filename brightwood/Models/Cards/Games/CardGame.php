@@ -5,7 +5,6 @@ namespace Brightwood\Models\Cards\Games;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Joker;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Sets\Decks\Deck;
 use Brightwood\Models\Cards\Sets\Pile;
@@ -26,13 +25,14 @@ abstract class CardGame
 
     public function __construct(
         Deck $deck,
+        Pile $discard,
         Player ...$players
     )
     {
         Assert::notEmpty($players);
 
         $this->deck = $deck;
-        $this->discard = new Pile();
+        $this->discard = $discard;
         $this->trash = new Pile();
 
         $this->players = PlayerCollection::make($players);

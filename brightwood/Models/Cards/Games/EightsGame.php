@@ -3,8 +3,6 @@
 namespace Brightwood\Models\Cards\Games;
 
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Interfaces\RestrictingInterface;
-use Brightwood\Models\Cards\Joker;
 use Brightwood\Models\Cards\Moves\Actions\Eights\EightGiftAction;
 use Brightwood\Models\Cards\Moves\Actions\Eights\SevenGiftAction;
 use Brightwood\Models\Cards\Moves\Actions\Eights\SixGiftAction;
@@ -15,6 +13,7 @@ use Brightwood\Models\Cards\Moves\Actions\SkipGiftAction;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Rank;
 use Brightwood\Models\Cards\Sets\Decks\FullDeck;
+use Brightwood\Models\Cards\Sets\EightsDiscard;
 use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
@@ -49,11 +48,17 @@ class EightsGame extends CardGame
     {
         parent::__construct(
             new FullDeck(),
+            new EightsDiscard(),
             ...$players
         );
 
         $this->parser = $parser;
         $this->cases = $cases;
+    }
+
+    public function discard() : EightsDiscard
+    {
+        return $this->discard;
     }
 
     public static function maxPlayers(): int
@@ -69,42 +74,6 @@ class EightsGame extends CardGame
     public function isFinished() : bool
     {
         return $this->isStarted() && ($this->hasWinner() || $this->isDraw());
-    }
-
-    /**
-     * If some jokers are on the top, the actual top is underneath them.
-     */
-    private function actualTopDiscard() : ?Card
-    {
-        $cards = $this->discard->cards();
-
-        $actual = $cards->last(
-            fn (Card $c) => !($c instanceof Joker)
-        );
-
-        return $actual ?? $cards->last();
-    }
-
-    private function topDiscardStr() : ?string
-    {
-        $top = $this->topDiscard();
-
-        if (is_null($top)) {
-            return null;
-        }
-
-        $actual = $this->actualTopDiscard();
-
-        if ($top->equals($actual) && !$actual->hasRestriction()) {
-            return $top->toString();
-        }
-
-        return
-            $top . ' ('
-            . ($actual->hasRestriction()
-                ? $actual->restriction()->restrictionStr()
-                : $actual)
-            . ')';
     }
 
     /**
@@ -196,7 +165,7 @@ class EightsGame extends CardGame
 
         $lines[] =
             '[' . $this->moves . '] ' .
-            'Стол: ' . $this->topDiscardStr() . ', Колода: ' . $this->deckSize();;
+            'Стол: ' . $this->discard()->topString() . ', Колода: ' . $this->deckSize();;
 
         $lines[] = '';
 
@@ -365,12 +334,9 @@ class EightsGame extends CardGame
             return true;
         }
 
-        $topDiscard = $this->actualTopDiscard();
+        $topDiscard = $this->discard()->actualTop();
 
-        if (
-            is_null($topDiscard)
-            || $topDiscard->isJoker()
-        ) {
+        if (is_null($topDiscard) || $topDiscard->isJoker()) {
             return true;
         }
 
