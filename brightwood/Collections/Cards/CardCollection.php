@@ -3,7 +3,6 @@
 namespace Brightwood\Collections\Cards;
 
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\SuitedCard;
 
 class CardCollection extends EquatableCollection
 {
@@ -13,7 +12,7 @@ class CardCollection extends EquatableCollection
     {
         return SuitedCardCollection::from(
             $this->where(
-                fn (Card $c) => $c instanceof SuitedCard
+                fn (Card $c) => $c->isSuited()
             )
         );
     }
@@ -25,12 +24,10 @@ class CardCollection extends EquatableCollection
 
     public function toString() : string
     {
-        $cardNames = $this
+        return $this
             ->map(
                 fn (Card $c) => $c->name()
             )
-            ->toArray();
-
-        return implode(', ', $cardNames);
+            ->join(', ');
     }
 }
