@@ -15,6 +15,8 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     protected string $id;
     protected Hand $hand;
 
+    protected bool $isInspector = false;
+
     public function __construct()
     {
         $this->id = Security::generateToken(10);
@@ -59,6 +61,21 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
             $obj
             && ($obj instanceof self)
             && ($this->id === $obj->id());
+    }
+
+    /**
+     * @return static
+     */
+    public function asInspector() : self
+    {
+        $this->isInspector = true;
+
+        return $this;
+    }
+
+    public function isInspector() : bool
+    {
+        return $this->isInspector;
     }
 
     // NamedInterface

@@ -34,34 +34,26 @@ final class CardCollectionTest extends TestCase
                 SuitedCardCollection::empty()
             ],
             [
-                CardCollection::make(
-                    [
-                        new SuitedCard(Suit::clubs(), Rank::eight()),
-                        new SuitedCard(Suit::hearts(), Rank::jack()),
-                        new SuitedCard(Suit::spades(), Rank::ace()),
-                    ]
+                CardCollection::collect(
+                    new SuitedCard(Suit::clubs(), Rank::eight()),
+                    new SuitedCard(Suit::hearts(), Rank::jack()),
+                    new SuitedCard(Suit::spades(), Rank::ace())
                 ),
-                SuitedCardCollection::make(
-                    [
-                        new SuitedCard(Suit::clubs(), Rank::eight()),
-                        new SuitedCard(Suit::hearts(), Rank::jack()),
-                        new SuitedCard(Suit::spades(), Rank::ace()),
-                    ]
+                SuitedCardCollection::collect(
+                    new SuitedCard(Suit::clubs(), Rank::eight()),
+                    new SuitedCard(Suit::hearts(), Rank::jack()),
+                    new SuitedCard(Suit::spades(), Rank::ace())
                 )
             ],
             [
-                CardCollection::make(
-                    [
-                        new SuitedCard(Suit::clubs(), Rank::eight()),
-                        new Joker(),
-                        new SuitedCard(Suit::spades(), Rank::ace()),
-                    ]
+                CardCollection::collect(
+                    new SuitedCard(Suit::clubs(), Rank::eight()),
+                    new Joker(),
+                    new SuitedCard(Suit::spades(), Rank::ace())
                 ),
-                SuitedCardCollection::make(
-                    [
-                        new SuitedCard(Suit::clubs(), Rank::eight()),
-                        new SuitedCard(Suit::spades(), Rank::ace()),
-                    ]
+                SuitedCardCollection::collect(
+                    new SuitedCard(Suit::clubs(), Rank::eight()),
+                    new SuitedCard(Suit::spades(), Rank::ace())
                 )
             ]
         ];

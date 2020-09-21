@@ -1,10 +1,13 @@
 <?php
 
-namespace Brightwood\Models\Cards\Moves\Actions\Eights;
+namespace Brightwood\Models\Cards\Actions\Eights;
 
+use Brightwood\Collections\Cards\CardEventCollection;
+use Brightwood\Models\Cards\Actions\GiftAction;
 use Brightwood\Models\Cards\Card;
+use Brightwood\Models\Cards\Events\Basic\PublicEvent;
+use Brightwood\Models\Cards\Events\SuitRestrictionEvent;
 use Brightwood\Models\Cards\Interfaces\RestrictingInterface;
-use Brightwood\Models\Cards\Moves\Actions\GiftAction;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Suit;
 
@@ -44,16 +47,13 @@ class EightGiftAction extends GiftAction implements RestrictingInterface
         return $this->suit->fullNameRu();
     }
 
-    /**
-     * @return string[] Message lines.
-     */
-    public function getMessages() : array
+    public function initialEvents() : CardEventCollection
     {
         $suitName = $this->suit->fullNameRu();
 
-        return [
-            $this->sender . ' называет масть: <b>' . $suitName . '</b>',
-            'Следующий игрок должен положить ' . $suitName
-        ];
+        return CardEventCollection::collect(
+            new SuitRestrictionEvent($this->sender, $this->suit),
+            new PublicEvent('Следующий игрок должен положить ' . $suitName)
+        );
     }
 }

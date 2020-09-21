@@ -17,11 +17,9 @@ class StoryRepository implements StoryRepositoryInterface
 
     public function __construct()
     {
-        $this->stories = StoryCollection::make(
-            [
-                new WoodStory(1),
-                new MysteryStory(2)
-            ]
+        $this->stories = StoryCollection::collect(
+            new WoodStory(1),
+            new MysteryStory(2)
         );
     }
 

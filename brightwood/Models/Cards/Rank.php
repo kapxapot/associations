@@ -108,22 +108,20 @@ class Rank implements EquatableInterface
 
     public static function all() : RankCollection
     {
-        self::$ranks ??= RankCollection::make(
-            [
-                new self(self::ACE, 'A', 'ace', 'туз', 'Т'),
-                new self(self::TWO, 2, 'two', 'двойка'),
-                new self(self::THREE, 3, 'three', 'тройка'),
-                new self(self::FOUR, 4, 'four', 'четверка'),
-                new self(self::FIVE, 5, 'five', 'пятерка'),
-                new self(self::SIX, 6, 'six', 'шестерка'),
-                new self(self::SEVEN, 7, 'seven', 'семерка'),
-                new self(self::EIGHT, 8, 'eight', 'восьмерка'),
-                new self(self::NINE, 9, 'nine', 'девятка'),
-                (new self(self::TEN, 10, 'ten', 'десятка'))->withCode('T'),
-                new self(self::JACK, 'J', 'jack', 'валет', 'В'),
-                new self(self::QUEEN, 'Q', 'queen', 'дама', 'Д'),
-                new self(self::KING, 'K', 'king', 'король', 'К')
-            ]
+        self::$ranks ??= RankCollection::collect(
+            new self(self::ACE, 'A', 'ace', 'туз', 'Т'),
+            new self(self::TWO, 2, 'two', 'двойка'),
+            new self(self::THREE, 3, 'three', 'тройка'),
+            new self(self::FOUR, 4, 'four', 'четверка'),
+            new self(self::FIVE, 5, 'five', 'пятерка'),
+            new self(self::SIX, 6, 'six', 'шестерка'),
+            new self(self::SEVEN, 7, 'seven', 'семерка'),
+            new self(self::EIGHT, 8, 'eight', 'восьмерка'),
+            new self(self::NINE, 9, 'nine', 'девятка'),
+            (new self(self::TEN, 10, 'ten', 'десятка'))->withCode('T'),
+            new self(self::JACK, 'J', 'jack', 'валет', 'В'),
+            new self(self::QUEEN, 'Q', 'queen', 'дама', 'Д'),
+            new self(self::KING, 'K', 'king', 'король', 'К')
         );
 
         return self::$ranks;

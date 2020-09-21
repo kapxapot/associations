@@ -2,9 +2,9 @@
 
 namespace Brightwood\Tests\Models\Cards;
 
+use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Joker;
-use Brightwood\Models\Cards\Moves\Actions\Eights\EightGiftAction;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Rank;
 use Brightwood\Models\Cards\Sets\EightsDiscard;

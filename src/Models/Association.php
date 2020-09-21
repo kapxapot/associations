@@ -31,11 +31,9 @@ class Association extends LanguageElement
 
     public function words() : WordCollection
     {
-        return WordCollection::make(
-            [
-                $this->firstWord(),
-                $this->secondWord()
-            ]
+        return WordCollection::collect(
+            $this->firstWord(),
+            $this->secondWord()
         );
     }
 

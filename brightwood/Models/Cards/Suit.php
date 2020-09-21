@@ -80,13 +80,11 @@ class Suit implements EquatableInterface
 
     public static function all() : SuitCollection
     {
-        self::$suits ??= SuitCollection::make(
-            [
-                new self(self::SPADES, '♠', 'spades', 'пики', 'пик'),
-                new self(self::CLUBS, '♣', 'clubs', 'трефы', 'треф'),
-                new self(self::HEARTS, '♥', 'hearts', 'червы', 'черв'),
-                new self(self::DIAMONDS, '♦', 'diamonds', 'бубны', 'бубен')
-            ]
+        self::$suits ??= SuitCollection::collect(
+            new self(self::SPADES, '♠', 'spades', 'пики', 'пик'),
+            new self(self::CLUBS, '♣', 'clubs', 'трефы', 'треф'),
+            new self(self::HEARTS, '♥', 'hearts', 'червы', 'черв'),
+            new self(self::DIAMONDS, '♦', 'diamonds', 'бубны', 'бубен')
         );
 
         return self::$suits;

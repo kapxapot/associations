@@ -12,8 +12,10 @@ class FullDeck extends StandardDeck
 {
     protected function build() : CardCollection
     {
-        return parent::build()->concat(
-            CardCollection::make([new Joker(), new Joker()])
-        );
+        return parent::build()
+            ->add(
+                new Joker(),
+                new Joker()
+            );
     }
 }

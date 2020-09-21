@@ -1,11 +1,12 @@
 <?php
 
-namespace Brightwood\Models\Cards\Moves\Actions;
+namespace Brightwood\Models\Cards\Actions;
 
+use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Players\Player;
 
-class GiftAction extends Action
+abstract class GiftAction extends Action
 {
     protected Player $sender;
     protected Card $card;
@@ -30,12 +31,7 @@ class GiftAction extends Action
     }
 
     /**
-     * @return string[] Message lines.
+     * Returns initial events, that will be consumes on gift creation.
      */
-    public function getMessages() : array
-    {
-        return [
-            'Here is a gift for... someone'
-        ];
-    }
+    abstract public function initialEvents() : CardEventCollection;
 }

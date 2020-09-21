@@ -2,14 +2,18 @@
 
 namespace Brightwood\Models\Cards\Games;
 
+use Brightwood\Collections\Cards\CardCollection;
+use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
+use Brightwood\Models\Cards\Actions\Eights\SevenGiftAction;
+use Brightwood\Models\Cards\Actions\Eights\SixGiftAction;
+use Brightwood\Models\Cards\Actions\GiftAction;
+use Brightwood\Models\Cards\Actions\Interfaces\ApplicableActionInterface;
+use Brightwood\Models\Cards\Actions\SkipGiftAction;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Moves\Actions\Eights\EightGiftAction;
-use Brightwood\Models\Cards\Moves\Actions\Eights\SevenGiftAction;
-use Brightwood\Models\Cards\Moves\Actions\Eights\SixGiftAction;
-use Brightwood\Models\Cards\Moves\Actions\GiftAction;
-use Brightwood\Models\Cards\Moves\Actions\Interfaces\ApplicableActionInterface;
-use Brightwood\Models\Cards\Moves\Actions\Interfaces\SkipActionInterface;
-use Brightwood\Models\Cards\Moves\Actions\SkipGiftAction;
+use Brightwood\Models\Cards\Events\CardEventAccumulator;
+use Brightwood\Models\Cards\Events\DiscardEvent;
+use Brightwood\Models\Cards\Events\DrawEvent;
+use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Rank;
 use Brightwood\Models\Cards\Sets\Decks\FullDeck;
@@ -171,48 +175,35 @@ class EightsGame extends CardGame
 
         $lines = array_merge(
             $lines,
-            $this->actualMove($player)
+            $this->actualMove($player)->messagesFor(null)
         );
 
         $lines[] = '';
 
-        $lines[] = implode(
-            ', ',
-            $this
-                ->players
-                ->map(
-                    fn (Player $p) =>
-                    $p->name() . ' (' . $p->handSize() . ')'
-                )
-                ->toArray()
-        );
+        $lines[] = $this
+            ->players
+            ->map(
+                fn (Player $p) => $p->name() . ' (' . $p->handSize() . ')'
+            )
+            ->join(', ');
 
         return new Message($lines);
     }
 
-    /**
-     * @return string[]
-     */
-    private function actualMove(Player $player) : array
+    private function actualMove(Player $player) : CardEventAccumulator
     {
-        $lines = [];
+        $events = new CardEventAccumulator();
 
         $gift = $this->gift;
         $this->gift = null;
 
-        if ($gift) {
-            if ($gift instanceof ApplicableActionInterface) {
-                $lines = array_merge(
-                    $lines,
-                    $gift->applyTo($this, $player)
-                );
-            }
+        if ($gift instanceof ApplicableActionInterface) {
+            $giftEvents = $gift->applyTo($this, $player);
+            $events->addMany($giftEvents);
+        }
 
-            if ($gift instanceof SkipActionInterface) {
-                $lines[] = $player . ' пропускает ход';
-
-                return $lines;
-            }
+        if ($events->hasSkip()) {
+            return $events;
         }
 
         // drawing & trying to put a card
@@ -220,7 +211,12 @@ class EightsGame extends CardGame
             $putCard = $this->tryPutCard($player);
 
             if ($putCard) {
-                $lines[] = $player . ' кладет ' . $putCard . ' на стол';
+                $events->add(
+                    new DiscardEvent(
+                        $player,
+                        CardCollection::collect($putCard)
+                    )
+                );
 
                 // if we already have a winner, no need to make gifts
                 if (!$this->hasWinner()) {
@@ -229,9 +225,8 @@ class EightsGame extends CardGame
                     if ($gift) {
                         $this->gift = $gift;
 
-                        $lines = array_merge(
-                            $lines,
-                            $gift->getMessages()
+                        $events->addMany(
+                            $gift->initialEvents()
                         );
                     }
                 }
@@ -242,7 +237,9 @@ class EightsGame extends CardGame
             }
 
             if ($this->isDeckEmpty()) {
-                $lines[] = $player . ' пропускает ход (нет карт)';
+                $events->add(
+                    new SkipEvent($player, 'нет карт')
+                );
 
                 $this->noCardsInARow++;
 
@@ -252,11 +249,13 @@ class EightsGame extends CardGame
             $drawn = $this->drawToHand($player);
 
             if ($drawn->any()) {
-                $lines[] = $player . ' берет ' . $drawn . ' из колоды';
+                $events->add(
+                    new DrawEvent($player, $drawn)
+                );
             }
         }
 
-        return $lines;
+        return $events;
     }
 
     private function toGift(Player $player, Card $card) : ?GiftAction
@@ -266,7 +265,7 @@ class EightsGame extends CardGame
         }
 
         // 6
-        
+
         if ($card->isRank(Rank::six())) {
             return new SixGiftAction($player, $card);
         }
