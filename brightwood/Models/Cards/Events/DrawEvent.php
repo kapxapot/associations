@@ -28,6 +28,11 @@ class DrawEvent extends PrivatePlayerEvent
         $this->cases = new Cases();
     }
 
+    public function cards() : CardCollection
+    {
+        return $this->cards;
+    }
+
     public function publicChunk() : string
     {
         $count = $this->cards->count();
@@ -44,5 +49,12 @@ class DrawEvent extends PrivatePlayerEvent
     public function personalChunk() : string
     {
         return 'берете ' . $this->cards . ' из колоды';
+    }
+
+    public function glue(self $other) : self
+    {
+        $this->cards = $this->cards->concat($other->cards);
+
+        return $this;
     }
 }

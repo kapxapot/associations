@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Cards\Events;
 
 use Brightwood\Collections\Cards\CardEventCollection;
+use Brightwood\Models\Cards\Events\Basic\PublicPlayerEvent;
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Players\Player;
 
@@ -49,10 +50,32 @@ class CardEventAccumulator
     public function messagesFor(?Player $player) : array
     {
         return $this
-            ->events
+            ->mergedEvents()
             ->map(
                 fn (CardEventInterface $e) => $e->messageFor($player)
             )
             ->toArray();
+    }
+
+    public function mergedEvents() : CardEventCollection
+    {
+        $merged = new self();
+
+        foreach ($this->events as $event) {
+            $last = $merged->events()->last();
+
+            if (
+                $last instanceof DrawEvent
+                && $event instanceof DrawEvent
+                && $last->player()->equals($event->player())
+            ) {
+                $last->glue($event);
+                continue;
+            }
+
+            $merged->add($event);
+        }
+
+        return $merged->events();
     }
 }
