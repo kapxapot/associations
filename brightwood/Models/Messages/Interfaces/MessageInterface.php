@@ -22,4 +22,9 @@ interface MessageInterface
      * @return static
      */
     function prependLines(string ...$lines) : self;
+
+    /**
+     * @return static
+     */
+    function appendLines(string ...$lines) : self;
 }

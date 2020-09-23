@@ -16,6 +16,10 @@ class Human extends Player
         parent::__construct();
 
         $this->tgUser = $tgUser;
+
+        $this->icon = $this->gender() == Cases::MAS
+            ? '👦'
+            : '👧';
     }
 
     public function tgUser() : TelegramUser
@@ -32,11 +36,7 @@ class Human extends Player
 
     public function name() : string
     {
-        $pic = $this->gender == Cases::MAS
-            ? '👦'
-            : '👧';
-
-        return $pic . ' ' . $this->tgUser->name();
+        return $this->tgUser->name();
     }
 
     // GenderedInterface

@@ -8,11 +8,14 @@ use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Sets\Hand;
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
+use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Security;
 
 abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface
 {
     protected string $id;
+    protected ?string $icon = null;
+
     protected Hand $hand;
 
     protected bool $isInspector = false;
@@ -78,6 +81,39 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
         return $this->isInspector;
     }
 
+    public function nameFor(?self $other) : string
+    {
+        return $this->equals($other)
+            ? $this->personalName()
+            : $this->publicName();
+    }
+
+    public function personalName() : string
+    {
+        return $this->iconize('Вы');
+    }
+
+    public function publicName() : string
+    {
+        return $this->iconize(
+            $this->name()
+        );
+    }
+
+    /**
+     * Adds the icon to the name if it's defined.
+     */
+    protected function iconize(string $name) : string
+    {
+        return
+            Collection::collect(
+                $this->icon,
+                $name
+            )
+            ->clean()
+            ->join(' ');
+    }
+
     // NamedInterface
 
     abstract public function name() : string;
@@ -90,6 +126,6 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
 
     public function __toString()
     {
-        return $this->name();
+        return $this->publicName();
     }
 }

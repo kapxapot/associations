@@ -14,6 +14,7 @@ use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Events\CardEventAccumulator;
 use Brightwood\Models\Cards\Events\DiscardEvent;
 use Brightwood\Models\Cards\Events\DrawEvent;
+use Brightwood\Models\Cards\Events\NoCardsEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Rank;
@@ -85,9 +86,12 @@ class EightsGame extends CardGame
     {
         $messages = [];
 
-        $messages[] = $this->start();
-        $messages[] = new Message(['Наблюдает за игрой: ' . $this->observer]);
-        $messages[] = new Message(['Игра начинается!']);
+        $messages[] = $this
+            ->start()
+            ->appendLines(
+                'Наблюдает за игрой: ' . $this->observer,
+                'Игра начинается!'
+            );
 
         $player = $this->starter;
 
@@ -97,7 +101,9 @@ class EightsGame extends CardGame
             if ($this->hasWon($player)) {
                 $messages[] = new Message(
                     [
-                        $this->parseFor($player, $player . ' {выиграл|выиграла}!')
+                        $player->equals($this->observer)
+                            ? $player->personalName() . ' выиграли!'
+                            : $this->parseFor($player, $player . ' {выиграл|выиграла}!')
                     ]
                 );
 
@@ -160,10 +166,6 @@ class EightsGame extends CardGame
 
         $lines = [];
 
-        if ($this->hasWon($player)) {
-            $lines[] = $this->parseFor($player, $player . ' уже {выиграл|выиграла}!');
-        }
-
         $this->moves++;
 
         $lines[] =
@@ -180,7 +182,7 @@ class EightsGame extends CardGame
         $lines[] = $this
             ->players
             ->map(
-                fn (Player $p) => $p->name() . ' (' . $p->handSize() . ')'
+                fn (Player $p) => $p . ' (' . $p->handSize() . ')'
             )
             ->join(', ');
 
@@ -235,7 +237,7 @@ class EightsGame extends CardGame
 
             if ($this->isDeckEmpty()) {
                 $events->add(
-                    new SkipEvent($player, 'нет карт')
+                    new NoCardsEvent($player)
                 );
 
                 $this->noCardsInARow++;

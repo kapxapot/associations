@@ -8,7 +8,6 @@ use Plasticode\Util\Cases;
 class Bot extends Player
 {
     protected string $name;
-    protected string $icon;
     protected int $gender;
 
     public function __construct(string $name, ?int $gender = null)
@@ -33,7 +32,7 @@ class Bot extends Player
 
     public function name() : string
     {
-        return $this->icon . ' ' . $this->name;
+        return $this->name;
     }
 
     // GenderedInterface

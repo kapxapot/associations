@@ -39,10 +39,7 @@ class SevenGiftAction extends GiftAction implements ApplicableActionInterface
             $toDraw--;
         }
 
-        $events[] = new SkipEvent(
-            $player,
-            Rank::seven()->nameRu()
-        );
+        $events[] = new SkipEvent($player);
 
         return CardEventCollection::make($events);
     }

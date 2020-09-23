@@ -8,6 +8,22 @@ use Plasticode\Util\Arrays;
 class Sentence
 {
     /**
+     * Joins parts into a sentence such as "a, b, c".
+     *
+     * @param array|ArrayableInterface $array
+     */
+    public static function join(
+        $array,
+        ?string $commaDelimiter = null
+    ) : string
+    {
+        return implode(
+            $commaDelimiter ?? ', ',
+            Arrays::adopt($array)
+        );
+    }
+
+    /**
      * Joins homogeneous parts into a sentence such as "a, b и c".
      *
      * @param array|ArrayableInterface $array

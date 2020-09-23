@@ -47,6 +47,16 @@ class Message implements MessageInterface
         return null;
     }
 
+    public function appendLines(string ...$lines) : self
+    {
+        $allLines = array_merge(
+            $this->lines,
+            $lines
+        );
+
+        return new static($allLines, $this->actions);
+    }
+
     public function prependLines(string ...$lines) : self
     {
         $allLines = array_merge(

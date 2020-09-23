@@ -6,6 +6,7 @@ use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Sets\CardList;
+use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Testing\Models\TestDeck;
 use Plasticode\Core\Response;
 use Plasticode\Util\Text;
@@ -24,6 +25,7 @@ class CardsTestController
 
         $game = new CardGame(
             new TestDeck(false),
+            new Pile(),
             $bot1,
             $bot2
         );

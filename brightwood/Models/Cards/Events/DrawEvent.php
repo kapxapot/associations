@@ -43,12 +43,12 @@ class DrawEvent extends PrivatePlayerEvent
 
     public function privateChunk() : string
     {
-        return 'берет ' . $this->cards . ' из колоды';
+        return 'берет ' . $this->cards->toHomogeneousString() . ' из колоды';
     }
 
     public function personalChunk() : string
     {
-        return 'берете ' . $this->cards . ' из колоды';
+        return 'берете ' . $this->cards->toHomogeneousString() . ' из колоды';
     }
 
     public function glue(self $other) : self

@@ -57,6 +57,16 @@ class StoryMessage extends Message
     /**
      * @return static
      */
+    public function appendLines(string ...$lines) : self
+    {
+        return $this->merge(
+            new static($this->nodeId, $lines)
+        );
+    }
+
+    /**
+     * @return static
+     */
     public function prependLines(string ...$lines) : self
     {
         return (new static(0, $lines))->merge($this);

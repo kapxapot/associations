@@ -33,10 +33,7 @@ class SixGiftAction extends GiftAction implements ApplicableActionInterface
             }
         }
 
-        $events[] = new SkipEvent(
-            $player,
-            Rank::six()->nameRu()
-        );
+        $events[] = new SkipEvent($player);
 
         return CardEventCollection::make($events);
     }

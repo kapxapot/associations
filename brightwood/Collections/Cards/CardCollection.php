@@ -2,6 +2,7 @@
 
 namespace Brightwood\Collections\Cards;
 
+use App\Semantics\Sentence;
 use Brightwood\Models\Cards\Card;
 
 class CardCollection extends EquatableCollection
@@ -24,10 +25,19 @@ class CardCollection extends EquatableCollection
 
     public function toString() : string
     {
-        return $this
-            ->map(
+        return Sentence::join(
+            $this->map(
                 fn (Card $c) => $c->name()
             )
-            ->join(', ');
+        );
+    }
+
+    public function toHomogeneousString() : string
+    {
+        return Sentence::homogeneousJoin(
+            $this->map(
+                fn (Card $c) => $c->name()
+            )
+        );
     }
 }

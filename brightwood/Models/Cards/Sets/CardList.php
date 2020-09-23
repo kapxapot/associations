@@ -3,10 +3,8 @@
 namespace Brightwood\Models\Cards\Sets;
 
 use Brightwood\Collections\Cards\CardCollection;
-use Brightwood\Collections\Cards\SuitCollection;
 use Brightwood\Collections\Cards\SuitedCardCollection;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\SuitedCard;
 
 /**
  * Just a bunch of cards.
@@ -53,5 +51,10 @@ abstract class CardList
     public function toString() : string
     {
         return $this->cards->toString();
+    }
+
+    public function toHomogeneousString() : string
+    {
+        return $this->cards->toHomogeneousString();
     }
 }

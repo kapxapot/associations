@@ -63,7 +63,7 @@ abstract class PlayerEvent implements CardEventInterface
                 fn (self $e) => $e->personalChunk()
             );
 
-        return 'Вы ' . $sentence;
+        return $this->player->personalName() . ' ' . $sentence;
     }
 
     /**
