@@ -18,6 +18,6 @@ class PublicEvent implements CardEventInterface
 
     public function messageFor(?Player $player): string
     {
-        return $this->message;
+        return '<i>' . $this->message . '</i>';
     }
 }

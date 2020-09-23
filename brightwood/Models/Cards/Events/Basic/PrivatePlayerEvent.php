@@ -20,7 +20,9 @@ abstract class PrivatePlayerEvent extends PlayerEvent
         $sentence = $this
             ->chain
             ->toSentence(
-                fn (self $e) => $e->privateChunk()
+                fn (PlayerEvent $e) => $e instanceof self
+                    ? $e->privateChunk()
+                    : $e->publicChunk()
             );
 
         return $this->player . ' ' . $sentence;

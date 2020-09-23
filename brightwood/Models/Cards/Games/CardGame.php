@@ -23,6 +23,8 @@ abstract class CardGame
     protected Player $starter;
     protected bool $started = false;
 
+    protected Player $observer;
+
     public function __construct(
         Deck $deck,
         Pile $discard,
@@ -40,6 +42,7 @@ abstract class CardGame
         Assert::true($this->isValidPlayerCount());
 
         $this->starter = $this->players->first();
+        $this->observer = $this->players->last();
 
         $this->initNextPlayers();
     }
@@ -121,6 +124,16 @@ abstract class CardGame
     public function isStarted() : bool
     {
         return $this->started;
+    }
+
+    /**
+     * @return static
+     */
+    public function withObserver(Player $player) : self
+    {
+        $this->observer = $player;
+
+        return $this;
     }
 
     public function deck() : Deck

@@ -53,7 +53,7 @@ class EightGiftAction extends GiftAction implements RestrictingInterface
 
         return CardEventCollection::collect(
             new SuitRestrictionEvent($this->sender, $this->suit),
-            new PublicEvent('Следующий игрок должен положить ' . $suitName)
+            new PublicEvent('Следующий игрок должен положить <b>' . $suitName . '</b>')
         );
     }
 }

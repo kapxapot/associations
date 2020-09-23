@@ -2,6 +2,7 @@
 
 namespace Brightwood\Controllers;
 
+use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Games\EightsGame;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\FemaleBot;
@@ -20,33 +21,34 @@ class EightsTestController
         ResponseInterface $response
     )
     {
-        $game = new EightsGame(
-            new StoryParser(),
-            new Cases(),
+        $players = PlayerCollection::collect(
             new Bot('Кузьма'),
             new Bot('Миша'),
             new FemaleBot('Соня'),
             new FemaleBot('Аглая')
         );
 
-        $result = $game->run();
+        $game = (new EightsGame(
+            new StoryParser(),
+            new Cases(),
+            ...$players
+        ))->withObserver($players->random());
 
-        $result = array_map(
-            fn ($msg) => $this->wrap($msg),
-            $result
-        );
+        $result = $game
+            ->run()
+            ->map(
+                fn ($msg) => $this->wrap($msg)
+            )
+            ->join();
 
-        return Response::text(
-            $response,
-            Text::join($result)
-        );
+        return Response::text($response, $result);
     }
 
     private function wrap(MessageInterface $message) : string
     {
         return
             '<div style="background-color: #efefef; padding: 0.5rem;">' .
-            Text::join($message->lines(), '<br />') .
+            Text::join($message->lines(), '<br /><br />') .
             '</div><br />';
     }
 }

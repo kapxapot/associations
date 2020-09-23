@@ -3,12 +3,13 @@
 namespace Brightwood\Models\Cards\Games;
 
 use Brightwood\Collections\Cards\CardCollection;
+use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
+use Brightwood\Models\Cards\Actions\Eights\JackGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\SevenGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\SixGiftAction;
 use Brightwood\Models\Cards\Actions\GiftAction;
 use Brightwood\Models\Cards\Actions\Interfaces\ApplicableActionInterface;
-use Brightwood\Models\Cards\Actions\SkipGiftAction;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Events\CardEventAccumulator;
 use Brightwood\Models\Cards\Events\DiscardEvent;
@@ -80,14 +81,12 @@ class EightsGame extends CardGame
         return $this->isStarted() && ($this->hasWinner() || $this->isDraw());
     }
 
-    /**
-     * @return MessageInterface[]
-     */
-    public function run() : array
+    public function run() : MessageCollection
     {
         $messages = [];
 
         $messages[] = $this->start();
+        $messages[] = new Message(['Наблюдает за игрой: ' . $this->observer]);
         $messages[] = new Message(['Игра начинается!']);
 
         $player = $this->starter;
@@ -117,7 +116,7 @@ class EightsGame extends CardGame
             );
         }
 
-        return $messages;
+        return MessageCollection::make($messages);
     }
 
     protected function dealing() : MessageInterface
@@ -171,14 +170,12 @@ class EightsGame extends CardGame
             '[' . $this->moves . '] ' .
             'Стол: ' . $this->discard()->topString() . ', Колода: ' . $this->deckSize();;
 
-        $lines[] = '';
-
         $lines = array_merge(
             $lines,
-            $this->actualMove($player)->messagesFor(null)
+            $this
+                ->actualMove($player)
+                ->messagesFor($this->observer)
         );
-
-        $lines[] = '';
 
         $lines[] = $this
             ->players
@@ -279,7 +276,7 @@ class EightsGame extends CardGame
         // jack
 
         if ($card->isRank(Rank::jack())) {
-            return new SkipGiftAction($player, $card);
+            return new JackGiftAction($player, $card);
         }
 
         // 8

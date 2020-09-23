@@ -10,6 +10,7 @@ use Brightwood\Models\Cards\Events\DrawEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Player;
+use Brightwood\Models\Cards\Rank;
 
 class SixGiftAction extends GiftAction implements ApplicableActionInterface
 {
@@ -32,7 +33,10 @@ class SixGiftAction extends GiftAction implements ApplicableActionInterface
             }
         }
 
-        $events[] = new SkipEvent($player);
+        $events[] = new SkipEvent(
+            $player,
+            Rank::six()->nameRu()
+        );
 
         return CardEventCollection::make($events);
     }
