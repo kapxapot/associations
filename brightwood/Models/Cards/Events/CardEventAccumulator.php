@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Cards\Events;
 
 use Brightwood\Collections\Cards\CardEventCollection;
-use Brightwood\Models\Cards\Events\Basic\PublicPlayerEvent;
+use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Players\Player;
 
@@ -65,15 +65,23 @@ class CardEventAccumulator
             $last = $merged->events()->last();
 
             if (
+                !($last instanceof PlayerEvent)
+                || !($event instanceof PlayerEvent)
+                || !$last->player()->equals($event->player())
+            ) {
+                $merged->add($event);
+                continue;
+            }
+
+            if (
                 $last instanceof DrawEvent
                 && $event instanceof DrawEvent
-                && $last->player()->equals($event->player())
             ) {
                 $last->glue($event);
                 continue;
             }
 
-            $merged->add($event);
+            $last->link($event);
         }
 
         return $merged->events();

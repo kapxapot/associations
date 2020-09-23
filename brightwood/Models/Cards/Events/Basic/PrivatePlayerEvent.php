@@ -4,7 +4,7 @@ namespace Brightwood\Models\Cards\Events\Basic;
 
 use Brightwood\Models\Cards\Players\Player;
 
-abstract class PrivatePlayerEvent extends PublicPlayerEvent
+abstract class PrivatePlayerEvent extends PlayerEvent
 {
     abstract public function privateChunk() : string;
 
@@ -17,6 +17,12 @@ abstract class PrivatePlayerEvent extends PublicPlayerEvent
 
     private function privateMessage() : string
     {
-        return $this->player . ' ' . $this->privateChunk();
+        $sentence = $this
+            ->chain
+            ->toSentence(
+                fn (self $e) => $e->privateChunk()
+            );
+
+        return $this->player . ' ' . $sentence;
     }
 }

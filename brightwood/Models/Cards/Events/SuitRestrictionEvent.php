@@ -2,11 +2,11 @@
 
 namespace Brightwood\Models\Cards\Events;
 
-use Brightwood\Models\Cards\Events\Basic\PublicPlayerEvent;
+use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Suit;
 
-class SuitRestrictionEvent extends PublicPlayerEvent
+class SuitRestrictionEvent extends PlayerEvent
 {
     protected Suit $suit;
 

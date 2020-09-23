@@ -2,10 +2,10 @@
 
 namespace Brightwood\Models\Cards\Events;
 
-use Brightwood\Models\Cards\Events\Basic\PublicPlayerEvent;
+use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
 use Brightwood\Models\Cards\Players\Player;
 
-class SkipEvent extends PublicPlayerEvent
+class SkipEvent extends PlayerEvent
 {
     private ?string $reason = null;
 

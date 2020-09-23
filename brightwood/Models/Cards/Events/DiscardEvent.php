@@ -3,11 +3,11 @@
 namespace Brightwood\Models\Cards\Events;
 
 use Brightwood\Collections\Cards\CardCollection;
-use Brightwood\Models\Cards\Events\Basic\PublicPlayerEvent;
+use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Webmozart\Assert\Assert;
 
-class DiscardEvent extends PublicPlayerEvent
+class DiscardEvent extends PlayerEvent
 {
     protected CardCollection $cards;
 
