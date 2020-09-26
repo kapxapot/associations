@@ -540,7 +540,7 @@ class Bootstrap extends BootstrapBase
 
         return array_merge(
             $map,
-            $brightwoodBootstrap->getMappings()
+            $brightwoodBootstrap->getMappings($this->settings)
         );
     }
 

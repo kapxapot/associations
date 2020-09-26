@@ -5,6 +5,7 @@ namespace Brightwood\Controllers;
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
+use Brightwood\External\TelegramTransport;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\StoryMessage;
@@ -34,14 +35,16 @@ class BrightwoodBotController extends Controller
 
     private TelegramUserService $telegramUserService;
 
+    private TelegramTransport $telegram;
+
     private StoryParser $parser;
 
     // temp default
     private int $defaultStoryId = 1;
 
     // actions
-    private string $masAction = 'Мальчик 👦';
-    private string $femAction = 'Девочка 👧';
+    private string $masAction = '👦 Мальчик';
+    private string $femAction = '👧 Девочка';
 
     public function __construct(ContainerInterface $container)
     {
@@ -53,6 +56,8 @@ class BrightwoodBotController extends Controller
 
         $this->telegramUserService = $container->telegramUserService;
 
+        $this->telegram = $container->brightwoodTelegramTransport;
+
         $this->parser = new StoryParser();
     }
 
@@ -61,14 +66,12 @@ class BrightwoodBotController extends Controller
         ResponseInterface $response
     ) : ResponseInterface
     {
+        $logEnabled = $this->getSettings('telegram.brightwood_bot_log', false) === true;
+
         $data = $request->getParsedBody();
 
-        if (!empty($data)) {
-            $logEnabled = $this->getSettings('telegram.brightwood_bot_log', false);
-
-            if ($logEnabled === true) {
-                $this->logger->info('Got BRIGHTWOOD request', $data);
-            }
+        if (!empty($data) && $logEnabled) {
+            $this->logger->info('Got BRIGHTWOOD request', $data);
         }
 
         $message = $data['message'] ?? null;
@@ -78,7 +81,17 @@ class BrightwoodBotController extends Controller
             : null;
 
         if ($processed) {
-            return Response::json($response, $processed);
+            if ($logEnabled) {
+                $this->logger->info('Trying to send message', $processed);
+            }
+
+            $result = $this->telegram->sendMessage($processed);
+
+            if ($logEnabled) {
+                $this->logger->info('Send message result: ' . $result);
+            }
+
+            return $response;
         }
 
         throw new BadRequestException();
