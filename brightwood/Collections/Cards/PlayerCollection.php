@@ -2,6 +2,7 @@
 
 namespace Brightwood\Collections\Cards;
 
+use App\Semantics\Sentence;
 use Brightwood\Models\Cards\Players\Player;
 
 class PlayerCollection extends EquatableCollection
@@ -13,5 +14,19 @@ class PlayerCollection extends EquatableCollection
         return $this->first(
             fn (Player $p) => $p->isInspector()
         );
+    }
+
+    public function handsString() : string
+    {
+        return Sentence::join(
+            $this->map(
+                fn (Player $p) => $p->handString()
+            )
+        );
+    }
+
+    public function toSentence() : string
+    {
+        return Sentence::homogeneousJoin($this);
     }
 }

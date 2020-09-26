@@ -40,7 +40,7 @@ class ActionNode extends LinkedNode
         return $this->links;
     }
 
-    public function getMessage(?StoryData $data = null) : StoryMessage
+    public function getMessage(StoryData $data) : StoryMessage
     {
         $message = parent::getMessage($data);
         $data = $message->data();

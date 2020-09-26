@@ -54,7 +54,7 @@ class Message implements MessageInterface
             $lines
         );
 
-        return new static($allLines, $this->actions);
+        return new self($allLines, $this->actions);
     }
 
     public function prependLines(string ...$lines) : self
@@ -64,6 +64,6 @@ class Message implements MessageInterface
             $this->lines
         );
 
-        return new static($allLines, $this->actions);
+        return new self($allLines, $this->actions);
     }
 }

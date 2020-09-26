@@ -37,9 +37,9 @@ abstract class StoryLink implements ConditionalInterface, MutatorInterface
         return $this;
     }
 
-    public function mutate(?StoryData $data) : ?StoryData
+    public function mutate(StoryData $data) : StoryData
     {
-        return ($data && $this->mutator)
+        return $this->mutator
             ? ($this->mutator)($data)
             : $data;
     }

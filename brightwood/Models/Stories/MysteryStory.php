@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Stories;
 
+use App\Models\TelegramUser;
 use Brightwood\Models\Data\MysteryData;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
@@ -16,7 +17,7 @@ class MysteryStory extends Story
         parent::__construct($id, '🏰 Тайная местность', true);
     }
 
-    public function makeData(?array $data = null) : MysteryData
+    public function makeData(TelegramUser $tgUser, ?array $data = null) : MysteryData
     {
         return new MysteryData($data);
     }

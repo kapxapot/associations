@@ -17,6 +17,7 @@ use Plasticode\Controllers\Controller;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Util\Cases;
+use Plasticode\Util\Strings;
 use Plasticode\Util\Text;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -25,6 +26,8 @@ use Webmozart\Assert\Assert;
 
 class BrightwoodBotController extends Controller
 {
+    private const STORY_SELECTION_COMMAND = '📚 Выбрать историю';
+
     private StoryRepositoryInterface $storyRepository;
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
@@ -39,8 +42,6 @@ class BrightwoodBotController extends Controller
     // actions
     private string $masAction = 'Мальчик 👦';
     private string $femAction = 'Девочка 👧';
-
-    private string $selectStoryAction = '📚 Выбрать историю';
 
     public function __construct(ContainerInterface $container)
     {
@@ -129,6 +130,15 @@ class BrightwoodBotController extends Controller
             $result = $this->parseText($result, $tgUser, $text);
         } catch (\Exception $ex) {
             $this->logger->error($ex->getMessage());
+
+            $lines = [];
+
+            foreach ($ex->getTrace() as $trace) {
+                $lines[] = $trace['file'] . ' (' . $trace['line'] . '), ' . $trace['class'] . $trace['type'] . $trace['function'];
+            }
+
+            $this->logger->info(Text::join($lines));
+
             $result['text'] = 'Что-то пошло не так. 😐';
         }
 
@@ -157,7 +167,7 @@ class BrightwoodBotController extends Controller
         }
 
         if (count($actions) == 1 && $actions[0] == Story::RESTART_ACTION) {
-            $actions[] = $this->selectStoryAction;
+            $actions[] = self::STORY_SELECTION_COMMAND;
         }
 
         $result['text'] = $this->messageToText($message);
@@ -196,7 +206,7 @@ class BrightwoodBotController extends Controller
     private function getAnswer(TelegramUser $tgUser, string $text) : MessageInterface
     {
         // start command
-        if (strpos($text, '/start') === 0) {
+        if (Strings::startsWith($text, '/start')) {
             return $this->startCommand($tgUser);
         }
 
@@ -205,11 +215,23 @@ class BrightwoodBotController extends Controller
             return $this->readGender($tgUser, $text);
         }
 
-        if ($this->selectStoryAction == $text) {
+        // try executing story-specific commands
+        if (Strings::startsWith($text, '/')) {
+            $executionResult = $this->executeStoryCommand($tgUser, $text);
+
+            if ($executionResult) {
+                return $this->currentStatusMessage(
+                    $tgUser,
+                    ...$executionResult->lines()
+                );
+            }
+        }
+
+        if (self::STORY_SELECTION_COMMAND == $text) {
             return $this->storySelection();
         }
 
-        // story command
+        // /story command
         if (preg_match("#^/story(?:\s+|_)(\d+)$#i", $text, $matches)) {
             $storyId = $matches[1];
 
@@ -227,6 +249,24 @@ class BrightwoodBotController extends Controller
 
         // default - next step
         return $this->nextStep($tgUser, $text);
+    }
+
+    private function executeStoryCommand(
+        TelegramUser $tgUser,
+        string $command
+    ) : ?MessageInterface
+    {
+        $status = $this->getStatus($tgUser);
+
+        if (!$status) {
+            return null;
+        }
+
+        $story = $this->storyRepository->get($status->storyId);
+
+        Assert::notNull($story);
+
+        return $story->tryExecuteCommand($command);
     }
 
     private function startCommand(TelegramUser $tgUser) : MessageInterface
@@ -322,7 +362,7 @@ class BrightwoodBotController extends Controller
     {
         $story = $this->storyRepository->get($storyId);
 
-        $message = $story->start();
+        $message = $story->start($tgUser);
 
         $this->storyStatusRepository->store(
             [
@@ -372,8 +412,8 @@ class BrightwoodBotController extends Controller
 
         Assert::notNull($node);
 
-        $data = $story->makeData($status->data());
-        $message = $story->go($node, $text, $data);
+        $data = $story->makeData($tgUser, $status->data());
+        $message = $story->go($tgUser, $node, $text, $data);
 
         if ($message) {
             $status->stepId = $message->nodeId();
@@ -396,7 +436,7 @@ class BrightwoodBotController extends Controller
 
         Assert::notNull($status);
 
-        $message = $story->start();
+        $message = $story->start($tgUser);
 
         $status->storyId = $story->id();
         $status->stepId = $message->nodeId();
@@ -418,6 +458,7 @@ class BrightwoodBotController extends Controller
 
         return $this
             ->statusToMessage($status)
+            ->prependLines('* * *')
             ->prependLines(...$prependLines);
     }
 
@@ -425,7 +466,7 @@ class BrightwoodBotController extends Controller
     {
         $story = $this->storyRepository->get($status->storyId);
         $node = $story->getNode($status->stepId);
-        $data = $story->makeData($status->data());
+        $data = $story->makeData($status->telegramUser(), $status->data());
 
         return $story->renderNode($node, $data);
     }

@@ -32,7 +32,9 @@ class EightsTestController
             new StoryParser(),
             new Cases(),
             ...$players
-        ))->withObserver($players->random());
+        ))
+        ->withObserver($players->random())
+        ->withPlayersLine();
 
         $result = $game
             ->run()

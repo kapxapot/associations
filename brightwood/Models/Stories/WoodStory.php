@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Stories;
 
+use App\Models\TelegramUser;
 use Brightwood\Models\Data\WoodData;
 use Brightwood\Models\Links\RedirectLink;
 use Brightwood\Models\Nodes\ActionNode;
@@ -49,7 +50,7 @@ class WoodStory extends Story
         parent::__construct($id, '🌲 Лес', true);
     }
 
-    public function makeData(?array $data = null) : WoodData
+    public function makeData(TelegramUser $tgUser, ?array $data = null) : WoodData
     {
         return new WoodData($data);
     }

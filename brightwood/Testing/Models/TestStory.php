@@ -2,6 +2,7 @@
 
 namespace Brightwood\Testing\Models;
 
+use App\Models\TelegramUser;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\SimpleRedirectNode;
@@ -17,7 +18,7 @@ class TestStory extends Story
         parent::__construct($id, 'Лес');
     }
 
-    public function makeData(?array $data = null) : TestData
+    public function makeData(TelegramUser $tgUser, ?array $data = null) : TestData
     {
         return new TestData($data);
     }

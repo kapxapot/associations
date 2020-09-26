@@ -2,11 +2,14 @@
 
 namespace Brightwood\Models\Stories;
 
+use App\Models\TelegramUser;
 use Brightwood\Collections\StoryNodeCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
+use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Nodes\ActionNode;
+use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\StoryNode;
 use Plasticode\Exceptions\InvalidConfigurationException;
 use Webmozart\Assert\Assert;
@@ -65,7 +68,15 @@ abstract class Story
         return $this->startNode;
     }
 
-    abstract public function makeData(?array $data = null) : StoryData;
+    abstract public function makeData(
+        TelegramUser $tgUser,
+        ?array $data = null
+    ) : StoryData;
+
+    public function tryExecuteCommand(string $command) : ?MessageInterface
+    {
+        return null;
+    }
 
     abstract protected function build() : void;
 
@@ -117,10 +128,10 @@ abstract class Story
     /**
      * Renders the start node with a fresh data.
      */
-    public function start() : StoryMessage
+    public function start(TelegramUser $tgUser) : StoryMessage
     {
         $node = $this->startNode();
-        $data = $this->makeData();
+        $data = $this->makeData($tgUser);
 
         return $this->renderNode($node, $data);
     }
@@ -128,7 +139,7 @@ abstract class Story
     /**
      * Gets node's message (auto moving through nodes if possible).
      */
-    public function renderNode(StoryNode $node, ?StoryData $data = null) : StoryMessage
+    public function renderNode(StoryNode $node, StoryData $data) : StoryMessage
     {
         $message = $node->getMessage($data);
         $message = $this->checkForFinish($message);
@@ -163,12 +174,21 @@ abstract class Story
     /**
      * Attempts to go to the next node + renders it.
      */
-    public function go(StoryNode $node, string $text, ?StoryData $data) : ?StoryMessage
+    public function go(
+        TelegramUser $tgUser,
+        StoryNode $node,
+        string $text,
+        StoryData $data
+    ) : ?StoryMessage
     {
         if ($node->isFinish()) {
             return (self::RESTART_ACTION === $text)
-                ? $this->start()
+                ? $this->start($tgUser)
                 : null;
+        }
+
+        if ($node instanceof FunctionNode) {
+            return $this->renderNode($node, $data);
         }
 
         if (!($node instanceof ActionNode)) {

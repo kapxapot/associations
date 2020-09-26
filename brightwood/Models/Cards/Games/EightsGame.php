@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Cards\Games;
 
+use App\Semantics\Sentence;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
@@ -15,7 +16,6 @@ use Brightwood\Models\Cards\Events\CardEventAccumulator;
 use Brightwood\Models\Cards\Events\DiscardEvent;
 use Brightwood\Models\Cards\Events\DrawEvent;
 use Brightwood\Models\Cards\Events\NoCardsEvent;
-use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Rank;
 use Brightwood\Models\Cards\Sets\Decks\FullDeck;
@@ -24,6 +24,7 @@ use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
+use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Parsing\StoryParser;
 use Plasticode\Util\Cases;
 use Webmozart\Assert\Assert;
@@ -35,6 +36,8 @@ class EightsGame extends CardGame
 
     private StoryParser $parser;
     private Cases $cases;
+
+    private bool $showPlayersLine = false;
 
     /**
      * Gift from the previous player.
@@ -60,6 +63,13 @@ class EightsGame extends CardGame
 
         $this->parser = $parser;
         $this->cases = $cases;
+    }
+
+    public function withPlayersLine() : self
+    {
+        $this->showPlayersLine = true;
+
+        return $this;
     }
 
     public function discard() : EightsDiscard
@@ -89,7 +99,7 @@ class EightsGame extends CardGame
         $messages[] = $this
             ->start()
             ->appendLines(
-                'Наблюдает за игрой: ' . $this->observer,
+                //'Наблюдает за игрой: ' . $this->observer,
                 'Игра начинается!'
             );
 
@@ -99,12 +109,10 @@ class EightsGame extends CardGame
             $messages[] = $this->makeMove($player);
 
             if ($this->hasWon($player)) {
-                $messages[] = new Message(
-                    [
-                        $player->equals($this->observer)
-                            ? $player->personalName() . ' выиграли!'
-                            : $this->parseFor($player, $player . ' {выиграл|выиграла}!')
-                    ]
+                $messages[] = new TextMessage(
+                    $player->equals($this->observer)
+                        ? $player->personalName() . ' выиграли!'
+                        : $this->parseFor($player, $player . ' {выиграл|выиграла}!')
                 );
 
                 break;
@@ -114,11 +122,9 @@ class EightsGame extends CardGame
         }
 
         if ($this->isDraw()) {
-            $messages[] = new Message(
-                [
-                    $this->drawReason(),
-                    'Ничья!'
-                ]
+            $messages[] = new TextMessage(
+                $this->drawReason(),
+                'Ничья!'
             );
         }
 
@@ -142,21 +148,20 @@ class EightsGame extends CardGame
                 $amount = 4;
         }
 
-        $lines = [];
-
         $this->deal($amount);
 
-        $lines[] =
+        $message = new TextMessage(
             'Раздаем по ' . $amount . ' ' .
-            $this->cases->caseForNumber('карта', $amount);
+            $this->cases->caseForNumber('карта', $amount)
+        );
 
         $cards = $this->drawToDiscard();
 
-        $lines[] = (!$cards->isEmpty())
-            ? 'Кладем ' . $cards . ' из колоды на стол'
-            : 'Че... Где все карты?';
-
-        return new Message($lines);
+        return $message->appendLines(
+            !$cards->isEmpty()
+                ? 'Кладем ' . $cards . ' из колоды на стол'
+                : 'Че... Где все карты?'
+        );
     }
 
     public function makeMove(Player $player) : MessageInterface
@@ -164,29 +169,26 @@ class EightsGame extends CardGame
         Assert::true($this->isValidPlayer($player));
         Assert::true($this->started);
 
-        $lines = [];
-
         $this->moves++;
 
-        $lines[] =
+        $moveStatus =
             '[' . $this->moves . '] ' .
-            'Стол: ' . $this->discard()->topString() . ', Колода: ' . $this->deckSize();;
+            'Стол: ' . $this->discard()->topString() . ', ' .
+            'Колода: ' . $this->deckSize();
 
-        $lines = array_merge(
-            $lines,
-            $this
-                ->actualMove($player)
-                ->messagesFor($this->observer)
-        );
+        $moveResults = $this
+            ->actualMove($player)
+            ->messagesFor($this->observer);
 
-        $lines[] = $this
-            ->players
-            ->map(
-                fn (Player $p) => $p . ' (' . $p->handSize() . ')'
-            )
-            ->join(', ');
+        $message = (new TextMessage($moveStatus))
+            ->appendLines(...$moveResults);
 
-        return new Message($lines);
+        if ($this->showPlayersLine) {
+            $playersLine = $this->players->handsString();
+            $message = $message->appendLines($playersLine);
+        }
+
+        return $message;
     }
 
     private function actualMove(Player $player) : CardEventAccumulator

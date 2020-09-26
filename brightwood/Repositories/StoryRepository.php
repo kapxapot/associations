@@ -3,6 +3,7 @@
 namespace Brightwood\Repositories;
 
 use Brightwood\Collections\StoryCollection;
+use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Models\Stories\MysteryStory;
 use Brightwood\Models\Stories\Story;
 use Brightwood\Models\Stories\WoodStory;
@@ -19,7 +20,8 @@ class StoryRepository implements StoryRepositoryInterface
     {
         $this->stories = StoryCollection::collect(
             new WoodStory(1),
-            new MysteryStory(2)
+            new MysteryStory(2),
+            new EightsStory(3)
         );
     }
 
