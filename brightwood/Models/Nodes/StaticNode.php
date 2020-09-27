@@ -5,8 +5,9 @@ namespace Brightwood\Models\Nodes;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Interfaces\MutatorInterface;
 use Brightwood\Models\Messages\StoryMessage;
+use Brightwood\Models\Messages\StoryMessageSequence;
 
-abstract class TextNode extends StoryNode implements MutatorInterface
+abstract class StaticNode extends StoryNode implements MutatorInterface
 {
     /** @var string[] */
     protected array $text;
@@ -38,9 +39,10 @@ abstract class TextNode extends StoryNode implements MutatorInterface
     /**
      * @return static
      */
-    public function withMutator(callable $func) : self
+    public function withMutator(callable $mutator) : self
     {
-        $this->mutator = $func;
+        $this->mutator = $mutator;
+
         return $this;
     }
 
@@ -56,18 +58,20 @@ abstract class TextNode extends StoryNode implements MutatorInterface
      * 
      * @return static
      */
-    public function do(callable $func) : self
+    public function do(callable $mutator) : self
     {
-        return $this->withMutator($func);
+        return $this->withMutator($mutator);
     }
 
-    public function getMessage(StoryData $data) : StoryMessage
+    public function getMessages(StoryData $data) : StoryMessageSequence
     {
-        return (new StoryMessage(
-            $this->id,
-            $this->text
-        ))->withData(
-            $this->mutate($data)
+        return new StoryMessageSequence(
+            new StoryMessage(
+                $this->id,
+                $this->text,
+                null,
+                $this->mutate($data)
+            )
         );
     }
 }

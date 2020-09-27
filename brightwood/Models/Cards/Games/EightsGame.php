@@ -96,12 +96,7 @@ class EightsGame extends CardGame
     {
         $messages = [];
 
-        $messages[] = $this
-            ->start()
-            ->appendLines(
-                //'Наблюдает за игрой: ' . $this->observer,
-                'Игра начинается!'
-            );
+        $messages[] = $this->start();
 
         $player = $this->starter;
 
@@ -180,12 +175,13 @@ class EightsGame extends CardGame
             ->actualMove($player)
             ->messagesFor($this->observer);
 
-        $message = (new TextMessage($moveStatus))
-            ->appendLines(...$moveResults);
+        $message = new TextMessage($moveStatus);
+        $message->appendLines(...$moveResults);
 
         if ($this->showPlayersLine) {
-            $playersLine = $this->players->handsString();
-            $message = $message->appendLines($playersLine);
+            $message->appendLines(
+                $this->players->handsString()
+            );
         }
 
         return $message;

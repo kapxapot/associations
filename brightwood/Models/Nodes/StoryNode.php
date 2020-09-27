@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Nodes;
 
 use Brightwood\Models\Data\StoryData;
-use Brightwood\Models\Messages\StoryMessage;
+use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\Story;
 use Webmozart\Assert\Assert;
 
@@ -30,12 +30,13 @@ abstract class StoryNode
     public function withStory(Story $story) : self
     {
         $this->story = $story;
+
         return $this;
     }
 
-    abstract public function isFinish() : bool;
+    abstract public function isFinish(?StoryData $data) : bool;
 
-    abstract public function getMessage(StoryData $data) : StoryMessage;
+    abstract public function getMessages(StoryData $data) : StoryMessageSequence;
 
     /**
      * @throws \InvalidArgumentException

@@ -3,15 +3,16 @@
 namespace Brightwood\Models\Stories;
 
 use App\Models\TelegramUser;
+use Brightwood\Collections\MessageCollection;
 use Brightwood\Collections\StoryNodeCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
-use Brightwood\Models\Messages\Interfaces\MessageInterface;
-use Brightwood\Models\Messages\StoryMessage;
+use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\StoryNode;
 use Plasticode\Exceptions\InvalidConfigurationException;
+use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
 abstract class Story
@@ -73,9 +74,9 @@ abstract class Story
         ?array $data = null
     ) : StoryData;
 
-    public function tryExecuteCommand(string $command) : ?MessageInterface
+    public function executeCommand(string $command) : MessageCollection
     {
-        return null;
+        return MessageCollection::empty();
     }
 
     abstract protected function build() : void;
@@ -118,8 +119,12 @@ abstract class Story
         return $this;
     }
 
-    public function getNode(int $id) : ?StoryNode
+    public function getNode(?int $id) : ?StoryNode
     {
+        if (is_null($id)) {
+            return null;
+        }
+
         return $this->nodes->first(
             fn (StoryNode $n) => $n->id() == $id
         );
@@ -128,7 +133,7 @@ abstract class Story
     /**
      * Renders the start node with a fresh data.
      */
-    public function start(TelegramUser $tgUser) : StoryMessage
+    public function start(TelegramUser $tgUser) : StoryMessageSequence
     {
         $node = $this->startNode();
         $data = $this->makeData($tgUser);
@@ -139,49 +144,44 @@ abstract class Story
     /**
      * Gets node's message (auto moving through nodes if possible).
      */
-    public function renderNode(StoryNode $node, StoryData $data) : StoryMessage
+    public function renderNode(
+        StoryNode $node,
+        StoryData $data
+    ) : StoryMessageSequence
     {
-        $message = $node->getMessage($data);
-        $message = $this->checkForFinish($message);
+        $sequence = $node
+            ->getMessages($data)
+            ->prependPrefix($this->messagePrefix);
 
-        return $this->addPrefix($message);
+        return $this->checkForFinish($sequence);
     }
 
     /**
      * Checks if the node is a finish node (= no actions)
      * and adds restart action in that case.
      */
-    private function checkForFinish(StoryMessage $message) : StoryMessage
+    public function checkForFinish(StoryMessageSequence $sequence) : StoryMessageSequence
     {
-        $resultNode = $this->getNode($message->nodeId());
+        $resultNode = $this->getNode($sequence->nodeId());
 
-        return $resultNode && $resultNode->isFinish()
-            ? $message->withActions(self::RESTART_ACTION)
-            : $message;
-    }
-
-    private function addPrefix(StoryMessage $message) : StoryMessage
-    {
-        if (strlen($this->messagePrefix) == 0) {
-            return $message;
-        }
-
-        return $message->prependLines(
-            $this->messagePrefix
-        );
+        return $resultNode && $resultNode->isFinish($sequence->data())
+            ? $sequence->withActions(self::RESTART_ACTION)
+            : $sequence;
     }
 
     /**
      * Attempts to go to the next node + renders it.
+     * 
+     * @throws InvalidConfigurationException
      */
     public function go(
         TelegramUser $tgUser,
         StoryNode $node,
         string $text,
         StoryData $data
-    ) : ?StoryMessage
+    ) : ?StoryMessageSequence
     {
-        if ($node->isFinish()) {
+        if ($node->isFinish($data)) {
             return (self::RESTART_ACTION === $text)
                 ? $this->start($tgUser)
                 : null;

@@ -6,6 +6,7 @@ use Brightwood\Collections\RedirectLinkCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\RedirectLink;
 use Brightwood\Models\Messages\StoryMessage;
+use Brightwood\Models\Messages\StoryMessageSequence;
 use Webmozart\Assert\Assert;
 
 class RedirectNode extends LinkedNode
@@ -34,21 +35,27 @@ class RedirectNode extends LinkedNode
         return $this->links;
     }
 
-    public function getMessage(StoryData $data) : StoryMessage
+    public function getMessages(StoryData $data) : StoryMessageSequence
     {
-        $message = parent::getMessage($data);
-        $data = $message->data();
-
+        $data = $this->mutate($data);
         $link = $this->links->satisfying($data)->choose();
 
         Assert::notNull($link);
 
         $nextNode = $this->resolveNode($link->nodeId());
-
         $data = $link->mutate($data);
 
-        return $message->merge(
-            $nextNode->getMessage($data)
+        $sequence = new StoryMessageSequence(
+            new StoryMessage(
+                $this->id,
+                $this->text,
+                null,
+                $data
+            )
+        );
+
+        return $sequence->merge(
+            $nextNode->getMessages($data)
         );
     }
 

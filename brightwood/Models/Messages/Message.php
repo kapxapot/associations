@@ -42,28 +42,57 @@ class Message implements MessageInterface
         return $this->actions;
     }
 
+    public function hasActions() : bool
+    {
+        return !empty($this->actions);
+    }
+
     public function data() : ?StoryData
     {
         return null;
     }
 
-    public function appendLines(string ...$lines) : self
+    public function hasData() : bool
     {
-        $allLines = array_merge(
-            $this->lines,
-            $lines
-        );
-
-        return new self($allLines, $this->actions);
+        return $this->data !== null;
     }
 
+    /**
+     * @return static
+     */
     public function prependLines(string ...$lines) : self
     {
-        $allLines = array_merge(
+        $this->lines = array_merge(
             $lines,
             $this->lines
         );
 
-        return new self($allLines, $this->actions);
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function appendLines(string ...$lines) : self
+    {
+        $this->lines = array_merge(
+            $this->lines,
+            $lines
+        );
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function appendActions(string ...$actions) : self
+    {
+        $this->actions = array_merge(
+            $this->actions,
+            $actions
+        );
+
+        return $this;
     }
 }

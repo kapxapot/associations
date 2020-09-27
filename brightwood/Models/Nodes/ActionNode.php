@@ -6,6 +6,7 @@ use Brightwood\Collections\ActionLinkCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
 use Brightwood\Models\Messages\StoryMessage;
+use Brightwood\Models\Messages\StoryMessageSequence;
 use Webmozart\Assert\Assert;
 
 class ActionNode extends LinkedNode
@@ -40,13 +41,18 @@ class ActionNode extends LinkedNode
         return $this->links;
     }
 
-    public function getMessage(StoryData $data) : StoryMessage
+    public function getMessages(StoryData $data) : StoryMessageSequence
     {
-        $message = parent::getMessage($data);
-        $data = $message->data();
+        $data = $this->mutate($data);
+        $actions = $this->links->satisfying($data)->actions();
 
-        return $message->withActions(
-            ...$this->links->satisfying($data)->actions()
+        return new StoryMessageSequence(
+            new StoryMessage(
+                $this->id,
+                $this->text,
+                $actions,
+                $data
+            )
         );
     }
 

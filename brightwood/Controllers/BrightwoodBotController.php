@@ -5,17 +5,18 @@ namespace Brightwood\Controllers;
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
+use Brightwood\Collections\MessageCollection;
 use Brightwood\External\TelegramTransport;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
-use Brightwood\Models\Messages\StoryMessage;
+use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Models\Stories\Story;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
+use Plasticode\Collections\Basic\ArrayCollection;
 use Plasticode\Controllers\Controller;
-use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Util\Cases;
 use Plasticode\Util\Strings;
@@ -76,19 +77,21 @@ class BrightwoodBotController extends Controller
 
         $message = $data['message'] ?? null;
 
-        $processed = $message
+        $answers = $message
             ? $this->processIncomingMessage($message, $response)
             : null;
 
-        if ($processed) {
-            if ($logEnabled) {
-                $this->logger->info('Trying to send message', $processed);
-            }
+        if ($answers->any()) {
+            foreach ($answers as $answer) {
+                if ($logEnabled) {
+                    $this->logger->info('Trying to send message', $answer);
+                }
 
-            $result = $this->telegram->sendMessage($processed);
+                $result = $this->telegram->sendMessage($answer);
 
-            if ($logEnabled) {
-                $this->logger->info('Send message result: ' . $result);
+                if ($logEnabled) {
+                    $this->logger->info('Send message result: ' . $result);
+                }
             }
 
             return $response;
@@ -97,100 +100,134 @@ class BrightwoodBotController extends Controller
         throw new BadRequestException();
     }
 
-    private function processIncomingMessage(array $message) : ?array
+    private function processIncomingMessage(array $message) : ArrayCollection
     {
-        $result = [];
-
         $chatId = $message['chat']['id'];
-        $text = $message['text'] ?? null;
+        $text = trim($message['text'] ?? null);
 
+        if (strlen($text) == 0) {
+            $answer = $this->buildTelegramMessage(
+                $chatId,
+                '🧾 Я понимаю только сообщения с текстом.'
+            );
+
+            return ArrayCollection::collect($answer);
+        }
+
+        $from = $message['from'];
+        $tgUser = $this->getTelegramUser($from);
+
+        return $this->tryGetAnswersFromText($tgUser, $chatId, $text);
+    }
+
+    private function getTelegramUser(array $data) : TelegramUser
+    {
         $tgUser = $this
             ->telegramUserService
-            ->getOrCreateTelegramUser(
-                $message['from']
-            );
+            ->getOrCreateTelegramUser($data);
 
         Assert::true($tgUser->isValid());
 
-        $result = [
-            'method' => 'sendMessage',
-            'chat_id' => $chatId,
-            'parse_mode' => 'html',
-        ];
-
-        $text = trim($text);
-
-        if (strlen($text) == 0) {
-            $result['text'] = '🧾 Я понимаю только сообщения с текстом.';
-        } else {
-            $result = $this->tryParseText($result, $tgUser, $text);
-        }
-
-        return $result;
+        return $tgUser;
     }
 
-    /**
-     * @param array<string, mixed> $result
-     * @return array<string, mixed>
-     */
-    private function tryParseText(
-        array $result,
+    private function tryGetAnswersFromText(
         TelegramUser $tgUser,
+        string $chatId,
         string $text
-    ) : array
+    ) : ArrayCollection
     {
         try {
-            $result = $this->parseText($result, $tgUser, $text);
+            return $this->getAnswersFromText($tgUser, $chatId, $text);
         } catch (\Exception $ex) {
             $this->logger->error($ex->getMessage());
 
-            $lines = [];
-
-            foreach ($ex->getTrace() as $trace) {
-                $lines[] = $trace['file'] . ' (' . $trace['line'] . '), ' . $trace['class'] . $trace['type'] . $trace['function'];
-            }
-
-            $this->logger->info(Text::join($lines));
-
-            $result['text'] = 'Что-то пошло не так. 😐';
+            $this->logger->info(
+                Text::join(
+                    $this->exceptionTrace($ex)
+                )
+            );
         }
 
-        return $result;
+        $answer = $this->buildTelegramMessage(
+            $chatId,
+            'Что-то пошло не так. 😐'
+        );
+
+        return ArrayCollection::collect($answer);
     }
 
     /**
-     * @param array<string, mixed> $result
-     * @return array<string, mixed>
-     * 
+     * @return string[]
+     */
+    private function exceptionTrace(\Exception $ex) : array
+    {
+        $lines = [];
+
+        foreach ($ex->getTrace() as $trace) {
+            $lines[] = $trace['file'] . ' (' . $trace['line'] . '), ' . $trace['class'] . $trace['type'] . $trace['function'];
+        }
+
+        return $lines;
+    }
+
+    /**
      * @throws \Exception
      */
-    private function parseText(
-        array $result,
+    private function getAnswersFromText(
         TelegramUser $tgUser,
+        string $chatId,
         string $text
+    ) : ArrayCollection
+    {
+        return ArrayCollection::from(
+            $this
+                ->getAnswers($tgUser, $text)
+                ->map(
+                    fn (MessageInterface $m)
+                    => $this->toTelegramMessage($tgUser, $chatId, $m)
+                )
+        );
+    }
+
+    private function toTelegramMessage(
+        TelegramUser $tgUser,
+        string $chatId,
+        MessageInterface $message
     ) : array
     {
-        $message = $this->getAnswer($tgUser, $text);
         $message = $this->parseMessage($tgUser, $message);
 
         $actions = $message->actions();
 
         if (empty($actions)) {
-            $actions = ['Бот сломался! Почините!'];
+            $actions = ['⏳'];
         }
 
         if (count($actions) == 1 && $actions[0] == Story::RESTART_ACTION) {
             $actions[] = self::STORY_SELECTION_COMMAND;
         }
 
-        $result['text'] = $this->messageToText($message);
+        $answer = $this->buildTelegramMessage(
+            $chatId,
+            $this->messageToText($message)
+        );
 
-        $result['reply_markup'] = [
+        $answer['reply_markup'] = [
             'keyboard' => [$actions],
             'resize_keyboard' => true
         ];
 
-        return $result;
+        return $answer;
+    }
+
+    private function buildTelegramMessage(string $chatId, string $text) : array
+    {
+        return [
+            'chat_id' => $chatId,
+            'parse_mode' => 'html',
+            'text' => $text
+        ];
     }
 
     private function parseMessage(
@@ -216,7 +253,7 @@ class BrightwoodBotController extends Controller
         return Text::sparseJoin($message->lines());
     }
 
-    private function getAnswer(TelegramUser $tgUser, string $text) : MessageInterface
+    private function getAnswers(TelegramUser $tgUser, string $text) : MessageCollection
     {
         // start command
         if (Strings::startsWith($text, '/start')) {
@@ -230,18 +267,19 @@ class BrightwoodBotController extends Controller
 
         // try executing story-specific commands
         if (Strings::startsWith($text, '/')) {
-            $executionResult = $this->executeStoryCommand($tgUser, $text);
+            $executionResults = $this->executeStoryCommand($tgUser, $text);
 
-            if ($executionResult) {
-                return $this->currentStatusMessage(
-                    $tgUser,
-                    ...$executionResult->lines()
+            if ($executionResults->any()) {
+                return $executionResults->concat(
+                    $this->currentStatusMessages($tgUser)
                 );
             }
         }
 
         if (self::STORY_SELECTION_COMMAND == $text) {
-            return $this->storySelection();
+            return MessageCollection::collect(
+                $this->storySelection()
+            );
         }
 
         // /story command
@@ -254,10 +292,11 @@ class BrightwoodBotController extends Controller
                 return $this->switchToStory($tgUser, $story);
             }
 
-            return $this->currentStatusMessage(
-                $tgUser,
-                'История с id = ' . $storyId . ' не найдена.'
-            );
+            return $this
+                ->currentStatusMessages($tgUser)
+                ->prepend(
+                    new TextMessage('История с id = ' . $storyId . ' не найдена.')
+                );
         }
 
         // default - next step
@@ -267,7 +306,7 @@ class BrightwoodBotController extends Controller
     private function executeStoryCommand(
         TelegramUser $tgUser,
         string $command
-    ) : ?MessageInterface
+    ) : MessageCollection
     {
         $status = $this->getStatus($tgUser);
 
@@ -279,10 +318,10 @@ class BrightwoodBotController extends Controller
 
         Assert::notNull($story);
 
-        return $story->tryExecuteCommand($command);
+        return $story->executeCommand($command);
     }
 
-    private function startCommand(TelegramUser $tgUser) : MessageInterface
+    private function startCommand(TelegramUser $tgUser) : MessageCollection
     {
         $status = $this->getStatus($tgUser);
         $isReader = !is_null($status);
@@ -290,18 +329,21 @@ class BrightwoodBotController extends Controller
         $greeting = $isReader ? 'С возвращением' : 'Добро пожаловать';
         $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
 
+        $greetingMessage = new TextMessage($greeting);
+
         if (!$tgUser->hasGender()) {
-            return $this
-                ->askGender()
-                ->prependLines($greeting);
+            return MessageCollection::collect(
+                $greetingMessage,
+                $this->askGender()
+            );
         }
 
         return $this
             ->startOrContinueStory($tgUser)
-            ->prependLines($greeting);
+            ->prepend($greetingMessage);
     }
 
-    private function readGender(TelegramUser $tgUser, string $text) : MessageInterface
+    private function readGender(TelegramUser $tgUser, string $text) : MessageCollection
     {
         /** @var integer|null */
         $gender = null;
@@ -319,9 +361,10 @@ class BrightwoodBotController extends Controller
         $genderIsOk = ($gender !== null);
 
         if (!$genderIsOk) {
-            return $this
-                ->askGender()
-                ->prependLines('Вы написали что-то не то. 🤔');
+            return MessageCollection::collect(
+                new TextMessage('Вы написали что-то не то. 🤔'),
+                $this->askGender()
+            );
         }
 
         $tgUser->genderId = $gender;
@@ -329,8 +372,11 @@ class BrightwoodBotController extends Controller
 
         return $this
             ->startOrContinueStory($tgUser)
-            ->prependLines(
-                'Спасибо, {уважаемый 👦|уважаемая 👧}, ваш пол сохранен и теперь будет учитываться. 👌'
+            ->prepend(
+                new TextMessage(
+                    'Спасибо, {уважаемый 👦|уважаемая 👧}, ' .
+                    'ваш пол сохранен и теперь будет учитываться. 👌'
+                )
             );
     }
 
@@ -350,7 +396,7 @@ class BrightwoodBotController extends Controller
     /**
      * Starts the default story or continues the current one.
      */
-    private function startOrContinueStory(TelegramUser $tgUser) : StoryMessage
+    private function startOrContinueStory(TelegramUser $tgUser) : MessageCollection
     {
         $status = $this->getStatus($tgUser);
 
@@ -364,14 +410,18 @@ class BrightwoodBotController extends Controller
         );
     }
 
-    private function continueStory(StoryStatus $status) : StoryMessage
+    private function continueStory(StoryStatus $status) : MessageCollection
     {
-        return $this
-            ->statusToMessage($status)
-            ->prependLines('Итак, продолжим...');
+        return
+            MessageCollection::collect(
+                new TextMessage('Итак, продолжим...')
+            )
+            ->concat(
+                $this->statusToMessages($status)
+            );
     }
 
-    private function startStory(TelegramUser $tgUser, int $storyId) : StoryMessage
+    private function startStory(TelegramUser $tgUser, int $storyId) : MessageCollection
     {
         $story = $this->storyRepository->get($storyId);
 
@@ -386,7 +436,10 @@ class BrightwoodBotController extends Controller
             ]
         );
 
-        return $message->prependLines('Итак, начнем...');
+        return MessageCollection::collect(
+            new TextMessage('Итак, начнем...'),
+            $message
+        );
     }
 
     public function storySelection() : MessageInterface
@@ -414,7 +467,7 @@ class BrightwoodBotController extends Controller
         );
     }
 
-    private function nextStep(TelegramUser $tgUser, string $text) : StoryMessage
+    private function nextStep(TelegramUser $tgUser, string $text) : MessageCollection
     {
         $status = $this->getStatus($tgUser);
 
@@ -426,62 +479,59 @@ class BrightwoodBotController extends Controller
         Assert::notNull($node);
 
         $data = $story->makeData($tgUser, $status->data());
-        $message = $story->go($tgUser, $node, $text, $data);
+        $sequence = $story->go($tgUser, $node, $text, $data);
 
-        if ($message) {
-            $status->stepId = $message->nodeId();
-            $status->jsonData = json_encode($message->data());
+        if ($sequence) {
+            $status->stepId = $sequence->nodeId();
+            $status->jsonData = json_encode($sequence->data());
 
             $this->storyStatusRepository->save($status);
 
-            return $message;
+            return $sequence->messages();
         }
 
-        return $this->currentStatusMessage(
-            $tgUser,
-            'Что-что? Повторите-ка... 🧐'
-        );
+        return $this
+            ->currentStatusMessages($tgUser)
+            ->prepend(
+                new TextMessage('Что-что? Повторите-ка... 🧐')
+            );
     }
 
-    private function switchToStory(TelegramUser $tgUser, Story $story) : StoryMessage
+    private function switchToStory(TelegramUser $tgUser, Story $story) : MessageCollection
     {
         $status = $this->getStatus($tgUser);
 
         Assert::notNull($status);
 
-        $message = $story->start($tgUser);
+        $sequence = $story->start($tgUser);
 
         $status->storyId = $story->id();
-        $status->stepId = $message->nodeId();
-        $status->jsonData = json_encode($message->data());
+        $status->stepId = $sequence->nodeId();
+        $status->jsonData = json_encode($sequence->data());
 
         $this->storyStatusRepository->save($status);
 
-        return $message;
+        return $sequence->messages();
     }
 
-    private function currentStatusMessage(
-        TelegramUser $tgUser,
-        string ...$prependLines
-    ) : StoryMessage
+    private function currentStatusMessages(TelegramUser $tgUser) : MessageCollection
     {
         $status = $this->getStatus($tgUser);
 
         Assert::notNull($status);
 
-        return $this
-            ->statusToMessage($status)
-            ->prependLines('* * *')
-            ->prependLines(...$prependLines);
+        return $this->statusToMessages($status);
     }
 
-    private function statusToMessage(StoryStatus $status) : StoryMessage
+    private function statusToMessages(StoryStatus $status) : MessageCollection
     {
         $story = $this->storyRepository->get($status->storyId);
         $node = $story->getNode($status->stepId);
         $data = $story->makeData($status->telegramUser(), $status->data());
 
-        return $story->renderNode($node, $data);
+        return $story
+            ->renderNode($node, $data)
+            ->messages();
     }
 
     private function getStatus(TelegramUser $tgUser) : ?StoryStatus

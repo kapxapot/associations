@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Nodes;
 
 use Brightwood\Models\Data\StoryData;
-use Brightwood\Models\Messages\StoryMessage;
+use Brightwood\Models\Messages\StoryMessageSequence;
 
 class FunctionNode extends StoryNode
 {
@@ -20,13 +20,13 @@ class FunctionNode extends StoryNode
         $this->function = $function;
     }
 
-    public function isFinish() : bool
+    public function isFinish(?StoryData $data) : bool
     {
         // todo: allow to redefine this
         return false;
     }
 
-    public function getMessage(StoryData $data) : StoryMessage
+    public function getMessages(StoryData $data) : StoryMessageSequence
     {
         return ($this->function)($data);
     }

@@ -3,15 +3,16 @@
 namespace Brightwood\Models\Nodes;
 
 use Brightwood\Collections\StoryLinkCollection;
+use Brightwood\Models\Data\StoryData;
 use Webmozart\Assert\Assert;
 
-abstract class LinkedNode extends TextNode
+abstract class LinkedNode extends StaticNode
 {
     abstract public function links() : StoryLinkCollection;
 
-    public function isFinish() : bool
+    public function isFinish(?StoryData $data) : bool
     {
-        return $this->links()->isEmpty();
+        return $this->links()->satisfying($data)->isEmpty();
     }
 
     /**

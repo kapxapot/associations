@@ -2,9 +2,11 @@
 
 namespace Brightwood\Models\Nodes;
 
-class FinishNode extends TextNode
+use Brightwood\Models\Data\StoryData;
+
+class FinishNode extends StaticNode
 {
-    public function isFinish() : bool
+    public function isFinish(?StoryData $data) : bool
     {
         return true;
     }
