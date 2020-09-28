@@ -142,7 +142,7 @@ class EightsStory extends Story
             new FunctionNode(
                 self::START_GAME,
                 function (EightsData $data) {
-                    $data = $data->start();
+                    $data = $data->initGame();
                     $game = $data->game();
                     $players = $game->players();
 
@@ -156,10 +156,11 @@ class EightsStory extends Story
                         ]
                     );
 
-                    $log = $game->run();
-
-                    $sequence = new StoryMessageSequence($startMessage);
-                    $sequence->add(...$log);
+                    $sequence = new StoryMessageSequence(
+                        $startMessage,
+                        $game->start(),
+                        ...$game->run()
+                    );
 
                     return $sequence->withData($data);
                 }

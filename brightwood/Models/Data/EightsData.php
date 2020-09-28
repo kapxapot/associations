@@ -17,7 +17,7 @@ use Webmozart\Assert\Assert;
  */
 class EightsData extends StoryData
 {
-    private TelegramUser $tgUser;
+    private Human $human;
     private ?EightsGame $game = null;
 
     public function __construct(
@@ -27,7 +27,7 @@ class EightsData extends StoryData
     {
         parent::__construct($data);
 
-        $this->tgUser = $tgUser;
+        $this->human = new Human($tgUser);
     }
 
     protected function init() : void
@@ -53,15 +53,13 @@ class EightsData extends StoryData
         return $this;
     }
 
-    public function start() : self
+    public function initGame() : self
     {
-        $human = new Human($this->tgUser);
-
         $botCount = $this->playerCount - 1;
 
         $players = $this
             ->fetchBots($botCount)
-            ->add($human)
+            ->add($this->human)
             ->shuffle();
 
         $this->game = new EightsGame(
@@ -70,7 +68,7 @@ class EightsData extends StoryData
             ...$players
         );
 
-        $this->game->withObserver($human);
+        $this->game->withObserver($this->human);
 
         return $this;
     }
@@ -97,5 +95,15 @@ class EightsData extends StoryData
             new Bot('Гарри'),
             new Bot('Джеймс')
         );
+    }
+
+    public function jsonSerialize()
+    {
+        $data = parent::jsonSerialize();
+
+        $data['human_id'] = $this->human->id();
+        $data['game'] = $this->game;
+
+        return $data;
     }
 }

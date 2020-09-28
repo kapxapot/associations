@@ -41,4 +41,16 @@ class Bot extends Player
     {
         return $this->gender;
     }
+
+    // JsonSerializable
+
+    public function jsonSerialize()
+    {
+        $data = parent::jsonSerialize();
+
+        $data['name'] = $this->name;
+        $data['gender'] = $this->gender;
+
+        return $data;
+    }
 }

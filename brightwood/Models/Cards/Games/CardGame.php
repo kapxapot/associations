@@ -11,7 +11,7 @@ use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Webmozart\Assert\Assert;
 
-abstract class CardGame
+abstract class CardGame implements \JsonSerializable
 {
     protected Deck $deck;
     protected Pile $discard;
@@ -21,7 +21,7 @@ abstract class CardGame
     protected array $nextPlayers;
 
     protected Player $starter;
-    protected bool $started = false;
+    protected bool $isStarted = false;
 
     protected Player $observer;
 
@@ -123,7 +123,7 @@ abstract class CardGame
 
     public function isStarted() : bool
     {
-        return $this->started;
+        return $this->isStarted;
     }
 
     /**
@@ -184,14 +184,17 @@ abstract class CardGame
         return $this->discardSize() == 0;
     }
 
+    /**
+     * Deals cards and marks the game as started.
+     */
     public function start() : MessageInterface
     {
-        Assert::false($this->started);
+        Assert::false($this->isStarted);
         Assert::notNull($this->starter);
 
         $message = $this->dealing();
 
-        $this->started = true;
+        $this->isStarted = true;
 
         return $message;
     }
@@ -297,5 +300,18 @@ abstract class CardGame
 
         $player->removeCard($card);
         $this->trash->add($card);
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'players' => $this->players,
+            'deck' => $this->deck,
+            'discard' => $this->discard,
+            'trash' => $this->trash,
+            'starter_id' => $this->starter->id(),
+            'is_started' => $this->isStarted,
+            'observer_id' => $this->observer->id()
+        ];
     }
 }

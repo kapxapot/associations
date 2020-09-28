@@ -217,8 +217,13 @@ $app->group(
             );
 
             $this->get(
-                '/test/eights',
+                '/test/eights/play',
                 EightsTestController::class . ':play'
+            );
+
+            $this->get(
+                '/test/eights/serialize',
+                EightsTestController::class . ':serialize'
             );
         }
 

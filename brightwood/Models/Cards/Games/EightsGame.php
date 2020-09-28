@@ -2,7 +2,6 @@
 
 namespace Brightwood\Models\Cards\Games;
 
-use App\Semantics\Sentence;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
@@ -23,7 +22,6 @@ use Brightwood\Models\Cards\Sets\EightsDiscard;
 use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
-use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Parsing\StoryParser;
 use Plasticode\Util\Cases;
@@ -31,7 +29,7 @@ use Webmozart\Assert\Assert;
 
 class EightsGame extends CardGame
 {
-    private int $moves = 0;
+    private int $move = 0;
     private int $maxMoves = 1000; // safeguard
 
     private StoryParser $parser;
@@ -95,8 +93,6 @@ class EightsGame extends CardGame
     public function run() : MessageCollection
     {
         $messages = [];
-
-        $messages[] = $this->start();
 
         $player = $this->starter;
 
@@ -162,21 +158,23 @@ class EightsGame extends CardGame
     public function makeMove(Player $player) : MessageInterface
     {
         Assert::true($this->isValidPlayer($player));
-        Assert::true($this->started);
+        Assert::true($this->isStarted);
 
-        $this->moves++;
+        $this->move++;
 
         $moveStatus =
-            '[' . $this->moves . '] ' .
+            '[' . $this->move . '] ' .
             'Стол: ' . $this->discard()->topString() . ', ' .
             'Колода: ' . $this->deckSize();
 
-        $moveResults = $this
+        $moveMessages = $this
             ->actualMove($player)
             ->messagesFor($this->observer);
 
-        $message = new TextMessage($moveStatus);
-        $message->appendLines(...$moveResults);
+        $message = new TextMessage(
+            $moveStatus,
+            ...$moveMessages
+        );
 
         if ($this->showPlayersLine) {
             $message->appendLines(
@@ -356,7 +354,7 @@ class EightsGame extends CardGame
 
     public function winner() : ?Player
     {
-        if (!$this->started) {
+        if (!$this->isStarted) {
             return null;
         }
 
@@ -382,7 +380,7 @@ class EightsGame extends CardGame
 
     private function drawReason() : ?string
     {
-        if ($this->moves >= $this->maxMoves) {
+        if ($this->move >= $this->maxMoves) {
             return 'Превышено максимальное число ходов (' . $this->maxMoves . '), что-то явно не так!';
         }
 
@@ -391,5 +389,17 @@ class EightsGame extends CardGame
         }
 
         return null;
+    }
+
+    public function jsonSerialize()
+    {
+        $data = parent::jsonSerialize();
+
+        $data['move'] = $this->move;
+        $data['show_players_line'] = $this->showPlayersLine;
+        $data['gift'] = $this->gift;
+        $data['no_cards_in_a_row'] = $this->noCardsInARow;
+
+        return $data;
     }
 }

@@ -28,7 +28,12 @@ use Webmozart\Assert\Assert;
 
 class BrightwoodBotController extends Controller
 {
+    private const LOG_DISABLED = 0;
+    private const LOG_BRIEF = 1;
+    private const LOG_FULL = 2;
+
     private const STORY_SELECTION_COMMAND = '📚 Выбрать историю';
+    private const DUMMY_COMMAND = '⏳';
 
     private StoryRepositoryInterface $storyRepository;
     private StoryStatusRepositoryInterface $storyStatusRepository;
@@ -67,11 +72,14 @@ class BrightwoodBotController extends Controller
         ResponseInterface $response
     ) : ResponseInterface
     {
-        $logEnabled = $this->getSettings('telegram.brightwood_bot_log', false) === true;
+        $logLevel = $this->getSettings(
+            'telegram.brightwood_bot_log_level',
+            self::LOG_DISABLED
+        );
 
         $data = $request->getParsedBody();
 
-        if (!empty($data) && $logEnabled) {
+        if (!empty($data) && $logLevel >= self::LOG_BRIEF) {
             $this->logger->info('Got BRIGHTWOOD request', $data);
         }
 
@@ -83,21 +91,19 @@ class BrightwoodBotController extends Controller
 
         if ($answers->any()) {
             foreach ($answers as $answer) {
-                if ($logEnabled) {
+                if ($logLevel >= self::LOG_FULL) {
                     $this->logger->info('Trying to send message', $answer);
                 }
 
                 $result = $this->telegram->sendMessage($answer);
 
-                if ($logEnabled) {
+                if ($logLevel >= self::LOG_FULL) {
                     $this->logger->info('Send message result: ' . $result);
                 }
             }
-
-            return $response;
         }
 
-        throw new BadRequestException();
+        return $response;
     }
 
     private function processIncomingMessage(array $message) : ArrayCollection
@@ -201,7 +207,7 @@ class BrightwoodBotController extends Controller
         $actions = $message->actions();
 
         if (empty($actions)) {
-            $actions = ['⏳'];
+            $actions = [self::DUMMY_COMMAND];
         }
 
         if (count($actions) == 1 && $actions[0] == Story::RESTART_ACTION) {
@@ -263,6 +269,10 @@ class BrightwoodBotController extends Controller
         // check gender
         if (!$tgUser->hasGender()) {
             return $this->readGender($tgUser, $text);
+        }
+
+        if (self::DUMMY_COMMAND == $text) {
+            return MessageCollection::empty();
         }
 
         // try executing story-specific commands

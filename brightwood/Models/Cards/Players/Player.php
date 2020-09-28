@@ -11,7 +11,7 @@ use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Security;
 
-abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface
+abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface, \JsonSerializable
 {
     protected string $id;
     protected ?string $icon = null;
@@ -135,5 +135,18 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     public function __toString()
     {
         return $this->publicName();
+    }
+
+    // JsonSerializable
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'icon' => $this->icon,
+            'hand' => $this->hand->jsonSerialize(),
+            'is_inspector' => $this->isInspector,
+            'is_bot' => $this->isBot()
+        ];
     }
 }

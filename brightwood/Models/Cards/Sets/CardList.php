@@ -9,7 +9,7 @@ use Brightwood\Models\Cards\Card;
 /**
  * Just a bunch of cards.
  */
-abstract class CardList
+abstract class CardList implements \JsonSerializable
 {
     protected CardCollection $cards;
 
@@ -56,5 +56,12 @@ abstract class CardList
     public function toHomogeneousString() : string
     {
         return $this->cards->toHomogeneousString();
+    }
+
+    // JsonSerializable
+
+    public function jsonSerialize()
+    {
+        return $this->cards;
     }
 }
