@@ -256,6 +256,10 @@ abstract class CardGame implements \JsonSerializable
 
         if ($drawn->any()) {
             $this->discard->addMany($drawn);
+
+            $drawn->apply(
+                fn (Card $c) => $this->onDiscard($c)
+            );
         }
 
         return $drawn;
@@ -288,6 +292,16 @@ abstract class CardGame implements \JsonSerializable
 
         $player->removeCard($card);
         $this->discard->add($card);
+
+        $this->onDiscard($card, $player);
+    }
+
+    /**
+     * Override this method to apply some logic on every card discard.
+     */
+    protected function onDiscard(Card $card, ?Player $player = null) : void
+    {
+        // nothing here
     }
 
     /**

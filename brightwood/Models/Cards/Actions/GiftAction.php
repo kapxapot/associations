@@ -8,21 +8,16 @@ use Brightwood\Models\Cards\Players\Player;
 
 abstract class GiftAction extends Action
 {
-    protected Player $sender;
     protected Card $card;
+    protected ?Player $sender;
 
     public function __construct(
-        Player $sender,
-        Card $card
+        Card $card,
+        ?Player $sender = null
     )
     {
-        $this->sender = $sender;
         $this->card = $card;
-    }
-
-    public function sender() : Player
-    {
-        return $this->sender;
+        $this->sender = $sender;
     }
 
     public function card() : Card
@@ -30,8 +25,13 @@ abstract class GiftAction extends Action
         return $this->card;
     }
 
+    public function sender() : ?Player
+    {
+        return $this->sender;
+    }
+
     /**
-     * Returns initial events, that will be consumes on gift creation.
+     * Returns announcement events, that will be consumed on gift creation.
      */
-    abstract public function initialEvents() : CardEventCollection;
+    abstract public function announcementEvents() : CardEventCollection;
 }

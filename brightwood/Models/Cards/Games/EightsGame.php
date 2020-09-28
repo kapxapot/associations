@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Cards\Games;
 
 use Brightwood\Collections\Cards\CardCollection;
+use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\JackGiftAction;
@@ -148,11 +149,23 @@ class EightsGame extends CardGame
 
         $cards = $this->drawToDiscard();
 
-        return $message->appendLines(
-            !$cards->isEmpty()
-                ? 'Кладем ' . $cards . ' из колоды на стол'
-                : 'Че... Где все карты?'
+        Assert::notEmpty($cards);
+
+        $message->appendLines(
+            'Кладем ' . $cards . ' из колоды на стол'
         );
+
+        $events = $this->giftAnnouncementEvents();
+
+        if ($events->any()) {
+            $accum = new CardEventAccumulator(...$events);
+
+            $message->appendLines(
+                ...$accum->messagesFor($this->observer)
+            );
+        }
+
+        return $message;
     }
 
     public function makeMove(Player $player) : MessageInterface
@@ -189,8 +202,7 @@ class EightsGame extends CardGame
     {
         $events = new CardEventAccumulator();
 
-        $gift = $this->gift;
-        $this->gift = null;
+        $gift = $this->retrieveGift();
 
         if ($gift instanceof ApplicableActionInterface) {
             $giftEvents = $gift->applyTo($this, $player);
@@ -213,17 +225,12 @@ class EightsGame extends CardGame
                     )
                 );
 
-                // if we already have a winner, no need to make gifts
+                // add gift's announcement events, if there is no winner yet
+                // in case of a winner, gifts don't make sense
                 if (!$this->hasWinner()) {
-                    $gift = $this->toGift($player, $putCard);
-
-                    if ($gift) {
-                        $this->gift = $gift;
-
-                        $events->addMany(
-                            $gift->initialEvents()
-                        );
-                    }
+                    $events->addMany(
+                        $this->giftAnnouncementEvents()
+                    );
                 }
 
                 $this->noCardsInARow = 0;
@@ -253,55 +260,6 @@ class EightsGame extends CardGame
         return $events;
     }
 
-    private function toGift(Player $player, Card $card) : ?GiftAction
-    {
-        if (!($card instanceof SuitedCard)) {
-            return null;
-        }
-
-        // 6
-
-        if ($card->isRank(Rank::six())) {
-            return new SixGiftAction($player, $card);
-        }
-
-        // 7
-
-        if ($card->isRank(Rank::seven())) {
-            return new SevenGiftAction($player, $card);
-        }
-
-        // jack
-
-        if ($card->isRank(Rank::jack())) {
-            return new JackGiftAction($player, $card);
-        }
-
-        // 8
-
-        if ($card->isRank(Rank::eight())) {
-            $suit = $this->chooseSuit($player);
-            $action = new EightGiftAction($player, $card, $suit);
-
-            $card->addRestriction($action);
-
-            return $action;
-        }
-
-        return null;
-    }
-
-    private function chooseSuit(Player $player) : Suit
-    {
-        // todo: extract this to strategy
-
-        $suited = $player->hand()->suitedCards();
-
-        return $suited->any()
-            ? $suited->suits()->random()
-            : Suit::random();
-    }
-
     private function tryPutCard(Player $player) : ?Card
     {
         // todo: extract this to strategy
@@ -320,6 +278,85 @@ class EightsGame extends CardGame
         }
 
         return $suitableCard;
+    }
+
+    protected function onDiscard(Card $card, ?Player $player = null) : void
+    {
+        $this->placeGift(
+            $this->toGift($card, $player)
+        );
+    }
+
+    protected function placeGift(?GiftAction $gift) : void
+    {
+        $this->gift = $gift;
+    }
+
+    protected function retrieveGift() : ?GiftAction
+    {
+        $gift = $this->gift;
+        $this->gift = null;
+
+        return $gift;
+    }
+
+    protected function giftAnnouncementEvents() : CardEventCollection
+    {
+        return $this->gift
+            ? $this->gift->announcementEvents()
+            : CardEventCollection::empty();
+    }
+
+    private function toGift(Card $card, ?Player $player = null) : ?GiftAction
+    {
+        if (!($card instanceof SuitedCard)) {
+            return null;
+        }
+
+        // 6
+
+        if ($card->isRank(Rank::six())) {
+            return new SixGiftAction($card, $player);
+        }
+
+        // 7
+
+        if ($card->isRank(Rank::seven())) {
+            return new SevenGiftAction($card, $player);
+        }
+
+        // jack
+
+        if ($card->isRank(Rank::jack())) {
+            return new JackGiftAction($card, $player);
+        }
+
+        // 8
+
+        if ($card->isRank(Rank::eight())) {
+            $suit = $player
+                ? $this->chooseSuit($player)
+                : $card->suit();
+
+            $action = new EightGiftAction($card, $suit, $player);
+
+            $card->addRestriction($action);
+
+            return $action;
+        }
+
+        return null;
+    }
+
+    private function chooseSuit(Player $player) : Suit
+    {
+        // todo: extract this to strategy
+
+        $suited = $player->hand()->suitedCards();
+
+        return $suited->any()
+            ? $suited->suits()->random()
+            : Suit::random();
     }
 
     public function canBeDiscarded(Card $card) : bool

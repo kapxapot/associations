@@ -33,9 +33,9 @@ final class EightsDiscardTest extends TestCase
 
         $restricting->addRestriction(
             new EightGiftAction(
-                new Bot('bot'),
                 $restricting,
-                Suit::hearts()
+                Suit::hearts(),
+                new Bot('bot')
             )
         );
 
@@ -80,9 +80,9 @@ final class EightsDiscardTest extends TestCase
 
         $restricting->addRestriction(
             new EightGiftAction(
-                new Bot('bot'),
                 $restricting,
-                Suit::hearts()
+                Suit::hearts(),
+                new Bot('bot')
             )
         );
 

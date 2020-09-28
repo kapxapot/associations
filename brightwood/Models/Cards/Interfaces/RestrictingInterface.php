@@ -4,7 +4,7 @@ namespace Brightwood\Models\Cards\Interfaces;
 
 use Brightwood\Models\Cards\Card;
 
-interface RestrictingInterface
+interface RestrictingInterface extends \JsonSerializable
 {
     /**
      * Returns true if the card falls under the restriction.

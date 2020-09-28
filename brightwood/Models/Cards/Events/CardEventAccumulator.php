@@ -11,9 +11,9 @@ class CardEventAccumulator
 {
     private CardEventCollection $events;
 
-    public function __construct()
+    public function __construct(CardEventInterface ...$events)
     {
-        $this->events = CardEventCollection::empty();
+        $this->events = CardEventCollection::make($events);
     }
 
     public function events() : CardEventCollection
@@ -35,6 +35,9 @@ class CardEventAccumulator
         return $this;
     }
 
+    /**
+     * Is there a skip event in the accumulator?
+     */
     public function hasSkip() : bool
     {
         return $this

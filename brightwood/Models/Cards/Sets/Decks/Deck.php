@@ -40,7 +40,7 @@ abstract class Deck extends CardList
     }
 
     /**
-     * Removes first card from deck and returns it.
+     * Removes first card from the deck and returns it.
      * Returns null in case of empty deck.
      */
     public function draw() : ?Card
@@ -49,7 +49,7 @@ abstract class Deck extends CardList
     }
 
     /**
-     * Removes up to $amount first cards from deck and returns them.
+     * Removes up to $amount first cards from the deck and returns them.
      * 
      * @throws \InvalidArgumentException
      */

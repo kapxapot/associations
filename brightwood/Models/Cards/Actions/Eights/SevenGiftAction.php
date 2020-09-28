@@ -10,11 +10,10 @@ use Brightwood\Models\Cards\Events\DrawEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Player;
-use Brightwood\Models\Cards\Rank;
 
 class SevenGiftAction extends GiftAction implements ApplicableActionInterface
 {
-    public function initialEvents() : CardEventCollection
+    public function announcementEvents() : CardEventCollection
     {
         return CardEventCollection::collect(
             new PublicEvent('Следующий игрок берет 2 карты и пропускает ход')

@@ -15,17 +15,17 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface
     protected ?string $reason;
 
     public function __construct(
-        Player $sender,
         Card $card,
+        ?Player $sender = null,
         ?string $reason = null
     )
     {
-        parent::__construct($sender, $card);
+        parent::__construct($card, $sender);
 
         $this->reason = $reason;
     }
 
-    public function initialEvents() : CardEventCollection
+    public function announcementEvents() : CardEventCollection
     {
         return CardEventCollection::collect(
             new PublicEvent('Следующий игрок пропускает ход')

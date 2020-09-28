@@ -16,15 +16,32 @@ class EightGiftAction extends GiftAction implements RestrictingInterface
     protected Suit $suit;
 
     public function __construct(
-        Player $sender,
-        Card $gift,
-        Suit $suit
+        Card $card,
+        Suit $suit,
+        ?Player $sender = null
     )
     {
-        parent::__construct($sender, $gift);
+        parent::__construct($card, $sender);
 
         $this->suit = $suit;
     }
+
+    public function announcementEvents() : CardEventCollection
+    {
+        $events = CardEventCollection::empty();
+
+        if ($this->sender) {
+            $events = $events->add(
+                new SuitRestrictionEvent($this->sender, $this->suit)
+            );
+        }
+
+        return $events->add(
+            new PublicEvent('Следующий игрок должен положить <b>' . $this . '</b>')
+        );
+    }
+
+    // RestrictingInterface
 
     /**
      * Returns true if the card falls under the restriction.
@@ -47,13 +64,12 @@ class EightGiftAction extends GiftAction implements RestrictingInterface
         return $this->suit->fullNameRu();
     }
 
-    public function initialEvents() : CardEventCollection
-    {
-        $suitName = $this->suit->fullNameRu();
+    // JsonSerializable
 
-        return CardEventCollection::collect(
-            new SuitRestrictionEvent($this->sender, $this->suit),
-            new PublicEvent('Следующий игрок должен положить <b>' . $suitName . '</b>')
-        );
+    public function jsonSerialize()
+    {
+        return [
+            'suit' => $this->suit
+        ];
     }
 }
