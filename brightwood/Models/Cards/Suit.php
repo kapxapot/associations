@@ -5,7 +5,7 @@ namespace Brightwood\Models\Cards;
 use Brightwood\Collections\Cards\SuitCollection;
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 
-class Suit implements EquatableInterface
+class Suit implements EquatableInterface, \JsonSerializable
 {
     private const SPADES = 1;
     private const CLUBS = 2;
@@ -131,6 +131,13 @@ class Suit implements EquatableInterface
     }
 
     public function __toString()
+    {
+        return $this->toString();
+    }
+
+    // JsonSerializable
+
+    public function jsonSerialize()
     {
         return $this->toString();
     }

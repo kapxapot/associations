@@ -83,6 +83,7 @@ class EightsTestController
 
         $data->initGame();
         $data->game()->start();
+        $data->game()->run();
 
         return Response::text($response, json_encode($data));
     }

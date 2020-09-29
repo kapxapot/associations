@@ -202,13 +202,13 @@ class Rank implements EquatableInterface
         );
     }
 
-    public function toString() : string
-    {
-        return $this->value();
-    }
-
     public function __toString()
     {
         return $this->toString();
+    }
+
+    public function toString() : string
+    {
+        return $this->value;
     }
 }

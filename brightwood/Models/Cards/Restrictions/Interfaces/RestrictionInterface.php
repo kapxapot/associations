@@ -1,10 +1,10 @@
 <?php
 
-namespace Brightwood\Models\Cards\Interfaces;
+namespace Brightwood\Models\Cards\Restrictions\Interfaces;
 
 use Brightwood\Models\Cards\Card;
 
-interface RestrictingInterface extends \JsonSerializable
+interface RestrictionInterface extends \JsonSerializable
 {
     /**
      * Returns true if the card falls under the restriction.

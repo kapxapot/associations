@@ -40,8 +40,11 @@ abstract class GiftAction implements \JsonSerializable
     public function jsonSerialize()
     {
         return [
-            'card' => $this->card,
-            'sender' => $this->sender
+            'type' => static::class,
+            'data' => [
+                'card' => $this->card,
+                'sender' => $this->sender
+            ]
         ];
     }
 }

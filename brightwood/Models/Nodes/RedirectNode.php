@@ -47,10 +47,7 @@ class RedirectNode extends LinkedNode
 
         return StoryMessageSequence::mash(
             new StoryMessage(
-                $this->id,
-                $this->text,
-                null,
-                $data
+                $this->id, $this->text, null, $data
             ),
             $nextNode->getMessages($data)
         );

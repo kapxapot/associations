@@ -48,10 +48,7 @@ class ActionNode extends LinkedNode
 
         return new StoryMessageSequence(
             new StoryMessage(
-                $this->id,
-                $this->text,
-                $actions,
-                $data
+                $this->id, $this->text, $actions, $data
             )
         );
     }

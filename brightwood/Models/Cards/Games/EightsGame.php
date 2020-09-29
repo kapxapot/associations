@@ -340,7 +340,9 @@ class EightsGame extends CardGame
 
             $action = new EightGiftAction($card, $suit, $player);
 
-            $card->addRestriction($action);
+            $card->addRestriction(
+                $action->restriction()
+            );
 
             return $action;
         }

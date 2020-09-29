@@ -3,9 +3,7 @@
 namespace Brightwood\Models\Stories;
 
 use App\Models\TelegramUser;
-use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Data\EightsData;
-use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;

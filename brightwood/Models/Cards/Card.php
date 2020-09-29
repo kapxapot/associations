@@ -3,11 +3,11 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
-use Brightwood\Models\Cards\Interfaces\RestrictingInterface;
+use Brightwood\Models\Cards\Restrictions\Interfaces\RestrictionInterface;
 
 abstract class Card implements EquatableInterface, \JsonSerializable
 {
-    private ?RestrictingInterface $restriction = null;
+    private ?RestrictionInterface $restriction = null;
 
     public function __toString()
     {
@@ -54,7 +54,7 @@ abstract class Card implements EquatableInterface, \JsonSerializable
     /**
      * @return static
      */
-    public function addRestriction(RestrictingInterface $restriction) : self
+    public function addRestriction(RestrictionInterface $restriction) : self
     {
         $this->restriction = $restriction;
 
@@ -66,7 +66,7 @@ abstract class Card implements EquatableInterface, \JsonSerializable
         return $this->restriction !== null;
     }
 
-    public function restriction() : ?RestrictingInterface
+    public function restriction() : ?RestrictionInterface
     {
         return $this->restriction;
     }
@@ -75,6 +75,11 @@ abstract class Card implements EquatableInterface, \JsonSerializable
 
     public function jsonSerialize()
     {
-        return $this->toString();
+        return $this->hasRestriction()
+            ? [
+                'card' => $this->toString(),
+                'restriction' => $this->restriction()
+            ]
+            : $this->toString();
     }
 }

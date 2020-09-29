@@ -29,14 +29,16 @@ final class EightsDiscardTest extends TestCase
         $clubs8 = new SuitedCard(Suit::clubs(), Rank::eight());
         $joker = new Joker();
 
-        $restricting = new SuitedCard(Suit::clubs(), Rank::eight());
+        $restrictingCard = new SuitedCard(Suit::clubs(), Rank::eight());
 
-        $restricting->addRestriction(
-            new EightGiftAction(
-                $restricting,
-                Suit::hearts(),
-                new Bot('bot')
-            )
+        $gift = new EightGiftAction(
+            $restrictingCard,
+            Suit::hearts(),
+            new Bot('bot')
+        );
+
+        $restrictingCard->addRestriction(
+            $gift->restriction()
         );
 
         return [
@@ -53,9 +55,9 @@ final class EightsDiscardTest extends TestCase
             ],
             [
                 (new EightsDiscard())
-                    ->add($restricting)
+                    ->add($restrictingCard)
                     ->add($joker),
-                $restricting
+                $restrictingCard
             ]
         ];
     }
@@ -76,14 +78,16 @@ final class EightsDiscardTest extends TestCase
         $clubs8 = new SuitedCard(Suit::clubs(), Rank::eight());
         $joker = new Joker();
 
-        $restricting = new SuitedCard(Suit::clubs(), Rank::eight());
+        $restrictingCard = new SuitedCard(Suit::clubs(), Rank::eight());
 
-        $restricting->addRestriction(
-            new EightGiftAction(
-                $restricting,
-                Suit::hearts(),
-                new Bot('bot')
-            )
+        $gift = new EightGiftAction(
+            $restrictingCard,
+            Suit::hearts(),
+            new Bot('bot')
+        );
+
+        $restrictingCard->addRestriction(
+            $gift->restriction()
         );
 
         return [
@@ -100,9 +104,9 @@ final class EightsDiscardTest extends TestCase
             ],
             [
                 (new EightsDiscard())
-                    ->add($restricting)
+                    ->add($restrictingCard)
                     ->add($joker),
-                $joker . ' (' . $restricting->restriction() . ')'
+                $joker . ' (' . $restrictingCard->restriction() . ')'
             ]
         ];
     }

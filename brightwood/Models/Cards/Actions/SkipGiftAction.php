@@ -38,4 +38,15 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface
             new SkipEvent($player, $this->reason)
         );
     }
+
+    // JsonSerializable
+
+    public function jsonSerialize()
+    {
+        $data = parent::jsonSerialize();
+
+        $data['data']['reason'] = $this->reason;
+
+        return $data;
+    }
 }
