@@ -190,8 +190,6 @@ class BrightwoodBotController extends Controller
 
         $defaultActions = $sequence->actions();
 
-        $this->logger->info('finalized? ' . ($sequence->isFinalized() ? 'yes' : 'no'));
-
         if (empty($defaultActions)) {
             $defaultActions = $sequence->isFinalized()
                 ? [Story::RESTART_ACTION, self::STORY_SELECTION_COMMAND]

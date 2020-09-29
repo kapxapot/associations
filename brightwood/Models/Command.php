@@ -55,7 +55,7 @@ class Command
         $codeStr = $this->codeString();
 
         return $this->label
-            ? $codeStr . ' ' . $this->label
+            ? $this->label . ' ' . $codeStr
             : $codeStr;
     }
 }
