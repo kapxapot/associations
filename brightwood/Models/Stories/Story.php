@@ -3,19 +3,19 @@
 namespace Brightwood\Models\Stories;
 
 use App\Models\TelegramUser;
-use Brightwood\Collections\MessageCollection;
 use Brightwood\Collections\StoryNodeCollection;
+use Brightwood\Models\Command;
 use Brightwood\Models\Data\StoryData;
+use Brightwood\Models\Interfaces\CommandProviderInterface;
 use Brightwood\Models\Links\ActionLink;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\StoryNode;
 use Plasticode\Exceptions\InvalidConfigurationException;
-use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
-abstract class Story
+abstract class Story implements CommandProviderInterface
 {
     public const RESTART_ACTION = '♻ Начать заново';
 
@@ -74,9 +74,12 @@ abstract class Story
         ?array $data = null
     ) : StoryData;
 
-    public function executeCommand(string $command) : MessageCollection
+    /**
+     * Override this.
+     */
+    public function executeCommand(string $command) : StoryMessageSequence
     {
-        return MessageCollection::empty();
+        return StoryMessageSequence::empty();
     }
 
     abstract protected function build() : void;
@@ -158,15 +161,15 @@ abstract class Story
 
     /**
      * Checks if the node is a finish node (= no actions)
-     * and adds restart action in that case.
+     * and marks the sequence as finalized in that case.
      */
     public function checkForFinish(StoryMessageSequence $sequence) : StoryMessageSequence
     {
         $resultNode = $this->getNode($sequence->nodeId());
 
-        return $resultNode && $resultNode->isFinish($sequence->data())
-            ? $sequence->withActions(self::RESTART_ACTION)
-            : $sequence;
+        return $sequence->finalize(
+            $resultNode && $resultNode->isFinish($sequence->data())
+        );
     }
 
     /**
@@ -226,5 +229,15 @@ abstract class Story
         foreach ($this->nodes as $node) {
             $node->checkIntegrity();
         }
+    }
+
+    // CommandProviderInterface
+
+    public function toCommand(): Command
+    {
+        return new Command(
+            'story_' . $this->id(),
+            $this->name()
+        );
     }
 }

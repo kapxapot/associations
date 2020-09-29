@@ -82,11 +82,28 @@ final class StoryTest extends TestCase
 
         $sequence = $story->renderNode($node, $data);
 
-        $this->assertNotEmpty(
+        $this->assertEmpty(
             $sequence->actions()
         );
 
-        $this->assertNotEmpty(
+        $this->assertEmpty(
+            $sequence->messages()->last()->actions()
+        );
+    }
+
+    public function testEmptyFinishNode() : void
+    {
+        $story = new TestStory(1);
+        $node = $story->getNode(8);
+        $data = $story->makeData(new TelegramUser());
+
+        $sequence = $story->renderNode($node, $data);
+
+        $this->assertEmpty(
+            $sequence->actions()
+        );
+
+        $this->assertEmpty(
             $sequence->messages()->last()->actions()
         );
     }

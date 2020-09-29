@@ -45,16 +45,13 @@ class RedirectNode extends LinkedNode
         $nextNode = $this->resolveNode($link->nodeId());
         $data = $link->mutate($data);
 
-        $sequence = new StoryMessageSequence(
+        return StoryMessageSequence::mash(
             new StoryMessage(
                 $this->id,
                 $this->text,
                 null,
                 $data
-            )
-        );
-
-        return $sequence->merge(
+            ),
             $nextNode->getMessages($data)
         );
     }

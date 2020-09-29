@@ -6,8 +6,9 @@ use Brightwood\Collections\MessageCollection;
 use Brightwood\Collections\StoryMessageCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
+use Brightwood\Models\Messages\Interfaces\SequencableInterface;
 
-class StoryMessageSequence
+class StoryMessageSequence implements SequencableInterface
 {
     private MessageCollection $messages;
 
@@ -15,6 +16,8 @@ class StoryMessageSequence
     private array $actions;
 
     private ?StoryData $data = null;
+
+    private bool $isFinalized = false;
 
     public function __construct(
         MessageInterface ...$messages
@@ -34,11 +37,49 @@ class StoryMessageSequence
         return $this->messages->storyMessages();
     }
 
+    public function isFinalized() : bool
+    {
+        return $this->isFinalized;
+    }
+
     public function add(MessageInterface ...$messages) : self
     {
         $this->messages = $this->messages->add(...$messages);
 
         return $this;
+    }
+
+    /**
+     * "Mashes" together messages and sequences, returning a resulting sequence.
+     */
+    public static function mash(SequencableInterface ...$items) : self
+    {
+        $sequence = new self();
+
+        foreach ($items as $item) {
+            if ($item instanceof MessageInterface) {
+                $sequence->add($item);
+            }
+
+            if ($item instanceof self) {
+                $sequence = $sequence->merge($item);
+            }
+        }
+
+        return $sequence;
+    }
+
+    /**
+     * Creates an empty sequence.
+     */
+    public static function empty() : self
+    {
+        return new self();
+    }
+
+    public function isEmpty() : bool
+    {
+        return $this->messages->isEmpty();
     }
 
     /**
@@ -87,6 +128,13 @@ class StoryMessageSequence
     public function withData(StoryData $data) : self
     {
         $this->data = $data;
+
+        return $this;
+    }
+
+    public function finalize(bool $state = true) : self
+    {
+        $this->isFinalized = $state;
 
         return $this;
     }
@@ -148,9 +196,10 @@ class StoryMessageSequence
     }
 
     /**
-     * Concats messages.
+     * Concats messages and creates a NEW sequence.
      * 
-     * If there are overrides, they are taken from the added sequence (!).
+     * If there are overrides or other attributes (such as isFinalized),
+     * they are taken from the added sequence (!).
      */
     public function merge(self $other) : self
     {
@@ -169,6 +218,8 @@ class StoryMessageSequence
             );
         }
 
-        return $sequence;
+        return $sequence->finalize(
+            $other->isFinalized()
+        );
     }
 }

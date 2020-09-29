@@ -4,7 +4,7 @@ namespace Brightwood\Models\Messages\Interfaces;
 
 use Brightwood\Models\Data\StoryData;
 
-interface MessageInterface
+interface MessageInterface extends SequencableInterface
 {
     /**
      * @return string[]

@@ -18,9 +18,4 @@ class MessageCollection extends TypedCollection
             )
         );
     }
-
-    public function prepend(MessageInterface ...$messages) : self
-    {
-        return self::collect(...$messages)->concat($this);
-    }
 }

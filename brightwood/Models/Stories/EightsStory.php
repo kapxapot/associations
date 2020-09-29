@@ -32,7 +32,7 @@ class EightsStory extends Story
         int $id
     )
     {
-        parent::__construct($id, '♠ Восьмерки');
+        parent::__construct($id, '♠ Восьмерки (в разработке)', true);
     }
 
     public function makeData(TelegramUser $tgUser, ?array $data = null) : EightsData
@@ -40,11 +40,11 @@ class EightsStory extends Story
         return new EightsData($tgUser, $data);
     }
 
-    public function executeCommand(string $command) : MessageCollection
+    public function executeCommand(string $command) : StoryMessageSequence
     {
         switch ($command) {
             case self::RULES_COMMAND:
-                return MessageCollection::collect(
+                return new StoryMessageSequence(
                     new TextMessage(
                         '<b>Правила игры в «Восьмерки»</b>',
                         'Колода: 52 карты + 2 джокера',

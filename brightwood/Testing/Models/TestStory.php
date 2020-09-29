@@ -109,5 +109,12 @@ class TestStory extends Story
                 1
             )
         );
+
+        $this->addNode(
+            new FinishNode(
+                8,
+                []
+            )
+        );
     }
 }
