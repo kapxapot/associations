@@ -16,9 +16,14 @@ class Bot extends Player
 
         $this->name = $name;
 
-        $this->icon = Collection::collect(
-            '🤖', '👽', '🐵', '🐶', '🐱', '🦊', '🐭', '🐹', '🐰', '🐻', '🐷', '🐯', '🐺', '🐸', '🦁', '🐮', '🐨', '🐼'
-        )->random();
+        $this->icon =
+            Collection::collect(
+                '🤖', '👽', '🐵', '🐶', '🐱',
+                '🦊', '🐭', '🐹', '🐰', '🐻',
+                '🐷', '🐯', '🐺', '🐸', '🦁',
+                '🐮', '🐨', '🐼'
+            )
+            ->random();
 
         $this->gender = $gender ?? Cases::MAS;
     }
@@ -42,15 +47,18 @@ class Bot extends Player
         return $this->gender;
     }
 
-    // JsonSerializable
+    // SerializableInterface
 
-    public function jsonSerialize()
+    /**
+     * @param array[] $data
+     */
+    public function serialize(array ...$data) : array
     {
-        $data = parent::jsonSerialize();
-
-        $data['name'] = $this->name;
-        $data['gender'] = $this->gender;
-
-        return $data;
+        return parent::serialize(
+            [
+                'name' => $this->name,
+                'gender' => $this->gender
+            ]
+        );
     }
 }

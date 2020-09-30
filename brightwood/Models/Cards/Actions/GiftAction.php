@@ -4,10 +4,14 @@ namespace Brightwood\Models\Cards\Actions;
 
 use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Models\Cards\Card;
+use Brightwood\Models\Cards\Interfaces\SerializableInterface;
 use Brightwood\Models\Cards\Players\Player;
+use Brightwood\Models\Cards\Traits\UniformSerialize;
 
-abstract class GiftAction implements \JsonSerializable
+abstract class GiftAction implements SerializableInterface
 {
+    use UniformSerialize;
+
     protected Card $card;
     protected ?Player $sender;
 
@@ -35,16 +39,20 @@ abstract class GiftAction implements \JsonSerializable
      */
     abstract public function announcementEvents() : CardEventCollection;
 
-    // JsonSerializable
+    // SerializableInterface
 
-    public function jsonSerialize()
+    /**
+     * @param array[] $data
+     */
+    public function serialize(array ...$data) : array
     {
-        return [
-            'type' => static::class,
-            'data' => [
+        return $this->serializeRoot(
+            [
                 'card' => $this->card,
-                'sender' => $this->sender
+                'sender_id' => $this->sender
+                    ? $this->sender->id()
+                    : null
             ]
-        ];
+        );
     }
 }

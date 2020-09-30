@@ -46,14 +46,15 @@ class Human extends Player
         return $this->tgUser->gender();
     }
 
-    // JsonSerializable
+    // SerializableInterface
 
-    public function jsonSerialize()
+    /**
+     * @param array[] $data
+     */
+    public function serialize(array ...$data) : array
     {
-        $data = parent::jsonSerialize();
-
-        $data['telegram_user_id'] = $this->tgUser->getId();
-
-        return $data;
+        return parent::serialize(
+            ['telegram_user_id' => $this->tgUser->getId()]
+        );
     }
 }

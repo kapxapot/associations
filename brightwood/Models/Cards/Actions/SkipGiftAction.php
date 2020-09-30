@@ -39,14 +39,15 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface
         );
     }
 
-    // JsonSerializable
+    // SerializableInterface
 
-    public function jsonSerialize()
+    /**
+     * @param array[] $data
+     */
+    public function serialize(array ...$data) : array
     {
-        $data = parent::jsonSerialize();
-
-        $data['data']['reason'] = $this->reason;
-
-        return $data;
+        return parent::serialize(
+            ['reason' => $this->reason]
+        );
     }
 }

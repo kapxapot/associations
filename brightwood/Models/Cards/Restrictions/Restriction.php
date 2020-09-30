@@ -4,9 +4,12 @@ namespace Brightwood\Models\Cards\Restrictions;
 
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Restrictions\Interfaces\RestrictionInterface;
+use Brightwood\Models\Cards\Traits\UniformSerialize;
 
 abstract class Restriction implements RestrictionInterface
 {
+    use UniformSerialize;
+
     abstract public function isCompatible(Card $card) : bool;
 
     public function __toString()
@@ -16,12 +19,10 @@ abstract class Restriction implements RestrictionInterface
 
     abstract function toString() : string;
 
-    // JsonSerializable
+    // SerializableInterface
 
-    public function jsonSerialize()
+    public function serialize(array ...$data) : array
     {
-        return [
-            'type' => static::class
-        ];
+        return $this->serializeRoot(...$data);
     }
 }

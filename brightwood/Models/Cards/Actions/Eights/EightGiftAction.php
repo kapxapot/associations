@@ -49,14 +49,15 @@ class EightGiftAction extends GiftAction
         return new SuitRestriction($this->suit);
     }
 
-    // JsonSerializable
+    // SerializableInterface
 
-    public function jsonSerialize()
+    /**
+     * @param array[] $data
+     */
+    public function serialize(array ...$data) : array
     {
-        $data = parent::jsonSerialize();
-
-        $data['data']['suit'] = $this->suit;
-
-        return $data;
+        return parent::serialize(
+            ['suit' => $this->suit]
+        );
     }
 }

@@ -8,11 +8,15 @@ use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Sets\Hand;
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
+use Brightwood\Models\Cards\Interfaces\SerializableInterface;
+use Brightwood\Models\Cards\Traits\UniformSerialize;
 use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Security;
 
-abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface, \JsonSerializable
+abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface, SerializableInterface
 {
+    use UniformSerialize;
+
     protected string $id;
     protected ?string $icon = null;
 
@@ -137,16 +141,20 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
         return $this->publicName();
     }
 
-    // JsonSerializable
+    // SerializableInterface
 
-    public function jsonSerialize()
+    /**
+     * @param array[] $data
+     */
+    public function serialize(array ...$data) : array
     {
-        return [
-            'id' => $this->id,
-            'icon' => $this->icon,
-            'hand' => $this->hand->jsonSerialize(),
-            'is_inspector' => $this->isInspector,
-            'is_bot' => $this->isBot()
-        ];
+        return $this->serializeRoot(
+            [
+                'id' => $this->id,
+                'icon' => $this->icon,
+                'hand' => $this->hand,
+                'is_inspector' => $this->isInspector
+            ]
+        );
     }
 }
