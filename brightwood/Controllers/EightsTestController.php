@@ -34,7 +34,7 @@ class EightsTestController
         $game =new EightsGame(
             new StoryParser(),
             new Cases(),
-            ...$players
+            $players
         );
 
         $game->withObserver($players->random());

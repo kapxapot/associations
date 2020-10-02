@@ -4,6 +4,7 @@ namespace Brightwood\Models\Cards\Games;
 
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\CardEventCollection;
+use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\JackGiftAction;
@@ -51,13 +52,13 @@ class EightsGame extends CardGame
     public function __construct(
         StoryParser $parser,
         Cases $cases,
-        Player ...$players
+        PlayerCollection $players
     )
     {
         parent::__construct(
             new FullDeck(),
             new EightsDiscard(),
-            ...$players
+            $players
         );
 
         $this->parser = $parser;

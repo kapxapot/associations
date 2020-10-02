@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Cards\Restrictions\Interfaces;
 
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Interfaces\SerializableInterface;
+use Brightwood\Serialization\Interfaces\SerializableInterface;
 
 interface RestrictionInterface extends SerializableInterface
 {

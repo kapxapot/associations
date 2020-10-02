@@ -65,7 +65,7 @@ class EightsData extends StoryData
         $this->game = new EightsGame(
             new StoryParser(),
             new Cases(),
-            ...$players
+            $players
         );
 
         $this->game->withObserver($this->human);

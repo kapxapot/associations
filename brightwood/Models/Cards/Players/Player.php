@@ -8,58 +8,82 @@ use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Sets\Hand;
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
-use Brightwood\Models\Cards\Interfaces\SerializableInterface;
-use Brightwood\Models\Cards\Traits\UniformSerialize;
+use Brightwood\Serialization\Interfaces\SerializableInterface;
+use Brightwood\Serialization\UniformSerializer;
 use Plasticode\Collections\Basic\Collection;
 use Plasticode\Core\Security;
 
 abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface, SerializableInterface
 {
-    use UniformSerialize;
-
-    protected string $id;
+    protected ?string $id = null;
     protected ?string $icon = null;
-
-    protected Hand $hand;
-
+    protected ?Hand $hand = null;
     protected bool $isInspector = false;
-
-    public function __construct()
-    {
-        $this->id = Security::generateToken(10);
-        $this->hand = new Hand();
-    }
 
     public function id() : string
     {
+        $this->id ??= Security::generateToken(10);
+
         return $this->id;
+    }
+
+    /**
+     * @return static
+     */
+    public function withId(string $id) : self
+    {
+        $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function withIcon(string $icon) : self
+    {
+        $this->icon = $icon;
+
+        return $this;
     }
 
     public function hand() : Hand
     {
+        $this->hand ??= new Hand();
+
         return $this->hand;
+    }
+
+    /**
+     * @return static
+     */
+    public function withHand(Hand $hand) : self
+    {
+        $this->hand = $hand;
+
+        return $this;
     }
 
     public function handSize() : int
     {
-        return $this->hand->size();
+        return $this->hand()->size();
     }
 
     abstract public function isBot() : bool;
 
     public function addCards(CardCollection $cards) : void
     {
-        $this->hand->addMany($cards);
+        $this->hand()->addMany($cards);
     }
 
     public function removeCard(Card $card) : void
     {
-        $this->hand->remove($card);
+        $this->hand()->remove($card);
     }
 
     public function hasCard(Card $card) : bool
     {
-        return $this->hand->contains($card);
+        return $this->hand()->contains($card);
     }
 
     public function equals(?EquatableInterface $obj) : bool
@@ -67,22 +91,22 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
         return
             $obj
             && ($obj instanceof self)
-            && ($this->id === $obj->id());
-    }
-
-    /**
-     * @return static
-     */
-    public function asInspector() : self
-    {
-        $this->isInspector = true;
-
-        return $this;
+            && ($this->id() === $obj->id());
     }
 
     public function isInspector() : bool
     {
         return $this->isInspector;
+    }
+
+    /**
+     * @return static
+     */
+    public function withIsInspector(bool $isInspector) : self
+    {
+        $this->isInspector = $isInspector;
+
+        return $this;
     }
 
     public function nameFor(?self $other) : string
@@ -126,6 +150,11 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
         return $this . ' (' . $this->handSize() . ')';
     }
 
+    public function __toString()
+    {
+        return $this->publicName();
+    }
+
     // NamedInterface
 
     abstract public function name() : string;
@@ -134,27 +163,27 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
 
     abstract public function gender() : int;
 
-    // toString
-
-    public function __toString()
-    {
-        return $this->publicName();
-    }
-
     // SerializableInterface
+
+    public function jsonSerialize()
+    {
+        return $this->serialize();
+    }
 
     /**
      * @param array[] $data
      */
     public function serialize(array ...$data) : array
     {
-        return $this->serializeRoot(
+        return UniformSerializer::serialize(
+            $this,
             [
-                'id' => $this->id,
+                'id' => $this->id(),
                 'icon' => $this->icon,
-                'hand' => $this->hand,
+                'hand' => $this->hand(),
                 'is_inspector' => $this->isInspector
-            ]
+            ],
+            ...$data
         );
     }
 }

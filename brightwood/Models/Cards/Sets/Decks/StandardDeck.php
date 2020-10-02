@@ -31,8 +31,7 @@ class StandardDeck extends ShortDeck
             }
         }
 
-        return parent::build()->concat(
-            CardCollection::make($moreCards)
-        );
+        return parent::build()
+            ->add(...$moreCards);
     }
 }

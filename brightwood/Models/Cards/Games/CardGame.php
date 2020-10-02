@@ -28,7 +28,7 @@ abstract class CardGame implements \JsonSerializable
     public function __construct(
         Deck $deck,
         Pile $discard,
-        Player ...$players
+        PlayerCollection $players
     )
     {
         Assert::notEmpty($players);
@@ -37,7 +37,7 @@ abstract class CardGame implements \JsonSerializable
         $this->discard = $discard;
         $this->trash = new Pile();
 
-        $this->players = PlayerCollection::make($players);
+        $this->players = $players;
 
         Assert::true($this->isValidPlayerCount());
 
@@ -78,7 +78,7 @@ abstract class CardGame implements \JsonSerializable
     /**
      * Build a support array for quick next player retrieval.
      */
-    private function initNextPlayers()
+    private function initNextPlayers() : void
     {
         $this->nextPlayers = [];
 

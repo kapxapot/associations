@@ -10,10 +10,11 @@ class Bot extends Player
     protected string $name;
     protected int $gender;
 
-    public function __construct(string $name, ?int $gender = null)
+    public function __construct(
+        string $name,
+        ?int $gender = null
+    )
     {
-        parent::__construct();
-
         $this->name = $name;
 
         $this->icon =

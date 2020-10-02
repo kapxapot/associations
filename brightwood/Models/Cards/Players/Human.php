@@ -13,8 +13,6 @@ class Human extends Player
         TelegramUser $tgUser
     )
     {
-        parent::__construct();
-
         $this->tgUser = $tgUser;
 
         $this->icon = $this->gender() == Cases::MAS

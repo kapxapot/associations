@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Models\Cards\Interfaces;
+namespace Brightwood\Serialization\Interfaces;
 
 interface SerializableInterface extends \JsonSerializable
 {

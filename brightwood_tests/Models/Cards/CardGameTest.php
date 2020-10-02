@@ -2,6 +2,7 @@
 
 namespace Brightwood\Tests\Models\Cards;
 
+use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Testing\Models\TestDeck;
@@ -18,8 +19,7 @@ final class CardGameTest extends TestCase
         $game = new TestGame(
             new TestDeck(false),
             new Pile(),
-            $bot1,
-            $bot2
+            PlayerCollection::collect($bot1, $bot2)
         );
 
         $this->assertEquals(
