@@ -1,28 +1,36 @@
 <?php
 
-namespace Brightwood\Serialization\Factories;
+namespace Brightwood\Serialization\Serializers;
 
+use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\Cards\Players\Human;
+use Brightwood\Serialization\Interfaces\JsonDeserializerInterface;
 
-class HumanSerializer extends Serializer
+class HumanSerializer extends PlayerSerializer
 {
+    private TelegramUserRepositoryInterface $telegramUserRepository;
+
+    public function __construct(
+        TelegramUserRepositoryInterface $telegramUserRepository
+    )
+    {
+        $this->telegramUserRepository = $telegramUserRepository;
+    }
+
     /**
      * @param Human $obj
      */
-    public static function deserialize(object $obj, array $data) : Human
+    public function deserialize(
+        JsonDeserializerInterface $deserializer,
+        object $obj,
+        array $data
+    ) : Human
     {
-        return $obj;
-        // "id": "e9529ed13767cb2422b5",
-        // "icon": "👦",
-        // "hand": {
-        //   "type": "Brightwood\\Models\\Cards\\Sets\\Hand",
-        //   "data": {
-        //     "cards": [
-              
-        //     ]
-        //   }
-        // },
-        // "is_inspector": false,
-        // "telegram_user_id": 1
+        /** @var Human */
+        $obj = parent::deserialize($deserializer, $obj, $data);
+
+        $tgUser = $this->telegramUserRepository->get($data['telegram_user_id']);
+
+        return $obj->withTelegramUser($tgUser);
     }
 }

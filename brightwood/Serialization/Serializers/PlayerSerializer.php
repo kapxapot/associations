@@ -1,22 +1,27 @@
 <?php
 
-namespace Brightwood\Serialization\Factories;
+namespace Brightwood\Serialization\Serializers;
 
 use Brightwood\Models\Cards\Players\Player;
-use Brightwood\Serialization\UniformDeserializer;
+use Brightwood\Serialization\Interfaces\JsonDeserializerInterface;
+use Brightwood\Serialization\Interfaces\SerializerInterface;
 
-class PlayerSerializer extends Serializer
+class PlayerSerializer implements SerializerInterface
 {
     /**
      * @param Player $obj
      */
-    public static function deserialize(object $obj, array $data) : Player
+    public function deserialize(
+        JsonDeserializerInterface $deserializer,
+        object $obj,
+        array $data
+    ) : Player
     {
         return $obj
             ->withId($data['id'])
             ->withIcon($data['icon'])
             ->withHand(
-                UniformDeserializer::deserialize($data['hand'])
+                $deserializer->deserialize($data['hand'])
             )
             ->withIsInspector($data['is_inspector']);
     }

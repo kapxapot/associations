@@ -4,25 +4,38 @@ namespace Brightwood\Models\Cards\Players;
 
 use App\Models\TelegramUser;
 use Plasticode\Util\Cases;
+use Webmozart\Assert\Assert;
 
 class Human extends Player
 {
-    private TelegramUser $tgUser;
+    private ?TelegramUser $telegramUser;
 
     public function __construct(
-        TelegramUser $tgUser
+        ?TelegramUser $telegramUser = null
     )
     {
-        $this->tgUser = $tgUser;
+        $this->telegramUser = $telegramUser;
 
         $this->icon = $this->gender() == Cases::MAS
             ? '👦'
             : '👧';
     }
 
-    public function tgUser() : TelegramUser
+    public function telegramUser() : TelegramUser
     {
-        return $this->tgUser;
+        Assert::notNull($this->telegramUser);
+
+        return $this->telegramUser;
+    }
+
+    /**
+     * @return static
+     */
+    public function withTelegramUser(TelegramUser $telegramUser) : self
+    {
+        $this->telegramUser = $telegramUser;
+
+        return $this;
     }
 
     public function isBot() : bool
@@ -34,14 +47,14 @@ class Human extends Player
 
     public function name() : string
     {
-        return $this->tgUser->name();
+        return $this->telegramUser()->name();
     }
 
     // GenderedInterface
 
     public function gender() : int
     {
-        return $this->tgUser->gender();
+        return $this->telegramUser()->gender();
     }
 
     // SerializableInterface
@@ -52,7 +65,7 @@ class Human extends Player
     public function serialize(array ...$data) : array
     {
         return parent::serialize(
-            ['telegram_user_id' => $this->tgUser->getId()]
+            ['telegram_user_id' => $this->telegramUser()->getId()]
         );
     }
 }
