@@ -4,9 +4,13 @@ namespace Brightwood\Config;
 
 use Brightwood\External\TelegramTransport;
 use Brightwood\Hydrators\StoryStatusHydrator;
+use Brightwood\Models\Cards\Players\Bot;
+use Brightwood\Models\Cards\Players\FemaleBot;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Repositories\StoryRepository;
 use Brightwood\Repositories\StoryStatusRepository;
+use Brightwood\Serialization\Serializers\BotSerializer;
+use Brightwood\Serialization\Serializers\FemaleBotSerializer;
 use Brightwood\Serialization\Serializers\HumanSerializer;
 use Brightwood\Serialization\Serializers\PlayerSerializer;
 use Brightwood\Serialization\SerializerSource;
@@ -31,13 +35,8 @@ class Bootstrap
 
         $map['jsonDeserializer'] = fn (CI $c) =>
             new UniformDeserializer(
-                new SerializerSource(
-                    [
-                        Player::class => new PlayerSerializer(),
-                        Human::class => new HumanSerializer(
-                            $c->telegramUserRepository
-                        )
-                    ]
+                new SerializationConfig(
+                    $c->telegramUserRepository
                 )
             );
 

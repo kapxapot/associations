@@ -26,9 +26,6 @@ class UniformDeserializer implements JsonDeserializerInterface
         /** @var string */
         $type = $jsonData['type'] ?? '';
 
-        /** @var array */
-        $data = $jsonData['data'] ?? [];
-
         Assert::stringNotEmpty($type);
 
         $serializer = $this->serializerSource->getSerializer($type);
@@ -41,7 +38,9 @@ class UniformDeserializer implements JsonDeserializerInterface
 
         $obj = new $type();
 
-        // todo: do!
-        return $type::deserialize($data);
+        /** @var array */
+        $data = $jsonData['data'] ?? [];
+
+        return $serializer->deserialize($this, $obj, $data);
     }
 }

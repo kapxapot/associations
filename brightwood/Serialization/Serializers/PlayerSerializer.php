@@ -6,7 +6,7 @@ use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Serialization\Interfaces\JsonDeserializerInterface;
 use Brightwood\Serialization\Interfaces\SerializerInterface;
 
-class PlayerSerializer implements SerializerInterface
+abstract class PlayerSerializer implements SerializerInterface
 {
     /**
      * @param Player $obj

@@ -11,11 +11,11 @@ class Bot extends Player
     protected int $gender;
 
     public function __construct(
-        string $name,
+        ?string $name = null,
         ?int $gender = null
     )
     {
-        $this->name = $name;
+        $this->name = $name ?? 'Bot';
 
         $this->icon =
             Collection::collect(
@@ -32,6 +32,26 @@ class Bot extends Player
     public function isBot() : bool
     {
         return true;
+    }
+
+    /**
+     * @return static
+     */
+    public function withName(string $name) : self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return static
+     */
+    public function withGender(int $gender) : self
+    {
+        $this->gender = $gender;
+
+        return $this;
     }
 
     // NamedInterface

@@ -3,11 +3,46 @@
 namespace Brightwood\Tests\Models\Cards;
 
 use App\Models\TelegramUser;
+use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
+use App\Testing\Seeders\TelegramUserSeeder;
+use Brightwood\Config\SerializationConfig;
+use Brightwood\Models\Cards\Players\Bot;
+use Brightwood\Models\Cards\Rank;
+use Brightwood\Models\Cards\Sets\Hand;
+use Brightwood\Models\Cards\Suit;
+use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Data\EightsData;
+use Brightwood\Serialization\Interfaces\JsonDeserializerInterface;
+use Brightwood\Serialization\UniformDeserializer;
 use PHPUnit\Framework\TestCase;
 
 final class EightsDataTest extends TestCase
 {
+    private JsonDeserializerInterface $deserializer;
+    private TelegramUserRepositoryInterface $telegramUserRepository;
+
+    public function setUp() : void
+    {
+        parent::setUp();
+
+        $this->telegramUserRepository = new TelegramUserRepositoryMock(
+            new TelegramUserSeeder()
+        );
+
+        $this->deserializer = new UniformDeserializer(
+            new SerializationConfig($this->telegramUserRepository)
+        );
+    }
+
+    public function tearDown() : void
+    {
+        unset($this->deserializer);
+        unset($this->telegramUserRepository);
+
+        parent::tearDown();
+    }
+
     public function testSerialize() : void
     {
         $data = new EightsData(
@@ -58,5 +93,23 @@ final class EightsDataTest extends TestCase
 
         $this->assertIsArray($playersData);
         $this->assertCount(4, $playersData);
+
+        /** @var Bot */
+        $bot = $this->deserializer->deserialize($playersData[0]);
+
+        $this->assertInstanceOf(Bot::class, $bot);
+        $this->assertInstanceOf(Hand::class, $bot->hand());
+        $this->assertEquals(4, $bot->handSize());
+
+        $this->assertEquals(
+            '♣3, ♦J, ♥5, ♦Q',
+            $bot->hand()->toString()
+        );
+
+        $this->assertTrue(
+            $bot->hand()->cards()->first()->equals(
+                new SuitedCard(Suit::clubs(), Rank::three())
+            )
+        );
     }
 }

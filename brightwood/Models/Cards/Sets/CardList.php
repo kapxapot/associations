@@ -5,14 +5,13 @@ namespace Brightwood\Models\Cards\Sets;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\SuitedCardCollection;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Serialization\Interfaces\DeserializableInterface;
 use Brightwood\Serialization\Interfaces\SerializableInterface;
 use Brightwood\Serialization\UniformSerializer;
 
 /**
  * Just a bunch of cards.
  */
-abstract class CardList implements SerializableInterface, DeserializableInterface
+abstract class CardList implements SerializableInterface
 {
     protected CardCollection $cards;
 
@@ -24,6 +23,16 @@ abstract class CardList implements SerializableInterface, DeserializableInterfac
     public function cards() : CardCollection
     {
         return $this->cards;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withCards(CardCollection $cards) : self
+    {
+        $this->cards = $cards;
+
+        return $this;
     }
 
     public function size() : int
@@ -78,13 +87,5 @@ abstract class CardList implements SerializableInterface, DeserializableInterfac
             ['cards' => $this->cards],
             ...$data
         );
-    }
-
-    // DeserializableInterface
-
-    public static function deserialize(array $data) : self
-    {
-        // todo: implement
-        return new self();
     }
 }

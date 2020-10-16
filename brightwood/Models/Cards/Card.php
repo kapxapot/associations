@@ -4,6 +4,7 @@ namespace Brightwood\Models\Cards;
 
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 use Brightwood\Models\Cards\Restrictions\Interfaces\RestrictionInterface;
+use Webmozart\Assert\Assert;
 
 abstract class Card implements EquatableInterface, \JsonSerializable
 {
@@ -52,7 +53,7 @@ abstract class Card implements EquatableInterface, \JsonSerializable
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function addRestriction(RestrictionInterface $restriction) : self
     {
@@ -69,6 +70,31 @@ abstract class Card implements EquatableInterface, \JsonSerializable
     public function restriction() : ?RestrictionInterface
     {
         return $this->restriction;
+    }
+
+    /**
+     * Parses a card. If unsuccessful, throws {@see \InvalidArgumentException}.
+     * 
+     * @throws \InvalidArgumentException
+     */
+    public static function parse(?string $str) : self
+    {
+        $card = self::tryParse($str);
+
+        Assert::notNull(
+            $card,
+            'Failed to parse the card: ' . $str
+        );
+
+        return $card;
+    }
+
+    /**
+     * Tries to parse a card. If unsuccessful, returns null.
+     */
+    public static function tryParse(?string $str) : ?self
+    {
+        return SuitedCard::tryParse($str) ?? Joker::tryParse($str);
     }
 
     // JsonSerializable

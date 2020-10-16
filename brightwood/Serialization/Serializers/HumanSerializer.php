@@ -5,6 +5,7 @@ namespace Brightwood\Serialization\Serializers;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Serialization\Interfaces\JsonDeserializerInterface;
+use Webmozart\Assert\Assert;
 
 class HumanSerializer extends PlayerSerializer
 {
@@ -30,6 +31,8 @@ class HumanSerializer extends PlayerSerializer
         $obj = parent::deserialize($deserializer, $obj, $data);
 
         $tgUser = $this->telegramUserRepository->get($data['telegram_user_id']);
+
+        Assert::notNull($tgUser);
 
         return $obj->withTelegramUser($tgUser);
     }

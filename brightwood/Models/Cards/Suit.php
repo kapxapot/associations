@@ -4,6 +4,8 @@ namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\SuitCollection;
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
+use Exception;
+use Webmozart\Assert\Assert;
 
 class Suit implements EquatableInterface, \JsonSerializable
 {
@@ -116,7 +118,24 @@ class Suit implements EquatableInterface, \JsonSerializable
     }
 
     /**
-     * Tries to parse suit. If not successful, returns null.
+     * Parses a suit. If not successful, throws {@see \InvalidArgumentException}.
+     * 
+     * @throws \InvalidArgumentException
+     */
+    public static function parse(?string $str) : self
+    {
+        $suit = self::tryParse($str);
+
+        Assert::notNull(
+            $suit,
+            'Failed to parse the suit: ' . $str
+        );
+
+        return $suit;
+    }
+
+    /**
+     * Tries to parse a suit. If not successful, returns null.
      */
     public static function tryParse(?string $str) : ?self
     {
