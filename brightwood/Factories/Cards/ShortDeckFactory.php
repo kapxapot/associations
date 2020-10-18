@@ -1,18 +1,27 @@
 <?php
 
-namespace Brightwood\Models\Cards\Sets\Decks;
+namespace Brightwood\Factories\Cards;
 
 use Brightwood\Collections\Cards\CardCollection;
+use Brightwood\Factories\Cards\Interfaces\DeckFactoryInterface;
 use Brightwood\Models\Cards\Rank;
+use Brightwood\Models\Cards\Sets\Deck;
 use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
 
 /**
- * 36-card french deck. Shuffled by default.
+ * Factory that produces a 36-card french deck.
  */
-class ShortDeck extends Deck
+class ShortDeckFactory implements DeckFactoryInterface
 {
-    protected function build() : CardCollection
+    public function make() : Deck
+    {
+        return new Deck(
+            $this->collectCards()
+        );
+    }
+
+    protected function collectCards() : CardCollection
     {
         $suits = Suit::all();
 

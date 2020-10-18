@@ -1,10 +1,10 @@
 <?php
 
-namespace Brightwood\Serialization\Serializers;
+namespace Brightwood\Serialization\Cards\Serializers\Players;
 
 use Brightwood\Models\Cards\Players\Player;
-use Brightwood\Serialization\Interfaces\JsonDeserializerInterface;
-use Brightwood\Serialization\Interfaces\SerializerInterface;
+use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
+use Brightwood\Serialization\Cards\Interfaces\SerializerInterface;
 
 abstract class PlayerSerializer implements SerializerInterface
 {
@@ -12,7 +12,7 @@ abstract class PlayerSerializer implements SerializerInterface
      * @param Player $obj
      */
     public function deserialize(
-        JsonDeserializerInterface $deserializer,
+        RootDeserializerInterface $rootDeserializer,
         object $obj,
         array $data
     ) : Player
@@ -21,7 +21,7 @@ abstract class PlayerSerializer implements SerializerInterface
             ->withId($data['id'])
             ->withIcon($data['icon'])
             ->withHand(
-                $deserializer->deserialize($data['hand'])
+                $rootDeserializer->deserialize($data['hand'])
             )
             ->withIsInspector($data['is_inspector']);
     }

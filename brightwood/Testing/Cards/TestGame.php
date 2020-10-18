@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Testing\Models;
+namespace Brightwood\Testing\Cards;
 
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;

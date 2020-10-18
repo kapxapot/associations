@@ -1,16 +1,17 @@
 <?php
 
-namespace Brightwood\Testing\Models;
+namespace Brightwood\Testing\Cards;
 
 use Brightwood\Collections\Cards\CardCollection;
+use Brightwood\Factories\Cards\Interfaces\DeckFactoryInterface;
 use Brightwood\Models\Cards\Rank;
-use Brightwood\Models\Cards\Sets\Decks\Deck;
+use Brightwood\Models\Cards\Sets\Deck;
 use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
 
-class TestDeck extends Deck
+class TestDeckFactory implements DeckFactoryInterface
 {
-    protected function build() : CardCollection
+    public function make() : Deck
     {
         $suits = Suit::all();
 
@@ -28,6 +29,8 @@ class TestDeck extends Deck
             }
         }
 
-        return CardCollection::make($cards);
+        return new Deck(
+            CardCollection::make($cards)
+        );
     }
 }

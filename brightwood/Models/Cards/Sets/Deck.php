@@ -1,36 +1,18 @@
 <?php
 
-namespace Brightwood\Models\Cards\Sets\Decks;
+namespace Brightwood\Models\Cards\Sets;
 
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Sets\CardList;
 use Webmozart\Assert\Assert;
 
 /**
- * A specific card list that allows shuffling and dealing.
- * 
- * Shuffled by default.
+ * A card list that allows shuffling and dealing.
  */
-abstract class Deck extends CardList
+class Deck extends CardList
 {
-    public function __construct(bool $shuffle = true)
-    {
-        parent::__construct(
-            $this->build()
-        );
-
-        Assert::false($this->isEmpty());
-
-        if ($shuffle) {
-            $this->shuffle();
-        }
-    }
-
-    abstract protected function build() : CardCollection;
-
     /**
-     * @return static
+     * @return $this
      */
     public function shuffle() : self
     {

@@ -7,13 +7,15 @@ use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\FemaleBot;
 use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Cards\Restrictions\SuitRestriction;
+use Brightwood\Models\Cards\Sets\Deck;
+use Brightwood\Models\Cards\Sets\EightsDiscard;
 use Brightwood\Models\Cards\Sets\Hand;
-use Brightwood\Serialization\Serializers\BotSerializer;
-use Brightwood\Serialization\Serializers\FemaleBotSerializer;
-use Brightwood\Serialization\Serializers\HandSerializer;
-use Brightwood\Serialization\Serializers\HumanSerializer;
-use Brightwood\Serialization\Serializers\SuitRestrictionSerializer;
-use Brightwood\Serialization\SerializerSource;
+use Brightwood\Models\Cards\Sets\Pile;
+use Brightwood\Serialization\Cards\Serializers\CardListSerializer;
+use Brightwood\Serialization\Cards\Serializers\Players\BotSerializer;
+use Brightwood\Serialization\Cards\Serializers\Players\HumanSerializer;
+use Brightwood\Serialization\Cards\Serializers\Restrictions\SuitRestrictionSerializer;
+use Brightwood\Serialization\Cards\SerializerSource;
 
 class SerializationConfig extends SerializerSource
 {
@@ -21,14 +23,18 @@ class SerializationConfig extends SerializerSource
         TelegramUserRepositoryInterface $telegramUserRepository
     )
     {
+        $botSerializer = new BotSerializer();
+        $cardListSerializer = new CardListSerializer();
+
         return parent::__construct(
             [
-                Bot::class => new BotSerializer(),
-                FemaleBot::class => new FemaleBotSerializer(),
-                Human::class => new HumanSerializer(
-                    $telegramUserRepository
-                ),
-                Hand::class => new HandSerializer(),
+                Bot::class => $botSerializer,
+                Deck::class => $cardListSerializer,
+                EightsDiscard::class => $cardListSerializer,
+                FemaleBot::class => $botSerializer,
+                Hand::class => $cardListSerializer,
+                Human::class => new HumanSerializer($telegramUserRepository),
+                Pile::class => $cardListSerializer,
                 SuitRestriction::class => new SuitRestrictionSerializer(),
             ]
         );

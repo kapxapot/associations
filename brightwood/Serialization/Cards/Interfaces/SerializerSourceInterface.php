@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Serialization\Interfaces;
+namespace Brightwood\Serialization\Cards\Interfaces;
 
 interface SerializerSourceInterface
 {

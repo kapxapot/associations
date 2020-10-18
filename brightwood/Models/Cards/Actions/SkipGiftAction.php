@@ -15,7 +15,7 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface
     protected ?string $reason;
 
     public function __construct(
-        Card $card,
+        ?Card $card = null,
         ?Player $sender = null,
         ?string $reason = null
     )
@@ -23,6 +23,21 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface
         parent::__construct($card, $sender);
 
         $this->reason = $reason;
+    }
+
+    public function reason() : ?string
+    {
+        return $this->reason;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withReason(string $reason) : self
+    {
+        $this->reason = $reason;
+
+        return $this;
     }
 
     public function announcementEvents() : CardEventCollection

@@ -1,11 +1,11 @@
 <?php
 
-namespace Brightwood\Serialization\Interfaces;
+namespace Brightwood\Serialization\Cards\Interfaces;
 
 interface SerializerInterface
 {
     function deserialize(
-        JsonDeserializerInterface $deserializer,
+        RootDeserializerInterface $rootDeserializer,
         object $obj,
         array $data
     ) : object;

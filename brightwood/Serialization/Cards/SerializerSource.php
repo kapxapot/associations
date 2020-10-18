@@ -1,9 +1,9 @@
 <?php
 
-namespace Brightwood\Serialization;
+namespace Brightwood\Serialization\Cards;
 
-use Brightwood\Serialization\Interfaces\SerializerInterface;
-use Brightwood\Serialization\Interfaces\SerializerSourceInterface;
+use Brightwood\Serialization\Cards\Interfaces\SerializerInterface;
+use Brightwood\Serialization\Cards\Interfaces\SerializerSourceInterface;
 use Webmozart\Assert\Assert;
 
 class SerializerSource implements SerializerSourceInterface

@@ -14,11 +14,9 @@ class Human extends Player
         ?TelegramUser $telegramUser = null
     )
     {
-        $this->telegramUser = $telegramUser;
-
-        $this->icon = $this->gender() == Cases::MAS
-            ? '👦'
-            : '👧';
+        if ($telegramUser) {
+            $this->withTelegramUser($telegramUser);
+        }
     }
 
     public function telegramUser() : TelegramUser
@@ -34,6 +32,10 @@ class Human extends Player
     public function withTelegramUser(TelegramUser $telegramUser) : self
     {
         $this->telegramUser = $telegramUser;
+
+        $this->icon = $this->gender() == Cases::MAS
+            ? '👦'
+            : '👧';
 
         return $this;
     }

@@ -4,17 +4,10 @@ namespace Brightwood\Config;
 
 use Brightwood\External\TelegramTransport;
 use Brightwood\Hydrators\StoryStatusHydrator;
-use Brightwood\Models\Cards\Players\Bot;
-use Brightwood\Models\Cards\Players\FemaleBot;
-use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Repositories\StoryRepository;
 use Brightwood\Repositories\StoryStatusRepository;
-use Brightwood\Serialization\Serializers\BotSerializer;
-use Brightwood\Serialization\Serializers\FemaleBotSerializer;
-use Brightwood\Serialization\Serializers\HumanSerializer;
-use Brightwood\Serialization\Serializers\PlayerSerializer;
-use Brightwood\Serialization\SerializerSource;
-use Brightwood\Serialization\UniformDeserializer;
+use Brightwood\Serialization\Cards\CardSerializer;
+use Brightwood\Serialization\Cards\RootDeserializer;
 use Plasticode\ObjectProxy;
 use Psr\Container\ContainerInterface as CI;
 use Slim\Collection as SlimCollection;
@@ -33,11 +26,12 @@ class Bootstrap
                 $settings['telegram']['brightwood_bot_token']
             );
 
-        $map['jsonDeserializer'] = fn (CI $c) =>
-            new UniformDeserializer(
+        $map['cardsRootDeserializer'] = fn (CI $c) =>
+            new RootDeserializer(
                 new SerializationConfig(
                     $c->telegramUserRepository
-                )
+                ),
+                new CardSerializer()
             );
 
         $map['storyRepository'] = fn (CI $c) =>

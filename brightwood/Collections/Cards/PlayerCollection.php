@@ -29,4 +29,11 @@ class PlayerCollection extends EquatableCollection
     {
         return Sentence::homogeneousJoin($this);
     }
+
+    public function find(string $id) : ?Player
+    {
+        return $this->first(
+            fn (Player $p) => $p->id() == $id
+        );
+    }
 }

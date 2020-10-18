@@ -7,14 +7,15 @@ use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Serialization\Interfaces\SerializableInterface;
 use Brightwood\Serialization\UniformSerializer;
+use Webmozart\Assert\Assert;
 
 abstract class GiftAction implements SerializableInterface
 {
-    protected Card $card;
+    protected ?Card $card;
     protected ?Player $sender;
 
     public function __construct(
-        Card $card,
+        ?Card $card = null,
         ?Player $sender = null
     )
     {
@@ -24,12 +25,34 @@ abstract class GiftAction implements SerializableInterface
 
     public function card() : Card
     {
+        Assert::notNull($this->card);
+
         return $this->card;
     }
 
-    public function sender() : ?Player
+    /**
+     * @return $this
+     */
+    public function withCard(Card $card) : self
+    {
+        $this->card = $card;
+
+        return $this;
+    }
+
+    public function sender() : ?int
     {
         return $this->sender;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withSender(Player $sender) : self
+    {
+        $this->sender = $sender;
+
+        return $this;
     }
 
     /**
@@ -52,10 +75,10 @@ abstract class GiftAction implements SerializableInterface
         return UniformSerializer::serialize(
             $this,
             [
-                'card' => $this->card,
+                'card' => $this->card(),
                 'sender_id' => $this->sender
                     ? $this->sender->id()
-                    : null
+                    : null,
             ],
             ...$data
         );

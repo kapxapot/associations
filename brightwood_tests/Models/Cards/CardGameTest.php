@@ -5,8 +5,8 @@ namespace Brightwood\Tests\Models\Cards;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Sets\Pile;
-use Brightwood\Testing\Models\TestDeck;
-use Brightwood\Testing\Models\TestGame;
+use Brightwood\Testing\Cards\TestDeckFactory;
+use Brightwood\Testing\Cards\TestGame;
 use PHPUnit\Framework\TestCase;
 
 final class CardGameTest extends TestCase
@@ -16,8 +16,11 @@ final class CardGameTest extends TestCase
         $bot1 = new Bot('Bot1');
         $bot2 = new Bot('Bot2');
 
+        $deckFactory = new TestDeckFactory();
+        $deck = $deckFactory->make();
+
         $game = new TestGame(
-            new TestDeck(false),
+            $deck,
             new Pile(),
             PlayerCollection::collect($bot1, $bot2)
         );

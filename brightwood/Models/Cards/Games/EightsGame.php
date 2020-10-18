@@ -6,6 +6,7 @@ use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Collections\MessageCollection;
+use Brightwood\Factories\Cards\FullDeckFactory;
 use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\JackGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\SevenGiftAction;
@@ -19,7 +20,7 @@ use Brightwood\Models\Cards\Events\DrawEvent;
 use Brightwood\Models\Cards\Events\NoCardsEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Rank;
-use Brightwood\Models\Cards\Sets\Decks\FullDeck;
+use Brightwood\Models\Cards\Sets\Deck;
 use Brightwood\Models\Cards\Sets\EightsDiscard;
 use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
@@ -52,12 +53,19 @@ class EightsGame extends CardGame
     public function __construct(
         StoryParser $parser,
         Cases $cases,
-        PlayerCollection $players
+        PlayerCollection $players,
+        ?Deck $deck = null,
+        ?EightsDiscard $discard = null
     )
     {
+        if (is_null($deck)) {
+            $deckFactory = new FullDeckFactory();
+            $deck = $deckFactory->make()->shuffle();
+        }
+
         parent::__construct(
-            new FullDeck(),
-            new EightsDiscard(),
+            $deck,
+            $discard ?? new EightsDiscard(),
             $players
         );
 
@@ -96,14 +104,14 @@ class EightsGame extends CardGame
     {
         $messages = [];
 
-        $player = $this->starter;
+        $player = $this->starter();
 
         while (!$this->isFinished()) {
             $messages[] = $this->makeMove($player);
 
             if ($this->hasWon($player)) {
                 $messages[] = new TextMessage(
-                    $player->equals($this->observer)
+                    $player->equals($this->observer())
                         ? $player->personalName() . ' выиграли!'
                         : $this->parseFor($player, $player . ' {выиграл|выиграла}!')
                 );
@@ -162,7 +170,7 @@ class EightsGame extends CardGame
             $accum = new CardEventAccumulator(...$events);
 
             $message->appendLines(
-                ...$accum->messagesFor($this->observer)
+                ...$accum->messagesFor($this->observer())
             );
         }
 
@@ -183,7 +191,7 @@ class EightsGame extends CardGame
 
         $moveMessages = $this
             ->actualMove($player)
-            ->messagesFor($this->observer);
+            ->messagesFor($this->observer());
 
         $message = new TextMessage(
             $moveStatus,
@@ -433,13 +441,14 @@ class EightsGame extends CardGame
 
     public function jsonSerialize()
     {
-        $data = parent::jsonSerialize();
-
-        $data['move'] = $this->move;
-        $data['show_players_line'] = $this->showPlayersLine;
-        $data['gift'] = $this->gift;
-        $data['no_cards_in_a_row'] = $this->noCardsInARow;
-
-        return $data;
+        return array_merge(
+            parent::jsonSerialize(),
+            [
+                'move' => $this->move,
+                'show_players_line' => $this->showPlayersLine,
+                'gift' => $this->gift,
+                'no_cards_in_a_row' => $this->noCardsInARow,
+            ]
+        );
     }
 }

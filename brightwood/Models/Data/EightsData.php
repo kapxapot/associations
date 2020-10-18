@@ -99,11 +99,12 @@ class EightsData extends StoryData
 
     public function jsonSerialize()
     {
-        $data = parent::jsonSerialize();
-
-        $data['human_id'] = $this->human->id();
-        $data['game'] = $this->game;
-
-        return $data;
+        return array_merge(
+            parent::jsonSerialize(),
+            [
+                'human_id' => $this->human->id(),
+                'game' => $this->game,
+            ]
+        );
     }
 }

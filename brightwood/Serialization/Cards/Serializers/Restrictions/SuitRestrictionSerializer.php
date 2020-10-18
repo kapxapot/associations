@@ -1,11 +1,11 @@
 <?php
 
-namespace Brightwood\Serialization\Serializers;
+namespace Brightwood\Serialization\Cards\Serializers\Restrictions;
 
 use Brightwood\Models\Cards\Restrictions\SuitRestriction;
 use Brightwood\Models\Cards\Suit;
-use Brightwood\Serialization\Interfaces\JsonDeserializerInterface;
-use Brightwood\Serialization\Interfaces\SerializerInterface;
+use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
+use Brightwood\Serialization\Cards\Interfaces\SerializerInterface;
 
 class SuitRestrictionSerializer implements SerializerInterface
 {
@@ -13,7 +13,7 @@ class SuitRestrictionSerializer implements SerializerInterface
      * @param SuitRestriction $obj
      */
     public function deserialize(
-        JsonDeserializerInterface $deserializer,
+        RootDeserializerInterface $rootDeserializer,
         object $obj,
         array $data
     ) : SuitRestriction

@@ -6,7 +6,7 @@ use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Players\Player;
-use Brightwood\Models\Cards\Sets\Decks\Deck;
+use Brightwood\Models\Cards\Sets\Deck;
 use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Webmozart\Assert\Assert;
@@ -18,7 +18,7 @@ abstract class CardGame implements \JsonSerializable
     protected Pile $trash;
 
     protected PlayerCollection $players;
-    protected array $nextPlayers;
+    protected ?array $nextPlayers = null;
 
     protected Player $starter;
     protected bool $isStarted = false;
@@ -41,10 +41,8 @@ abstract class CardGame implements \JsonSerializable
 
         Assert::true($this->isValidPlayerCount());
 
-        $this->starter = $this->players->first();
-        $this->observer = $this->players->last();
-
-        $this->initNextPlayers();
+        $this->withStarter($this->players->first());
+        $this->withObserver($this->players->last());
     }
 
     private function isValidPlayerCount() : bool
@@ -75,8 +73,17 @@ abstract class CardGame implements \JsonSerializable
         );
     }
 
+    protected function nextPlayer(Player $player) : Player
+    {
+        if (is_null($this->nextPlayers)) {
+            $this->initNextPlayers();
+        }
+
+        return $this->nextPlayers[$player->id()];
+    }
+
     /**
-     * Build a support array for quick next player retrieval.
+     * Builds a support array for quick next player retrieval.
      */
     private function initNextPlayers() : void
     {
@@ -96,21 +103,16 @@ abstract class CardGame implements \JsonSerializable
         $this->nextPlayers[$prev->id()] = $this->players->first();
     }
 
-    protected function nextPlayer(Player $player) : Player
-    {
-        return $this->nextPlayers[$player->id()];
-    }
-
     /**
      * Who goes first?
      */
-    public function starter() : Player
+    protected function starter() : Player
     {
         return $this->starter;
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function withStarter(Player $player) : self
     {
@@ -126,8 +128,13 @@ abstract class CardGame implements \JsonSerializable
         return $this->isStarted;
     }
 
+    protected function observer() : Player
+    {
+        return $this->observer;
+    }
+
     /**
-     * @return static
+     * @return $this
      */
     public function withObserver(Player $player) : self
     {
@@ -190,7 +197,7 @@ abstract class CardGame implements \JsonSerializable
     public function start() : MessageInterface
     {
         Assert::false($this->isStarted);
-        Assert::notNull($this->starter);
+        Assert::notNull($this->starter());
 
         $message = $this->dealing();
 
@@ -323,9 +330,9 @@ abstract class CardGame implements \JsonSerializable
             'deck' => $this->deck,
             'discard' => $this->discard,
             'trash' => $this->trash,
-            'starter_id' => $this->starter->id(),
+            'starter_id' => $this->starter()->id(),
             'is_started' => $this->isStarted,
-            'observer_id' => $this->observer->id()
+            'observer_id' => $this->observer()->id(),
         ];
     }
 }

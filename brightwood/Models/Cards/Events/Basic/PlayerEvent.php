@@ -67,7 +67,7 @@ abstract class PlayerEvent implements CardEventInterface
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function link(self $other) : self
     {

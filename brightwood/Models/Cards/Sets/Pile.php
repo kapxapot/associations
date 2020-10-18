@@ -8,15 +8,10 @@ use Webmozart\Assert\Assert;
 
 /**
  * A stack of cards that allows to put and take cards.
- * Starts empty.
+ * Cards are taken from the end of the list.
  */
 class Pile extends ExtendableCardList
 {
-    public function __construct()
-    {
-        parent::__construct();
-    }
-
     public function top() : ?Card
     {
         return $this->cards->last();

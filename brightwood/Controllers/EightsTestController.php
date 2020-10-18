@@ -3,6 +3,8 @@
 namespace Brightwood\Controllers;
 
 use App\Models\TelegramUser;
+use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
+use App\Testing\Seeders\TelegramUserSeeder;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Games\EightsGame;
@@ -68,15 +70,12 @@ class EightsTestController
         ResponseInterface $response
     )
     {
+        $repo = new TelegramUserRepositoryMock(
+            new TelegramUserSeeder()
+        );
+
         $data = new EightsData(
-            new TelegramUser(
-                [
-                    'id' => 1,
-                    'user_id' => 1,
-                    'telegram_id' => 123,
-                    'username' => 'tg user'
-                ]
-            )
+            $repo->get(1)
         );
 
         $data->setPlayerCount(4);

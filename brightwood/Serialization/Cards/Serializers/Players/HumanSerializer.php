@@ -1,10 +1,10 @@
 <?php
 
-namespace Brightwood\Serialization\Serializers;
+namespace Brightwood\Serialization\Cards\Serializers\Players;
 
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\Cards\Players\Human;
-use Brightwood\Serialization\Interfaces\JsonDeserializerInterface;
+use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Webmozart\Assert\Assert;
 
 class HumanSerializer extends PlayerSerializer
@@ -22,13 +22,13 @@ class HumanSerializer extends PlayerSerializer
      * @param Human $obj
      */
     public function deserialize(
-        JsonDeserializerInterface $deserializer,
+        RootDeserializerInterface $rootDeserializer,
         object $obj,
         array $data
     ) : Human
     {
         /** @var Human */
-        $obj = parent::deserialize($deserializer, $obj, $data);
+        $obj = parent::deserialize($rootDeserializer, $obj, $data);
 
         $tgUser = $this->telegramUserRepository->get($data['telegram_user_id']);
 
