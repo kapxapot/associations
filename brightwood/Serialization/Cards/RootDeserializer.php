@@ -5,8 +5,11 @@ namespace Brightwood\Serialization\Cards;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Players\Player;
+use Brightwood\Models\Cards\Suit;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\Interfaces\SerializerSourceInterface;
+use Brightwood\Serialization\Cards\Serializers\CardSerializer;
+use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use Plasticode\Exceptions\InvalidConfigurationException;
 use Webmozart\Assert\Assert;
 
@@ -14,15 +17,18 @@ class RootDeserializer implements RootDeserializerInterface
 {
     private SerializerSourceInterface $serializerSource;
     private CardSerializer $cardSerializer;
+    private SuitSerializer $suitSerializer;
     private PlayerCollection $players;
 
     public function __construct(
         SerializerSourceInterface $serializerSource,
-        CardSerializer $cardSerializer
+        CardSerializer $cardSerializer,
+        SuitSerializer $suitSerializer
     )
     {
         $this->serializerSource = $serializerSource;
         $this->cardSerializer = $cardSerializer;
+        $this->suitSerializer = $suitSerializer;
         $this->players = PlayerCollection::empty();
     }
 
@@ -58,6 +64,11 @@ class RootDeserializer implements RootDeserializerInterface
     public function deserializeCard($rawCard) : Card
     {
         return $this->cardSerializer->deserialize($this, $rawCard);
+    }
+
+    public function deserializeSuit(string $rawSuit) : Suit
+    {
+        return $this->suitSerializer->deserialize($rawSuit);
     }
 
     /**

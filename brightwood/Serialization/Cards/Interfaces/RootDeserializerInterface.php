@@ -4,6 +4,7 @@ namespace Brightwood\Serialization\Cards\Interfaces;
 
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Players\Player;
+use Brightwood\Models\Cards\Suit;
 
 interface RootDeserializerInterface
 {
@@ -13,6 +14,8 @@ interface RootDeserializerInterface
      * @param string|array $rawCard
      */
     function deserializeCard($rawCard) : Card;
+
+    function deserializeSuit(string $rawSuit) : Suit;
 
     /**
      * @return $this

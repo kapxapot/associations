@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Serialization\Cards;
+namespace Brightwood\Serialization\Cards\Serializers;
 
 use Brightwood\Models\Cards\Card;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;

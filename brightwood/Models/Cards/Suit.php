@@ -4,7 +4,6 @@ namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\SuitCollection;
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
-use Exception;
 use Webmozart\Assert\Assert;
 
 class Suit implements EquatableInterface, \JsonSerializable

@@ -6,7 +6,7 @@ use Brightwood\Models\Cards\Actions\GiftAction;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\Interfaces\SerializerInterface;
 
-abstract class GiftActionSerializer implements SerializerInterface
+class GiftActionSerializer implements SerializerInterface
 {
     /**
      * @param GiftAction $obj

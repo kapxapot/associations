@@ -7,6 +7,8 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use App\Testing\Seeders\TelegramUserSeeder;
 use Brightwood\Config\SerializationConfig;
+use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
+use Brightwood\Models\Cards\Actions\Eights\JackGiftAction;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Joker;
 use Brightwood\Models\Cards\Players\Bot;
@@ -21,9 +23,10 @@ use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Data\EightsData;
-use Brightwood\Serialization\Cards\CardSerializer;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\RootDeserializer;
+use Brightwood\Serialization\Cards\Serializers\CardSerializer;
+use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Util\Cases;
 
@@ -42,7 +45,8 @@ final class EightsDataTest extends TestCase
 
         $this->deserializer = new RootDeserializer(
             new SerializationConfig($this->telegramUserRepository),
-            new CardSerializer()
+            new CardSerializer(),
+            new SuitSerializer()
         );
     }
 
@@ -189,5 +193,35 @@ final class EightsDataTest extends TestCase
 
         $this->assertInstanceOf(Pile::class, $trash);
         $this->assertEquals(0, $trash->size());
+
+        // gift (jack)
+        /** @var JackGiftAction */
+        $gift = $this->deserializer->deserialize($gameData['gift']);
+
+        $this->assertInstanceOf(JackGiftAction::class, $gift);
+
+        $this->assertTrue(
+            $femaleBot->equals($gift->sender())
+        );
+
+        // eight gift
+        /** @var EightGiftAction */
+        $eightGift = $this->deserializer->deserialize($gameData['eight_gift']);
+
+        $this->assertInstanceOf(EightGiftAction::class, $eightGift);
+
+        $this->assertTrue(
+            $eightGift->sender()->equals($femaleBot)
+        );
+
+        $this->assertTrue(
+            $eightGift->suit()->equals(Suit::clubs())
+        );
+
+        $this->assertTrue(
+            $eightGift->card()->equals(
+                new SuitedCard(Suit::spades(), Rank::eight())
+            )
+        );
     }
 }

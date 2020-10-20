@@ -3,7 +3,6 @@
 namespace Brightwood\Serialization\Cards\Serializers\Restrictions;
 
 use Brightwood\Models\Cards\Restrictions\SuitRestriction;
-use Brightwood\Models\Cards\Suit;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\Interfaces\SerializerInterface;
 
@@ -18,9 +17,8 @@ class SuitRestrictionSerializer implements SerializerInterface
         array $data
     ) : SuitRestriction
     {
-        return $obj
-            ->withSuit(
-                Suit::parse($data['suit'])
-            );
+        return $obj->withSuit(
+            $rootDeserializer->deserializeSuit($data['suit'])
+        );
     }
 }

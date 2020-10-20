@@ -3,6 +3,11 @@
 namespace Brightwood\Config;
 
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
+use Brightwood\Models\Cards\Actions\Eights\JackGiftAction;
+use Brightwood\Models\Cards\Actions\Eights\SevenGiftAction;
+use Brightwood\Models\Cards\Actions\Eights\SixGiftAction;
+use Brightwood\Models\Cards\Actions\SkipGiftAction;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\FemaleBot;
 use Brightwood\Models\Cards\Players\Human;
@@ -11,6 +16,9 @@ use Brightwood\Models\Cards\Sets\Deck;
 use Brightwood\Models\Cards\Sets\EightsDiscard;
 use Brightwood\Models\Cards\Sets\Hand;
 use Brightwood\Models\Cards\Sets\Pile;
+use Brightwood\Serialization\Cards\Serializers\Actions\EightGiftActionSerializer;
+use Brightwood\Serialization\Cards\Serializers\Actions\GiftActionSerializer;
+use Brightwood\Serialization\Cards\Serializers\Actions\SkipGiftActionSerializer;
 use Brightwood\Serialization\Cards\Serializers\CardListSerializer;
 use Brightwood\Serialization\Cards\Serializers\Players\BotSerializer;
 use Brightwood\Serialization\Cards\Serializers\Players\HumanSerializer;
@@ -25,16 +33,23 @@ class SerializationConfig extends SerializerSource
     {
         $botSerializer = new BotSerializer();
         $cardListSerializer = new CardListSerializer();
+        $giftActionSerializer = new GiftActionSerializer();
+        $skipGiftActionSerializer = new SkipGiftActionSerializer();
 
         return parent::__construct(
             [
                 Bot::class => $botSerializer,
                 Deck::class => $cardListSerializer,
+                EightGiftAction::class => new EightGiftActionSerializer(),
                 EightsDiscard::class => $cardListSerializer,
                 FemaleBot::class => $botSerializer,
                 Hand::class => $cardListSerializer,
                 Human::class => new HumanSerializer($telegramUserRepository),
+                JackGiftAction::class => $skipGiftActionSerializer,
                 Pile::class => $cardListSerializer,
+                SevenGiftAction::class => $giftActionSerializer,
+                SixGiftAction::class => $giftActionSerializer,
+                SkipGiftAction::class => $skipGiftActionSerializer,
                 SuitRestriction::class => new SuitRestrictionSerializer(),
             ]
         );

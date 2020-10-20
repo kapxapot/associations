@@ -33,7 +33,7 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface
     /**
      * @return $this
      */
-    public function withReason(string $reason) : self
+    public function withReason(?string $reason) : self
     {
         $this->reason = $reason;
 

@@ -15,7 +15,7 @@ use Webmozart\Assert\Assert;
 
 class EightGiftAction extends GiftAction
 {
-    protected Suit $suit;
+    protected ?Suit $suit;
 
     public function __construct(
         ?Card $card = null,

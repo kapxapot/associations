@@ -40,7 +40,7 @@ abstract class GiftAction implements SerializableInterface
         return $this;
     }
 
-    public function sender() : ?int
+    public function sender() : ?Player
     {
         return $this->sender;
     }

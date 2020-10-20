@@ -6,8 +6,9 @@ use Brightwood\External\TelegramTransport;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Repositories\StoryRepository;
 use Brightwood\Repositories\StoryStatusRepository;
-use Brightwood\Serialization\Cards\CardSerializer;
 use Brightwood\Serialization\Cards\RootDeserializer;
+use Brightwood\Serialization\Cards\Serializers\CardSerializer;
+use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use Plasticode\ObjectProxy;
 use Psr\Container\ContainerInterface as CI;
 use Slim\Collection as SlimCollection;
@@ -31,7 +32,8 @@ class Bootstrap
                 new SerializationConfig(
                     $c->telegramUserRepository
                 ),
-                new CardSerializer()
+                new CardSerializer(),
+                new SuitSerializer()
             );
 
         $map['storyRepository'] = fn (CI $c) =>
