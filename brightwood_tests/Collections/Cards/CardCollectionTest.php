@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Tests\Models\Cards;
+namespace Brightwood\Tests\Collections\Cards;
 
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\SuitedCardCollection;
