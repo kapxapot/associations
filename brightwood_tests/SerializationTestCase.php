@@ -5,16 +5,11 @@ namespace Brightwood\Tests;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use App\Testing\Seeders\TelegramUserSeeder;
-use Brightwood\Config\SerializationConfig;
 use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Cards\Players\Player;
-use Brightwood\Parsing\StoryParser;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
-use Brightwood\Serialization\Cards\RootDeserializer;
-use Brightwood\Serialization\Cards\Serializers\CardSerializer;
-use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
+use Brightwood\Testing\Factories\RootDeserializerFactory;
 use PHPUnit\Framework\TestCase;
-use Plasticode\Util\Cases;
 
 abstract class SerializationTestCase extends TestCase
 {
@@ -30,15 +25,7 @@ abstract class SerializationTestCase extends TestCase
             new TelegramUserSeeder()
         );
 
-        $this->deserializer = new RootDeserializer(
-            new SerializationConfig(
-                $this->telegramUserRepository,
-                new StoryParser(),
-                new Cases()
-            ),
-            new CardSerializer(),
-            new SuitSerializer()
-        );
+        $this->deserializer = RootDeserializerFactory::make();
 
         $this->player = new Human(
             $this->telegramUserRepository->get(1)
@@ -52,6 +39,7 @@ abstract class SerializationTestCase extends TestCase
     public function tearDown() : void
     {
         unset($this->deserializer);
+        unset($this->player);
         unset($this->telegramUserRepository);
 
         parent::tearDown();

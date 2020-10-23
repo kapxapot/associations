@@ -93,14 +93,14 @@ final class EightsDataTest extends SerializationTestCase
             $player4
         );
 
-        $originalGame = new EightsGame(
+        $game = new EightsGame(
             new StoryParser(),
             new Cases(),
             $players,
             new Deck() // empty deck
         );
 
-        $originalGame
+        $game
             ->withDiscard(
                 new EightsDiscard(
                     CardCollection::collect(
@@ -140,9 +140,7 @@ final class EightsDataTest extends SerializationTestCase
             ->withNoCardsInARow(0)
             ->withShowPlayersLine(false);
 
-        $data = (new EightsData())
-            ->withHuman($player4)
-            ->withGame($originalGame);
+        $data = (new EightsData())->withGame($game);
 
         $jsonStr = json_encode($data);
 
@@ -159,20 +157,20 @@ final class EightsDataTest extends SerializationTestCase
     {
         $jsonStr = file_get_contents('brightwood_tests/Files/eights_data.json');
 
-        $data = json_decode($jsonStr, true, 512, JSON_THROW_ON_ERROR);
+        $jsonData = json_decode($jsonStr, true, 512, JSON_THROW_ON_ERROR);
 
-        $this->assertIsArray($data);
+        $this->assertIsArray($jsonData);
 
-        /** @var EightsGame */
-        $game = $this->deserializer->deserialize($data['game']);
+        /** @var EightsData */
+        $data = $this->deserializer->deserialize($jsonData);
+
+        $this->assertInstanceOf(EightsData::class, $data);
+
+        $game = $data->game();
 
         $this->assertInstanceOf(EightsGame::class, $game);
 
-        $playerCount = $data['player_count'];
-        $human = $this->deserializer->resolvePlayer($data['human_id']);
-
-        $this->assertEquals(4, $playerCount);
-        $this->assertInstanceOf(Human::class, $human);
+        $this->assertEquals(4, $data->playerCount);
 
         // check players
         $this->assertInstanceOf(PlayerCollection::class, $game->players());
@@ -188,10 +186,6 @@ final class EightsDataTest extends SerializationTestCase
             /** @var Human */
             $player4
         ] = $game->players();
-
-        $this->assertTrue(
-            $human->equals($player4)
-        );
 
         // check 1st player - bot
         $this->assertInstanceOf(Bot::class, $player1);

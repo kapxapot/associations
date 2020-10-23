@@ -43,7 +43,9 @@ class Bootstrap
             new StoryParser();
 
         $map['storyRepository'] = fn (CI $c) =>
-            new StoryRepository();
+            new StoryRepository(
+                $c->cardsRootDeserializer
+            );
 
         $map['storyStatusRepository'] = fn (CI $c) =>
             new StoryStatusRepository(

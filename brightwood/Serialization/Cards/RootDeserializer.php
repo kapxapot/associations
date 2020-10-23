@@ -33,10 +33,15 @@ class RootDeserializer implements RootDeserializerInterface
     }
 
     /**
+     * @throws \InvalidArgumentException
      * @throws InvalidConfigurationException
      */
-    public function deserialize(array $jsonData) : object
+    public function deserialize(?array $jsonData) : ?object
     {
+        if (is_null($jsonData)) {
+            return null;
+        }
+
         /** @var string */
         $type = $jsonData['type'] ?? '';
 

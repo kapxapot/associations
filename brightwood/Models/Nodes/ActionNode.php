@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Nodes;
 
+use App\Models\TelegramUser;
 use Brightwood\Collections\ActionLinkCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
@@ -41,7 +42,7 @@ class ActionNode extends LinkedNode
         return $this->links;
     }
 
-    public function getMessages(StoryData $data) : StoryMessageSequence
+    public function getMessages(TelegramUser $tgUser, StoryData $data) : StoryMessageSequence
     {
         $data = $this->mutate($data);
         $actions = $this->links->satisfying($data)->actions();

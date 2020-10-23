@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Nodes;
 
+use App\Models\TelegramUser;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Interfaces\MutatorInterface;
 use Brightwood\Models\Messages\StoryMessage;
@@ -63,7 +64,7 @@ abstract class StaticNode extends StoryNode implements MutatorInterface
         return $this->withMutator($mutator);
     }
 
-    public function getMessages(StoryData $data) : StoryMessageSequence
+    public function getMessages(TelegramUser $tgUser, StoryData $data) : StoryMessageSequence
     {
         return new StoryMessageSequence(
             new StoryMessage(

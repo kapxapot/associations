@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Nodes;
 
+use App\Models\TelegramUser;
 use Brightwood\Collections\RedirectLinkCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\RedirectLink;
@@ -35,7 +36,7 @@ class RedirectNode extends LinkedNode
         return $this->links;
     }
 
-    public function getMessages(StoryData $data) : StoryMessageSequence
+    public function getMessages(TelegramUser $tgUser, StoryData $data) : StoryMessageSequence
     {
         $data = $this->mutate($data);
         $link = $this->links->satisfying($data)->choose();
@@ -49,7 +50,7 @@ class RedirectNode extends LinkedNode
             new StoryMessage(
                 $this->id, $this->text, null, $data
             ),
-            $nextNode->getMessages($data)
+            $nextNode->getMessages($tgUser, $data)
         );
     }
 

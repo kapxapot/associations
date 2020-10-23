@@ -50,7 +50,7 @@ class WoodStory extends Story
         parent::__construct($id, '🌲 Лес', true);
     }
 
-    public function makeData(TelegramUser $tgUser, ?array $data = null) : WoodData
+    public function makeData(?array $data = null) : WoodData
     {
         return new WoodData($data);
     }

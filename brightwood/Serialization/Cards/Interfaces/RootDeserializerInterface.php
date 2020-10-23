@@ -8,7 +8,11 @@ use Brightwood\Models\Cards\Suit;
 
 interface RootDeserializerInterface
 {
-    function deserialize(array $jsonData) : object;
+    /**
+     * @throws \InvalidArgumentException
+     * @throws InvalidConfigurationException
+     */
+    function deserialize(?array $jsonData) : ?object;
 
     /**
      * @param string|array $rawCard

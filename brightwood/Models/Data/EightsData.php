@@ -9,50 +9,20 @@ use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\FemaleBot;
 use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Parsing\StoryParser;
+use Brightwood\Serialization\Interfaces\SerializableInterface;
+use Brightwood\Serialization\UniformSerializer;
 use Plasticode\Util\Cases;
 use Webmozart\Assert\Assert;
 
 /**
  * @property integer $playerCount
  */
-class EightsData extends StoryData
+class EightsData extends StoryData implements SerializableInterface
 {
     /**
-     * Required - either set using the constructor or withHuman().
-     */
-    private ?Human $human;
-
-    /**
-     * Required - either init using initGame() or set using withGame().
+     * Optional, BUT - either init using initGame() or set using withGame().
      */
     private ?EightsGame $game = null;
-
-    public function __construct(
-        ?Human $human = null,
-        ?array $data = null
-    )
-    {
-        parent::__construct($data);
-
-        $this->withHuman($human);
-    }
-
-    private function human() : Human
-    {
-        Assert::notNull($this->human);
-
-        return $this->human;
-    }
-
-    /**
-     * @return $this
-     */
-    public function withHuman(?Human $human) : self
-    {
-        $this->human = $human;
-
-        return $this;
-    }
 
     public function game() : EightsGame
     {
@@ -64,10 +34,13 @@ class EightsData extends StoryData
     /**
      * @return $this
      */
-    public function withGame(EightsGame $game) : self
+    public function withGame(?EightsGame $game) : self
     {
         $this->game = $game;
-        $this->playerCount = $game->players()->count();
+
+        if ($game) {
+            $this->playerCount = $game->players()->count();
+        }
 
         return $this;
     }
@@ -96,13 +69,15 @@ class EightsData extends StoryData
     /**
      * @return $this
      */
-    public function initGame() : self
+    public function initGame(TelegramUser $tgUser) : self
     {
         $botCount = $this->playerCount - 1;
 
+        $human = new Human($tgUser);
+
         $players = $this
             ->fetchBots($botCount)
-            ->add($this->human())
+            ->add($human)
             ->shuffle();
 
         $game = new EightsGame(
@@ -113,7 +88,7 @@ class EightsData extends StoryData
 
         return $this
             ->withGame(
-                $game->withObserver($this->human())
+                $game->withObserver($human)
             );
     }
 
@@ -141,14 +116,23 @@ class EightsData extends StoryData
         );
     }
 
+    // SerializableInterface
+
     public function jsonSerialize()
     {
-        return array_merge(
+        return $this->serialize();
+    }
+
+    /**
+     * @param array[] $data
+     */
+    public function serialize(array ...$data) : array
+    {
+        return UniformSerializer::serialize(
+            $this,
             parent::jsonSerialize(),
-            [
-                'human_id' => $this->human()->id(),
-                'game' => $this->game,
-            ]
+            ['game' => $this->game],
+            ...$data
         );
     }
 }

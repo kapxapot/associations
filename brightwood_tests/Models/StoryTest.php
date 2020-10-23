@@ -3,7 +3,6 @@
 namespace Brightwood\Tests\Models;
 
 use App\Models\TelegramUser;
-use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Testing\Models\TestData;
 use Brightwood\Testing\Models\TestStory;
 use PHPUnit\Framework\TestCase;
@@ -20,11 +19,12 @@ final class StoryTest extends TestCase
 
     public function testRenderNode() : void
     {
+        $tgUser = new TelegramUser();
         $story = new TestStory(1);
         $node = $story->getNode(6);
-        $data = $story->makeData(new TelegramUser());
+        $data = $story->makeData();
 
-        $sequence = $story->renderNode($node, $data);
+        $sequence = $story->renderNode($tgUser, $node, $data);
 
         $this->assertNotNull($sequence->data());
     }
@@ -33,7 +33,7 @@ final class StoryTest extends TestCase
     {
         $story = new TestStory(1);
         $node = $story->getNode(6);
-        $data = $story->makeData(new TelegramUser());
+        $data = $story->makeData();
 
         $this->assertNotNull($data);
 
@@ -51,7 +51,7 @@ final class StoryTest extends TestCase
     public function testDefaultMakeData() : void
     {
         $story = new TestStory(1);
-        $data = $story->makeData(new TelegramUser());
+        $data = $story->makeData();
 
         $this->assertInstanceOf(TestData::class, $data);
         $this->assertEquals(1, $data->day);
@@ -60,27 +60,20 @@ final class StoryTest extends TestCase
     public function testPredefinedMakeData() : void
     {
         $story = new TestStory(1);
-        $data = $story->makeData(new TelegramUser(), ['day' => 2]);
+        $data = $story->makeData(['day' => 2]);
 
         $this->assertInstanceOf(TestData::class, $data);
         $this->assertEquals(2, $data->day);
     }
 
-    public function testEightsStoryStart() : void
-    {
-        $story = new EightsStory(3);
-        $sequence = $story->start(new TelegramUser());
-
-        $this->assertNotNull($sequence);
-    }
-
     public function testFinishNode() : void
     {
+        $tgUser = new TelegramUser();
         $story = new TestStory(1);
         $node = $story->getNode(4);
-        $data = $story->makeData(new TelegramUser());
+        $data = $story->makeData();
 
-        $sequence = $story->renderNode($node, $data);
+        $sequence = $story->renderNode($tgUser, $node, $data);
 
         $this->assertEmpty(
             $sequence->actions()
@@ -93,11 +86,12 @@ final class StoryTest extends TestCase
 
     public function testEmptyFinishNode() : void
     {
+        $tgUser = new TelegramUser();
         $story = new TestStory(1);
         $node = $story->getNode(8);
-        $data = $story->makeData(new TelegramUser());
+        $data = $story->makeData();
 
-        $sequence = $story->renderNode($node, $data);
+        $sequence = $story->renderNode($tgUser, $node, $data);
 
         $this->assertEmpty(
             $sequence->actions()

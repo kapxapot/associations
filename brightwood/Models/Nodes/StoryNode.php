@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Nodes;
 
+use App\Models\TelegramUser;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\Story;
@@ -36,7 +37,10 @@ abstract class StoryNode
 
     abstract public function isFinish(?StoryData $data) : bool;
 
-    abstract public function getMessages(StoryData $data) : StoryMessageSequence;
+    abstract public function getMessages(
+        TelegramUser $tgUser,
+        StoryData $data
+    ) : StoryMessageSequence;
 
     /**
      * @throws \InvalidArgumentException

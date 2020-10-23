@@ -18,7 +18,7 @@ class TestStory extends Story
         parent::__construct($id, 'Лес');
     }
 
-    public function makeData(TelegramUser $tgUser, ?array $data = null) : TestData
+    public function makeData(?array $data = null) : TestData
     {
         return new TestData($data);
     }

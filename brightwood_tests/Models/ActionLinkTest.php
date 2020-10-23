@@ -13,7 +13,7 @@ final class ActionLinkTest extends TestCase
     public function testEmptyMutatePreservesData() : void
     {
         $story = new TestStory(1);
-        $data = $story->makeData(new TelegramUser());
+        $data = $story->makeData();
 
         $this->assertNotNull($data);
 
@@ -28,7 +28,7 @@ final class ActionLinkTest extends TestCase
     public function testMutateMutatesData() : void
     {
         $story = new TestStory(1);
-        $data = $story->makeData(new TelegramUser());
+        $data = $story->makeData();
 
         $this->assertNotNull($data);
 

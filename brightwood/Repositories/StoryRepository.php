@@ -8,6 +8,7 @@ use Brightwood\Models\Stories\MysteryStory;
 use Brightwood\Models\Stories\Story;
 use Brightwood\Models\Stories\WoodStory;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
+use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 
 /**
  * Stub repository for now.
@@ -16,12 +17,14 @@ class StoryRepository implements StoryRepositoryInterface
 {
     private StoryCollection $stories;
 
-    public function __construct()
+    public function __construct(
+        RootDeserializerInterface $rootDeserializer
+    )
     {
         $this->stories = StoryCollection::collect(
             new WoodStory(1),
             new MysteryStory(2),
-            new EightsStory(3)
+            new EightsStory(3, $rootDeserializer)
         );
     }
 

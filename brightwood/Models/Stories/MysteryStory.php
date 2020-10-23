@@ -17,7 +17,7 @@ class MysteryStory extends Story
         parent::__construct($id, '🏰 Тайная местность', true);
     }
 
-    public function makeData(TelegramUser $tgUser, ?array $data = null) : MysteryData
+    public function makeData(?array $data = null) : MysteryData
     {
         return new MysteryData($data);
     }

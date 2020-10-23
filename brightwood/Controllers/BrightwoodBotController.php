@@ -476,12 +476,15 @@ class BrightwoodBotController extends Controller
 
         Assert::notNull($status);
 
+        $this->logger->info('we got status', $status->data());
+
         $story = $this->storyRepository->get($status->storyId);
         $node = $story->getNode($status->stepId);
 
         Assert::notNull($node);
 
-        $data = $story->makeData($tgUser, $status->data());
+        $data = $story->makeData($status->data());
+
         $sequence = $story->go($tgUser, $node, $text, $data);
 
         if ($sequence) {
@@ -529,9 +532,9 @@ class BrightwoodBotController extends Controller
     {
         $story = $this->storyRepository->get($status->storyId);
         $node = $story->getNode($status->stepId);
-        $data = $story->makeData($status->telegramUser(), $status->data());
+        $data = $story->makeData($status->data());
 
-        return $story->renderNode($node, $data);
+        return $story->renderNode($status->telegramUser(), $node, $data);
     }
 
     private function getStatus(TelegramUser $tgUser) : ?StoryStatus

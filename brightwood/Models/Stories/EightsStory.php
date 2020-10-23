@@ -3,7 +3,6 @@
 namespace Brightwood\Models\Stories;
 
 use App\Models\TelegramUser;
-use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
@@ -12,6 +11,7 @@ use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\SkipNode;
+use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Plasticode\Util\Text;
 
 class EightsStory extends Story
@@ -27,19 +27,30 @@ class EightsStory extends Story
     private const FINISH_GAME = 7;
     private const NEXT_MOVE = 8;
 
+    private RootDeserializerInterface $rootDeserializer;
+
     public function __construct(
-        int $id
+        int $id,
+        RootDeserializerInterface $rootDeserializer
     )
     {
         parent::__construct($id, '♠ Восьмерки (в разработке)', true);
+
+        $this->rootDeserializer = $rootDeserializer;
     }
 
-    public function makeData(TelegramUser $tgUser, ?array $data = null) : EightsData
+    public function makeData(?array $data = null) : EightsData
     {
-        return new EightsData(
-            new Human($tgUser),
-            $data
-        );
+        if ($data !== null) {
+            try {
+                return $this->rootDeserializer->deserialize($data);
+            } catch (\InvalidArgumentException $ex) {
+                // just ignore it
+                // this is needed for parsing the data without the type
+            }
+        }
+
+        return new EightsData($data);
     }
 
     public function executeCommand(string $command) : StoryMessageSequence
@@ -143,8 +154,8 @@ class EightsStory extends Story
         $this->addNode(
             new FunctionNode(
                 self::START_GAME,
-                function (EightsData $data) {
-                    $data = $data->initGame();
+                function (TelegramUser $tgUser, EightsData $data) {
+                    $data = $data->initGame($tgUser);
                     $game = $data->game();
                     $players = $game->players();
 

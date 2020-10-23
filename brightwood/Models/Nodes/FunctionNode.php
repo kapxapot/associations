@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Nodes;
 
+use App\Models\TelegramUser;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 
@@ -26,8 +27,8 @@ class FunctionNode extends StoryNode
         return false;
     }
 
-    public function getMessages(StoryData $data) : StoryMessageSequence
+    public function getMessages(TelegramUser $tgUser, StoryData $data) : StoryMessageSequence
     {
-        return ($this->function)($data);
+        return ($this->function)($tgUser, $data);
     }
 }

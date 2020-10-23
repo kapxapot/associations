@@ -69,10 +69,7 @@ abstract class Story implements CommandProviderInterface
         return $this->startNode;
     }
 
-    abstract public function makeData(
-        TelegramUser $tgUser,
-        ?array $data = null
-    ) : StoryData;
+    abstract public function makeData(?array $data = null) : StoryData;
 
     /**
      * Override this.
@@ -85,7 +82,7 @@ abstract class Story implements CommandProviderInterface
     abstract protected function build() : void;
 
     /**
-     * @return static
+     * @return $this
      */
     public function setStartNode(StoryNode $node) : self
     {
@@ -101,7 +98,7 @@ abstract class Story implements CommandProviderInterface
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function setMessagePrefix(string $msg) : self
     {
@@ -111,7 +108,7 @@ abstract class Story implements CommandProviderInterface
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function addNode(StoryNode $node) : self
     {
@@ -139,21 +136,22 @@ abstract class Story implements CommandProviderInterface
     public function start(TelegramUser $tgUser) : StoryMessageSequence
     {
         $node = $this->startNode();
-        $data = $this->makeData($tgUser);
+        $data = $this->makeData();
 
-        return $this->renderNode($node, $data);
+        return $this->renderNode($tgUser, $node, $data);
     }
 
     /**
      * Gets node's message (auto moving through nodes if possible).
      */
     public function renderNode(
+        TelegramUser $tgUser,
         StoryNode $node,
         StoryData $data
     ) : StoryMessageSequence
     {
         $sequence = $node
-            ->getMessages($data)
+            ->getMessages($tgUser, $data)
             ->prependPrefix($this->messagePrefix);
 
         return $this->checkForFinish($sequence);
@@ -191,7 +189,7 @@ abstract class Story implements CommandProviderInterface
         }
 
         if ($node instanceof FunctionNode) {
-            return $this->renderNode($node, $data);
+            return $this->renderNode($tgUser, $node, $data);
         }
 
         if (!($node instanceof ActionNode)) {
@@ -212,7 +210,7 @@ abstract class Story implements CommandProviderInterface
 
             $data = $link->mutate($data);
 
-            return $this->renderNode($nextNode, $data);
+            return $this->renderNode($tgUser, $nextNode, $data);
         }
 
         return null;
