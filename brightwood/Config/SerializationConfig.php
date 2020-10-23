@@ -8,6 +8,7 @@ use Brightwood\Models\Cards\Actions\Eights\JackGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\SevenGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\SixGiftAction;
 use Brightwood\Models\Cards\Actions\SkipGiftAction;
+use Brightwood\Models\Cards\Games\EightsGame;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\FemaleBot;
 use Brightwood\Models\Cards\Players\Human;
@@ -16,19 +17,24 @@ use Brightwood\Models\Cards\Sets\Deck;
 use Brightwood\Models\Cards\Sets\EightsDiscard;
 use Brightwood\Models\Cards\Sets\Hand;
 use Brightwood\Models\Cards\Sets\Pile;
+use Brightwood\Parsing\StoryParser;
 use Brightwood\Serialization\Cards\Serializers\Actions\EightGiftActionSerializer;
 use Brightwood\Serialization\Cards\Serializers\Actions\GiftActionSerializer;
 use Brightwood\Serialization\Cards\Serializers\Actions\SkipGiftActionSerializer;
 use Brightwood\Serialization\Cards\Serializers\CardListSerializer;
+use Brightwood\Serialization\Cards\Serializers\Games\EightsGameSerializer;
 use Brightwood\Serialization\Cards\Serializers\Players\BotSerializer;
 use Brightwood\Serialization\Cards\Serializers\Players\HumanSerializer;
 use Brightwood\Serialization\Cards\Serializers\Restrictions\SuitRestrictionSerializer;
 use Brightwood\Serialization\Cards\SerializerSource;
+use Plasticode\Util\Cases;
 
 class SerializationConfig extends SerializerSource
 {
     public function __construct(
-        TelegramUserRepositoryInterface $telegramUserRepository
+        TelegramUserRepositoryInterface $telegramUserRepository,
+        StoryParser $parser,
+        Cases $cases
     )
     {
         $botSerializer = new BotSerializer();
@@ -42,6 +48,7 @@ class SerializationConfig extends SerializerSource
                 Deck::class => $cardListSerializer,
                 EightGiftAction::class => new EightGiftActionSerializer(),
                 EightsDiscard::class => $cardListSerializer,
+                EightsGame::class => new EightsGameSerializer($parser, $cases),
                 FemaleBot::class => $botSerializer,
                 Hand::class => $cardListSerializer,
                 Human::class => new HumanSerializer($telegramUserRepository),

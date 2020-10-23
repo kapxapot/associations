@@ -3,9 +3,11 @@
 namespace Brightwood\Tests\Models\Cards;
 
 use App\Models\TelegramUser;
-use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
-use Brightwood\Models\Cards\Actions\Eights\JackGiftAction;
+use Brightwood\Collections\Cards\CardCollection;
+use Brightwood\Collections\Cards\PlayerCollection;
+use Brightwood\Models\Cards\Actions\Eights\SixGiftAction;
 use Brightwood\Models\Cards\Card;
+use Brightwood\Models\Cards\Games\EightsGame;
 use Brightwood\Models\Cards\Joker;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\FemaleBot;
@@ -19,6 +21,7 @@ use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Data\EightsData;
+use Brightwood\Parsing\StoryParser;
 use Brightwood\Tests\SerializationTestCase;
 use Plasticode\Util\Cases;
 
@@ -26,23 +29,130 @@ final class EightsDataTest extends SerializationTestCase
 {
     public function testSerialize() : void
     {
-        $data = new EightsData(
-            $this->telegramUserRepository->get(1)
+        $player1 = (new Bot())
+            ->withId('929e1b1d93a09b7d5aba')
+            ->withName('Гарри')
+            ->withIcon('🐷')
+            ->withHand(
+                new Hand()
+            );
+
+        $player2 = (new FemaleBot())
+            ->withId('12120dcd2f939d0f3935')
+            ->withName('Анна')
+            ->withIcon('🐵')
+            ->withHand(
+                new Hand(
+                    CardCollection::collect(
+                        Card::parse('♦6'),
+                        Card::parse('♣10'),
+                        Card::parse('♣5')
+                    )
+                )
+            );
+
+        $player3 = (new FemaleBot())
+            ->withId('db39d485e636eab5d47b')
+            ->withName('Лиза')
+            ->withIcon('🐱')
+            ->withHand(
+                new Hand(
+                    CardCollection::collect(
+                        Card::parse('♠5'),
+                        Card::parse('♠4'),
+                        Card::parse('♣4'),
+                        Card::parse('♦2'),
+                        Card::parse('♣9')
+                    )
+                )
+            );
+
+        $tgUser = $this->telegramUserRepository->get(1);
+
+        $player4 = (new Human())
+            ->withId('6027c68aadaac8c43f13')
+            ->withTelegramUser($tgUser)
+            ->withHand(
+                new Hand(
+                    CardCollection::collect(
+                        Card::parse('♦Q'),
+                        Card::parse('♦9'),
+                        Card::parse('♦10'),
+                        Card::parse('♠10'),
+                        Card::parse('♠2'),
+                        Card::parse('♥6'),
+                        Card::parse('♠A')
+                    )
+                )
+            );
+
+        $players = PlayerCollection::collect(
+            $player1,
+            $player2,
+            $player3,
+            $player4
         );
 
-        $data->setPlayerCount(4);
+        $originalGame = new EightsGame(
+            new StoryParser(),
+            new Cases(),
+            $players,
+            new Deck() // empty deck
+        );
 
-        $data->initGame();
-        $data->game()->start();
-        $data->game()->run();
+        $originalGame
+            ->withDiscard(
+                new EightsDiscard(
+                    CardCollection::collect(
+                        Card::parse('♥J'),
+                        Card::parse('♥8')
+                            ->withRestriction(
+                                new SuitRestriction(
+                                    Suit::hearts()
+                                )
+                            ),
+                        Card::parse('♣8')
+                            ->withRestriction(
+                                new SuitRestriction(
+                                    Suit::spades()
+                                )
+                            ),
+                        Card::parse('♠7'),
+                        Card::parse('🃏'),
+                        Card::parse('♦7'),
+                        Card::parse('♣7'),
+                        Card::parse('♣K'),
+                        Card::parse('♣Q')
+                    )
+                )
+            )
+            ->withTrash(new Pile())
+            ->withStarter($player1)
+            ->withIsStarted(true)
+            ->withObserver($player4)
+            ->withGift(
+                new SixGiftAction(
+                    Card::parse('♣6'),
+                    $player1
+                )
+            )
+            ->withMove(53)
+            ->withNoCardsInARow(0)
+            ->withShowPlayersLine(false);
+
+        $data = (new EightsData())
+            ->withHuman($player4)
+            ->withGame($originalGame);
 
         $jsonStr = json_encode($data);
 
+        //var_dump($jsonStr);
+
         $this->assertIsString($jsonStr);
 
-        $jsonData = json_decode($jsonStr, true);
+        $expectedJsonStr = file_get_contents('brightwood_tests/Files/eights_data.json');
 
-        $this->assertIsArray($jsonData);
+        $this->assertEquals($expectedJsonStr, $jsonStr . PHP_EOL);
     }
 
     public function testDeserialize() : void
@@ -53,64 +163,65 @@ final class EightsDataTest extends SerializationTestCase
 
         $this->assertIsArray($data);
 
+        /** @var EightsGame */
+        $game = $this->deserializer->deserialize($data['game']);
+
+        $this->assertInstanceOf(EightsGame::class, $game);
+
         $playerCount = $data['player_count'];
-        $humanId = $data['human_id'];
+        $human = $this->deserializer->resolvePlayer($data['human_id']);
 
         $this->assertEquals(4, $playerCount);
-        $this->assertIsString($humanId);
-
-        $gameData = $data['game'];
-
-        $this->assertIsArray($gameData);
-
-        $playersData = $gameData['players'];
-
-        $players = array_map(
-            fn ($p) => $this->deserializer->deserialize($p),
-            $playersData
-        );
+        $this->assertInstanceOf(Human::class, $human);
 
         // check players
-        $this->assertIsArray($players);
-        $this->assertCount(4, $players);
+        $this->assertInstanceOf(PlayerCollection::class, $game->players());
+        $this->assertCount(4, $game->players());
 
-        // !!! important
-        $this->deserializer->addPlayers(...$players);
+        [
+            /** @var Bot */
+            $player1,
+            /** @var FemaleBot */
+            $player2,
+            /** @var FemaleBot */
+            $player3,
+            /** @var Human */
+            $player4
+        ] = $game->players();
+
+        $this->assertTrue(
+            $human->equals($player4)
+        );
 
         // check 1st player - bot
-        /** @var Bot */
-        $bot = $players[0];
+        $this->assertInstanceOf(Bot::class, $player1);
+        $this->assertEquals(Cases::MAS, $player1->gender());
+        $this->assertInstanceOf(Hand::class, $player1->hand());
+        $this->assertEquals(0, $player1->handSize());
 
-        $this->assertInstanceOf(Bot::class, $bot);
-        $this->assertEquals(Cases::MAS, $bot->gender());
-        $this->assertInstanceOf(Hand::class, $bot->hand());
-        $this->assertEquals(4, $bot->handSize());
+        // check 2nd player - female bot
+        $this->assertInstanceOf(FemaleBot::class, $player2);
+        $this->assertEquals(Cases::FEM, $player2->gender());
 
         $this->assertEquals(
-            '♣3, ♦J, ♥5, ♦Q',
-            $bot->hand()->toString()
+            '♦6, ♣10, ♣5',
+            $player2->hand()->toString()
         );
 
         $this->assertTrue(
-            $bot->hand()->cards()->first()->equals(
-                new SuitedCard(Suit::clubs(), Rank::three())
+            $player2->hand()->cards()->first()->equals(
+                new SuitedCard(Suit::diamonds(), Rank::six())
             )
         );
 
-        // check 2nd player - female bot
-        /** @var FemaleBot */
-        $femaleBot = $players[1];
-
-        $this->assertInstanceOf(FemaleBot::class, $femaleBot);
-        $this->assertEquals(Cases::FEM, $femaleBot->gender());
+        // check 3rd player - female bot
+        $this->assertInstanceOf(FemaleBot::class, $player3);
+        $this->assertEquals(Cases::FEM, $player3->gender());
 
         // check 4th player - human
-        /** @var Human */
-        $human = $players[3];
+        $this->assertInstanceOf(Human::class, $player4);
 
-        $this->assertInstanceOf(Human::class, $human);
-
-        $tgUser = $human->telegramUser();
+        $tgUser = $player4->telegramUser();
 
         $this->assertInstanceOf(TelegramUser::class, $tgUser);
 
@@ -121,21 +232,15 @@ final class EightsDataTest extends SerializationTestCase
         );
 
         // deck
-        /** @var Deck */
-        $deck = $this->deserializer->deserialize($gameData['deck']);
-
-        $this->assertInstanceOf(Deck::class, $deck);
-        $this->assertEquals(25, $deck->size());
+        $this->assertInstanceOf(Deck::class, $game->deck());
+        $this->assertEquals(0, $game->deckSize());
 
         // discard
-        /** @var EightsDiscard */
-        $discard = $this->deserializer->deserialize($gameData['discard']);
-
-        $this->assertInstanceOf(EightsDiscard::class, $discard);
-        $this->assertEquals(18, $discard->size());
+        $this->assertInstanceOf(EightsDiscard::class, $game->discard());
+        $this->assertEquals(9, $game->discardSize());
 
         /** @var Card */
-        $card = $discard->cards()->first();
+        $card = $game->discard()->cards()[1];
 
         $this->assertTrue($card->hasRestriction());
 
@@ -149,45 +254,29 @@ final class EightsDataTest extends SerializationTestCase
         );
 
         /** @var Joker */
-        $joker = $discard->cards()[11];
+        $joker = $game->discard()->cards()[4];
 
         $this->assertInstanceOf(Joker::class, $joker);
 
         // trash
-        /** @var Pile */
-        $trash = $this->deserializer->deserialize($gameData['trash']);
+        $this->assertInstanceOf(Pile::class, $game->trash());
+        $this->assertEquals(0, $game->trash()->size());
 
-        $this->assertInstanceOf(Pile::class, $trash);
-        $this->assertEquals(0, $trash->size());
+        // gift (six)
+        $gift = $game->gift();
 
-        // gift (jack)
-        /** @var JackGiftAction */
-        $gift = $this->deserializer->deserialize($gameData['gift']);
-
-        $this->assertInstanceOf(JackGiftAction::class, $gift);
+        $this->assertInstanceOf(SixGiftAction::class, $gift);
 
         $this->assertTrue(
-            $femaleBot->equals($gift->sender())
-        );
-
-        // eight gift
-        /** @var EightGiftAction */
-        $eightGift = $this->deserializer->deserialize($gameData['eight_gift']);
-
-        $this->assertInstanceOf(EightGiftAction::class, $eightGift);
-
-        $this->assertTrue(
-            $eightGift->sender()->equals($femaleBot)
-        );
-
-        $this->assertTrue(
-            $eightGift->suit()->equals(Suit::clubs())
-        );
-
-        $this->assertTrue(
-            $eightGift->card()->equals(
-                new SuitedCard(Suit::spades(), Rank::eight())
+            $gift->card()->equals(
+                Card::parse('♣6')
             )
+        );
+
+        $this->assertNotNull($gift->sender());
+
+        $this->assertTrue(
+            $gift->sender()->equals($player1)
         );
     }
 }

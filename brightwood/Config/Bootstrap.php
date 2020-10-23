@@ -4,6 +4,7 @@ namespace Brightwood\Config;
 
 use Brightwood\External\TelegramTransport;
 use Brightwood\Hydrators\StoryStatusHydrator;
+use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\StoryRepository;
 use Brightwood\Repositories\StoryStatusRepository;
 use Brightwood\Serialization\Cards\RootDeserializer;
@@ -30,11 +31,16 @@ class Bootstrap
         $map['cardsRootDeserializer'] = fn (CI $c) =>
             new RootDeserializer(
                 new SerializationConfig(
-                    $c->telegramUserRepository
+                    $c->telegramUserRepository,
+                    $c->storyParser,
+                    $c->cases
                 ),
                 new CardSerializer(),
                 new SuitSerializer()
             );
+
+        $map['storyParser'] = fn (CI $c) =>
+            new StoryParser();
 
         $map['storyRepository'] = fn (CI $c) =>
             new StoryRepository();

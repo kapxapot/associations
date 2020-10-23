@@ -12,7 +12,7 @@ use Brightwood\Models\Cards\Players\Player;
 
 class SkipGiftAction extends GiftAction implements ApplicableActionInterface
 {
-    protected ?string $reason;
+    private ?string $reason;
 
     public function __construct(
         ?Card $card = null,
@@ -22,7 +22,7 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface
     {
         parent::__construct($card, $sender);
 
-        $this->reason = $reason;
+        $this->withReason($reason);
     }
 
     public function reason() : ?string

@@ -52,10 +52,15 @@ abstract class Card implements EquatableInterface, \JsonSerializable
         return false;
     }
 
+    public function restriction() : ?RestrictionInterface
+    {
+        return $this->restriction;
+    }
+
     /**
      * @return $this
      */
-    public function addRestriction(RestrictionInterface $restriction) : self
+    public function withRestriction(?RestrictionInterface $restriction) : self
     {
         $this->restriction = $restriction;
 
@@ -65,11 +70,6 @@ abstract class Card implements EquatableInterface, \JsonSerializable
     public function hasRestriction() : bool
     {
         return $this->restriction !== null;
-    }
-
-    public function restriction() : ?RestrictionInterface
-    {
-        return $this->restriction;
     }
 
     /**

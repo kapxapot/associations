@@ -40,7 +40,10 @@ class RootDeserializer implements RootDeserializerInterface
         /** @var string */
         $type = $jsonData['type'] ?? '';
 
-        Assert::stringNotEmpty($type);
+        Assert::stringNotEmpty(
+            $type,
+            'No type name found in the serialized data.'
+        );
 
         $serializer = $this->serializerSource->getSerializer($type);
 

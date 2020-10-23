@@ -11,16 +11,21 @@ use Webmozart\Assert\Assert;
 
 abstract class GiftAction implements SerializableInterface
 {
-    protected ?Card $card;
-    protected ?Player $sender;
+    /**
+     * Required - set either using the constructor, or using withCard().
+     */
+    private ?Card $card;
+
+    private ?Player $sender;
 
     public function __construct(
         ?Card $card = null,
         ?Player $sender = null
     )
     {
-        $this->card = $card;
-        $this->sender = $sender;
+        $this
+            ->withCard($card)
+            ->withSender($sender);
     }
 
     public function card() : Card
@@ -33,7 +38,7 @@ abstract class GiftAction implements SerializableInterface
     /**
      * @return $this
      */
-    public function withCard(Card $card) : self
+    public function withCard(?Card $card) : self
     {
         $this->card = $card;
 
@@ -48,7 +53,7 @@ abstract class GiftAction implements SerializableInterface
     /**
      * @return $this
      */
-    public function withSender(Player $sender) : self
+    public function withSender(?Player $sender) : self
     {
         $this->sender = $sender;
 

@@ -35,8 +35,15 @@ class EightsGame extends CardGame
     private int $move = 0;
     private int $maxMoves = 1000; // safeguard
 
-    private StoryParser $parser;
-    private Cases $cases;
+    /**
+     * Required - set either using the constructor, or using withParser().
+     */
+    private ?StoryParser $parser;
+
+    /**
+     * Required - set either using the constructor, or using withCases().
+     */
+    private ?Cases $cases;
 
     private bool $showPlayersLine = false;
 
@@ -51,26 +58,50 @@ class EightsGame extends CardGame
     private int $noCardsInARow = 0;
 
     public function __construct(
-        StoryParser $parser,
-        Cases $cases,
-        PlayerCollection $players,
-        ?Deck $deck = null,
-        ?EightsDiscard $discard = null
+        ?StoryParser $parser = null,
+        ?Cases $cases = null,
+        ?PlayerCollection $players = null,
+        ?Deck $deck = null
     )
     {
-        if (is_null($deck)) {
-            $deckFactory = new FullDeckFactory();
-            $deck = $deckFactory->make()->shuffle();
-        }
+        parent::__construct($deck, new EightsDiscard(), $players);
 
-        parent::__construct(
-            $deck,
-            $discard ?? new EightsDiscard(),
-            $players
-        );
+        $this->withParser($parser);
+        $this->withCases($cases);
+    }
 
+    protected function parser() : StoryParser
+    {
+        Assert::notNull($this->parser);
+
+        return $this->parser;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withParser(?StoryParser $parser) : self
+    {
         $this->parser = $parser;
+
+        return $this;
+    }
+
+    protected function cases() : Cases
+    {
+        Assert::notNull($this->cases);
+
+        return $this->cases;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withCases(?Cases $cases) : self
+    {
         $this->cases = $cases;
+
+        return $this;
     }
 
     public function withPlayersLine() : self
@@ -82,7 +113,52 @@ class EightsGame extends CardGame
 
     public function discard() : EightsDiscard
     {
-        return $this->discard;
+        return parent::discard();
+    }
+
+    public function gift() : ?GiftAction
+    {
+        return $this->gift;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withGift(?GiftAction $gift) : self
+    {
+        $this->placeGift($gift);
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withMove(int $move) : self
+    {
+        $this->move = $move;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withNoCardsInARow(int $count) : self
+    {
+        $this->noCardsInARow = $count;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withShowPlayersLine(int $show) : self
+    {
+        $this->showPlayersLine = $show;
+
+        return $this;
     }
 
     public static function maxPlayers(): int
@@ -90,14 +166,24 @@ class EightsGame extends CardGame
         return 10;
     }
 
-    public function parseFor(Player $player, string $text) : string
-    {
-        return $this->parser->parse($player, $text);
-    }
-
     public function isFinished() : bool
     {
         return $this->isStarted() && ($this->hasWinner() || $this->isDraw());
+    }
+
+    /**
+     * Starts the game ensuring that the deck is in place.
+     */
+    public function start() : MessageInterface
+    {
+        if (!$this->hasDeck()) {
+            $deckFactory = new FullDeckFactory();
+            $deck = $deckFactory->make()->shuffle();
+
+            $this->withDeck($deck);
+        }
+
+        return parent::start();
     }
 
     public function run() : MessageCollection
@@ -113,7 +199,7 @@ class EightsGame extends CardGame
                 $messages[] = new TextMessage(
                     $player->equals($this->observer())
                         ? $player->personalName() . ' выиграли!'
-                        : $this->parseFor($player, $player . ' {выиграл|выиграла}!')
+                        : $this->parser()->parse($player, $player . ' выигра{л|ла}!')
                 );
 
                 break;
@@ -134,7 +220,7 @@ class EightsGame extends CardGame
 
     protected function dealing() : MessageInterface
     {
-        $count = $this->players->count();
+        $count = $this->players()->count();
 
         switch ($count) {
             case 2:
@@ -153,7 +239,7 @@ class EightsGame extends CardGame
 
         $message = new TextMessage(
             'Раздаем по ' . $amount . ' ' .
-            $this->cases->caseForNumber('карта', $amount)
+            $this->cases()->caseForNumber('карта', $amount)
         );
 
         $cards = $this->drawToDiscard();
@@ -180,7 +266,7 @@ class EightsGame extends CardGame
     public function makeMove(Player $player) : MessageInterface
     {
         Assert::true($this->isValidPlayer($player));
-        Assert::true($this->isStarted);
+        Assert::true($this->isStarted());
 
         $this->move++;
 
@@ -200,7 +286,7 @@ class EightsGame extends CardGame
 
         if ($this->showPlayersLine) {
             $message->appendLines(
-                $this->players->handsString()
+                $this->players()->handsString()
             );
         }
 
@@ -349,7 +435,7 @@ class EightsGame extends CardGame
 
             $action = new EightGiftAction($card, $suit, $player);
 
-            $card->addRestriction(
+            $card->withRestriction(
                 $action->restriction()
             );
 
@@ -402,11 +488,11 @@ class EightsGame extends CardGame
 
     public function winner() : ?Player
     {
-        if (!$this->isStarted) {
+        if (!$this->isStarted()) {
             return null;
         }
 
-        return $this->players->first(
+        return $this->players()->first(
             fn (Player $p) => $this->hasWon($p)
         );
     }
@@ -432,22 +518,26 @@ class EightsGame extends CardGame
             return 'Превышено максимальное число ходов (' . $this->maxMoves . '), что-то явно не так!';
         }
 
-        if ($this->noCardsInARow >= $this->players->count()) {
+        if ($this->noCardsInARow >= $this->players()->count()) {
             return 'Ни у кого из игроков нет карт для хода';
         }
 
         return null;
     }
 
-    public function jsonSerialize()
+    // SerializableInterface
+
+    /**
+     * @param array[] $data
+     */
+    public function serialize(array ...$data) : array
     {
-        return array_merge(
-            parent::jsonSerialize(),
+        return parent::serialize(
             [
-                'move' => $this->move,
-                'show_players_line' => $this->showPlayersLine,
                 'gift' => $this->gift,
+                'move' => $this->move,
                 'no_cards_in_a_row' => $this->noCardsInARow,
+                'show_players_line' => $this->showPlayersLine,
             ]
         );
     }

@@ -28,7 +28,7 @@ class CardSerializer
         $restriction = $rawCard['restriction'] ?? null;
 
         if ($restriction) {
-            $card->addRestriction(
+            $card->withRestriction(
                 $rootDeserializer->deserialize($restriction)
             );
         }

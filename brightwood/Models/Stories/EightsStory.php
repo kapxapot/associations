@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Stories;
 
 use App\Models\TelegramUser;
+use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
@@ -35,7 +36,10 @@ class EightsStory extends Story
 
     public function makeData(TelegramUser $tgUser, ?array $data = null) : EightsData
     {
-        return new EightsData($tgUser, $data);
+        return new EightsData(
+            new Human($tgUser),
+            $data
+        );
     }
 
     public function executeCommand(string $command) : StoryMessageSequence
@@ -112,7 +116,7 @@ class EightsStory extends Story
                 [],
                 self::START_GAME
             ))->do(
-                fn (EightsData $d) => $d->setPlayerCount(2)
+                fn (EightsData $d) => $d->withPlayerCount(2)
             )
         );
 
@@ -122,7 +126,7 @@ class EightsStory extends Story
                 [],
                 self::START_GAME
             ))->do(
-                fn (EightsData $d) => $d->setPlayerCount(3)
+                fn (EightsData $d) => $d->withPlayerCount(3)
             )
         );
 
@@ -132,7 +136,7 @@ class EightsStory extends Story
                 [],
                 self::START_GAME
             ))->do(
-                fn (EightsData $d) => $d->setPlayerCount(4)
+                fn (EightsData $d) => $d->withPlayerCount(4)
             )
         );
 

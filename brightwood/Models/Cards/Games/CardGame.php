@@ -9,48 +9,182 @@ use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Sets\Deck;
 use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
+use Brightwood\Serialization\Interfaces\SerializableInterface;
+use Brightwood\Serialization\UniformSerializer;
 use Webmozart\Assert\Assert;
 
-abstract class CardGame implements \JsonSerializable
+abstract class CardGame implements SerializableInterface
 {
-    protected Deck $deck;
-    protected Pile $discard;
-    protected Pile $trash;
+    /**
+     * Required - set either using the constructor, or using withDeck().
+     */
+    private ?Deck $deck;
 
-    protected PlayerCollection $players;
-    protected ?array $nextPlayers = null;
+    /**
+     * Empty by default.
+     */
+    private Pile $discard;
 
-    protected Player $starter;
-    protected bool $isStarted = false;
+    /**
+     * Empty by default.
+     */
+    private Pile $trash;
 
-    protected Player $observer;
+    /**
+     * Required - set either using the constructor, or using withPlayers().
+     */
+    private ?PlayerCollection $players;
+
+    private ?array $nextPlayers = null;
+
+    private ?Player $starter;
+    private bool $isStarted = false;
+
+    private ?Player $observer;
 
     public function __construct(
-        Deck $deck,
-        Pile $discard,
-        PlayerCollection $players
+        ?Deck $deck = null,
+        ?Pile $discard = null,
+        ?PlayerCollection $players = null
     )
     {
-        Assert::notEmpty($players);
-
-        $this->deck = $deck;
-        $this->discard = $discard;
-        $this->trash = new Pile();
-
-        $this->players = $players;
-
-        Assert::true($this->isValidPlayerCount());
-
-        $this->withStarter($this->players->first());
-        $this->withObserver($this->players->last());
+        $this
+            ->withDeck($deck)
+            ->withDiscard($discard ?? new Pile())
+            ->withTrash(new Pile())
+            ->withPlayers($players);
     }
 
-    private function isValidPlayerCount() : bool
+    public function deck() : Deck
     {
-        $count = $this->players->count();
+        Assert::notNull($this->deck);
 
-        return $count >= static::minPlayers()
-            && $count <= static::maxPlayers();
+        return $this->deck;
+    }
+
+    protected function hasDeck() : bool
+    {
+        return $this->deck !== null;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withDeck(?Deck $deck) : self
+    {
+        $this->deck = $deck;
+
+        return $this;
+    }
+
+    public function discard() : Pile
+    {
+        return $this->discard;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withDiscard(Pile $discard) : self
+    {
+        $this->discard = $discard;
+
+        return $this;
+    }
+
+    public function trash() : Pile
+    {
+        return $this->trash;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withTrash(Pile $trash) : self
+    {
+        $this->trash = $trash;
+
+        return $this;
+    }
+
+    public function players() : PlayerCollection
+    {
+        Assert::notEmpty($this->players);
+
+        Assert::countBetween(
+            $this->players,
+            static::minPlayers(),
+            static::maxPlayers()
+        );
+
+        return $this->players;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withPlayers(?PlayerCollection $players) : self
+    {
+        $this->players = $players;
+
+        if ($players) {
+            $this->withStarter($players->first());
+            $this->withObserver($players->last());
+        }
+
+        return $this;
+    }
+
+    /**
+     * Who goes first?
+     */
+    protected function starter() : Player
+    {
+        return $this->starter;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withStarter(Player $player) : self
+    {
+        Assert::true(
+            $this->isValidPlayer($player)
+        );
+
+        $this->starter = $player;
+
+        return $this;
+    }
+
+    public function isStarted() : bool
+    {
+        return $this->isStarted;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withIsStarted(bool $isStarted) : self
+    {
+        $this->isStarted = $isStarted;
+
+        return $this;
+    }
+
+    protected function observer() : Player
+    {
+        return $this->observer;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withObserver(Player $player) : self
+    {
+        $this->observer = $player;
+
+        return $this;
     }
 
     /**
@@ -68,7 +202,7 @@ abstract class CardGame implements \JsonSerializable
 
     protected function isValidPlayer(Player $player) : bool
     {
-        return $this->players->any(
+        return $this->players()->any(
             fn (Player $p) => $p->equals($player)
         );
     }
@@ -92,7 +226,7 @@ abstract class CardGame implements \JsonSerializable
         /** @var Player|null */
         $prev = null;
 
-        foreach ($this->players as $player) {
+        foreach ($this->players() as $player) {
             if ($prev) {
                 $this->nextPlayers[$prev->id()] = $player;
             }
@@ -100,57 +234,7 @@ abstract class CardGame implements \JsonSerializable
             $prev = $player;
         }
 
-        $this->nextPlayers[$prev->id()] = $this->players->first();
-    }
-
-    /**
-     * Who goes first?
-     */
-    protected function starter() : Player
-    {
-        return $this->starter;
-    }
-
-    /**
-     * @return $this
-     */
-    public function withStarter(Player $player) : self
-    {
-        Assert::true($this->isValidPlayer($player));
-
-        $this->starter = $player;
-
-        return $this;
-    }
-
-    public function isStarted() : bool
-    {
-        return $this->isStarted;
-    }
-
-    protected function observer() : Player
-    {
-        return $this->observer;
-    }
-
-    /**
-     * @return $this
-     */
-    public function withObserver(Player $player) : self
-    {
-        $this->observer = $player;
-
-        return $this;
-    }
-
-    public function deck() : Deck
-    {
-        return $this->deck;
-    }
-
-    public function discard() : Pile
-    {
-        return $this->discard;
+        $this->nextPlayers[$prev->id()] = $this->players()->first();
     }
 
     /**
@@ -159,16 +243,6 @@ abstract class CardGame implements \JsonSerializable
     protected function topDiscard() : ?Card
     {
         return $this->discard->top();
-    }
-
-    public function trash() : Pile
-    {
-        return $this->trash;
-    }
-
-    public function players() : PlayerCollection
-    {
-        return $this->players;
     }
 
     public function deckSize() : int
@@ -222,7 +296,7 @@ abstract class CardGame implements \JsonSerializable
         $dealed = 0;
 
         while (!$amount || ($dealed < $amount)) {
-            foreach ($this->players as $player) {
+            foreach ($this->players() as $player) {
                 $drawn = $this->drawToHand($player, 1);
 
                 if ($drawn->isEmpty()) {
@@ -323,16 +397,30 @@ abstract class CardGame implements \JsonSerializable
         $this->trash->add($card);
     }
 
+    // SerializableInterface
+
     public function jsonSerialize()
     {
-        return [
-            'players' => $this->players,
-            'deck' => $this->deck,
-            'discard' => $this->discard,
-            'trash' => $this->trash,
-            'starter_id' => $this->starter()->id(),
-            'is_started' => $this->isStarted,
-            'observer_id' => $this->observer()->id(),
-        ];
+        return $this->serialize();
+    }
+
+    /**
+     * @param array[] $data
+     */
+    public function serialize(array ...$data) : array
+    {
+        return UniformSerializer::serialize(
+            $this,
+            [
+                'players' => $this->players,
+                'deck' => $this->deck,
+                'discard' => $this->discard,
+                'trash' => $this->trash,
+                'starter_id' => $this->starter()->id(),
+                'is_started' => $this->isStarted,
+                'observer_id' => $this->observer()->id(),
+            ],
+            ...$data
+        );
     }
 }

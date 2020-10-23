@@ -37,7 +37,7 @@ final class EightsDiscardTest extends TestCase
             new Bot('bot')
         );
 
-        $restrictingCard->addRestriction(
+        $restrictingCard->withRestriction(
             $gift->restriction()
         );
 
@@ -86,7 +86,7 @@ final class EightsDiscardTest extends TestCase
             new Bot('bot')
         );
 
-        $restrictingCard->addRestriction(
+        $restrictingCard->withRestriction(
             $gift->restriction()
         );
 

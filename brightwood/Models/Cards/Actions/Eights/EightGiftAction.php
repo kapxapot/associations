@@ -15,7 +15,7 @@ use Webmozart\Assert\Assert;
 
 class EightGiftAction extends GiftAction
 {
-    protected ?Suit $suit;
+    private ?Suit $suit;
 
     public function __construct(
         ?Card $card = null,
@@ -25,7 +25,7 @@ class EightGiftAction extends GiftAction
     {
         parent::__construct($card, $sender);
 
-        $this->suit = $suit;
+        $this->withSuit($suit);
     }
 
     public function suit() : Suit
@@ -38,7 +38,7 @@ class EightGiftAction extends GiftAction
     /**
      * @return $this
      */
-    public function withSuit(Suit $suit) : self
+    public function withSuit(?Suit $suit) : self
     {
         $this->suit = $suit;
 
@@ -49,15 +49,15 @@ class EightGiftAction extends GiftAction
     {
         $events = CardEventCollection::empty();
 
-        if ($this->sender) {
+        if ($this->sender()) {
             $events = $events->add(
-                new SuitRestrictionEvent($this->sender, $this->suit)
+                new SuitRestrictionEvent($this->sender(), $this->suit())
             );
         }
 
         return $events->add(
             new PublicEvent(
-                'Следующий игрок должен положить <b>' . $this->suit->fullNameRu() . '</b>'
+                'Следующий игрок должен положить <b>' . $this->suit()->fullNameRu() . '</b>'
             )
         );
     }
