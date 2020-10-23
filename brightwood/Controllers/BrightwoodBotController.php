@@ -5,7 +5,6 @@ namespace Brightwood\Controllers;
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
-use Brightwood\Collections\MessageCollection;
 use Brightwood\External\TelegramTransport;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;

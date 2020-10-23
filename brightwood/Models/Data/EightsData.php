@@ -147,7 +147,7 @@ class EightsData extends StoryData
             parent::jsonSerialize(),
             [
                 'human_id' => $this->human()->id(),
-                'game' => $this->game(),
+                'game' => $this->game,
             ]
         );
     }
