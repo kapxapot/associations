@@ -38,6 +38,9 @@ class EightsGameSerializer extends CardGameSerializer
             ->withGift(
                 $rootDeserializer->deserialize($data['gift'])
             )
+            ->withCurrentPlayer(
+                $rootDeserializer->resolvePlayer($data['current_player_id'] ?? null)
+            )
             ->withMove($data['move'])
             ->withNoCardsInARow($data['no_cards_in_a_row'])
             ->withShowPlayersLine($data['show_players_line']);

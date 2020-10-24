@@ -29,5 +29,5 @@ interface RootDeserializerInterface
     /**
      * The player can be resolved only if it was previously added using addPlayers() function.
      */
-    function resolvePlayer(string $id) : Player;
+    function resolvePlayer(?string $id) : ?Player;
 }

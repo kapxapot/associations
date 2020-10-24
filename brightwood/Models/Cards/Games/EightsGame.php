@@ -52,6 +52,8 @@ class EightsGame extends CardGame
      */
     private ?GiftAction $gift = null;
 
+    private ?Player $currentPlayer = null;
+
     /**
      * Accumulates the count of players in a row who have no cards to put.
      */
@@ -131,6 +133,21 @@ class EightsGame extends CardGame
         return $this;
     }
 
+    public function currentPlayer() : ?Player
+    {
+        return $this->currentPlayer;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withCurrentPlayer(?Player $player) : self
+    {
+        $this->currentPlayer = $player;
+
+        return $this;
+    }
+
     /**
      * @return $this
      */
@@ -183,29 +200,29 @@ class EightsGame extends CardGame
             $this->withDeck($deck);
         }
 
-        return parent::start();
+        $message = parent::start();
+
+        $this->currentPlayer = $this->starter();
+
+        return $message;
     }
 
-    public function run() : MessageCollection
+    public function run(bool $breakOnHuman = false) : MessageCollection
     {
         $messages = [];
 
-        $player = $this->starter();
+        while (!$this->isFinished() && (!$breakOnHuman || $this->currentPlayer->isBot())) {
+            $messages[] = $this->makeMove($this->currentPlayer);
 
-        while (!$this->isFinished()) {
-            $messages[] = $this->makeMove($player);
-
-            if ($this->hasWon($player)) {
-                $messages[] = new TextMessage(
-                    $player->equals($this->observer())
-                        ? $player->personalName() . ' выиграли!'
-                        : $this->parser()->parse($player, $player . ' выигра{л|ла}!')
+            if ($this->hasWon($this->currentPlayer)) {
+                $messages[] = $this->winMessage(
+                    $this->currentPlayer
                 );
 
                 break;
             }
 
-            $player = $this->nextPlayer($player);
+            $this->currentPlayer = $this->nextPlayer($this->currentPlayer);
         }
 
         if ($this->isDraw()) {
@@ -216,6 +233,15 @@ class EightsGame extends CardGame
         }
 
         return MessageCollection::make($messages);
+    }
+
+    private function winMessage(Player $player) : MessageInterface
+    {
+        return new TextMessage(
+            $player->equals($this->observer())
+                ? $player->personalName() . ' выиграли!'
+                : $this->parser()->parse($player, $player . ' выигра{л|ла}!')
+        );
     }
 
     protected function dealing() : MessageInterface
@@ -535,6 +561,9 @@ class EightsGame extends CardGame
         return parent::serialize(
             [
                 'gift' => $this->gift,
+                'current_player_id' => $this->currentPlayer
+                    ? $this->currentPlayer->id()
+                    : null,
                 'move' => $this->move,
                 'no_cards_in_a_row' => $this->noCardsInARow,
                 'show_players_line' => $this->showPlayersLine,

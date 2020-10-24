@@ -50,6 +50,14 @@ class StoryMessageSequence implements SequencableInterface
     }
 
     /**
+     * Shortcut for constructor.
+     */
+    public static function make(MessageInterface ...$messages) : self
+    {
+        return new self(...$messages);
+    }
+
+    /**
      * "Mashes" together messages and sequences, returning a resulting sequence.
      */
     public static function mash(SequencableInterface ...$items) : self
@@ -124,6 +132,8 @@ class StoryMessageSequence implements SequencableInterface
 
     /**
      * Overrides data.
+     * 
+     * @return $this
      */
     public function withData(StoryData $data) : self
     {
@@ -132,6 +142,11 @@ class StoryMessageSequence implements SequencableInterface
         return $this;
     }
 
+    /**
+     * Changes isFinalized property.
+     * 
+     * @return $this
+     */
     public function finalize(bool $state = true) : self
     {
         $this->isFinalized = $state;

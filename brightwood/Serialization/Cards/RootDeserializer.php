@@ -92,8 +92,12 @@ class RootDeserializer implements RootDeserializerInterface
     /**
      * @throws \Exception
      */
-    function resolvePlayer(string $id) : Player
+    function resolvePlayer(?string $id) : ?Player
     {
+        if (strlen($id) == 0) {
+            return null;
+        }
+
         $player = $this->players->find($id);
 
         if ($player) {

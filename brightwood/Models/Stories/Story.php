@@ -17,7 +17,8 @@ use Webmozart\Assert\Assert;
 
 abstract class Story implements CommandProviderInterface
 {
-    public const RESTART_ACTION = '♻ Начать заново';
+    public const RESTART_COMMAND = '♻ Начать заново';
+    public const STORY_SELECTION_COMMAND = '📚 Выбрать историю';
 
     private int $id;
     private string $name;
@@ -183,7 +184,7 @@ abstract class Story implements CommandProviderInterface
     ) : ?StoryMessageSequence
     {
         if ($node->isFinish($data)) {
-            return (self::RESTART_ACTION === $text)
+            return (self::RESTART_COMMAND === $text)
                 ? $this->start($tgUser)
                 : null;
         }

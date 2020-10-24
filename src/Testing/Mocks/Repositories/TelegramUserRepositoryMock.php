@@ -2,22 +2,21 @@
 
 namespace App\Testing\Mocks\Repositories;
 
+use App\Collections\TelegramUserCollection;
 use App\Models\TelegramUser;
 use App\Models\User;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
-use Plasticode\Collections\Basic\DbModelCollection;
-use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
 class TelegramUserRepositoryMock implements TelegramUserRepositoryInterface
 {
-    private DbModelCollection $users;
+    private TelegramUserCollection $users;
 
-    public function __construct(
-        ArraySeederInterface $seeder
-    )
+    public function __construct(?ArraySeederInterface $seeder = null)
     {
-        $this->users = DbModelCollection::make($seeder->seed());
+        $this->users = $seeder
+            ? TelegramUserCollection::make($seeder->seed())
+            : TelegramUserCollection::empty();
     }
 
     public function get(?int $id) : ?TelegramUser
@@ -41,13 +40,23 @@ class TelegramUserRepositoryMock implements TelegramUserRepositoryInterface
 
     public function save(TelegramUser $user) : TelegramUser
     {
-        // placeholder
-        throw new InvalidOperationException();
+        if ($this->users->contains($user)) {
+            return $user;
+        }
+
+        if (!$user->isPersisted()) {
+            $user->id = $this->users->nextId();
+        }
+
+        $this->users = $this->users->add($user);
+
+        return $user;
     }
 
     public function store(array $data) : TelegramUser
     {
-        // placeholder
-        throw new InvalidOperationException();
+        $user = TelegramUser::create($data);
+
+        return $this->save($user);
     }
 }

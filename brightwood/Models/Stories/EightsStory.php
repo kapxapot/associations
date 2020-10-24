@@ -172,7 +172,7 @@ class EightsStory extends Story
                     $sequence = new StoryMessageSequence(
                         $startMessage,
                         $game->start(),
-                        ...$game->run()
+                        ...$game->run(true)
                     );
 
                     return $sequence->withData($data);

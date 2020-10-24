@@ -2,6 +2,7 @@
 
 namespace Brightwood\Config;
 
+use Brightwood\Answers\Answerer;
 use Brightwood\External\TelegramTransport;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Parsing\StoryParser;
@@ -56,6 +57,14 @@ class Bootstrap
                         $c->telegramUserRepository
                     )
                 )
+            );
+
+        $map['answerer'] = fn (CI $c) =>
+            new Answerer(
+                $c->storyRepository,
+                $c->storyStatusRepository,
+                $c->telegramUserRepository,
+                $c->logger
             );
 
         return $map;
