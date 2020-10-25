@@ -146,7 +146,7 @@ class BrightwoodBotController extends Controller
         $lines = [];
 
         foreach ($ex->getTrace() as $trace) {
-            $lines[] = $trace['file'] . ' (' . $trace['line'] . '), ' . $trace['class'] . $trace['type'] . $trace['function'];
+            $lines[] = ($trace['file'] ?? '') . ' (' . ($trace['line'] ?? '') . '), ' . ($trace['class'] ?? '') . ($trace['type'] ?? '') . $trace['function'];
         }
 
         return $lines;
@@ -162,6 +162,11 @@ class BrightwoodBotController extends Controller
     ) : ArrayCollection
     {
         $sequence = $this->answerer->getAnswers($tgUser, $text);
+
+        Assert::true(
+            $sequence->hasText(),
+            'Answers sequence must contain text.'
+        );
 
         $defaultActions = $sequence->actions();
 

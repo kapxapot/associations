@@ -42,7 +42,11 @@ class ActionNode extends LinkedNode
         return $this->links;
     }
 
-    public function getMessages(TelegramUser $tgUser, StoryData $data) : StoryMessageSequence
+    public function getMessages(
+        TelegramUser $tgUser,
+        StoryData $data,
+        ?string $text = null
+    ) : StoryMessageSequence
     {
         $data = $this->mutate($data);
         $actions = $this->links->satisfying($data)->actions();

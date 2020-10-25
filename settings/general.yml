@@ -78,7 +78,7 @@ telegram:
   bot_token: {TELEGRAM_BOT_TOKEN}
   bot_log: {DEBUG}
   brightwood_bot_token: {BRIGHTWOOD_BOT_TOKEN}
-  brightwood_bot_log_level: 1
+  brightwood_bot_log_level: 2
 
 jobs:
   secret: {JOBS_SECRET}

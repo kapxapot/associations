@@ -3,6 +3,12 @@
 namespace Brightwood\Models\Stories;
 
 use App\Models\TelegramUser;
+use Brightwood\Models\Cards\Card;
+use Brightwood\Models\Cards\Events\CardEventAccumulator;
+use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
+use Brightwood\Models\Cards\Events\NoCardsEvent;
+use Brightwood\Models\Cards\Games\EightsGame;
+use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
@@ -13,10 +19,13 @@ use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\SkipNode;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Plasticode\Util\Text;
+use Webmozart\Assert\Assert;
 
 class EightsStory extends Story
 {
     private const RULES_COMMAND = '/rules';
+    private const DRAW_CARD_COMMAND = 'Взять карту';
+    private const NO_CARDS_COMMAND = 'Нет карт';
 
     private const START = 1;
     private const TWO_PLAYERS = 2;
@@ -25,7 +34,8 @@ class EightsStory extends Story
     private const PLAYERS_NUMBER_CHOICE = 5;
     private const START_GAME = 6;
     private const FINISH_GAME = 7;
-    private const NEXT_MOVE = 8;
+    private const AUTO_MOVES = 8;
+    private const HUMAN_MOVE = 9;
 
     private RootDeserializerInterface $rootDeserializer;
 
@@ -154,37 +164,141 @@ class EightsStory extends Story
         $this->addNode(
             new FunctionNode(
                 self::START_GAME,
-                function (TelegramUser $tgUser, EightsData $data) {
-                    $data = $data->initGame($tgUser);
+                function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
+                    $data->initGame($tgUser);
+
                     $game = $data->game();
                     $players = $game->players();
 
-                    $startMessage = new StoryMessage(
-                        self::NEXT_MOVE,
-                        [
-                            'Играют:',
-                            Text::join(
-                                $players->toArray()
-                            )
-                        ]
-                    );
+                    return
+                        StoryMessageSequence::make(
+                            new StoryMessage(
+                                self::AUTO_MOVES,
+                                ['Играют:', Text::join($players->toArray())]
+                            ),
+                            $game->start()
+                        )
+                        ->withData($data);
+                }
+            )
+        );
+
+        $this->addNode(
+            new FunctionNode(
+                self::AUTO_MOVES,
+                function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
+                    $game = $data->game();
 
                     $sequence = new StoryMessageSequence(
-                        $startMessage,
-                        $game->start(),
-                        ...$game->run(true)
+                        ...$game->runTillBreak()
                     );
 
-                    return $sequence->withData($data);
+                    if ($game->isFinished()) {
+                        return $sequence
+                            ->add(new StoryMessage(self::FINISH_GAME))
+                            ->withData($data);
+                    }
+
+                    $player = $this->getAndCheckPlayer($game, $tgUser);
+
+                    return $sequence
+                        ->add(new StoryMessage(self::HUMAN_MOVE))
+                        ->withData($data);
+                }
+            )
+        );
+
+        $this->addNode(
+            new FunctionNode(
+                self::HUMAN_MOVE,
+                function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
+                    $game = $data->game();
+                    $player = $this->getAndCheckPlayer($game, $tgUser);
+                    $playableCards = $game->getPlayableCardsFor($player);
+
+                    $sequence = StoryMessageSequence::empty();
+
+                    // play a card if it's valid
+                    if (strlen($text) > 0 && $playableCards->any()) {
+                        $card = Card::tryParse($text);
+
+                        if (!$playableCards->contains($card)) {
+                            $sequence->add(
+                                new TextMessage('У вас нет такой карты. Вы что, шуле{р|рка}? 🤔')
+                            );
+                        } else {
+                            $events = $game->putCard($player, $card);
+                            $game->goToNextPlayer();
+
+                            return $sequence
+                                ->add(
+                                    new StoryMessage(
+                                        self::AUTO_MOVES,
+                                        $events->messagesFor($player)
+                                    )
+                                )
+                                ->withData($data);
+                        }
+                    }
+
+                    /** @var CardEventInterface */
+                    $event = null;
+
+                    // draw a card?
+                    if ($text === self::DRAW_CARD_COMMAND && !$game->isDeckEmpty()) {
+                        $event = $game->drawToHand($player);
+
+                        Assert::notNull($event);
+                    }
+
+                    // no cards?
+                    if ($text === self::NO_CARDS_COMMAND && $game->isDeckEmpty()) {
+                        $event = $game->hasNoCardsToPut($player);
+                        $game->goToNextPlayer();
+                    }
+
+                    return $sequence
+                        ->add(
+                            $event
+                                ? new StoryMessage(
+                                    self::AUTO_MOVES,
+                                    [$event->messageFor($player)],
+                                )
+                                : new StoryMessage(
+                                    self::HUMAN_MOVE,
+                                    [
+                                        $game->statusString(),
+                                        'Ваши карты: ' . $player->hand(),
+                                        'Ваш ход:'
+                                    ],
+                                    $playableCards->any()
+                                        ? $playableCards->stringize()->toArray()
+                                        : ($game->isDeckEmpty()
+                                            ? [self::NO_CARDS_COMMAND]
+                                            : [self::DRAW_CARD_COMMAND])
+                                )
+                        )
+                        ->withData($data);
                 }
             )
         );
 
         $this->addNode(
             new FinishNode(
-                self::NEXT_MOVE,
+                self::FINISH_GAME,
                 []
             )
         );
+    }
+
+    private function getAndCheckPlayer(EightsGame $game, TelegramUser $tgUser) : Human
+    {
+        /** @var Human */
+        $player = $game->currentPlayer();
+
+        Assert::isInstanceOf($player, Human::class);
+        Assert::true($player->telegramUser()->equals($tgUser));
+
+        return $player;
     }
 }

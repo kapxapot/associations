@@ -5,6 +5,7 @@ namespace Brightwood\Tests;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use Brightwood\Answers\Answerer;
+use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
@@ -74,12 +75,13 @@ final class AnswererTest extends TestCase
                 'telegram_user_id' => $tgUser->getId(),
                 'story_id' => 3,
                 'step_id' => 8,
-                'json_data' => null
+                'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug1.json')
             ]
         );
 
         $answers = $this->answerer->getAnswers($tgUser, '♻ Начать заново');
 
         $this->assertInstanceOf(StoryMessageSequence::class, $answers);
+        $this->assertTrue($answers->hasText());
     }
 }

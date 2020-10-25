@@ -27,8 +27,25 @@ class FunctionNode extends StoryNode
         return false;
     }
 
-    public function getMessages(TelegramUser $tgUser, StoryData $data) : StoryMessageSequence
+    public function getMessages(
+        TelegramUser $tgUser,
+        StoryData $data,
+        ?string $text = null
+    ) : StoryMessageSequence
     {
-        return ($this->function)($tgUser, $data);
+        /** @var StoryMessageSequence */
+        $sequence = ($this->function)($tgUser, $data, $text);
+
+        // function sequence can have no actions and return the next node id
+        // in this case the next node needs to be resolved
+        if (!$sequence->hasActions() && $sequence->nodeId() !== $this->id) {
+            $nextNode = $this->resolveNode($sequence->nodeId());
+
+            $sequence = $sequence->merge(
+                $nextNode->getMessages($tgUser, $data)
+            );
+        }
+
+        return $sequence;
     }
 }

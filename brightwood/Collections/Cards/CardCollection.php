@@ -4,6 +4,7 @@ namespace Brightwood\Collections\Cards;
 
 use App\Semantics\Sentence;
 use Brightwood\Models\Cards\Card;
+use Plasticode\Collections\Basic\ScalarCollection;
 
 class CardCollection extends EquatableCollection
 {
@@ -38,6 +39,13 @@ class CardCollection extends EquatableCollection
             $this->map(
                 fn (Card $c) => $c->name()
             )
+        );
+    }
+
+    public function stringize() : ScalarCollection
+    {
+        return $this->scalarize(
+            fn (Card $c) => $c->name()
         );
     }
 }

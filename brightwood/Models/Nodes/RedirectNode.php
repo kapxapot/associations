@@ -36,7 +36,11 @@ class RedirectNode extends LinkedNode
         return $this->links;
     }
 
-    public function getMessages(TelegramUser $tgUser, StoryData $data) : StoryMessageSequence
+    public function getMessages(
+        TelegramUser $tgUser,
+        StoryData $data,
+        ?string $text = null
+    ) : StoryMessageSequence
     {
         $data = $this->mutate($data);
         $link = $this->links->satisfying($data)->choose();

@@ -7,6 +7,7 @@ use Brightwood\Collections\StoryMessageCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Interfaces\SequencableInterface;
+use Plasticode\Collections\Basic\Collection;
 
 class StoryMessageSequence implements SequencableInterface
 {
@@ -42,6 +43,9 @@ class StoryMessageSequence implements SequencableInterface
         return $this->isFinalized;
     }
 
+    /**
+     * @return $this
+     */
     public function add(MessageInterface ...$messages) : self
     {
         $this->messages = $this->messages->add(...$messages);
@@ -116,6 +120,8 @@ class StoryMessageSequence implements SequencableInterface
 
     /**
      * Overrides actions.
+     * 
+     * @return $this
      */
     public function withActions(string ...$actions) : self
     {
@@ -236,5 +242,19 @@ class StoryMessageSequence implements SequencableInterface
         return $sequence->finalize(
             $other->isFinalized()
         );
+    }
+
+    public function hasText() : bool
+    {
+        return $this->messages->any(
+            fn (MessageInterface $m) =>
+            Collection::make($m->lines())
+                ->anyFirst(fn ($s) => strlen($s) > 0)
+        );
+    }
+
+    public function hasActions() : bool
+    {
+        return !empty($this->actions);
     }
 }

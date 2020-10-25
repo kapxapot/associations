@@ -148,11 +148,12 @@ abstract class Story implements CommandProviderInterface
     public function renderNode(
         TelegramUser $tgUser,
         StoryNode $node,
-        StoryData $data
+        StoryData $data,
+        ?string $text = null
     ) : StoryMessageSequence
     {
         $sequence = $node
-            ->getMessages($tgUser, $data)
+            ->getMessages($tgUser, $data, $text)
             ->prependPrefix($this->messagePrefix);
 
         return $this->checkForFinish($sequence);
@@ -174,13 +175,16 @@ abstract class Story implements CommandProviderInterface
     /**
      * Attempts to go to the next node + renders it.
      * 
+     * Empty result sequence means here that story failed to move further due to some
+     * reasons, e.g., incorrect input.
+     * 
      * @throws InvalidConfigurationException
      */
     public function go(
         TelegramUser $tgUser,
         StoryNode $node,
-        string $text,
-        StoryData $data
+        StoryData $data,
+        string $text
     ) : ?StoryMessageSequence
     {
         if ($node->isFinish($data)) {
@@ -190,7 +194,7 @@ abstract class Story implements CommandProviderInterface
         }
 
         if ($node instanceof FunctionNode) {
-            return $this->renderNode($tgUser, $node, $data);
+            return $this->renderNode($tgUser, $node, $data, $text);
         }
 
         if (!($node instanceof ActionNode)) {

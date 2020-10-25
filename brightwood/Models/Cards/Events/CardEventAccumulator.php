@@ -54,10 +54,7 @@ class CardEventAccumulator
     {
         return $this
             ->mergedEvents()
-            ->map(
-                fn (CardEventInterface $e) => $e->messageFor($player)
-            )
-            ->toArray();
+            ->messagesFor($player);
     }
 
     public function mergedEvents() : CardEventCollection

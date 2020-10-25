@@ -5,6 +5,7 @@ namespace Brightwood\Models\Cards\Games;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Card;
+use Brightwood\Models\Cards\Events\DrawEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Sets\Deck;
 use Brightwood\Models\Cards\Sets\Pile;
@@ -297,9 +298,9 @@ abstract class CardGame implements SerializableInterface
 
         while (!$amount || ($dealed < $amount)) {
             foreach ($this->players() as $player) {
-                $drawn = $this->drawToHand($player, 1);
+                $drawEvent = $this->drawToHand($player, 1);
 
-                if ($drawn->isEmpty()) {
+                if (is_null($drawEvent)) {
                     break;
                 }
             }
@@ -313,20 +314,29 @@ abstract class CardGame implements SerializableInterface
     }
 
     /**
+     * Tries to draw cards from the deck.
+     * 
+     * If any cards are drawn, they are added to the player's hand
+     * and a {@see DrawEvent} is returned.
+     * 
+     * Otherwise, the null is returned (which means that no cards where drawn).
+     * 
      * @throws \InvalidArgumentException
      */
-    public function drawToHand(Player $player, int $amount = 1) : CardCollection
+    public function drawToHand(Player $player, int $amount = 1) : ?DrawEvent
     {
         Assert::true($this->isValidPlayer($player));
         Assert::false($this->isDeckEmpty());
 
         $drawn = $this->deck->drawMany($amount);
 
-        if ($drawn->any()) {
-            $player->addCards($drawn);
+        if ($drawn->isEmpty()) {
+            return null;
         }
 
-        return $drawn;
+        $player->addCards($drawn);
+
+        return new DrawEvent($player, $drawn);
     }
 
     public function drawToDiscard(int $amount = 1) : CardCollection

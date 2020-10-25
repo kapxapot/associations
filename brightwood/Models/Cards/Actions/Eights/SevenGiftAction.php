@@ -5,13 +5,13 @@ namespace Brightwood\Models\Cards\Actions\Eights;
 use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Models\Cards\Actions\GiftAction;
 use Brightwood\Models\Cards\Actions\Interfaces\ApplicableActionInterface;
+use Brightwood\Models\Cards\Actions\Interfaces\SkipActionInterface;
 use Brightwood\Models\Cards\Events\Basic\PublicEvent;
-use Brightwood\Models\Cards\Events\DrawEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Player;
 
-class SevenGiftAction extends GiftAction implements ApplicableActionInterface
+class SevenGiftAction extends GiftAction implements ApplicableActionInterface, SkipActionInterface
 {
     public function announcementEvents() : CardEventCollection
     {
@@ -27,13 +27,13 @@ class SevenGiftAction extends GiftAction implements ApplicableActionInterface
         $toDraw = min(2, $game->deckSize());
 
         while ($toDraw > 0) {
-            $drawn = $game->drawToHand($player);
+            $drawEvent = $game->drawToHand($player);
 
-            if (!$drawn->any()) {
+            if (is_null($drawEvent)) {
                 break;
             }
 
-            $events[] = new DrawEvent($player, $drawn);
+            $events[] = $drawEvent;
 
             $toDraw--;
         }

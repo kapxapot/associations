@@ -64,7 +64,11 @@ abstract class StaticNode extends StoryNode implements MutatorInterface
         return $this->withMutator($mutator);
     }
 
-    public function getMessages(TelegramUser $tgUser, StoryData $data) : StoryMessageSequence
+    public function getMessages(
+        TelegramUser $tgUser,
+        StoryData $data,
+        ?string $text = null
+    ) : StoryMessageSequence
     {
         return new StoryMessageSequence(
             new StoryMessage(

@@ -40,8 +40,8 @@ final class StoryTest extends TestCase
         $sequence = $story->go(
             new TelegramUser(),
             $node,
-            'Сесть на пенек и заплакать',
-            $data
+            $data,
+            'Сесть на пенек и заплакать'
         );
 
         $this->assertNotNull($sequence);

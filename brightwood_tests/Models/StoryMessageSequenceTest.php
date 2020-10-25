@@ -2,6 +2,7 @@
 
 namespace Brightwood\Tests\Models;
 
+use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
 use PHPUnit\Framework\TestCase;
@@ -53,6 +54,48 @@ final class StoryMessageSequenceTest extends TestCase
                 StoryMessageSequence::empty(),
                 false
             ],
+        ];
+    }
+
+    /**
+     * @dataProvider hasTextProvider
+     */
+    public function testHasText(StoryMessageSequence $sequence, bool $expected) : void
+    {
+        $this->assertEquals($expected, $sequence->hasText());
+    }
+
+    public function hasTextProvider() : array
+    {
+        return [
+            'no messages' => [
+                StoryMessageSequence::make(),
+                false
+            ],
+            'no lines' => [
+                StoryMessageSequence::make(
+                    new StoryMessage(0)
+                ),
+                false
+            ],
+            'empty lines' => [
+                StoryMessageSequence::make(
+                    new StoryMessage(0, [])
+                ),
+                false
+            ],
+            'empty string' => [
+                StoryMessageSequence::make(
+                    new StoryMessage(0, [''])
+                ),
+                false
+            ],
+            'good string' => [
+                StoryMessageSequence::make(
+                    new StoryMessage(0, ['text'])
+                ),
+                true
+            ]
         ];
     }
 }

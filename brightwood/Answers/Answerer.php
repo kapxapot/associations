@@ -242,10 +242,10 @@ class Answerer
 
         Assert::notNull($status);
 
-        $this->logger->info(
-            'we got status data? ' . ($status->data() ? 'yes' : 'no'),
-            $status->data() ?? []
-        );
+        // $this->logger->info(
+        //     'we got status data? ' . ($status->data() ? 'yes' : 'no'),
+        //     $status->data() ?? []
+        // );
 
         $story = $this->storyRepository->get($status->storyId);
         $node = $story->getNode($status->stepId);
@@ -254,7 +254,7 @@ class Answerer
 
         $data = $story->makeData($status->data());
 
-        $sequence = $story->go($tgUser, $node, $text, $data);
+        $sequence = $story->go($tgUser, $node, $data, $text);
 
         if ($sequence) {
             $status->stepId = $sequence->nodeId();

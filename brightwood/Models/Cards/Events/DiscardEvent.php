@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Cards\Events;
 
 use Brightwood\Collections\Cards\CardCollection;
+use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Webmozart\Assert\Assert;
@@ -13,14 +14,14 @@ class DiscardEvent extends PlayerEvent
 
     public function __construct(
         Player $player,
-        CardCollection $cards
+        Card ...$cards
     )
     {
         parent::__construct($player);
 
         Assert::minCount($cards, 1);
 
-        $this->cards = $cards;
+        $this->cards = CardCollection::make($cards);
     }
 
     public function publicChunk() : string

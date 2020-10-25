@@ -13,10 +13,11 @@ use Brightwood\Models\Cards\Actions\Eights\SevenGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\SixGiftAction;
 use Brightwood\Models\Cards\Actions\GiftAction;
 use Brightwood\Models\Cards\Actions\Interfaces\ApplicableActionInterface;
+use Brightwood\Models\Cards\Actions\Interfaces\SkipActionInterface;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Events\CardEventAccumulator;
 use Brightwood\Models\Cards\Events\DiscardEvent;
-use Brightwood\Models\Cards\Events\DrawEvent;
+use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Events\NoCardsEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Rank;
@@ -133,6 +134,11 @@ class EightsGame extends CardGame
         return $this;
     }
 
+    private function hasGift() : bool
+    {
+        return $this->gift !== null;
+    }
+
     public function currentPlayer() : ?Player
     {
         return $this->currentPlayer;
@@ -203,26 +209,40 @@ class EightsGame extends CardGame
         $message = parent::start();
 
         $this->currentPlayer = $this->starter();
+        $this->move = 1;
 
         return $message;
     }
 
-    public function run(bool $breakOnHuman = false) : MessageCollection
+    public function runTillBreak() : MessageCollection
+    {
+        return $this->run(true);
+    }
+
+    /**
+     * @param boolean $withBreak Should the game break and wait for the human interaction?
+     */
+    public function run(bool $withBreak = false) : MessageCollection
     {
         $messages = [];
 
-        while (!$this->isFinished() && (!$breakOnHuman || $this->currentPlayer->isBot())) {
+        while (
+            !$this->isFinished()
+            && (!$withBreak
+                || $this->canAutoMove($this->currentPlayer)
+            )
+        ) {
             $messages[] = $this->makeMove($this->currentPlayer);
 
-            if ($this->hasWon($this->currentPlayer)) {
-                $messages[] = $this->winMessage(
-                    $this->currentPlayer
-                );
-
-                break;
+            if (!$this->isFinished()) {
+                $this->goToNextPlayer();
             }
+        }
 
-            $this->currentPlayer = $this->nextPlayer($this->currentPlayer);
+        if ($this->hasWinner()) {
+            $messages[] = $this->winMessageFor(
+                $this->currentPlayer
+            );
         }
 
         if ($this->isDraw()) {
@@ -235,7 +255,37 @@ class EightsGame extends CardGame
         return MessageCollection::make($messages);
     }
 
-    private function winMessage(Player $player) : MessageInterface
+    /**
+     * Checks if the player can make a move in auto-mode (by the AI).
+     * 
+     * Auto-move is possible when:
+     * 
+     * - The player is a bot.
+     * - The player has to skip a move and (optionally) do some pre-defined actions
+     * (e.g., draw cards).
+     */
+    private function canAutoMove(Player $player) : bool
+    {
+        if ($player->isBot()) {
+            return true;
+        }
+
+        return $this->isNextMoveASkip();
+    }
+
+    private function isNextMoveASkip() : bool
+    {
+        return $this->hasGift()
+            && ($this->gift instanceof SkipActionInterface);
+    }
+
+    public function goToNextPlayer() : void
+    {
+        $this->currentPlayer = $this->nextPlayer($this->currentPlayer);
+        $this->move++;
+    }
+
+    private function winMessageFor(Player $player) : MessageInterface
     {
         return new TextMessage(
             $player->equals($this->observer())
@@ -294,12 +344,7 @@ class EightsGame extends CardGame
         Assert::true($this->isValidPlayer($player));
         Assert::true($this->isStarted());
 
-        $this->move++;
-
-        $moveStatus =
-            '[' . $this->move . '] ' .
-            'Стол: ' . $this->discard()->topString() . ', ' .
-            'Колода: ' . $this->deckSize();
+        $moveStatus = $this->statusString();
 
         $moveMessages = $this
             ->actualMove($player)
@@ -319,6 +364,14 @@ class EightsGame extends CardGame
         return $message;
     }
 
+    public function statusString() : string
+    {
+        return
+            '[' . $this->move . '] ' .
+            'Стол: ' . $this->discard()->topString() . ', ' .
+            'Колода: ' . $this->deckSize();
+    }
+
     private function actualMove(Player $player) : CardEventAccumulator
     {
         $events = new CardEventAccumulator();
@@ -336,69 +389,90 @@ class EightsGame extends CardGame
 
         // drawing & trying to put a card
         while (true) {
-            $putCard = $this->tryPutCard($player);
+            $chosenCard = $this->chooseCardToPut($player);
 
-            if ($putCard) {
-                $events->add(
-                    new DiscardEvent(
-                        $player,
-                        CardCollection::collect($putCard)
-                    )
+            if ($chosenCard) {
+                $events->addMany(
+                    $this->putCard($player, $chosenCard)
                 );
-
-                // add gift's announcement events, if there is no winner yet
-                // in case of a winner, gifts don't make sense
-                if (!$this->hasWinner()) {
-                    $events->addMany(
-                        $this->giftAnnouncementEvents()
-                    );
-                }
-
-                $this->noCardsInARow = 0;
 
                 break;
             }
 
             if ($this->isDeckEmpty()) {
                 $events->add(
-                    new NoCardsEvent($player)
+                    $this->hasNoCardsToPut($player)
                 );
-
-                $this->noCardsInARow++;
 
                 break;
             }
 
-            $drawn = $this->drawToHand($player);
+            $drawEvent = $this->drawToHand($player);
 
-            if ($drawn->any()) {
-                $events->add(
-                    new DrawEvent($player, $drawn)
-                );
+            if ($drawEvent) {
+                $events->add($drawEvent);
             }
         }
 
         return $events;
     }
 
-    private function tryPutCard(Player $player) : ?Card
+    /**
+     * This function must be called in case when the player has no cards to put.
+     */
+    public function hasNoCardsToPut(Player $player) : CardEventInterface
     {
-        // todo: extract this to strategy
+        $this->noCardsInARow++;
 
-        /** @var Card|null */
-        $suitableCard = $player
+        return new NoCardsEvent($player);
+    }
+
+    /**
+     * Todo: extract this to strategy
+     */
+    private function chooseCardToPut(Player $player) : ?Card
+    {
+        return $this
+            ->getPlayableCardsFor($player)
+            ->random();
+    }
+
+    public function putCard(Player $player, Card $card) : CardEventCollection
+    {
+        $events = new CardEventAccumulator();
+
+        $this->discardFromHand($player, $card);
+
+        $events->add(
+            new DiscardEvent($player, $card)
+        );
+
+        // add gift's announcement events, if there is no winner yet
+        // in case of a winner, gifts don't make sense
+        if (!$this->hasWinner()) {
+            $events->addMany(
+                $this->giftAnnouncementEvents()
+            );
+        }
+
+        $this->noCardsInARow = 0;
+
+        return $events->events();
+    }
+
+    /**
+     * Returns the currently playable cards for the player.
+     */
+    public function getPlayableCardsFor(Player $player) : CardCollection
+    {
+        Assert::true($this->isValidPlayer($player));
+
+        return $player
             ->hand()
             ->cards()
             ->where(
                 fn (Card $c) => $this->canBeDiscarded($c)
-            )
-            ->random();
-
-        if ($suitableCard) {
-            $this->discardFromHand($player, $suitableCard);
-        }
-
-        return $suitableCard;
+            );
     }
 
     protected function onDiscard(Card $card, ?Player $player = null) : void
@@ -455,6 +529,8 @@ class EightsGame extends CardGame
         // 8
 
         if ($card->isRank(Rank::eight())) {
+            // todo: add restriction on discard, not here
+            // get suit for action from restriction
             $suit = $player
                 ? $this->chooseSuit($player)
                 : $card->suit();

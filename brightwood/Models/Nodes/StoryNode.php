@@ -39,7 +39,8 @@ abstract class StoryNode
 
     abstract public function getMessages(
         TelegramUser $tgUser,
-        StoryData $data
+        StoryData $data,
+        ?string $text = null
     ) : StoryMessageSequence;
 
     /**

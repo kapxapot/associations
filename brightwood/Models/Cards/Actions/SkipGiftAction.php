@@ -4,13 +4,14 @@ namespace Brightwood\Models\Cards\Actions;
 
 use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Models\Cards\Actions\Interfaces\ApplicableActionInterface;
+use Brightwood\Models\Cards\Actions\Interfaces\SkipActionInterface;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Events\Basic\PublicEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Player;
 
-class SkipGiftAction extends GiftAction implements ApplicableActionInterface
+class SkipGiftAction extends GiftAction implements ApplicableActionInterface, SkipActionInterface
 {
     private ?string $reason;
 
