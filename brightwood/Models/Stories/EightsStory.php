@@ -220,7 +220,7 @@ class EightsStory extends Story
                         return $sequence->add(
                             new StoryMessage(
                                 self::FINISH_GAME,
-                                ['Вы покинули игру.']
+                                ['Вы покинули игру']
                             )
                         )->withData($data);
                     }
