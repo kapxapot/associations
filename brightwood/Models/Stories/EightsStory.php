@@ -24,8 +24,9 @@ use Webmozart\Assert\Assert;
 class EightsStory extends Story
 {
     private const RULES_COMMAND = '/rules';
-    private const DRAW_CARD_COMMAND = 'Взять карту';
-    private const NO_CARDS_COMMAND = 'Нет карт';
+    private const DRAW_CARD_COMMAND = '🎴 Взять карту';
+    private const NO_CARDS_COMMAND = '❌ Нет карт';
+    private const QUIT_GAME_COMMAND = '🏃 Выйти';
 
     private const START = 1;
     private const TWO_PLAYERS = 2;
@@ -44,7 +45,7 @@ class EightsStory extends Story
         RootDeserializerInterface $rootDeserializer
     )
     {
-        parent::__construct($id, '♠ Восьмерки (в разработке)', true);
+        parent::__construct($id, '♠ Восьмерки (почти готово!)', true);
 
         $this->rootDeserializer = $rootDeserializer;
     }
@@ -199,7 +200,8 @@ class EightsStory extends Story
                             ->withData($data);
                     }
 
-                    $player = $this->getAndCheckPlayer($game, $tgUser);
+                    // the player isn't needed, but the check is needed
+                    $this->getAndCheckPlayer($game, $tgUser);
 
                     return $sequence
                         ->add(new StoryMessage(self::HUMAN_MOVE))
@@ -212,11 +214,20 @@ class EightsStory extends Story
             new FunctionNode(
                 self::HUMAN_MOVE,
                 function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
+                    $sequence = StoryMessageSequence::empty();
+
+                    if ($text === self::QUIT_GAME_COMMAND) {
+                        return $sequence->add(
+                            new StoryMessage(
+                                self::FINISH_GAME,
+                                ['Вы покинули игру.']
+                            )
+                        )->withData($data);
+                    }
+
                     $game = $data->game();
                     $player = $this->getAndCheckPlayer($game, $tgUser);
                     $playableCards = $game->getPlayableCardsFor($player);
-
-                    $sequence = StoryMessageSequence::empty();
 
                     // play a card if it's valid
                     if (strlen($text) > 0 && $playableCards->any()) {
@@ -257,25 +268,47 @@ class EightsStory extends Story
                         $game->goToNextPlayer();
                     }
 
-                    return $sequence
-                        ->add(
-                            $event
-                                ? new StoryMessage(
+                    if ($event) {
+                        return $sequence
+                            ->add(
+                                new StoryMessage(
                                     self::AUTO_MOVES,
                                     [$event->messageFor($player)],
                                 )
-                                : new StoryMessage(
-                                    self::HUMAN_MOVE,
+                            )
+                            ->withData($data);
+                    }
+
+                    return $sequence
+                        ->add(
+                            new StoryMessage(
+                                self::HUMAN_MOVE,
+                                [
+                                    $game->statusString(),
+                                    $game->players()->except($player)->handsString(),
+                                    'Ваши карты: ' . $player->hand()
+                                ]
+                            ),
+                            $playableCards->any()
+                                ? new StoryMessage(
+                                    0,
+                                    ['Ваш ход:'],
                                     [
-                                        $game->statusString(),
-                                        'Ваши карты: ' . $player->hand(),
-                                        'Ваш ход:'
-                                    ],
-                                    $playableCards->any()
-                                        ? $playableCards->stringize()->toArray()
-                                        : ($game->isDeckEmpty()
-                                            ? [self::NO_CARDS_COMMAND]
-                                            : [self::DRAW_CARD_COMMAND])
+                                        ...$playableCards->stringize()->toArray(),
+                                        self::QUIT_GAME_COMMAND
+                                    ]
+                                )
+                                : ($game->isDeckEmpty()
+                                    ? new StoryMessage(
+                                        0,
+                                        ['Вам нечем ходить, и колода пуста...'],
+                                        [self::NO_CARDS_COMMAND, self::QUIT_GAME_COMMAND]
+                                    )
+                                    : new StoryMessage(
+                                        0,
+                                        ['Вам нечем ходить, берите карту 👇'],
+                                        [self::DRAW_CARD_COMMAND, self::QUIT_GAME_COMMAND]
+                                    )
                                 )
                         )
                         ->withData($data);

@@ -163,7 +163,9 @@ class StoryMessageSequence implements SequencableInterface
     public function nodeId() : ?int
     {
         /** @var StoryMessage|null */
-        $last = $this->storyMessages()->last();
+        $last = $this->storyMessages()->last(
+            fn (StoryMessage $m) => $m->nodeId() > 0
+        );
 
         return $last
             ? $last->nodeId()

@@ -30,6 +30,20 @@ class EquatableCollection extends TypedCollection
         return $col;
     }
 
+    /**
+     * Returns all elements except the specified.
+     *
+     * @return static
+     */
+    public function except(EquatableInterface ...$elements) : self
+    {
+        $toExclude = static::make($elements);
+
+        return $this->where(
+            fn (EquatableInterface $eq) => !$toExclude->contains($eq)
+        );
+    }
+
     public function contains(?EquatableInterface $element) : bool
     {
         if (is_null($element)) {
