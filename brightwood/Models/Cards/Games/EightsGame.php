@@ -234,9 +234,7 @@ class EightsGame extends CardGame
         ) {
             $messages[] = $this->makeMove($this->currentPlayer);
 
-            if (!$this->isFinished()) {
-                $this->goToNextPlayer();
-            }
+            $this->goToNextPlayer();
         }
 
         if ($this->hasWinner()) {
@@ -281,6 +279,10 @@ class EightsGame extends CardGame
 
     public function goToNextPlayer() : void
     {
+        if ($this->isFinished()) {
+            return;
+        }
+
         $this->currentPlayer = $this->nextPlayer($this->currentPlayer);
         $this->move++;
     }
