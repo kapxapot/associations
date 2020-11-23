@@ -16,26 +16,21 @@ use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
 use App\Services\WordService;
+use App\Testing\Factories\LanguageRepositoryFactory;
+use App\Testing\Factories\UserRepositoryFactory;
+use App\Testing\Factories\WordRepositoryFactory;
 use App\Testing\Mocks\Config\WordConfigMock;
 use App\Testing\Mocks\LinkerMock;
 use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
 use App\Testing\Mocks\Repositories\GameRepositoryMock;
-use App\Testing\Mocks\Repositories\LanguageRepositoryMock;
 use App\Testing\Mocks\Repositories\TurnRepositoryMock;
-use App\Testing\Mocks\Repositories\UserRepositoryMock;
-use App\Testing\Mocks\Repositories\WordRepositoryMock;
-use App\Testing\Mocks\SettingsProviderMock;
-use App\Testing\Seeders\LanguageSeeder;
-use App\Testing\Seeders\UserSeeder;
-use App\Testing\Seeders\WordSeeder;
 use PHPUnit\Framework\TestCase;
-use Plasticode\Core\Translator;
+use Plasticode\Core\SettingsProvider;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\ObjectProxy;
 use Plasticode\Util\Cases;
 use Plasticode\Validation\ValidationRules;
 use Plasticode\Validation\Validator;
-use Slim\Container;
 
 class GameServiceTest extends TestCase
 {
@@ -50,21 +45,14 @@ class GameServiceTest extends TestCase
     {
         parent::setUp();
 
-        $this->languageRepository = new LanguageRepositoryMock(
-            new LanguageSeeder()
-        );
-
+        $this->languageRepository = LanguageRepositoryFactory::make();
         $this->associationRepository = new AssociationRepositoryMock();
 
-        $this->wordRepository = new WordRepositoryMock(
-            new WordSeeder(
-                $this->languageRepository
-            )
+        $this->wordRepository = WordRepositoryFactory::make(
+            $this->languageRepository
         );
 
-        $this->userRepository = new UserRepositoryMock(
-            new UserSeeder()
-        );
+        $this->userRepository = UserRepositoryFactory::make();
 
         $this->turnRepository = new TurnRepositoryMock(
             new ObjectProxy(
@@ -112,12 +100,9 @@ class GameServiceTest extends TestCase
             new Cases()
         );
 
-        $validator = new Validator(
-            new Container(),
-            new Translator([])
-        );
+        $validator = new Validator();
 
-        $settingsProvider = new SettingsProviderMock();
+        $settingsProvider = new SettingsProvider();
         $eventDispatcher = new EventDispatcher();
 
         $wordService = new WordService(

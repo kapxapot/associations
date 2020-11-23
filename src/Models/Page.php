@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Collections\PageCollection;
 use Plasticode\Collections\Basic\ArrayCollection;
 use Plasticode\Models\Interfaces\PageInterface;
+use Plasticode\Models\Interfaces\ParentedInterface;
 use Plasticode\Models\Traits\Parented;
 use Plasticode\Util\Strings;
 
@@ -16,7 +17,7 @@ use Plasticode\Util\Strings;
  * @method PageCollection children()
  * @method static withChildren(PageCollection|callable $children)
  */
-class Page extends NewsSource implements PageInterface
+class Page extends NewsSource implements PageInterface, ParentedInterface
 {
     use Parented;
 

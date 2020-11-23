@@ -4,9 +4,7 @@ namespace Brightwood\Models\Stories;
 
 use App\Models\TelegramUser;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Events\CardEventAccumulator;
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
-use Brightwood\Models\Cards\Events\NoCardsEvent;
 use Brightwood\Models\Cards\Games\EightsGame;
 use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Data\EightsData;

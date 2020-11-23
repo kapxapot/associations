@@ -4,10 +4,11 @@ namespace App\Repositories\Interfaces;
 
 use App\Collections\PageCollection;
 use App\Models\Page;
+use Plasticode\Repositories\Interfaces\Basic\ParentedRepositoryInterface;
 use Plasticode\Repositories\Interfaces\Basic\SearchableNewsSourceRepositoryInterface;
 use Plasticode\Repositories\Interfaces\PageRepositoryInterface as BasePageRepositoryInterface;
 
-interface PageRepositoryInterface extends SearchableNewsSourceRepositoryInterface, BasePageRepositoryInterface
+interface PageRepositoryInterface extends SearchableNewsSourceRepositoryInterface, BasePageRepositoryInterface, ParentedRepositoryInterface
 {
     function get(?int $id) : ?Page;
     function getProtected(?int $id) : ?Page;

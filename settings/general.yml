@@ -18,6 +18,10 @@ password_min: 5
 login_min: 3
 login_max: 20
 
+validation_namespaces:
+  - Plasticode\Validation\Rules\
+  - App\Validation\Rules\
+
 # auth
 # 1..16 digits
 captcha_digits: 2
@@ -78,7 +82,7 @@ telegram:
   bot_token: {TELEGRAM_BOT_TOKEN}
   bot_log: {DEBUG}
   brightwood_bot_token: {BRIGHTWOOD_BOT_TOKEN}
-  brightwood_bot_log_level: 1
+  brightwood_bot_log_level: {BRIGHTWOOD_BOT_LOG_LEVEL}
 
 jobs:
   secret: {JOBS_SECRET}

@@ -1,17 +1,25 @@
 <?php
 
+use App\Config\Bootstrap;
+use Plasticode\Core\Env;
+use Plasticode\Core\Settings;
+use Plasticode\Middleware\CookieAuthMiddleware;
+use Plasticode\Middleware\SlashMiddleware;
+use Respect\Validation\Validator;
+use Slim\App;
+use Slim\Container;
+
 $dir = __DIR__;
 $root = $dir . '/..';
 
 require $root . '/vendor/autoload.php';
 
-$env = \Plasticode\Core\Env::load($root);
+$env = Env::load($root);
+$settings = Settings::load($root . '/settings');
+$app = new App(['settings' => $settings]);
 
-$appSettings = \Plasticode\Core\Settings::load($root . '/settings');
-
-$app = \Plasticode\Core\App::get($appSettings);
+/** @var Container */
 $container = $app->getContainer();
-$settings = $container->get('settings');
 
 if ($settings['debug']) {
     error_reporting(E_ALL);
@@ -24,32 +32,25 @@ if ($settings['debug']) {
 
 session_start();
 
-$bootstrap = new \App\Config\Bootstrap($settings, $dir);
+$bootstrap = new Bootstrap($settings, $dir);
+$bootstrap->fillContainer($container);
 
-\Plasticode\Core\Core::bootstrap(
-    $container,
-    $bootstrap->getMappings(),
-    ['App\\Validation\\Rules\\']
-);
+foreach ($settings['validation_namespaces'] as $namespace) {
+    Validator::with($namespace);
+}
 
 $container['env'] = $env;
 
 // middleware
 
-$app->add(
-    new \Plasticode\Middleware\SlashMiddleware()
-);
+$app->add(new SlashMiddleware());
 
 $app->add(
-    new \Plasticode\Middleware\CookieAuthMiddleware(
+    new CookieAuthMiddleware(
         $container->authService,
         $settings['auth_token_key']
     )
 );
-
-// event handlers
-
-$bootstrap->registerEventHandlers($container);
 
 require $root . '/src/routes.php';
 

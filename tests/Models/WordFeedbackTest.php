@@ -2,21 +2,138 @@
 
 namespace App\Tests\Models;
 
+use App\Hydrators\GameHydrator;
+use App\Hydrators\TurnHydrator;
+use App\Hydrators\WordFeedbackHydrator;
 use App\Models\Word;
 use App\Models\WordFeedback;
-use App\Tests\BaseTestCase;
+use App\Repositories\Interfaces\GameRepositoryInterface;
+use App\Repositories\Interfaces\TurnRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\CasesService;
+use App\Services\WordFeedbackService;
+use App\Services\WordService;
+use App\Testing\Factories\LanguageRepositoryFactory;
+use App\Testing\Factories\UserRepositoryFactory;
+use App\Testing\Factories\WordRepositoryFactory;
+use App\Testing\Mocks\Config\WordConfigMock;
+use App\Testing\Mocks\LinkerMock;
+use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
+use App\Testing\Mocks\Repositories\GameRepositoryMock;
+use App\Testing\Mocks\Repositories\TurnRepositoryMock;
+use App\Testing\Mocks\Repositories\WordFeedbackRepositoryMock;
+use App\Tests\IntegrationTest;
+use Plasticode\Core\SettingsProvider;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\ValidationException;
+use Plasticode\ObjectProxy;
+use Plasticode\Util\Cases;
+use Plasticode\Validation\ValidationRules;
+use Plasticode\Validation\Validator;
 
-final class WordFeedbackTest extends BaseTestCase
+final class WordFeedbackTest extends IntegrationTest
 {
+    private GameRepositoryInterface $gameRepository;
+    private TurnRepositoryInterface $turnRepository;
+    private UserRepositoryInterface $userRepository;
+    private WordFeedbackRepositoryInterface $wordFeedbackRepository;
+    private WordRepositoryInterface $wordRepository;
+
+    private WordFeedbackService $wordFeedbackService;
+
+    public function setUp() : void
+    {
+        parent::setUp();
+
+        $this->userRepository = UserRepositoryFactory::make();
+
+        $languageRepository = LanguageRepositoryFactory::make();
+
+        $this->wordRepository = WordRepositoryFactory::make(
+            $languageRepository
+        );
+
+        $this->wordFeedbackRepository = new WordFeedbackRepositoryMock(
+            new ObjectProxy(
+                fn () => new WordFeedbackHydrator(
+                    $this->userRepository,
+                    $this->wordRepository
+                )
+            )
+        );
+
+        $associationRepository = new AssociationRepositoryMock();
+
+        $this->turnRepository = new TurnRepositoryMock(
+            new ObjectProxy(
+                fn () => new TurnHydrator(
+                    $associationRepository,
+                    $this->gameRepository,
+                    $this->turnRepository,
+                    $this->userRepository,
+                    $this->wordRepository
+                )
+            )
+        );
+
+        $this->gameRepository = new GameRepositoryMock(
+            new ObjectProxy(
+                fn () => new GameHydrator(
+                    $languageRepository,
+                    $this->turnRepository,
+                    $this->userRepository,
+                    new LinkerMock()
+                )
+            )
+        );
+
+        $validator = new Validator();
+        $validationRules = new ValidationRules(
+            new SettingsProvider($this->settings)
+        );
+
+        $wordService = new WordService(
+            $this->turnRepository,
+            $this->wordRepository,
+            new CasesService(
+                new Cases()
+            ),
+            $validator,
+            $validationRules,
+            new WordConfigMock(),
+            new EventDispatcher()
+        );
+
+        $this->wordFeedbackService = new WordFeedbackService(
+            $this->wordFeedbackRepository,
+            $this->wordRepository,
+            $validator,
+            $validationRules,
+            $wordService
+        );
+    }
+
+    public function tearDown() : void
+    {
+        unset($this->wordFeedbackService);
+
+        unset($this->gameRepository);
+        unset($this->turnRepository);
+        unset($this->wordFeedbackRepository);
+        unset($this->wordRepository);
+        unset($this->userRepository);
+
+        parent::tearDown();
+    }
+
     /** @dataProvider toModelProvider */
     public function testToModel(array $data, array $expected) : void
     {
-        $service = $this->container->wordFeedbackService;
-        $user = $this->getDefaultUser();
+        $user = $this->userRepository->get(1);
 
-        /** @var WordFeedback */
-        $model = $service->toModel($data, $user);
+        $model = $this->wordFeedbackService->toModel($data, $user);
 
         $this->assertInstanceOf(WordFeedback::class, $model);
         $this->assertInstanceOf(Word::class, $model->word());
@@ -46,7 +163,7 @@ final class WordFeedbackTest extends BaseTestCase
                     'word_id' => '1',
                     'dislike' => 'true',
                     'typo' => 'ababa',
-                    'duplicate' => 'стул',
+                    'duplicate' => 'табурет',
                     'mature' => 'true'
                 ],
                 [1, 1, true, 'ababa', 2, 1]
@@ -64,9 +181,8 @@ final class WordFeedbackTest extends BaseTestCase
     {
         $this->expectException(ValidationException::class);
 
-        $service = $this->container->wordFeedbackService;
-        $user = $this->getDefaultUser();
+        $user = $this->userRepository->get(1);
 
-        $service->toModel([], $user);
+        $this->wordFeedbackService->toModel([], $user);
     }
 }

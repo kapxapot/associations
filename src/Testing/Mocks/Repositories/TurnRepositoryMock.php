@@ -39,15 +39,13 @@ class TurnRepositoryMock implements TurnRepositoryInterface
 
     public function save(Turn $turn) : Turn
     {
-        if ($this->turns->contains($turn)) {
-            return $this->hydrator->hydrate($turn);
-        }
+        if (!$this->turns->contains($turn)) {
+            if (!$turn->isPersisted()) {
+                $turn->id = $this->turns->nextId();
+            }
 
-        if (!$turn->isPersisted()) {
-            $turn->id = $this->turns->nextId();
+            $this->turns = $this->turns->add($turn);
         }
-
-        $this->turns = $this->turns->add($turn);
 
         return $this->hydrator->hydrate($turn);
     }

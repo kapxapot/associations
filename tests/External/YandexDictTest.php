@@ -2,29 +2,58 @@
 
 namespace App\Tests\External;
 
+use App\External\YandexDict;
 use App\Models\Language;
-use App\Tests\BaseTestCase;
+use App\Repositories\Interfaces\LanguageRepositoryInterface;
+use App\Testing\Mocks\Repositories\LanguageRepositoryMock;
+use App\Testing\Seeders\LanguageSeeder;
+use App\Tests\IntegrationTest;
+use Plasticode\Core\Env;
+use Plasticode\Core\Settings;
 
-final class YandexDictTest extends BaseTestCase
+final class YandexDictTest extends IntegrationTest
 {
-    /** @dataProvider existingWordsProvider */
+    private LanguageRepositoryInterface $languageRepository;
+    private Language $language;
+    private YandexDict $dict;
+
+    public function setUp() : void
+    {
+        parent::setUp();
+
+        $this->languageRepository = new LanguageRepositoryMock(
+            new LanguageSeeder()
+        );
+
+        $this->language = $this->languageRepository->get(Language::RUSSIAN);
+
+        $this->dict = new YandexDict(
+            $this->settings['yandex_dict']['key']
+        );
+    }
+
+    public function tearDown() : void
+    {
+        unset($this->dict);
+        unset($this->language);
+        unset($this->languageRepository);
+
+        parent::tearDown();
+    }
+
+    /**
+     * @dataProvider existingWordsProvider
+     */
     public function testExistingWords(string $word) : void
     {
-        $languageRepository = $this->container->languageRepository;
-        $language = $languageRepository->get(Language::RUSSIAN);
-
-        $dict = $this->container->yandexDict;
-
-        $result = $dict->request($language->yandexDictCode, $word);
+        $result = $this->dict->request($this->language->yandexDictCode, $word);
 
         $data = json_decode($result, true);
 
         $def = $data['def'][0] ?? null;
 
-        if ($def) {
-            $text = $def['text'] ?? null;
-            $pos = $def['pos'] ?? null;
-        }
+        $text = $def['text'] ?? null;
+        $pos = $def['pos'] ?? null;
 
         $this->assertEquals($word, $text);
         $this->assertNotNull($pos);
@@ -42,21 +71,14 @@ final class YandexDictTest extends BaseTestCase
     /** @dataProvider notExistingWordsProvider */
     public function testNotExistingWords(string $word) : void
     {
-        $languageRepository = $this->container->languageRepository;
-        $language = $languageRepository->get(Language::RUSSIAN);
-
-        $dict = $this->container->yandexDict;
-
-        $result = $dict->request($language->yandexDictCode, $word);
+        $result = $this->dict->request($this->language->yandexDictCode, $word);
 
         $data = json_decode($result, true);
 
         $def = $data['def'][0] ?? null;
 
-        if ($def) {
-            $text = $def['text'] ?? null;
-            $pos = $def['pos'] ?? null;
-        }
+        $text = $def['text'] ?? null;
+        $pos = $def['pos'] ?? null;
 
         $this->assertNull($text);
         $this->assertNull($pos);

@@ -2,6 +2,7 @@
 
 namespace App\Testing\Seeders;
 
+use App\Collections\WordFeedbackCollection;
 use App\Models\Word;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
@@ -48,8 +49,11 @@ class WordSeeder implements ArraySeederInterface
         ];
 
         return array_map(
-            fn (Word $w) => $w->withLanguage(
+            fn (Word $w) =>
+            $w->withLanguage(
                 $this->languageRepository->get($w->languageId)
+            )->withFeedbacks(
+                WordFeedbackCollection::empty()
             ),
             $words
         );

@@ -1,0 +1,61 @@
+<?php
+
+namespace App\Testing\Mocks\Repositories;
+
+use App\Collections\AssociationFeedbackCollection;
+use App\Models\Association;
+use App\Models\AssociationFeedback;
+use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
+use Plasticode\Hydrators\Interfaces\HydratorInterface;
+use Plasticode\ObjectProxy;
+
+class AssociationFeedbackRepositoryMock implements AssociationFeedbackRepositoryInterface
+{
+    /** @var HydratorInterface|ObjectProxy */
+    private $hydrator;
+
+    private AssociationFeedbackCollection $feedbacks;
+
+    /**
+     * @param HydratorInterface|ObjectProxy $hydrator
+     */
+    public function __construct(
+        $hydrator
+    )
+    {
+        $this->hydrator = $hydrator;
+
+        $this->feedbacks = AssociationFeedbackCollection::empty();
+    }
+
+    public function create(array $data) : AssociationFeedback
+    {
+        return $this->hydrator->hydrate(
+            AssociationFeedback::create($data)
+        );
+    }
+
+    public function save(AssociationFeedback $feedback) : AssociationFeedback
+    {
+        if (!$this->feedbacks->contains($feedback)) {
+            if (!$feedback->isPersisted()) {
+                $feedback->id = $this->feedbacks->nextId();
+            }
+
+            $this->feedbacks = $this->feedbacks->add($feedback);
+        }
+
+        return $this->hydrator->hydrate($feedback);
+    }
+
+    public function getAllByAssociation(
+        Association $association
+    ) : AssociationFeedbackCollection
+    {
+        return $this
+            ->feedbacks
+            ->where(
+                fn (AssociationFeedback $f) => $f->association()->equals($association)
+            );
+    }
+}

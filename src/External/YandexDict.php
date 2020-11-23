@@ -4,7 +4,7 @@ namespace App\External;
 
 class YandexDict
 {
-    private $key;
+    private string $key;
 
     public function __construct(string $key)
     {

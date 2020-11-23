@@ -20,6 +20,6 @@ class AssociationExists extends AbstractRule
     {
         $association = $this->associationRepository->get($input);
 
-        return !is_null($association);
+        return $association !== null;
     }
 }

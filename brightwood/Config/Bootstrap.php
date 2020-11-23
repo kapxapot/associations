@@ -12,24 +12,23 @@ use Brightwood\Serialization\Cards\RootDeserializer;
 use Brightwood\Serialization\Cards\Serializers\CardSerializer;
 use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use Plasticode\ObjectProxy;
-use Psr\Container\ContainerInterface as CI;
-use Slim\Collection as SlimCollection;
+use Slim\Container;
 
 class Bootstrap
 {
     /**
      * Get mappings for DI container.
      */
-    public function getMappings(SlimCollection $settings) : array
+    public function getMappings(array $settings) : array
     {
         $map = [];
 
-        $map['brightwoodTelegramTransport'] = fn (CI $c) =>
+        $map['brightwoodTelegramTransport'] = fn (Container $c) =>
             new TelegramTransport(
                 $settings['telegram']['brightwood_bot_token']
             );
 
-        $map['cardsRootDeserializer'] = fn (CI $c) =>
+        $map['cardsRootDeserializer'] = fn (Container $c) =>
             new RootDeserializer(
                 new SerializationConfig(
                     $c->telegramUserRepository,
@@ -40,15 +39,15 @@ class Bootstrap
                 new SuitSerializer()
             );
 
-        $map['storyParser'] = fn (CI $c) =>
+        $map['storyParser'] = fn (Container $c) =>
             new StoryParser();
 
-        $map['storyRepository'] = fn (CI $c) =>
+        $map['storyRepository'] = fn (Container $c) =>
             new StoryRepository(
                 $c->cardsRootDeserializer
             );
 
-        $map['storyStatusRepository'] = fn (CI $c) =>
+        $map['storyStatusRepository'] = fn (Container $c) =>
             new StoryStatusRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -59,7 +58,7 @@ class Bootstrap
                 )
             );
 
-        $map['answerer'] = fn (CI $c) =>
+        $map['answerer'] = fn (Container $c) =>
             new Answerer(
                 $c->storyRepository,
                 $c->storyStatusRepository,

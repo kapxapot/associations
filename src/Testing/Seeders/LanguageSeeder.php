@@ -15,8 +15,9 @@ class LanguageSeeder implements ArraySeederInterface
         return [
             new Language(
                 [
-                    'id' => 1,
-                    'name' => 'Dummy',
+                    'id' => Language::RUSSIAN,
+                    'name' => 'Русский',
+                    'yandex_dict_code' => 'ru-ru'
                 ]
             )
         ];

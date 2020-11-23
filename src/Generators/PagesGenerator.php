@@ -30,7 +30,7 @@ class PagesGenerator extends TaggableEntityGenerator
             parent::getRules($data, $id),
             [
                 'title' => $this->rule('text'),
-                'parent_id' => Validator::nonRecursiveParent($this->entity, $id),
+                'parent_id' => Validator::nonRecursiveParent($this->pageRepository, $id),
                 'slug' => $this
                     ->rule('extendedAlias')
                     ->pageSlugAvailable(

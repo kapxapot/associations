@@ -2,22 +2,83 @@
 
 namespace App\Tests\Models;
 
+use App\Collections\AssociationFeedbackCollection;
+use App\Hydrators\AssociationFeedbackHydrator;
 use App\Models\Association;
 use App\Models\AssociationFeedback;
-use App\Tests\BaseTestCase;
+use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Services\AssociationFeedbackService;
+use App\Testing\Factories\UserRepositoryFactory;
+use App\Testing\Mocks\Repositories\AssociationFeedbackRepositoryMock;
+use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
+use App\Tests\IntegrationTest;
+use Plasticode\Core\SettingsProvider;
 use Plasticode\Exceptions\ValidationException;
+use Plasticode\ObjectProxy;
+use Plasticode\Validation\ValidationRules;
+use Plasticode\Validation\Validator;
 
-final class AssociationFeedbackTest extends BaseTestCase
+final class AssociationFeedbackTest extends IntegrationTest
 {
+    private AssociationFeedbackRepositoryInterface $associationFeedbackRepository;
+    private AssociationRepositoryInterface $associationRepository;
+    private UserRepositoryInterface $userRepository;
+
+    private AssociationFeedbackService $associationFeedbackService;
+
+    public function setUp() : void
+    {
+        parent::setUp();
+
+        $this->userRepository = UserRepositoryFactory::make();
+        $this->associationRepository = new AssociationRepositoryMock();
+
+        $this->associationRepository->save(
+            Association::create(['id' => 1])->withFeedbacks(
+                AssociationFeedbackCollection::empty()
+            )
+        );
+
+        $this->associationFeedbackRepository = new AssociationFeedbackRepositoryMock(
+            new ObjectProxy(
+                fn () => new AssociationFeedbackHydrator(
+                    $this->associationRepository,
+                    $this->userRepository
+                )
+            )
+        );
+
+        $this->associationFeedbackService = new AssociationFeedbackService(
+            $this->associationFeedbackRepository,
+            $this->associationRepository,
+            new Validator(),
+            new ValidationRules(
+                new SettingsProvider($this->settings)
+            )
+        );
+    }
+
+    public function tearDown() : void
+    {
+        unset($this->associationFeedbackService);
+
+        unset($this->associationFeedbackRepository);
+        unset($this->associationRepository);
+        unset($this->userRepository);
+
+        parent::tearDown();
+    }
+
     /**
      * @dataProvider toModelProvider
      */
     public function testToModel(array $data, array $expected) : void
     {
-        $service = $this->container->associationFeedbackService;
-        $user = $this->getDefaultUser();
+        $user = $this->userRepository->get(1);
 
-        $model = $service->toModel($data, $user);
+        $model = $this->associationFeedbackService->toModel($data, $user);
 
         $this->assertInstanceOf(AssociationFeedback::class, $model);
         $this->assertInstanceOf(Association::class, $model->association());
@@ -56,9 +117,8 @@ final class AssociationFeedbackTest extends BaseTestCase
     {
         $this->expectException(ValidationException::class);
 
-        $service = $this->container->associationFeedbackService;
-        $user = $this->getDefaultUser();
+        $user = $this->userRepository->get(1);
 
-        $service->toModel([], $user);
+        $this->associationFeedbackService->toModel([], $user);
     }
 }

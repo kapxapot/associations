@@ -64,7 +64,7 @@ class AssociationFeedbackService
         if ($model->isPersisted()) {
             $model->updatedAt = Date::dbNow();
         }
-        
+
         return $model;
     }
 
