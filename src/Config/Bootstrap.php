@@ -78,7 +78,7 @@ use Plasticode\Parsing\LinkMappers\PageLinkMapper;
 use Plasticode\Parsing\LinkMappers\TagLinkMapper;
 use Plasticode\Parsing\LinkMapperSource;
 use Plasticode\Services\NewsAggregatorService;
-use Slim\Container;
+use Psr\Container\ContainerInterface;
 
 class Bootstrap extends BootstrapBase
 {
@@ -89,12 +89,12 @@ class Bootstrap extends BootstrapBase
     {
         $map = parent::getMappings();
 
-        $map['auth'] = fn (Container $c) =>
+        $map['auth'] = fn (ContainerInterface $c) =>
             new Auth(
                 $c->session
             );
 
-        $map['associationFeedbackRepository'] = fn (Container $c) =>
+        $map['associationFeedbackRepository'] = fn (ContainerInterface $c) =>
             new AssociationFeedbackRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -106,7 +106,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['associationRepository'] = fn (Container $c) =>
+        $map['associationRepository'] = fn (ContainerInterface $c) =>
             new AssociationRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -123,7 +123,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['dictWordRepository'] = fn (Container $c) =>
+        $map['dictWordRepository'] = fn (ContainerInterface $c) =>
             new YandexDictWordRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -135,7 +135,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['gameRepository'] = fn (Container $c) =>
+        $map['gameRepository'] = fn (ContainerInterface $c) =>
             new GameRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -149,7 +149,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['languageRepository'] = fn (Container $c) =>
+        $map['languageRepository'] = fn (ContainerInterface $c) =>
             new LanguageRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -160,7 +160,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['newsRepository'] = fn (Container $c) =>
+        $map['newsRepository'] = fn (ContainerInterface $c) =>
             new NewsRepository(
                 $c->repositoryContext,
                 $c->tagRepository,
@@ -175,7 +175,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['pageRepository'] = fn (Container $c) =>
+        $map['pageRepository'] = fn (ContainerInterface $c) =>
             new PageRepository(
                 $c->repositoryContext,
                 $c->tagRepository,
@@ -191,7 +191,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['telegramUserRepository'] = fn (Container $c) =>
+        $map['telegramUserRepository'] = fn (ContainerInterface $c) =>
             new TelegramUserRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -202,7 +202,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['turnRepository'] = fn (Container $c) =>
+        $map['turnRepository'] = fn (ContainerInterface $c) =>
             new TurnRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -217,7 +217,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['userRepository'] = fn (Container $c) =>
+        $map['userRepository'] = fn (ContainerInterface $c) =>
             new UserRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -233,7 +233,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['wordFeedbackRepository'] = fn (Container $c) =>
+        $map['wordFeedbackRepository'] = fn (ContainerInterface $c) =>
             new WordFeedbackRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -245,7 +245,7 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['wordRepository'] = fn (Container $c) =>
+        $map['wordRepository'] = fn (ContainerInterface $c) =>
             new WordRepository(
                 $c->repositoryContext,
                 new ObjectProxy(
@@ -263,18 +263,18 @@ class Bootstrap extends BootstrapBase
                 )
             );
 
-        $map['config'] = fn (Container $c) =>
+        $map['config'] = fn (ContainerInterface $c) =>
             new Config(
                 $c->settingsProvider
             );
 
-        $map['captchaConfig'] = fn (Container $c) =>
+        $map['captchaConfig'] = fn (ContainerInterface $c) =>
             new CaptchaConfig();
 
-        $map['localizationConfig'] = fn (Container $c) =>
+        $map['localizationConfig'] = fn (ContainerInterface $c) =>
             new LocalizationConfig();
 
-        $map['tagsConfig'] = fn (Container $c) =>
+        $map['tagsConfig'] = fn (ContainerInterface $c) =>
             new TagsConfig(
                 [
                     News::class => 'news',
@@ -282,25 +282,25 @@ class Bootstrap extends BootstrapBase
                 ]
             );
 
-        $map['linker'] = fn (Container $c) =>
+        $map['linker'] = fn (ContainerInterface $c) =>
             new Linker(
                 $c->settingsProvider,
                 $c->router,
                 $c->tagsConfig
             );
 
-        $map['serializer'] = fn (Container $c) =>
+        $map['serializer'] = fn (ContainerInterface $c) =>
             new Serializer(
                 $c->linker
             );
 
-        $map['tagLinkMapper'] = fn (Container $c) =>
+        $map['tagLinkMapper'] = fn (ContainerInterface $c) =>
             new TagLinkMapper(
                 $c->renderer,
                 $c->linker
             );
 
-        $map['pageLinkMapper'] = fn (Container $c) =>
+        $map['pageLinkMapper'] = fn (ContainerInterface $c) =>
             new PageLinkMapper(
                 $c->pageRepository,
                 $c->tagRepository,
@@ -309,13 +309,13 @@ class Bootstrap extends BootstrapBase
                 $c->tagLinkMapper
             );
 
-        $map['newsLinkMapper'] = fn (Container $c) =>
+        $map['newsLinkMapper'] = fn (ContainerInterface $c) =>
             new NewsLinkMapper(
                 $c->renderer,
                 $c->linker
             );
 
-        $map['doubleBracketsConfig'] = function (Container $c) {
+        $map['doubleBracketsConfig'] = function (ContainerInterface $c) {
             $config = new LinkMapperSource();
 
             $config->setDefaultMapper($c->pageLinkMapper);
@@ -330,32 +330,32 @@ class Bootstrap extends BootstrapBase
             return $config;
         };
 
-        $map['ageValidation'] = fn (Container $c) =>
+        $map['ageValidation'] = fn (ContainerInterface $c) =>
             new AgeValidation(
                 $c->validationRules
             );
 
-        $map['userValidation'] = fn (Container $c) =>
+        $map['userValidation'] = fn (ContainerInterface $c) =>
             new UserValidation(
                 $c->validationRules,
                 $c->ageValidation,
                 $c->userRepository
             );
 
-        $map['associationSpecification'] = fn (Container $c) =>
+        $map['associationSpecification'] = fn (ContainerInterface $c) =>
             new AssociationSpecification(
                 $c->config
             );
 
-        $map['wordSpecification'] = fn (Container $c) =>
+        $map['wordSpecification'] = fn (ContainerInterface $c) =>
             new WordSpecification(
                 $c->config
             );
 
-        $map['anniversaryService'] = fn (Container $c) =>
+        $map['anniversaryService'] = fn (ContainerInterface $c) =>
             new AnniversaryService();
 
-        $map['associationFeedbackService'] = fn (Container $c) =>
+        $map['associationFeedbackService'] = fn (ContainerInterface $c) =>
             new AssociationFeedbackService(
                 $c->associationFeedbackRepository,
                 $c->associationRepository,
@@ -363,37 +363,37 @@ class Bootstrap extends BootstrapBase
                 $c->validationRules
             );
 
-        $map['associationRecountService'] = fn (Container $c) =>
+        $map['associationRecountService'] = fn (ContainerInterface $c) =>
             new AssociationRecountService(
                 $c->associationRepository,
                 $c->associationSpecification,
                 $c->eventDispatcher
             );
 
-        $map['associationService'] = fn (Container $c) =>
+        $map['associationService'] = fn (ContainerInterface $c) =>
             new AssociationService(
                 $c->associationRepository
             );
 
-        $map['casesService'] = fn (Container $c) =>
+        $map['casesService'] = fn (ContainerInterface $c) =>
             new CasesService(
                 $c->cases
             );
 
-        $map['dictionaryService'] = fn (Container $c) =>
+        $map['dictionaryService'] = fn (ContainerInterface $c) =>
             new DictionaryService(
                 $c->dictWordRepository,
                 $c->externalDictService,
                 $c->eventDispatcher
             );
 
-        $map['externalDictService'] = fn (Container $c) =>
+        $map['externalDictService'] = fn (ContainerInterface $c) =>
             new YandexDictService(
                 $c->dictWordRepository,
                 $c->yandexDict
             );
 
-        $map['gameService'] = fn (Container $c) =>
+        $map['gameService'] = fn (ContainerInterface $c) =>
             new GameService(
                 $c->gameRepository,
                 $c->languageService,
@@ -401,7 +401,7 @@ class Bootstrap extends BootstrapBase
                 $c->wordService
             );
 
-        $map['languageService'] = fn (Container $c) =>
+        $map['languageService'] = fn (ContainerInterface $c) =>
             new LanguageService(
                 $c->languageRepository,
                 $c->wordRepository,
@@ -409,7 +409,7 @@ class Bootstrap extends BootstrapBase
                 $c->wordService
             );
 
-        $map['newsAggregatorService'] = function (Container $c) {
+        $map['newsAggregatorService'] = function (ContainerInterface $c) {
             $service = new NewsAggregatorService(
                 $c->linker
             );
@@ -420,7 +420,7 @@ class Bootstrap extends BootstrapBase
             return $service;
         };
 
-        $map['searchService'] = fn (Container $c) =>
+        $map['searchService'] = fn (ContainerInterface $c) =>
             new SearchService(
                 $c->newsRepository,
                 $c->pageRepository,
@@ -428,19 +428,19 @@ class Bootstrap extends BootstrapBase
                 $c->linker
             );
 
-        $map['tagPartsProviderService'] = fn (Container $c) =>
+        $map['tagPartsProviderService'] = fn (ContainerInterface $c) =>
             new TagPartsProviderService(
                 $c->newsRepository,
                 $c->pageRepository
             );
 
-        $map['telegramUserService'] = fn (Container $c) =>
+        $map['telegramUserService'] = fn (ContainerInterface $c) =>
             new TelegramUserService(
                 $c->telegramUserRepository,
                 $c->userRepository
             );
 
-        $map['turnService'] = fn (Container $c) =>
+        $map['turnService'] = fn (ContainerInterface $c) =>
             new TurnService(
                 $c->gameRepository,
                 $c->turnRepository,
@@ -449,12 +449,12 @@ class Bootstrap extends BootstrapBase
                 $c->eventDispatcher
             );
 
-        $map['userService'] = fn (Container $c) =>
+        $map['userService'] = fn (ContainerInterface $c) =>
             new UserService(
                 $c->config
             );
 
-        $map['wordFeedbackService'] = fn (Container $c) =>
+        $map['wordFeedbackService'] = fn (ContainerInterface $c) =>
             new WordFeedbackService(
                 $c->wordFeedbackRepository,
                 $c->wordRepository,
@@ -463,14 +463,14 @@ class Bootstrap extends BootstrapBase
                 $c->wordService
             );
 
-        $map['wordRecountService'] = fn (Container $c) =>
+        $map['wordRecountService'] = fn (ContainerInterface $c) =>
             new WordRecountService(
                 $c->wordSpecification,
                 $c->wordService,
                 $c->eventDispatcher
             );
 
-        $map['wordService'] = fn (Container $c) =>
+        $map['wordService'] = fn (ContainerInterface $c) =>
             new WordService(
                 $c->turnRepository,
                 $c->wordRepository,
@@ -483,14 +483,14 @@ class Bootstrap extends BootstrapBase
 
         // factories
 
-        $map['loadUncheckedDictWordsJobFactory'] = fn (Container $c) =>
+        $map['loadUncheckedDictWordsJobFactory'] = fn (ContainerInterface $c) =>
             new LoadUncheckedDictWordsJobFactory(
                 $c->wordRepository,
                 $c->settingsProvider,
                 $c->dictionaryService
             );
 
-        $map['matchDanglingDictWordsJobFactory'] = fn (Container $c) =>
+        $map['matchDanglingDictWordsJobFactory'] = fn (ContainerInterface $c) =>
             new MatchDanglingDictWordsJobFactory(
                 $c->dictWordRepository,
                 $c->wordRepository,
@@ -498,14 +498,14 @@ class Bootstrap extends BootstrapBase
                 $c->settingsProvider
             );
 
-        $map['updateAssociationsJobFactory'] = fn (Container $c) =>
+        $map['updateAssociationsJobFactory'] = fn (ContainerInterface $c) =>
             new UpdateAssociationsJobFactory(
                 $c->associationRepository,
                 $c->settingsProvider,
                 $c->eventDispatcher
             );
 
-        $map['updateWordsJobFactory'] = fn (Container $c) =>
+        $map['updateWordsJobFactory'] = fn (ContainerInterface $c) =>
             new UpdateWordsJobFactory(
                 $c->wordRepository,
                 $c->settingsProvider,
@@ -514,21 +514,21 @@ class Bootstrap extends BootstrapBase
 
         // external
 
-        $map['yandexDict'] = fn (Container $c) =>
+        $map['yandexDict'] = fn (ContainerInterface $c) =>
             new YandexDict(
                 $this->settings['yandex_dict']['key']
             );
 
         // handlers
 
-        $map['notFoundHandler'] = fn (Container $c) =>
+        $map['notFoundHandler'] = fn (ContainerInterface $c) =>
             new NotFoundHandler(
                 $c
             );
 
         // event handlers
 
-        $map['eventHandlers'] = fn (Container $c) => [
+        $map['eventHandlers'] = fn (ContainerInterface $c) => [
             new AssociationApprovedChangedHandler($c->wordRecountService),
             new AssociationFeedbackCreatedHandler($c->associationRecountService),
             new AssociationOutOfDateHandler($c->associationRecountService),

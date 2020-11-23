@@ -7,7 +7,6 @@ use Plasticode\Middleware\CookieAuthMiddleware;
 use Plasticode\Middleware\SlashMiddleware;
 use Respect\Validation\Validator;
 use Slim\App;
-use Slim\Container;
 
 $dir = __DIR__;
 $root = $dir . '/..';
@@ -17,8 +16,6 @@ require $root . '/vendor/autoload.php';
 $env = Env::load($root);
 $settings = Settings::load($root . '/settings');
 $app = new App(['settings' => $settings]);
-
-/** @var Container */
 $container = $app->getContainer();
 
 if ($settings['debug']) {
