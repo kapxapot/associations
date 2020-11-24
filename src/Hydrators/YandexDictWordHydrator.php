@@ -6,7 +6,7 @@ use App\Models\YandexDictWord;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 class YandexDictWordHydrator extends Hydrator
 {

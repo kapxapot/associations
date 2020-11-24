@@ -3,7 +3,7 @@
 namespace Brightwood\Models;
 
 use App\Models\TelegramUser;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
 

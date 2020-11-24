@@ -6,7 +6,7 @@ use App\Models\WordFeedback;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 class WordFeedbackHydrator extends Hydrator
 {

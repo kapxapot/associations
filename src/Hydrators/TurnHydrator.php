@@ -9,7 +9,7 @@ use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 class TurnHydrator extends Hydrator
 {

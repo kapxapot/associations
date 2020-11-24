@@ -6,7 +6,7 @@ use App\Models\AssociationFeedback;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 class AssociationFeedbackHydrator extends Hydrator
 {

@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Collections\FeedbackCollection;
 use App\Collections\TurnCollection;
 use App\Models\Traits\Created;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 use Plasticode\Models\Interfaces\LinkableInterface;
 use Plasticode\Models\Traits\Linkable;
 use Plasticode\Models\Traits\UpdatedAt;

@@ -8,7 +8,7 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 class GameHydrator extends Hydrator
 {

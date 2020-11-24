@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\PartOfSpeech;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
 

@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Data;
 
-use Plasticode\Models\Model;
+use Plasticode\Models\Basic\Model;
 
 abstract class StoryData extends Model
 {

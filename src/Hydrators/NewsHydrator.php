@@ -4,7 +4,7 @@ namespace App\Hydrators;
 
 use App\Models\News;
 use Plasticode\Hydrators\Basic\NewsSourceHydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 class NewsHydrator extends NewsSourceHydrator
 {
@@ -13,7 +13,6 @@ class NewsHydrator extends NewsSourceHydrator
      */
     public function hydrate(DbModel $entity) : News
     {
-
         $entity = parent::hydrate($entity);
 
         return $entity

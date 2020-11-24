@@ -9,7 +9,7 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\UserService;
 use Plasticode\External\Gravatar;
 use Plasticode\Hydrators\UserHydrator as BaseUserHydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 use Plasticode\Repositories\Interfaces\RoleRepositoryInterface;
 
 class UserHydrator extends BaseUserHydrator

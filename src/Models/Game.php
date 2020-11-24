@@ -5,7 +5,7 @@ namespace App\Models;
 use App\Collections\TurnCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Util\Date;
 

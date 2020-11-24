@@ -5,7 +5,7 @@ namespace App\Hydrators;
 use App\Models\Language;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 class LanguageHydrator extends Hydrator
 {

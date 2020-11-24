@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\Created;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 /**
  * @property string|null $code

@@ -5,7 +5,7 @@ namespace Brightwood\Hydrators;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\StoryStatus;
 use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 class StoryStatusHydrator extends Hydrator
 {

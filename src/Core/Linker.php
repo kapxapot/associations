@@ -7,7 +7,7 @@ use App\Models\Association;
 use App\Models\Game;
 use App\Models\Word;
 use Plasticode\Core\Linker as LinkerBase;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 
 class Linker extends LinkerBase implements LinkerInterface
 {

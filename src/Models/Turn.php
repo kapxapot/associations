@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 use Plasticode\Models\Traits\CreatedAt;
 
 /**

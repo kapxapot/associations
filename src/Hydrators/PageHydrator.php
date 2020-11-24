@@ -7,7 +7,7 @@ use App\Repositories\Interfaces\PageRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Core\Interfaces\LinkerInterface;
 use Plasticode\Hydrators\Basic\NewsSourceHydrator;
-use Plasticode\Models\DbModel;
+use Plasticode\Models\Basic\DbModel;
 use Plasticode\Parsing\Interfaces\ParserInterface;
 use Plasticode\Parsing\Parsers\CutParser;
 
