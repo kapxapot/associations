@@ -2,10 +2,13 @@
 
 namespace App\Models\Validation;
 
-use Plasticode\Models\Validation\Validation;
+use Plasticode\Validation\Validation;
 
 class AgeValidation extends Validation
 {
+    /**
+     * @inheritDoc
+     */
     public function getRules(array $data, $id = null) : array
     {
         return [
