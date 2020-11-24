@@ -2,8 +2,10 @@
 
 namespace App\Tests\Services;
 
+use App\Collections\WordCollection;
 use App\Hydrators\GameHydrator;
 use App\Hydrators\TurnHydrator;
+use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
@@ -187,10 +189,32 @@ class GameServiceTest extends TestCase
 
         $this->assertNotNull($firstTurn);
 
+        $firstTurnWord = $firstTurn->word();
+        $word1 = $this->wordRepository->get(1); // стол (approved)
+
         $this->assertTrue(
-            $firstTurn->word()->equals(
-                $this->wordRepository->get(1) // стол (approved)
+            $firstTurnWord->equals($word1)
+        );
+
+        $this->assertTrue(
+            $game->containsWord($word1)
+        );
+
+        // find answer
+        /** @var Word */
+        $answer =
+            WordCollection::collect(
+                $word1,
+                $this->wordRepository->get(2),
+                $this->wordRepository->get(3)
             )
+            ->where(
+                fn (Word $w) => !$game->containsWord($w)
+            )
+            ->random();
+
+        $this->assertFalse(
+            $answer->equals($word1)
         );
     }
 }

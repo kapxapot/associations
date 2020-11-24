@@ -48,14 +48,14 @@ class Game extends DbModel
     {
         return $this->turns()->words();
     }
-    
+
     public function lastTurnWord() : ?Word
     {
         return $this->lastTurn()
             ? $this->lastTurn()->word()
             : null;
     }
-    
+
     public function beforeLastTurnWord() : ?Word
     {
         return $this->beforeLastTurn()

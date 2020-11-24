@@ -12,11 +12,15 @@ use App\Models\Word;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Traits\Logging;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Date;
+use Psr\Log\LoggerInterface;
 
 class TurnService
 {
+    use Logging;
+
     private GameRepositoryInterface $gameRepository;
     private TurnRepositoryInterface $turnRepository;
     private WordRepositoryInterface $wordRepository;
@@ -29,7 +33,8 @@ class TurnService
         TurnRepositoryInterface $turnRepository,
         WordRepositoryInterface $wordRepository,
         AssociationService $associationService,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher,
+        ?LoggerInterface $logger = null
     )
     {
         $this->gameRepository = $gameRepository;
@@ -37,6 +42,7 @@ class TurnService
         $this->wordRepository = $wordRepository;
         $this->associationService = $associationService;
         $this->eventDispatcher = $eventDispatcher;
+        $this->logger = $logger;
     }
 
     /**

@@ -72,6 +72,7 @@ use App\Specifications\WordSpecification;
 use Brightwood\Config\Bootstrap as BrightwoodBootstrap;
 use Plasticode\Config\Bootstrap as BootstrapBase;
 use Plasticode\Config\TagsConfig;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\ObjectProxy;
 use Plasticode\Parsing\LinkMappers\NewsLinkMapper;
 use Plasticode\Parsing\LinkMappers\PageLinkMapper;
@@ -446,7 +447,8 @@ class Bootstrap extends BootstrapBase
                 $c->turnRepository,
                 $c->wordRepository,
                 $c->associationService,
-                $c->eventDispatcher
+                $c->eventDispatcher,
+                $c->logger
             );
 
         $map['userService'] = fn (ContainerInterface $c) =>
@@ -526,22 +528,6 @@ class Bootstrap extends BootstrapBase
                 $c
             );
 
-        // event handlers
-
-        $map['eventHandlers'] = fn (ContainerInterface $c) => [
-            new AssociationApprovedChangedHandler($c->wordRecountService),
-            new AssociationFeedbackCreatedHandler($c->associationRecountService),
-            new AssociationOutOfDateHandler($c->associationRecountService),
-            new DictWordLinkedHandler($c->wordRecountService),
-            new DictWordUnlinkedHandler($c->wordRecountService),
-            new TurnCreatedHandler($c->associationRecountService),
-            new WordCreatedHandler($c->dictionaryService),
-            new WordFeedbackCreatedHandler($c->wordRecountService),
-            new WordMatureChangedHandler($c->associationRecountService),
-            new WordOutOfDateHandler($c->wordRecountService),
-            new WordUpdatedHandler($c->dictionaryService),
-        ];
-
         // Brightwood
 
         $map = $this->addBrightwood($map);
@@ -556,6 +542,26 @@ class Bootstrap extends BootstrapBase
         return array_merge(
             $map,
             $brightwoodBootstrap->getMappings($this->settings)
+        );
+    }
+
+    public function registerEventHandlers(ContainerInterface $c)
+    {
+        /** @var EventDispatcher */
+        $dispatcher = $c->eventDispatcher;
+
+        $dispatcher->addHandlers(
+            new AssociationApprovedChangedHandler($c->wordRecountService),
+            new AssociationFeedbackCreatedHandler($c->associationRecountService),
+            new AssociationOutOfDateHandler($c->associationRecountService),
+            new DictWordLinkedHandler($c->wordRecountService),
+            new DictWordUnlinkedHandler($c->wordRecountService),
+            new TurnCreatedHandler($c->associationRecountService),
+            new WordCreatedHandler($c->dictionaryService),
+            new WordFeedbackCreatedHandler($c->wordRecountService),
+            new WordMatureChangedHandler($c->associationRecountService),
+            new WordOutOfDateHandler($c->wordRecountService),
+            new WordUpdatedHandler($c->dictionaryService),
         );
     }
 }
