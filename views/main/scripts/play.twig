@@ -169,7 +169,6 @@ $scope.sendWord = () => {
     }
 
     $scope.prePost(null);
-
     $scope.play.saving = true;
 
     let data = {
@@ -191,11 +190,19 @@ $scope.sendWord = () => {
 };
 
 $scope.skip = () => {
-    hideAlerts();
+    $scope.prePost(null);
+    $scope.play.saving = true;
 
     $scope.ajax({
         url: '{{ path_for('actions.turn.skip') }}',
-        onSuccess: $scope.processGameResponse,
+        setSaving: (saving) => { $scope.play.saving = saving; },
+        onSuccess: (data) => {
+            $scope.processGameResponse(data);
+
+            setTimeout(() => {
+                $('#skip').focus();
+            }, 100);
+        },
         noSuccessMessage: true,
     });
 };

@@ -49,7 +49,7 @@
                 </div>
 
                 <div ng-if="play.turn()" class="mt-2">
-                    <button ng-click="skip()" class="btn btn-default mr-2" ng-disabled="play.loading || play.saving"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
+                    <button ng-click="skip()" class="btn btn-default mr-2" ng-disabled="play.loading || play.saving" id="skip"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
 
                     <button ng-click="problemsDialog()" class="btn btn-default" ng-disabled="play.loading || play.saving"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</button>
                 </div>

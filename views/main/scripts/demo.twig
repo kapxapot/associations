@@ -55,6 +55,13 @@ $scope.demo = {
             }
         });
     },
+    skip: function() {
+        this.fetch(() => {
+            setTimeout(() => {
+                $('#skip').focus();
+            }, 100);
+        });
+    },
     init: function() {
         this.fetch(() => {
             this.loading = false;
