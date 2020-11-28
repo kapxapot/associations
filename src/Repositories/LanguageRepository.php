@@ -8,7 +8,13 @@ use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 
 class LanguageRepository extends IdiormRepository implements LanguageRepositoryInterface
 {
-    protected string $entityClass = Language::class;
+    /**
+     * @inheritDoc
+     */
+    protected function entityClass() : string
+    {
+        return Language::class;
+    }
 
     public function get(?int $id) : ?Language
     {

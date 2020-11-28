@@ -2,22 +2,12 @@
 
 namespace App\Core;
 
-use App\Core\Interfaces\LinkerInterface;
 use App\Models\Association;
 use App\Models\Turn;
 use App\Models\Word;
 
 class Serializer
 {
-    private LinkerInterface $linker;
-
-    public function __construct(
-        LinkerInterface $linker
-    )
-    {
-        $this->linker = $linker;
-    }
-
     public function serializeTurn(?Turn $turn) : ?array
     {
         if (is_null($turn)) {

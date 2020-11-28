@@ -2,10 +2,12 @@
 
 namespace App\Generators;
 
+use App\Models\News;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
+use Plasticode\Generators\GeneratorContext;
 use Plasticode\Generators\TaggableEntityGenerator;
 use Plasticode\Generators\Traits\Publishable;
-use Psr\Container\ContainerInterface;
+use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
 
 class NewsGenerator extends TaggableEntityGenerator
 {
@@ -16,11 +18,25 @@ class NewsGenerator extends TaggableEntityGenerator
 
     private NewsRepositoryInterface $newsRepository;
 
-    public function __construct(ContainerInterface $container, string $entity)
+    public function __construct(
+        GeneratorContext $context,
+        NewsRepositoryInterface $newsRepository,
+        TagRepositoryInterface $tagRepository
+    )
     {
-        parent::__construct($container, $entity);
+        parent::__construct($context, $tagRepository);
 
-        $this->newsRepository = $container->newsRepository;
+        $this->newsRepository = $newsRepository;
+    }
+
+    protected function entityClass() : string
+    {
+        return News::class;
+    }
+
+    protected function getRepository() : NewsRepositoryInterface
+    {
+        return $this->newsRepository;
     }
 
     public function beforeSave(array $data, $id = null) : array
@@ -34,7 +50,7 @@ class NewsGenerator extends TaggableEntityGenerator
     {
         $item = parent::afterLoad($item);
 
-        $id = $item[$this->idField];
+        $id = $item[$this->idField()];
 
         $news = $this->newsRepository->get($id);
 

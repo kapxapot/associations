@@ -17,7 +17,13 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
     use ByUserRepository;
     use WithLanguageRepository;
 
-    protected string $entityClass = Game::class;
+    /**
+     * @inheritDoc
+     */
+    protected function entityClass() : string
+    {
+        return Game::class;
+    }
 
     public function get(?int $id) : ?Game
     {

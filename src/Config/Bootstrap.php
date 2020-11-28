@@ -21,6 +21,10 @@ use App\Factories\LoadUncheckedDictWordsJobFactory;
 use App\Factories\MatchDanglingDictWordsJobFactory;
 use App\Factories\UpdateAssociationsJobFactory;
 use App\Factories\UpdateWordsJobFactory;
+use App\Generators\GameGenerator;
+use App\Generators\LanguageGenerator;
+use App\Generators\NewsGenerator;
+use App\Generators\PageGenerator;
 use App\Handlers\NotFoundHandler;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
@@ -93,6 +97,32 @@ class Bootstrap extends BootstrapBase
         $map['auth'] = fn (ContainerInterface $c) =>
             new Auth(
                 $c->session
+            );
+
+        $map['gamesGenerator'] = fn (ContainerInterface $c) =>
+            new GameGenerator(
+                $c->generatorContext,
+                $c->gameRepository,
+                $c->serializer
+            );
+
+        $map['languagesGenerator'] = fn (ContainerInterface $c) =>
+            new LanguageGenerator(
+                $c->generatorContext
+            );
+
+        $map['newsGenerator'] = fn (ContainerInterface $c) =>
+            new NewsGenerator(
+                $c->generatorContext,
+                $c->newsRepository,
+                $c->tagRepository
+            );
+
+        $map['pageGenerator'] = fn (ContainerInterface $c) =>
+            new PageGenerator(
+                $c->generatorContext,
+                $c->pageRepository,
+                $c->tagRepository
             );
 
         $map['associationFeedbackRepository'] = fn (ContainerInterface $c) =>
@@ -291,9 +321,7 @@ class Bootstrap extends BootstrapBase
             );
 
         $map['serializer'] = fn (ContainerInterface $c) =>
-            new Serializer(
-                $c->linker
-            );
+            new Serializer();
 
         $map['tagLinkMapper'] = fn (ContainerInterface $c) =>
             new TagLinkMapper(
@@ -545,7 +573,7 @@ class Bootstrap extends BootstrapBase
         );
     }
 
-    public function registerEventHandlers(ContainerInterface $c)
+    public function registerEventHandlers(ContainerInterface $c) : void
     {
         /** @var EventDispatcher */
         $dispatcher = $c->eventDispatcher;

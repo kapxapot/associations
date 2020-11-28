@@ -9,7 +9,13 @@ use Plasticode\Repositories\Idiorm\Basic\NewsSourceRepository;
 
 class NewsRepository extends NewsSourceRepository implements NewsRepositoryInterface
 {
-    protected string $entityClass = News::class;
+    /**
+     * @inheritDoc
+     */
+    protected function entityClass() : string
+    {
+        return News::class;
+    }
 
     public function get(?int $id) : ?News
     {

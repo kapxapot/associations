@@ -2,13 +2,15 @@
 
 namespace App\Generators;
 
+use App\Models\Page;
 use App\Repositories\Interfaces\PageRepositoryInterface;
+use Plasticode\Generators\GeneratorContext;
 use Plasticode\Generators\TaggableEntityGenerator;
 use Plasticode\Generators\Traits\Publishable;
-use Psr\Container\ContainerInterface;
+use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
 use Respect\Validation\Validator;
 
-class PagesGenerator extends TaggableEntityGenerator
+class PageGenerator extends TaggableEntityGenerator
 {
     use Publishable
     {
@@ -17,11 +19,25 @@ class PagesGenerator extends TaggableEntityGenerator
 
     private PageRepositoryInterface $pageRepository;
 
-    public function __construct(ContainerInterface $container, string $entity)
+    public function __construct(
+        GeneratorContext $context,
+        PageRepositoryInterface $pageRepository,
+        TagRepositoryInterface $tagRepository
+    )
     {
-        parent::__construct($container, $entity);
+        parent::__construct($context, $tagRepository);
 
-        $this->pageRepository = $container->pageRepository;
+        $this->pageRepository = $pageRepository;
+    }
+
+    protected function entityClass() : string
+    {
+        return Page::class;
+    }
+
+    protected function getRepository() : PageRepositoryInterface
+    {
+        return $this->pageRepository;
     }
 
     public function getRules(array $data, $id = null) : array
@@ -62,7 +78,7 @@ class PagesGenerator extends TaggableEntityGenerator
     {
         $item = parent::afterLoad($item);
 
-        $id = $item[$this->idField];
+        $id = $item[$this->idField()];
 
         $page = $this->pageRepository->get($id);
 

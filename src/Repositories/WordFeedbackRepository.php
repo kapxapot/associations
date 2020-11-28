@@ -10,7 +10,13 @@ use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 
 class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRepositoryInterface
 {
-    protected string $entityClass = WordFeedback::class;
+    /**
+     * @inheritDoc
+     */
+    protected function entityClass() : string
+    {
+        return WordFeedback::class;
+    }
 
     public function create(array $data) : WordFeedback
     {

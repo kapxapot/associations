@@ -9,7 +9,13 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 
 class WordRepository extends LanguageElementRepository implements WordRepositoryInterface
 {
-    protected string $entityClass = Word::class;
+    /**
+     * @inheritDoc
+     */
+    protected function entityClass() : string
+    {
+        return Word::class;
+    }
 
     protected string $sortField = 'word';
 

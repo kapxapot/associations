@@ -16,7 +16,13 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
 {
     use WithLanguageRepository;
 
-    protected string $entityClass = YandexDictWord::class;
+    /**
+     * @inheritDoc
+     */
+    protected function entityClass() : string
+    {
+        return YandexDictWord::class;
+    }
 
     public function create(array $data) : YandexDictWord
     {

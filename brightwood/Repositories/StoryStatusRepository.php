@@ -10,7 +10,13 @@ use Plasticode\Util\Date;
 
 class StoryStatusRepository extends IdiormRepository implements StoryStatusRepositoryInterface
 {
-    protected string $entityClass = StoryStatus::class;
+    /**
+     * @inheritDoc
+     */
+    protected function entityClass() : string
+    {
+        return StoryStatus::class;
+    }
 
     public function get(?int $id) : ?StoryStatus
     {

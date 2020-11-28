@@ -10,7 +10,13 @@ use App\Repositories\Interfaces\AssociationRepositoryInterface;
 
 class AssociationRepository extends LanguageElementRepository implements AssociationRepositoryInterface
 {
-    protected string $entityClass = Association::class;
+    /**
+     * @inheritDoc
+     */
+    protected function entityClass() : string
+    {
+        return Association::class;
+    }
 
     public function get(?int $id) : ?Association
     {

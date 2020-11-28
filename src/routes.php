@@ -21,6 +21,7 @@ use Plasticode\Controllers\Auth\AuthController;
 use Plasticode\Controllers\Auth\PasswordController;
 use Plasticode\Controllers\ParserController;
 use Plasticode\Core\Response;
+use Plasticode\Generators\Interfaces\EntityGeneratorInterface;
 use Plasticode\Middleware\AuthMiddleware;
 use Plasticode\Middleware\GuestMiddleware;
 use Plasticode\Middleware\AccessMiddleware;
@@ -31,7 +32,7 @@ use Plasticode\Middleware\TokenAuthMiddleware;
 /**
  * Creates AccessMiddleware.
  * 
- * @var \Closure
+ * @var callable
  */
 $access = fn (string $entity, string $action, ?string $redirect = null)
     => new AccessMiddleware(
@@ -95,9 +96,10 @@ $app->group(
             function () use ($settings, $access, $container) {
                 foreach ($settings['tables'] as $alias => $table) {
                     if (isset($table['api'])) {
+                        /** @var EntityGeneratorInterface */
                         $gen = $container
                             ->generatorResolver
-                            ->resolveEntity($alias);
+                            ->resolve($alias);
 
                         $gen->generateAPIRoutes($this, $access);
                     }
@@ -123,9 +125,10 @@ $app->group(
             '/admin',
             function () use ($settings, $access, $container) {
                 foreach (array_keys($settings['entities']) as $entity) {
+                    /** @var EntityGeneratorInterface */
                     $gen = $container
                         ->generatorResolver
-                        ->resolveEntity($entity);
+                        ->resolve($entity);
                     
                     $gen->generateAdminPageRoute($this, $access);
                 }

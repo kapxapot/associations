@@ -3,29 +3,39 @@
 namespace App\Generators;
 
 use App\Core\Serializer;
+use App\Models\Game;
 use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use Plasticode\Generators\EntityGenerator;
-use Psr\Container\ContainerInterface;
+use Plasticode\Generators\GeneratorContext;
 
-class GamesGenerator extends EntityGenerator
+class GameGenerator extends EntityGenerator
 {
     private GameRepositoryInterface $gameRepository;
     private Serializer $serializer;
 
-    public function __construct(ContainerInterface $container, string $entity)
+    public function __construct(
+        GeneratorContext $context,
+        GameRepositoryInterface $gameRepository,
+        Serializer $serializer
+    )
     {
-        parent::__construct($container, $entity);
+        parent::__construct($context);
 
-        $this->gameRepository = $container->gameRepository;
-        $this->serializer = $container->serializer;
+        $this->gameRepository = $gameRepository;
+        $this->serializer = $serializer;
+    }
+
+    protected function entityClass() : string
+    {
+        return Game::class;
     }
 
     public function afterLoad(array $item) : array
     {
         $item = parent::afterLoad($item);
 
-        $id = $item[$this->idField];
+        $id = $item[$this->idField()];
 
         $game = $this->gameRepository->get($id);
 

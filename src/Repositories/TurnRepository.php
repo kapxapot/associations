@@ -19,7 +19,13 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
     use ByUserRepository;
     use WithLanguageRepository;
 
-    protected string $entityClass = Turn::class;
+    /**
+     * @inheritDoc
+     */
+    protected function entityClass() : string
+    {
+        return Turn::class;
+    }
 
     protected string $sortField = 'id';
     protected bool $sortReverse = true;
