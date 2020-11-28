@@ -4,7 +4,7 @@ namespace App\Generators;
 
 use App\Models\Page;
 use App\Repositories\Interfaces\PageRepositoryInterface;
-use Plasticode\Generators\GeneratorContext;
+use Plasticode\Generators\Basic\GeneratorContext;
 use Plasticode\Generators\TaggableEntityGenerator;
 use Plasticode\Generators\Traits\Publishable;
 use Plasticode\Repositories\Interfaces\TagRepositoryInterface;

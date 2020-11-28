@@ -6,8 +6,8 @@ use App\Core\Serializer;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
-use Plasticode\Generators\EntityGenerator;
-use Plasticode\Generators\GeneratorContext;
+use Plasticode\Generators\Basic\EntityGenerator;
+use Plasticode\Generators\Basic\GeneratorContext;
 
 class GameGenerator extends EntityGenerator
 {

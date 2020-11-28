@@ -3,7 +3,7 @@
 namespace App\Generators;
 
 use App\Models\Language;
-use Plasticode\Generators\EntityGenerator;
+use Plasticode\Generators\Basic\EntityGenerator;
 
 class LanguageGenerator extends EntityGenerator
 {

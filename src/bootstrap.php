@@ -30,7 +30,7 @@ if ($settings['debug']) {
 session_start();
 
 $bootstrap = new Bootstrap($settings, $dir);
-$bootstrap->fillContainer($container);
+$bootstrap->boot($container);
 
 foreach ($settings['validation_namespaces'] as $namespace) {
     Validator::with($namespace);

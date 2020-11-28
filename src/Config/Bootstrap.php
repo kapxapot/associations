@@ -118,7 +118,7 @@ class Bootstrap extends BootstrapBase
                 $c->tagRepository
             );
 
-        $map['pageGenerator'] = fn (ContainerInterface $c) =>
+        $map['pagesGenerator'] = fn (ContainerInterface $c) =>
             new PageGenerator(
                 $c->generatorContext,
                 $c->pageRepository,

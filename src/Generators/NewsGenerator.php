@@ -4,7 +4,7 @@ namespace App\Generators;
 
 use App\Models\News;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
-use Plasticode\Generators\GeneratorContext;
+use Plasticode\Generators\Basic\GeneratorContext;
 use Plasticode\Generators\TaggableEntityGenerator;
 use Plasticode\Generators\Traits\Publishable;
 use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
