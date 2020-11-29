@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Collections\LanguageElementCollection;
 use App\Models\Language;
+use App\Models\LanguageElement;
 use App\Models\User;
 use App\Repositories\Interfaces\LanguageElementRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
@@ -16,6 +17,11 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 {
     use CreatedRepository;
     use WithLanguageRepository;
+
+    public function get(?int $id) : ?LanguageElement
+    {
+        return $this->getEntity($id);
+    }
 
     public function getAllByLanguage(Language $language) : LanguageElementCollection
     {
