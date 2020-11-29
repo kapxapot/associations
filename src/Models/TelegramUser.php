@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Interfaces\GenderedInterface;
 use App\Models\Interfaces\NamedInterface;
 use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
 use Plasticode\Util\Cases;
@@ -20,7 +21,7 @@ use Plasticode\Util\Cases;
  * @method User|null user()
  * @method static withUser(User|callable|null $user)
  */
-class TelegramUser extends DbModel implements GenderedInterface, NamedInterface
+class TelegramUser extends DbModel implements GenderedInterface, NamedInterface, UpdatedAtInterface
 {
     use CreatedAt;
     use UpdatedAt;

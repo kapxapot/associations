@@ -5,9 +5,11 @@ namespace App\Repositories\Interfaces;
 use App\Collections\AssociationFeedbackCollection;
 use App\Models\Association;
 use App\Models\AssociationFeedback;
+use Plasticode\Repositories\Interfaces\Basic\ChangingRepositoryInterface;
 
-interface AssociationFeedbackRepositoryInterface
+interface AssociationFeedbackRepositoryInterface extends ChangingRepositoryInterface
 {
+    function get(?int $id) : ?AssociationFeedback;
     function create(array $data) : AssociationFeedback;
     function save(AssociationFeedback $feedback) : AssociationFeedback;
 

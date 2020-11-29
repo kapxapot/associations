@@ -7,6 +7,7 @@ use App\Collections\TurnCollection;
 use App\Models\Traits\Created;
 use Plasticode\Models\Basic\DbModel;
 use Plasticode\Models\Interfaces\LinkableInterface;
+use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Models\Traits\Linkable;
 use Plasticode\Models\Traits\UpdatedAt;
 
@@ -23,7 +24,7 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @method static withMe(User|callable|null $me)
  * @method static withTurns(TurnCollection|callable $turns)
  */
-abstract class LanguageElement extends DbModel implements LinkableInterface
+abstract class LanguageElement extends DbModel implements LinkableInterface, UpdatedAtInterface
 {
     use Created;
     use Linkable;

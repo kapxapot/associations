@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\PartOfSpeech;
 use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
 
@@ -19,7 +20,7 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @method static withLanguage(Language|callable $language)
  * @method static withLinkedWord(Word|callable|null $linkedWord)
  */
-class YandexDictWord extends DbModel implements DictWordInterface
+class YandexDictWord extends DbModel implements DictWordInterface, UpdatedAtInterface
 {
     use CreatedAt;
     use UpdatedAt;

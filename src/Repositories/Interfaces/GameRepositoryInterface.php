@@ -6,8 +6,9 @@ use App\Collections\GameCollection;
 use App\Models\Game;
 use App\Models\Language;
 use App\Models\User;
+use Plasticode\Repositories\Interfaces\Basic\GetRepositoryInterface;
 
-interface GameRepositoryInterface extends WithLanguageRepositoryInterface
+interface GameRepositoryInterface extends GetRepositoryInterface, WithLanguageRepositoryInterface
 {
     function get(?int $id) : ?Game;
     function getAllByLanguage(Language $language) : GameCollection;

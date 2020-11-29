@@ -24,6 +24,11 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
         return YandexDictWord::class;
     }
 
+    public function get(?int $id) : ?YandexDictWord
+    {
+        return $this->getEntity($id);
+    }
+
     public function create(array $data) : YandexDictWord
     {
         return $this->createEntity($data);

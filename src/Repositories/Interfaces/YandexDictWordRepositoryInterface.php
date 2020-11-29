@@ -6,9 +6,12 @@ use App\Models\Interfaces\DictWordInterface;
 use App\Models\Language;
 use App\Models\Word;
 use App\Models\YandexDictWord;
+use Plasticode\Repositories\Interfaces\Basic\ChangingRepositoryInterface;
 
-interface YandexDictWordRepositoryInterface extends DictWordRepositoryInterface
+interface YandexDictWordRepositoryInterface extends ChangingRepositoryInterface, DictWordRepositoryInterface
 {
+    function get(?int $id) : ?YandexDictWord;
+
     /**
      * @param YandexDictWord $dictWord
      */

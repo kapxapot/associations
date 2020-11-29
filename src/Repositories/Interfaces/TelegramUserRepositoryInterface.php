@@ -4,8 +4,9 @@ namespace App\Repositories\Interfaces;
 
 use App\Models\TelegramUser;
 use App\Models\User;
+use Plasticode\Repositories\Interfaces\Basic\ChangingRepositoryInterface;
 
-interface TelegramUserRepositoryInterface
+interface TelegramUserRepositoryInterface extends ChangingRepositoryInterface
 {
     function get(?int $id) : ?TelegramUser;
     function getByTelegramId(int $id) : ?TelegramUser;

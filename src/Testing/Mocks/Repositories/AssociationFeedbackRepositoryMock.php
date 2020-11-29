@@ -28,6 +28,13 @@ class AssociationFeedbackRepositoryMock implements AssociationFeedbackRepository
         $this->feedbacks = AssociationFeedbackCollection::empty();
     }
 
+    public function get(?int $id) : ?AssociationFeedback
+    {
+        return $this->feedbacks->first(
+            fn (AssociationFeedback $f) => $f->getId() == $id
+        );
+    }
+
     public function create(array $data) : AssociationFeedback
     {
         return $this->hydrator->hydrate(

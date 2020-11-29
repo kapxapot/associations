@@ -9,8 +9,9 @@ use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
+use Plasticode\Repositories\Interfaces\Basic\GetRepositoryInterface;
 
-interface TurnRepositoryInterface extends WithLanguageRepositoryInterface
+interface TurnRepositoryInterface extends GetRepositoryInterface, WithLanguageRepositoryInterface
 {
     function get(?int $id) : ?Turn;
     function save(Turn $turn) : Turn;

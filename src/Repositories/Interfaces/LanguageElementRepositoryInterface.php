@@ -4,10 +4,13 @@ namespace App\Repositories\Interfaces;
 
 use App\Collections\LanguageElementCollection;
 use App\Models\Language;
+use App\Models\LanguageElement;
 use App\Models\User;
+use Plasticode\Repositories\Interfaces\Basic\ChangingRepositoryInterface;
 
-interface LanguageElementRepositoryInterface extends WithLanguageRepositoryInterface
+interface LanguageElementRepositoryInterface extends ChangingRepositoryInterface, WithLanguageRepositoryInterface
 {
+    function get(?int $id) : ?LanguageElement;
     function getAllByLanguage(Language $language) : LanguageElementCollection;
 
     function getAllCreatedByUser(

@@ -28,6 +28,13 @@ class WordFeedbackRepositoryMock implements WordFeedbackRepositoryInterface
         $this->feedbacks = WordFeedbackCollection::empty();
     }
 
+    public function get(?int $id) : ?WordFeedback
+    {
+        return $this->feedbacks->first(
+            fn (WordFeedback $f) => $f->getId() == $id
+        );
+    }
+
     public function create(array $data) : WordFeedback
     {
         return $this->hydrator->hydrate(

@@ -18,6 +18,11 @@ class AssociationFeedbackRepository extends IdiormRepository implements Associat
         return AssociationFeedback::class;
     }
 
+    public function get(?int $id) : ?AssociationFeedback
+    {
+        return $this->getEntity($id);
+    }
+
     public function create(array $data) : AssociationFeedback
     {
         return $this->createEntity($data);
