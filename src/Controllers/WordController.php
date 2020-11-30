@@ -10,7 +10,7 @@ use Plasticode\Core\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Http\Request as SlimRequest;
+use Slim\Http\Request;
 
 class WordController extends Controller
 {
@@ -30,7 +30,7 @@ class WordController extends Controller
     }
 
     public function index(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response
     ) : ResponseInterface
     {
@@ -68,7 +68,7 @@ class WordController extends Controller
     }
 
     public function get(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response,
         array $args
     ) : ResponseInterface

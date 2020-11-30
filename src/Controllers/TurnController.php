@@ -8,7 +8,6 @@ use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Services\GameService;
 use App\Services\TurnService;
-use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\Http\NotFoundException;
@@ -16,7 +15,7 @@ use Plasticode\Exceptions\InvalidResultException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Http\Request as SlimRequest;
+use Slim\Http\Request;
 use Webmozart\Assert\Assert;
 
 class TurnController extends Controller
@@ -27,7 +26,6 @@ class TurnController extends Controller
     private AuthInterface $auth;
     private GameService $gameService;
     private TurnService $turnService;
-    private WordService $wordService;
 
     public function __construct(ContainerInterface $container)
     {
@@ -39,11 +37,10 @@ class TurnController extends Controller
         $this->auth = $container->auth;
         $this->gameService = $container->gameService;
         $this->turnService = $container->turnService;
-        $this->wordService = $container->wordService;
     }
 
     public function create(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response
     ) : ResponseInterface
     {

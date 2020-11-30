@@ -8,7 +8,7 @@ use Plasticode\Controllers\Traits\NewsPageDescription;
 use Plasticode\Services\NewsAggregatorService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Container\ContainerInterface;
-use Slim\Http\Request as SlimRequest;
+use Slim\Http\Request;
 
 class NewsController extends Controller
 {
@@ -28,7 +28,7 @@ class NewsController extends Controller
     }
 
     public function get(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response,
         array $args
     ) : ResponseInterface

@@ -17,7 +17,7 @@ use Plasticode\Exceptions\Http\NotFoundException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Http\Request as SlimRequest;
+use Slim\Http\Request;
 use Webmozart\Assert\Assert;
 
 class GameController extends Controller
@@ -50,7 +50,7 @@ class GameController extends Controller
     }
 
     public function get(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response,
         array $args
     ) : ResponseInterface
@@ -91,7 +91,7 @@ class GameController extends Controller
      * @deprecated
      */
     public function start(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response
     ) : ResponseInterface
     {
@@ -150,7 +150,7 @@ class GameController extends Controller
      * Play out of game context.
      */
     public function play(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response,
         array $args
     ) : ResponseInterface

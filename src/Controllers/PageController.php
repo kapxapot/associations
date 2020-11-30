@@ -7,7 +7,7 @@ use App\Repositories\Interfaces\PageRepositoryInterface;
 use Plasticode\Controllers\Traits\NewsPageDescription;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Http\Request as SlimRequest;
+use Slim\Http\Request;
 
 class PageController extends Controller
 {
@@ -25,7 +25,7 @@ class PageController extends Controller
     }
 
     public function get(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response,
         array $args
     ) : ResponseInterface

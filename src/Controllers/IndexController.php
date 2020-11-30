@@ -8,7 +8,7 @@ use App\Services\GameService;
 use Plasticode\Services\NewsAggregatorService;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Http\Request as SlimRequest;
+use Slim\Http\Request;
 
 class IndexController extends Controller
 {
@@ -30,7 +30,7 @@ class IndexController extends Controller
     }
 
     public function index(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response
     ) : ResponseInterface
     {

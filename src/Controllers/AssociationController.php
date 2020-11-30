@@ -9,7 +9,7 @@ use Plasticode\Core\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Http\Request as SlimRequest;
+use Slim\Http\Request;
 
 class AssociationController extends Controller
 {
@@ -27,7 +27,7 @@ class AssociationController extends Controller
     }
 
     public function get(
-        SlimRequest $request,
+        Request $request,
         ResponseInterface $response,
         array $args
     ) : ResponseInterface
