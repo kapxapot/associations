@@ -10,9 +10,6 @@ use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 
 class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRepositoryInterface
 {
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return WordFeedback::class;

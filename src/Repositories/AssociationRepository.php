@@ -10,9 +10,6 @@ use App\Repositories\Interfaces\AssociationRepositoryInterface;
 
 class AssociationRepository extends LanguageElementRepository implements AssociationRepositoryInterface
 {
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return Association::class;

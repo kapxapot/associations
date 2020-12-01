@@ -10,9 +10,6 @@ use Plasticode\Util\Date;
 
 class StoryStatusRepository extends IdiormRepository implements StoryStatusRepositoryInterface
 {
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return StoryStatus::class;

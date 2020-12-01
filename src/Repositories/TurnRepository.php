@@ -19,9 +19,6 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
     use ByUserRepository;
     use WithLanguageRepository;
 
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return Turn::class;

@@ -9,9 +9,6 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 
 class WordRepository extends LanguageElementRepository implements WordRepositoryInterface
 {
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return Word::class;

@@ -13,9 +13,6 @@ class PageRepository extends NewsSourceRepository implements PageRepositoryInter
 {
     use ChildrenRepository;
 
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return Page::class;

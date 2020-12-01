@@ -8,9 +8,6 @@ use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 
 class LanguageRepository extends IdiormRepository implements LanguageRepositoryInterface
 {
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return Language::class;

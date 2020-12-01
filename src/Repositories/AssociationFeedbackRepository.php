@@ -10,9 +10,6 @@ use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 
 class AssociationFeedbackRepository extends IdiormRepository implements AssociationFeedbackRepositoryInterface
 {
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return AssociationFeedback::class;

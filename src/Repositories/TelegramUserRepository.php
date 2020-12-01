@@ -9,9 +9,6 @@ use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 
 class TelegramUserRepository extends IdiormRepository implements TelegramUserRepositoryInterface
 {
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return TelegramUser::class;

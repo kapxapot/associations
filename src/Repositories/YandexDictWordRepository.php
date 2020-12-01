@@ -16,9 +16,6 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
 {
     use WithLanguageRepository;
 
-    /**
-     * @inheritDoc
-     */
     protected function entityClass() : string
     {
         return YandexDictWord::class;

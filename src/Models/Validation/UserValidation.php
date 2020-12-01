@@ -24,9 +24,6 @@ class UserValidation extends BaseUserValidation
         $this->ageValidation = $ageValidation;
     }
 
-    /**
-     * @inheritDoc
-     */
     public function getRules(array $data, $id = null) : array
     {
         return array_merge(
