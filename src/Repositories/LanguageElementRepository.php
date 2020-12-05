@@ -11,11 +11,12 @@ use App\Repositories\Traits\WithLanguageRepository;
 use Plasticode\Query;
 use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
-use Plasticode\Util\Convert;
+use Plasticode\Traits\Convert\ToBit;
 
 abstract class LanguageElementRepository extends IdiormRepository implements LanguageElementRepositoryInterface
 {
     use CreatedRepository;
+    use ToBit;
     use WithLanguageRepository;
 
     public function get(?int $id) : ?LanguageElement
@@ -120,7 +121,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     protected function filterApproved(Query $query, bool $approved = true) : Query
     {
-        return $query->where('approved', Convert::toBit($approved));
+        return $query->where('approved', self::toBit($approved));
     }
 
     protected function filterNotApproved(Query $query) : Query
@@ -130,7 +131,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     protected function filterMature(Query $query, bool $mature = true) : Query
     {
-        return $query->where('mature', Convert::toBit($mature));
+        return $query->where('mature', self::toBit($mature));
     }
 
     protected function filterNotMature(Query $query) : Query
