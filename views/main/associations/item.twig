@@ -37,7 +37,7 @@
                 {% include "components/word.twig" with { 'word': association.second_word } only %}
             </p>
 
-            <p>Добавил/а {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
+            <p>{{ lm.genderize(association.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
 
             {% if association.users|length > 0 %}
                 <p><strong>Использована игроками:</strong></p>

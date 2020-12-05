@@ -40,7 +40,7 @@ class StoryParser
 
     private function parseVar(string $var, StoryData $data) : ?string
     {
-        return $data[$var];
+        return $data[$var] ?? null;
     }
 
     private function parseGenders(string $str, GenderedInterface $gendered) : string
@@ -54,8 +54,9 @@ class StoryParser
         $mas = $parts[0];
         $fem = $parts[1];
 
+        $gender = $gendered->gender() ?? Cases::MAS;
 
-        return $gendered->gender() == Cases::MAS
+        return $gender == Cases::MAS
             ? $mas
             : $fem;
     }

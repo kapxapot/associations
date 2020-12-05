@@ -27,7 +27,7 @@ class Human extends Player
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function withTelegramUser(TelegramUser $telegramUser) : self
     {
@@ -54,7 +54,7 @@ class Human extends Player
 
     // GenderedInterface
 
-    public function gender() : int
+    public function gender() : ?int
     {
         return $this->telegramUser()->gender();
     }

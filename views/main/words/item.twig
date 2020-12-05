@@ -59,7 +59,7 @@
                 </div>
             {% endif %}
             
-            <p>Добавил/а {{ lm.user(word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
+            <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user(word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
 
             {% if word.approved_associations.any %}
                 <p><strong>Общие ассоциации ({{ word.approved_associations.count }}):</strong></p>

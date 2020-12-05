@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Models\Interfaces\GenderedInterface;
+use App\Models\Traits\Gendered;
 use Plasticode\Models\User as UserBase;
 use Plasticode\Util\Date;
 
@@ -16,8 +18,10 @@ use Plasticode\Util\Date;
  * @method static withLastGame(Game|callable|null $lastGame)
  * @method static withTelegramUser(TelegramUser|callable|null $telegramUser)
  */
-class User extends UserBase
+class User extends UserBase implements GenderedInterface
 {
+    use Gendered;
+
     protected function requiredWiths(): array
     {
         return [
@@ -66,5 +70,14 @@ class User extends UserBase
     public function isTelegramUser() : bool
     {
         return $this->telegramUser() !== null;
+    }
+
+    // GenderedInterface
+
+    public function gender() : ?int
+    {
+        return $this->isTelegramUser()
+            ? $this->telegramUser()->gender()
+            : null;
     }
 }

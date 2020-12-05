@@ -35,7 +35,7 @@ class Bot extends Player
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function withName(string $name) : self
     {
@@ -45,7 +45,7 @@ class Bot extends Player
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function withGender(int $gender) : self
     {
@@ -63,7 +63,7 @@ class Bot extends Player
 
     // GenderedInterface
 
-    public function gender() : int
+    public function gender() : ?int
     {
         return $this->gender;
     }

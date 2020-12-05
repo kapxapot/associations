@@ -67,19 +67,16 @@ class TelegramUser extends DbModel implements GenderedInterface, NamedInterface,
             : $this->username;
     }
 
-    public function hasGender() : bool
-    {
-        return !is_null($this->genderId);
-    }
-
     // GenderedInterface
 
-    /**
-     * Returns gender or default (MAS).
-     */
-    public function gender() : int
+    public function hasGender() : bool
     {
-        return $this->genderId ?? Cases::MAS;
+        return $this->genderId !== null;
+    }
+
+    public function gender() : ?int
+    {
+        return $this->genderId;
     }
 
     // NamedInterface

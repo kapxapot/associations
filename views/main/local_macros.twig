@@ -43,3 +43,8 @@
         {{ m.breadcrumbs(context, breadcrumbs, breadcrumbs_title) }}
     {% endif %}
 {% endmacro %}
+
+{% macro genderize(gendered, options) %}
+    {% set index = gendered.gender ?? 0 %}
+    {{ options[index] }}
+{% endmacro %}

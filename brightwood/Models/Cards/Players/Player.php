@@ -4,6 +4,7 @@ namespace Brightwood\Models\Cards\Players;
 
 use App\Models\Interfaces\GenderedInterface;
 use App\Models\Interfaces\NamedInterface;
+use App\Models\Traits\Gendered;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Sets\Hand;
@@ -15,6 +16,8 @@ use Plasticode\Core\Security;
 
 abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface, SerializableInterface
 {
+    use Gendered;
+
     protected ?string $id = null;
     protected ?string $icon = null;
     protected ?Hand $hand = null;
@@ -28,7 +31,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function withId(string $id) : self
     {
@@ -38,7 +41,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function withIcon(string $icon) : self
     {
@@ -55,7 +58,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function withHand(Hand $hand) : self
     {
@@ -100,7 +103,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function withIsInspector(bool $isInspector) : self
     {
@@ -161,7 +164,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
 
     // GenderedInterface
 
-    abstract public function gender() : int;
+    abstract public function gender() : ?int;
 
     // SerializableInterface
 
