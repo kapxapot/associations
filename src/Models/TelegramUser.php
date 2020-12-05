@@ -43,12 +43,17 @@ class TelegramUser extends DbModel implements GenderedInterface, NamedInterface,
 
     public function privateName() : string
     {
-        return $this->firstName ?? $this->lastName ?? $this->username ?? 'инкогнито';
+        return $this->firstName ?? $this->lastName ?? $this->username ?? self::noName();
     }
 
     public function publicName() : string
     {
-        return $this->username ?? $this->fullName() ?? 'инкогнито';
+        return $this->username ?? $this->fullName() ?? self::noName();
+    }
+
+    public static function noName() : string
+    {
+        return 'инкогнито';
     }
 
     public function fullName() : ?string
