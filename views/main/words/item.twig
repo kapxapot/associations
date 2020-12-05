@@ -154,7 +154,18 @@
         </div>
         
         <div class="panel-footer">
-            <i class="fas fa-info-circle"></i> <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x" class="mr-2">Грамота.ру</a> <i class="fas fa-info-circle"></i> <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловарь</a>
+            <span class="hgap-2">
+                <i class="fas fa-info-circle"></i>
+                <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x">Грамота.ру</a>
+            </span>
+            <span class="hgap-2">
+                <i class="fas fa-info-circle"></i>
+                <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловарь</a>
+            </span>
+            <span class="hgap-2">
+                <i class="fas fa-info-circle"></i>
+                <a href="https://www.google.com/search?q=define:{{ word.word|url_encode }}">Google</a>
+            </span>
         </div>
     </div>
 
