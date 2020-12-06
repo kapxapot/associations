@@ -59,56 +59,52 @@
                 </div>
             {% endif %}
 
-            {% if word.associations.any %}
-                <div class="mt-3">
-                    {% if word.approved_associations.any %}
-                        <p>Общие ассоциации ({{ word.approved_associations.count }}):</p>
+            {% if word.approved_associations.any %}
+                <p class="mt-3">Общие ассоциации ({{ word.approved_associations.count }}):</p>
 
-                        <ul class="vgap-2 br-word">
-                            {% for assoc in word.approved_visible_associations %}
-                                <li>
-                                    {% if word.origin_association and word.origin_association.id == assoc.id %}
-                                        <i class="fab fa-envira dendro-color" title="Источник" data-toggle="tooltip"></i>
-                                    {% endif %}
+                <ul class="vgap-2 br-word">
+                    {% for assoc in word.approved_visible_associations %}
+                        <li>
+                            {% if word.origin_association and word.origin_association.id == assoc.id %}
+                                <i class="fab fa-envira dendro-color" title="Источник" data-toggle="tooltip"></i>
+                            {% endif %}
 
-                                    {{ lm.association(assoc, word) }}
+                            {{ lm.association(assoc, word) }}
 
-                                    {% for user in assoc.extended_users %}
-                                        {{ lm.user(user) }}
-                                    {% endfor %}
-                                </li>
+                            {% for user in assoc.extended_users %}
+                                {{ lm.user(user) }}
                             {% endfor %}
-                        </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
 
-                        {% if approved_invisible_associations_str %}
-                            <p>{{ approved_invisible_associations_str }}.</p>
-                        {% endif %}
-                    {% endif %}
+                {% if approved_invisible_associations_str %}
+                    <p>{{ approved_invisible_associations_str }}.</p>
+                {% endif %}
+            {% endif %}
 
-                    {% if word.not_approved_associations.any %}
-                        <p>Личные ассоциации ({{ word.not_approved_associations.count }}):</p>
+            {% if word.not_approved_associations.any %}
+                <p class="mt-3">Личные ассоциации ({{ word.not_approved_associations.count }}):</p>
 
-                        <ul class="vgap-2 br-word">
-                            {% for assoc in word.not_approved_visible_associations %}
-                                <li>
-                                    {% if word.origin_association and word.origin_association.id == assoc.id %}
-                                        <i class="fab fa-envira dendro-color" title="Источник" data-toggle="tooltip"></i>
-                                    {% endif %}
+                <ul class="vgap-2 br-word">
+                    {% for assoc in word.not_approved_visible_associations %}
+                        <li>
+                            {% if word.origin_association and word.origin_association.id == assoc.id %}
+                                <i class="fab fa-envira dendro-color" title="Источник" data-toggle="tooltip"></i>
+                            {% endif %}
 
-                                    {{ lm.association(assoc, word) }}
+                            {{ lm.association(assoc, word) }}
 
-                                    {% for user in assoc.extended_users %}
-                                        {{ lm.user(user) }}
-                                    {% endfor %}
-                                </li>
+                            {% for user in assoc.extended_users %}
+                                {{ lm.user(user) }}
                             {% endfor %}
-                        </ul>
+                        </li>
+                    {% endfor %}
+                </ul>
 
-                        {% if not_approved_invisible_associations_str %}
-                            <p>{{ not_approved_invisible_associations_str }}.</p>
-                        {% endif %}
-                    {% endif %}
-                </div>
+                {% if not_approved_invisible_associations_str %}
+                    <p>{{ not_approved_invisible_associations_str }}.</p>
+                {% endif %}
             {% endif %}
 
             {% if word.duplicate_by_me %}
@@ -128,20 +124,24 @@
         <div class="panel-body">
             <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user(word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
 
-            <p>
-                {% for chain_word in word.origin_chain %}
-                    {{ lm.word(chain_word) }}{% if not loop.last %} &larr; {% endif %}
-                {% endfor %}
-            </p>
+            {% if word.origin_chain|length > 1 %}
+                <p>
+                    {% for chain_word in word.origin_chain %}
+                        {{ lm.word(chain_word) }}{% if not loop.last %} &larr; {% endif %}
+                    {% endfor %}
+                </p>
+            {% else %}
+                <p><i>Это слово волшебным образом возникло само по себе.</i></p>
+            {% endif %}
         </div>
     </div>
 
     <div class="panel-secondary-heading">Определение</div>
     <div class="panel panel-primary">
         <div class="panel-body">
-            <p><i>Очень крупное млекопитающее.</i></p>
+            <p><i><strong>{{ word.word|capitalize }}?</strong> Это что-то сферическое в вакууме... наверное.</i></p>
 
-            <p>Читать определение на <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x">Грамоте.ру</a>, в <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловаре</a> или в <a href="https://www.google.com/search?q=define:{{ word.word|url_encode }}">Google</a>.</p>
+            <p>Попробуйте поискать определение на <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x">Грамоте.ру</a>, в <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловаре</a> или в <a href="https://www.google.com/search?q=define:{{ word.word|url_encode }}">Google</a>.</p>
         </div>
     </div>
 
