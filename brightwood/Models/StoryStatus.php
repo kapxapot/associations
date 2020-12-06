@@ -4,6 +4,7 @@ namespace Brightwood\Models;
 
 use App\Models\TelegramUser;
 use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
 
@@ -16,7 +17,7 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @method TelegramUser telegramUser()
  * @method static withTelegramUser(TelegramUser|callable $telegramUser)
  */
-class StoryStatus extends DbModel
+class StoryStatus extends DbModel implements CreatedAtInterface
 {
     use CreatedAt;
     use UpdatedAt;

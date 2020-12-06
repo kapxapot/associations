@@ -33,9 +33,11 @@ class Human extends Player
     {
         $this->telegramUser = $telegramUser;
 
-        $this->icon = $this->gender() == Cases::MAS
-            ? '👦'
-            : '👧';
+        if ($this->gender()) {
+            $this->icon = $this->gender() == Cases::MAS
+                ? '👦'
+                : '👧';
+        }
 
         return $this;
     }

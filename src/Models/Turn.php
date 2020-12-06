@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
 
 /**
@@ -23,7 +24,7 @@ use Plasticode\Models\Traits\CreatedAt;
  * @method static withUser(User|callable|null $user)
  * @method static withWord(Word|callable $word)
  */
-class Turn extends DbModel
+class Turn extends DbModel implements CreatedAtInterface
 {
     use CreatedAt;
 

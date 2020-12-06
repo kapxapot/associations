@@ -121,6 +121,53 @@ class Word extends LanguageElement
             ->invisibleFor($this->me());
     }
 
+    /**
+     * Returns the origin association for this word
+     * (if the word originates from an association).
+     * 
+     * - The oldest association is used as a starting point.
+     * - If the other word in the association is older than this one,
+     * it is considered as an origin association.
+     * - Otherwise, there is no origin association.
+     */
+    public function originAssociation() : ?Association
+    {
+        $oldest = $this->associations()->oldest();
+
+        if (is_null($oldest)) {
+            return null;
+        }
+
+        $otherWord = $oldest->otherWord($this);
+
+        return $this->isNewerThan($otherWord->createdAt)
+            ? $oldest
+            : null;
+    }
+
+    /**
+     * If the origin association exists, the other word in it is
+     * considered as an origin word.
+     */
+    public function originWord() : ?Word
+    {
+        $originAssociation = $this->originAssociation();
+
+        return $originAssociation
+            ? $originAssociation->otherWord($this)
+            : null;
+    }
+
+    public function originChain() : WordCollection
+    {
+        $origin = $this->originWord();
+
+        return WordCollection::collect(
+            $this,
+            ...($origin ? $origin->originChain() : [])
+        );
+    }
+
     public function associatedWordsFor(User $user) : WordCollection
     {
         return WordCollection::from(

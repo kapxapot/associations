@@ -4,6 +4,7 @@ namespace App\Collections;
 
 use App\Models\Association;
 use App\Models\User;
+use Plasticode\Util\Sort;
 
 class AssociationCollection extends LanguageElementCollection
 {
@@ -19,5 +20,15 @@ class AssociationCollection extends LanguageElementCollection
     public function random() : ?Association
     {
         return parent::random();
+    }
+
+    public function oldest() : ?Association
+    {
+        return $this
+            ->asc(
+                fn (Association $a) => $a->createdAt,
+                Sort::DATE
+            )
+            ->first();
     }
 }

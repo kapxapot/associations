@@ -6,6 +6,7 @@ use App\Collections\TurnCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
 use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Util\Date;
 
@@ -22,7 +23,7 @@ use Plasticode\Util\Date;
  * @method static withUrl(string|callable $url)
  * @method static withUser(User|callable $user)
  */
-class Game extends DbModel
+class Game extends DbModel implements CreatedAtInterface
 {
     use CreatedAt;
 
