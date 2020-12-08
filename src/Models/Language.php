@@ -17,7 +17,7 @@ class Language extends DbModel implements CreatedAtInterface
 
     const RUSSIAN = 1;
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return ['creator'];
     }

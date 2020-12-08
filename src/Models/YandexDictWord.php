@@ -26,7 +26,7 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
     use CreatedAt;
     use UpdatedAt;
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return [
             'language',

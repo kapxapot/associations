@@ -22,7 +22,7 @@ class StoryStatus extends DbModel implements CreatedAtInterface
     use CreatedAt;
     use UpdatedAt;
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return ['telegramUser'];
     }

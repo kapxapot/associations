@@ -28,7 +28,7 @@ class Turn extends DbModel implements CreatedAtInterface
 {
     use CreatedAt;
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return ['association', 'game', 'prev', 'user', 'word'];
     }

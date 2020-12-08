@@ -9,7 +9,7 @@ namespace App\Models;
  */
 class AssociationFeedback extends Feedback
 {
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return [...parent::requiredWiths(), 'association'];
     }

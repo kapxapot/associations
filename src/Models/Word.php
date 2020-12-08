@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Collections\AssociationCollection;
+use App\Collections\MetaAssociationCollection;
 use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
 use App\Models\Interfaces\DictWordInterface;
@@ -17,7 +18,7 @@ use App\Models\Interfaces\DictWordInterface;
  */
 class Word extends LanguageElement
 {
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return [
             ...parent::requiredWiths(),
@@ -158,14 +159,17 @@ class Word extends LanguageElement
             : null;
     }
 
-    public function originChain() : WordCollection
+    public function originChain() : MetaAssociationCollection
     {
-        $origin = $this->originWord();
+        $chain = MetaAssociationCollection::empty();
+        $originAssociation = $this->originAssociation();
 
-        return WordCollection::collect(
-            $this,
-            ...($origin ? $origin->originChain() : [])
-        );
+        return $originAssociation
+            ? $chain->add(
+                new MetaAssociation($this, $originAssociation),
+                ...$this->originWord()->originChain()
+            )
+            : $chain;
     }
 
     public function associatedWordsFor(User $user) : WordCollection

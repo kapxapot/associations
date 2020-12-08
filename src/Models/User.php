@@ -22,7 +22,7 @@ class User extends UserBase implements GenderedInterface
 {
     use Gendered;
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return [
             ...parent::requiredWiths(),

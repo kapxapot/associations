@@ -27,7 +27,7 @@ class Game extends DbModel implements CreatedAtInterface
 {
     use CreatedAt;
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return ['language', 'turns', 'url', 'user'];
     }

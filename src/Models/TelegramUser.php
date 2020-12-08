@@ -26,7 +26,7 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
     use CreatedAt;
     use UpdatedAt;
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return ['user'];
     }

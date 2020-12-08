@@ -33,7 +33,7 @@ abstract class LanguageElement extends DbModel implements CreatedAtInterface, Li
 
     protected string $feedbacksPropertyName = 'feedbacks';
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return [
             $this->creatorPropertyName,

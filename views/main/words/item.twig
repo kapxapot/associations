@@ -124,14 +124,29 @@
         <div class="panel-body">
             <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user(word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
 
-            {% if word.origin_chain|length > 1 %}
+            {% if word.origin_chain.any %}
+                <p>Цепочка ассоциаций, которая привела к добавлению:</p>
                 <p>
-                    {% for chain_word in word.origin_chain %}
-                        {{ lm.word(chain_word) }}{% if not loop.last %} &larr; {% endif %}
+                    {% for meta_assoc in word.origin_chain %}
+                        {% if loop.first %}
+                            {{ lm.word(meta_assoc.to_word) }}
+                        {% endif %}
+
+                        {% include 'components/association.twig' with {
+                            'association': meta_assoc.association,
+                            'short': true,
+                            'reversed': true
+                        } only %}
+
+                        {% if meta_assoc.user %}
+                            {{ lm.user(meta_assoc.user) }}
+                        {% endif %}
+
+                        {{ lm.word(meta_assoc.from_word) }}
                     {% endfor %}
                 </p>
             {% else %}
-                <p><i>Это слово волшебным образом возникло само по себе.</i></p>
+                <p class="i">Это слово волшебным образом возникло само по себе.</p>
             {% endif %}
         </div>
     </div>
@@ -139,9 +154,9 @@
     <div class="panel-secondary-heading">Определение</div>
     <div class="panel panel-primary">
         <div class="panel-body">
-            <p><i><strong>{{ word.word|capitalize }}?</strong> Это что-то сферическое в вакууме... наверное.</i></p>
+            <p class="i">Определение отсутствует.</p>
 
-            <p>Попробуйте поискать определение на <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x">Грамоте.ру</a>, в <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловаре</a> или в <a href="https://www.google.com/search?q=define:{{ word.word|url_encode }}">Google</a>.</p>
+            <p>Искать на <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x">Грамоте.ру</a>, в <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловаре</a> или в <a href="https://www.google.com/search?q=define:{{ word.word|url_encode }}">Google</a>.</p>
         </div>
     </div>
 

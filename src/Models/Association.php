@@ -20,7 +20,7 @@ class Association extends LanguageElement
     const DEFAULT_SIGN = '→';
     const APPROVED_SIGN = '⇉';
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return [
             ...parent::requiredWiths(),

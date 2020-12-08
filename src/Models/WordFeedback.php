@@ -14,7 +14,7 @@ class WordFeedback extends Feedback
 {
     private string $duplicatePropertyName = 'duplicate';
 
-    protected function requiredWiths(): array
+    protected function requiredWiths() : array
     {
         return [
             ...parent::requiredWiths(),
