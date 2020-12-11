@@ -1,7 +1,9 @@
 {% spaceless %}
     {% set sign %}{% include 'components/association_sign.twig' %}{% endset %}
-    
+
     {% if association %}
+        {% set no_link = no_link or not association.is_visible_for_me %}
+
         {% if by_word and association.first_word.id != by_word.id %}
             {% set first = association.second_word %}
             {% set second = association.first_word %}
@@ -9,6 +11,7 @@
             {% set first = association.first_word %}
             {% set second = association.second_word %}
         {% endif %}
+
         {% if not no_link %}<a href="{{ association.url }}"{% if short %} class="assoc-arrow"{% endif %}>{% endif %}{% if not short %}{{ first.display_name }} {% endif %}{{ sign }}{% if not short %} {{ second.display_name }}{% endif %}{% if not no_link %}</a>{% endif %}
     {% else %}{{ sign }}{% endif %}
 {% endspaceless %}

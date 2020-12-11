@@ -1,6 +1,6 @@
 {% macro association(assoc, by_word = null, no_link = false) %}{% include 'components/association.twig' with { 'association': assoc, 'by_word': by_word, 'no_link': no_link } only %}{% endmacro %}
 
-{% macro word(word) %}{% include 'components/word.twig' with { 'word': word } only %}{% endmacro %}
+{% macro word(word) %}{% if word.is_visible_for_me %}{% include 'components/word.twig' with { 'word': word } only %}{% else %}слово скрыто{% endif %}{% endmacro %}
 
 {% macro user(user, full = false, big = false) %}{% include 'components/user.twig' with { 'user': user, 'full': full, 'big': big } only %}{% endmacro %}
 

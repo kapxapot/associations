@@ -105,7 +105,7 @@ abstract class LanguageElement extends DbModel implements CreatedAtInterface, Li
         // element can't be played against user, if
         //
         // 1. element is mature, user is not mature (maturity check)
-        // 2. eleemnt is not approved, user disliked it
+        // 2. element is not approved, user disliked it
 
         return $this->isVisibleFor($user)
             && (
