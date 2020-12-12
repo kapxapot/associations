@@ -9,6 +9,9 @@ use App\Services\WordService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
+/**
+ * @deprecated
+ */
 class TestController extends Controller
 {
     public function index(

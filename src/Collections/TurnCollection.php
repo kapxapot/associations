@@ -18,6 +18,9 @@ class TurnCollection extends DbModelCollection
         );
     }
 
+    /**
+     * Returns only real users (no AI).
+     */
     public function users() : UserCollection
     {
         return
@@ -29,6 +32,13 @@ class TurnCollection extends DbModelCollection
                     ->clean()
             )
             ->distinct();
+    }
+
+    public function hasAiTurn() : bool
+    {
+        return $this->any(
+            fn (Turn $t) => $t->isAiTurn()
+        );
     }
 
     public function words() : WordCollection

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Collections\TurnCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
+use Plasticode\Collections\Basic\Collection;
 use Plasticode\Models\Basic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
@@ -95,6 +96,9 @@ class Game extends DbModel implements CreatedAtInterface
             && $this->lastTurn()->isAiTurn();
     }
 
+    /**
+     * Returns real players of the game (no AI).
+     */
     public function players() : UserCollection
     {
         return $this->turns()->users();
@@ -102,10 +106,25 @@ class Game extends DbModel implements CreatedAtInterface
 
     public function hasPlayer(User $user) : bool
     {
-        return $this
-            ->players()
-            ->ids()
-            ->contains($user->getId());
+        return $this->players()->contains($user);
+    }
+
+    public function extendedPlayers() : Collection
+    {
+        $players = Collection::from(
+            $this
+                ->players()
+                ->add($this->creator())
+                ->distinct()
+        );
+
+        if ($this->turns()->hasAiTurn()) {
+            // this is bad
+            // todo: make a Player entity with the real and AI ones
+            $players = $players->add(null);
+        }
+
+        return $players;
     }
 
     public function containsWord(Word $word) : bool
