@@ -1,3 +1,40 @@
+association_feedbacks:
+
+  name_gen: отзыва об ассоциации
+  name_accus: отзыв об ассоциации
+  title: Отзывы об ассоциациях
+
+  columns:
+    id:
+      name: id
+      attributes: [readonly]
+
+    association:
+      name: Ассоциация
+      template: >
+        '<a href="' + row.association.url + '">' + row.association.name + '</a>'
+      attributes: [readonly]
+
+    dislike:
+      name: Не нравится
+      type: bool
+      attributes: [readonly]
+
+    mature:
+      name: Не для детей
+      type: bool
+      attributes: [readonly]
+
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [readonly]
+
+    created_by_name:
+      name: Автор
+      attributes: [readonly]
+
+
 languages:
 
   name_gen: языка
@@ -7,27 +44,27 @@ languages:
   columns:
     id:
       name: id
-      attributes: [ readonly ]
+      attributes: [readonly]
 
     name:
       name: Название
 
     code:
       name: Код
-      attributes: [ nullable ]
+      attributes: [nullable]
 
     yandex_dict_code:
       name: Код Яндекс.Словаря
-      attributes: [ nullable, hidden ]
+      attributes: [nullable, hidden]
 
     created_at:
       name: Дата создания
       type: date
-      attributes: [ readonly ]
+      attributes: [readonly]
 
     created_by_name:
       name: Автор
-      attributes: [ readonly ]
+      attributes: [readonly]
 
 menus:
 
@@ -40,7 +77,7 @@ menus:
   columns:
     id:
       name: id
-      attributes: [ readonly ]
+      attributes: [readonly]
 
     link:
       name: Ссылка
@@ -50,7 +87,7 @@ menus:
 
     text:
       name: Текст
-      attributes: [ hidden ]
+      attributes: [hidden]
 
     position:
       name: Позиция
@@ -60,13 +97,13 @@ menus:
     created_at:
       name: Дата создания
       type: date
-      attributes: [ readonly ]
+      attributes: [readonly]
 
     menu_items:
       name: Подменю
       template: >
         '<a href="menus/' + row.id + '/menu_items"><button type="button" class="btn btn-success btn-pad"><span class="glyphicon glyphicon-align-justify" title="Редактировать элементы меню"></span></button></a>'
-      attributes: [ no_sort, readonly ]
+      attributes: [no_sort, readonly]
 
 
 menu_items:
@@ -78,7 +115,7 @@ menu_items:
   columns:
     id:
       name: id
-      attributes: [ readonly ]
+      attributes: [readonly]
     
     link:
       name: Ссылка
@@ -88,7 +125,7 @@ menu_items:
 
     text:
       name: Текст
-      attributes: [ hidden ]
+      attributes: [hidden]
 
     position:
       name: Позиция
@@ -98,7 +135,7 @@ menu_items:
     created_at:
       name: Дата создания
       type: date
-      attributes: [ readonly ]
+      attributes: [readonly]
 
 
 news:
@@ -110,7 +147,7 @@ news:
   columns:
     id:
       name: id
-      attributes: [ readonly ]
+      attributes: [readonly]
 
     title:
       name: Заголовок
@@ -120,11 +157,11 @@ news:
     text:
       name: Текст
       type: html
-      attributes: [ hidden ]
+      attributes: [hidden]
 
     tags:
       name: Теги
-      attributes: [ nullable, hidden ]
+      attributes: [nullable, hidden]
       access: publish
       tooltip: Через запятую.
 
@@ -137,18 +174,18 @@ news:
     published_at:
       name: Дата публикации
       type: datetime-local
-      attributes: [ nullable, hidden ]
+      attributes: [nullable, hidden]
       access: publish
       tooltip: Оставьте пустой для автозаполнения.
 
     created_by_name:
       name: Автор
-      attributes: [ readonly ]
+      attributes: [readonly]
 
     created_at:
       name: Дата создания
       type: date
-      attributes: [ readonly ]
+      attributes: [readonly]
 
 
 pages:
@@ -160,7 +197,7 @@ pages:
   columns:
     id:
       name: id
-      attributes: [ readonly ]
+      attributes: [readonly]
 
     title:
       name: Заголовок
@@ -169,23 +206,23 @@ pages:
 
     slug:
       name: Адрес
-      attributes: [ hidden ]
+      attributes: [hidden]
       prefix: '//associ.ru/'
 
     text:
       name: Текст
       type: html
-      attributes: [ nullable, hidden ]
+      attributes: [nullable, hidden]
 
     parent_id:
       name: Родительская страница
       entity: pages
       dropdown_template: '{{%item%.select_title}}'
-      attributes: [ nullable, hidden, tokens ]
+      attributes: [nullable, hidden, tokens]
 
     tags:
       name: Теги
-      attributes: [ nullable, hidden ]
+      attributes: [nullable, hidden]
       access: publish
       tooltip: Через запятую.
 
@@ -193,14 +230,14 @@ pages:
       name: Выводить в ленте
       type: bool
       access: publish
-      attributes: [ hidden ]
+      attributes: [hidden]
 
     skip_in_breadcrumbs:
       name: Скрыта в пути
       form_name: Скрыта в пути (в «хлебных крошках»)
       type: bool
       access: publish
-      attributes: [ hidden ]
+      attributes: [hidden]
 
     published:
       name: Опубликована
@@ -211,18 +248,18 @@ pages:
     published_at:
       name: Дата публикации
       type: datetime-local
-      attributes: [ nullable, hidden ]
+      attributes: [nullable, hidden]
       access: publish
       tooltip: Оставьте пустой для автозаполнения.
 
     created_by_name:
       name: Автор
-      attributes: [ readonly ]
+      attributes: [readonly]
     
     created_at:
       name: Дата создания
       type: date
-      attributes: [ readonly ]
+      attributes: [readonly]
 
 
 roles:
@@ -234,7 +271,7 @@ roles:
   columns:
     id:
       name: id
-      attributes: [ readonly ]
+      attributes: [readonly]
     
     name:
       name: Название
@@ -252,7 +289,7 @@ users:
   columns:
     id:
       name: id
-      attributes: [ readonly ]
+      attributes: [readonly]
 
     login:
       name: Логин
@@ -261,7 +298,7 @@ users:
 
     name:
       name: Отображаемое имя
-      attributes: [ nullable, hidden ]
+      attributes: [nullable, hidden]
       tooltip: По умолчанию совпадает с логином.
 
     email:
@@ -281,9 +318,56 @@ users:
       name: Пароль
       type: password
       tooltip: Введите пароль, если хотите его изменить. Иначе оставьте поле пустым.
-      attributes: [ nullable, hidden, readonly, on_form ]
+      attributes: [nullable, hidden, readonly, on_form]
 
     created_at:
       name: Дата регистрации
       type: date
-      attributes: [ readonly ]
+      attributes: [readonly]
+
+
+word_feedbacks:
+
+  name_gen: отзыва о слове
+  name_accus: отзыв о о слове
+  title: Отзывы о словах
+
+  columns:
+    id:
+      name: id
+      attributes: [readonly]
+
+    association:
+      name: Слово
+      template: >
+        '<a href="' + row.word.url + '">' + row.word.name + '</a>'
+      attributes: [readonly]
+
+    dislike:
+      name: Не нравится
+      type: bool
+      attributes: [readonly]
+
+    typo:
+      name: Опечатка
+      attributes: [readonly]
+
+    duplicate:
+      name: Дублирует
+      template: >
+        row.duplicate ? '<a href="' + row.duplicate.url + '">' + row.duplicate.name + '</a>' : ''
+      attributes: [readonly]
+
+    mature:
+      name: Не для детей
+      type: bool
+      attributes: [readonly]
+
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [readonly]
+
+    created_by_name:
+      name: Автор
+      attributes: [readonly]

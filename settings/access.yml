@@ -16,33 +16,40 @@ actions:
 
 templates:
   admin_strict:
-    admin: [ full ]
+    admin: [full]
 
   admin_api:
-    admin: [ full ]
-    editor: [ api_read ]
-    author: [ api_read ]
+    admin: [full]
+    editor: [api_read]
+    author: [api_read]
+
+  strict_read:
+    admin: [read]
+    editor: [read]
 
   editor_strict:
-    admin: [ full ]
-    editor: [ edit ]
+    admin: [full]
+    editor: [edit]
 
   editor:
-    admin: [ full ]
-    editor: [ edit ]
-    author: [ read ]
+    admin: [full]
+    editor: [edit]
+    author: [read]
 
   public:
-    admin: [ full ]
-    editor: [ edit ]
-    author: [ read_own, create, edit_own ]
+    admin: [full]
+    editor: [edit]
+    author: [read_own, create, edit_own]
 
   public_immutable:
-    admin: [ full ]
-    editor: [ read ]
-    author: [ read_own, create ]
+    admin: [full]
+    editor: [read]
+    author: [read_own, create]
 
 rights:
+  association_feedbacks:
+    template: strict_read
+
   associations:
     template: editor
 
@@ -72,6 +79,9 @@ rights:
 
   users:
     template: admin_strict
+
+  word_feedbacks:
+    template: strict_read
 
   words:
     template: editor

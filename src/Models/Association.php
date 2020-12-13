@@ -122,4 +122,12 @@ class Association extends LanguageElement
             ? self::APPROVED_SIGN
             : self::DEFAULT_SIGN;
     }
+
+    public function fullName() : string
+    {
+        return
+            $this->firstWord()->word . ' ' .
+            $this->sign() . ' ' .
+            $this->secondWord()->word;
+    }
 }

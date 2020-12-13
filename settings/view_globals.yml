@@ -40,6 +40,11 @@ admin_menu:
   - news
   - pages
   - group:
+      title: Отзывы
+      items:
+        - word_feedbacks
+        - association_feedbacks
+  - group:
       title: Сайт
       items:
         - users

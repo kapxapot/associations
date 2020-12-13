@@ -1,3 +1,9 @@
+association_feedbacks:
+  api: read
+  sort: created_at
+  reverse: true
+  has: [created_at, created_by, updated_at]
+
 games:
   api: read_one
 
@@ -45,3 +51,9 @@ users:
   sort: created_at
   reverse: true
   has: [created_at, updated_at]
+
+word_feedbacks:
+  api: read
+  sort: created_at
+  reverse: true
+  has: [created_at, created_by, updated_at]

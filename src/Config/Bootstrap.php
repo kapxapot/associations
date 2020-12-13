@@ -21,10 +21,12 @@ use App\Factories\LoadUncheckedDictWordsJobFactory;
 use App\Factories\MatchDanglingDictWordsJobFactory;
 use App\Factories\UpdateAssociationsJobFactory;
 use App\Factories\UpdateWordsJobFactory;
+use App\Generators\AssociationFeedbackGenerator;
 use App\Generators\GameGenerator;
 use App\Generators\LanguageGenerator;
 use App\Generators\NewsGenerator;
 use App\Generators\PageGenerator;
+use App\Generators\WordFeedbackGenerator;
 use App\Handlers\NotFoundHandler;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
@@ -99,6 +101,12 @@ class Bootstrap extends BootstrapBase
                 $c->session
             );
 
+        $map['associationFeedbacksGenerator'] = fn (ContainerInterface $c) =>
+            new AssociationFeedbackGenerator(
+                $c->generatorContext,
+                $c->associationFeedbackRepository
+            );
+
         $map['gamesGenerator'] = fn (ContainerInterface $c) =>
             new GameGenerator(
                 $c->generatorContext,
@@ -123,6 +131,12 @@ class Bootstrap extends BootstrapBase
                 $c->generatorContext,
                 $c->pageRepository,
                 $c->tagRepository
+            );
+
+        $map['wordFeedbacksGenerator'] = fn (ContainerInterface $c) =>
+            new WordFeedbackGenerator(
+                $c->generatorContext,
+                $c->wordFeedbackRepository
             );
 
         $map['associationFeedbackRepository'] = fn (ContainerInterface $c) =>
