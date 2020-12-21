@@ -61,7 +61,7 @@ languages:
 news:
   latest_limit: 5
 
-  users:
+users:
   mature_age: 16
 
 words:
