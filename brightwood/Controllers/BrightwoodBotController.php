@@ -61,7 +61,7 @@ class BrightwoodBotController extends Controller
         $message = $data['message'] ?? null;
 
         $answers = $message
-            ? $this->processIncomingMessage($message, $response)
+            ? $this->processIncomingMessage($message)
             : null;
 
         if ($answers->any()) {
