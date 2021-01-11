@@ -4,8 +4,8 @@ namespace App\Generators;
 
 use App\Models\Page;
 use App\Repositories\Interfaces\PageRepositoryInterface;
-use Plasticode\Generators\Basic\GeneratorContext;
-use Plasticode\Generators\TaggableEntityGenerator;
+use Plasticode\Generators\Core\GeneratorContext;
+use Plasticode\Generators\Generic\TaggableEntityGenerator;
 use Plasticode\Generators\Traits\Publishable;
 use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
 use Respect\Validation\Validator;
@@ -30,17 +30,17 @@ class PageGenerator extends TaggableEntityGenerator
         $this->pageRepository = $pageRepository;
     }
 
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return Page::class;
     }
 
-    protected function getRepository() : PageRepositoryInterface
+    protected function getRepository(): PageRepositoryInterface
     {
         return $this->pageRepository;
     }
 
-    public function getRules(array $data, $id = null) : array
+    public function getRules(array $data, $id = null): array
     {
         return array_merge(
             parent::getRules($data, $id),
@@ -57,7 +57,7 @@ class PageGenerator extends TaggableEntityGenerator
         );
     }
 
-    public function getOptions() : array
+    public function getOptions(): array
     {
         $options = parent::getOptions();
 
@@ -67,14 +67,14 @@ class PageGenerator extends TaggableEntityGenerator
         return $options;
     }
 
-    public function beforeSave(array $data, $id = null) : array
+    public function beforeSave(array $data, $id = null): array
     {
         $data = $this->publishableBeforeSave($data, $id);
 
         return $data;
     }
 
-    public function afterLoad(array $item) : array
+    public function afterLoad(array $item): array
     {
         $item = parent::afterLoad($item);
 

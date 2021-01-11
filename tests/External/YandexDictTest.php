@@ -8,8 +8,6 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Testing\Mocks\Repositories\LanguageRepositoryMock;
 use App\Testing\Seeders\LanguageSeeder;
 use App\Tests\IntegrationTest;
-use Plasticode\Core\Env;
-use Plasticode\Core\Settings;
 
 final class YandexDictTest extends IntegrationTest
 {

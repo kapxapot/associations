@@ -5,30 +5,30 @@ namespace App\Repositories;
 use App\Collections\PageCollection;
 use App\Models\Page;
 use App\Repositories\Interfaces\PageRepositoryInterface;
-use Plasticode\Query;
-use Plasticode\Repositories\Idiorm\Basic\NewsSourceRepository;
+use Plasticode\Data\Query;
+use Plasticode\Repositories\Idiorm\Generic\NewsSourceRepository;
 use Plasticode\Repositories\Idiorm\Traits\ChildrenRepository;
 
 class PageRepository extends NewsSourceRepository implements PageRepositoryInterface
 {
     use ChildrenRepository;
 
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return Page::class;
     }
 
-    public function get(?int $id) : ?Page
+    public function get(?int $id): ?Page
     {
         return $this->getEntity($id);
     }
 
-    public function getProtected(?int $id) : ?Page
+    public function getProtected(?int $id): ?Page
     {
         return $this->getProtectedEntity($id);
     }
 
-    public function getBySlug(?string $slug) : ?Page
+    public function getBySlug(?string $slug): ?Page
     {
         return $this
             ->query()
@@ -39,7 +39,7 @@ class PageRepository extends NewsSourceRepository implements PageRepositoryInter
     /**
      * Checks duplicates (for validation).
      */
-    public function lookup(string $slug, int $exceptId = 0) : PageCollection
+    public function lookup(string $slug, int $exceptId = 0): PageCollection
     {
         return PageCollection::from(
             $this
@@ -52,7 +52,7 @@ class PageRepository extends NewsSourceRepository implements PageRepositoryInter
         );
     }
 
-    public function getChildren(Page $parent) : PageCollection
+    public function getChildren(Page $parent): PageCollection
     {
         return PageCollection::from(
             $this
@@ -66,7 +66,7 @@ class PageRepository extends NewsSourceRepository implements PageRepositoryInter
     /**
      * Returns all published orphans.
      */
-    public function getAllPublishedOrphans() : PageCollection
+    public function getAllPublishedOrphans(): PageCollection
     {
         return PageCollection::from(
             $this
@@ -79,7 +79,7 @@ class PageRepository extends NewsSourceRepository implements PageRepositoryInter
 
     // SearchableRepositoryInterface
 
-    public function search(string $searchQuery) : PageCollection
+    public function search(string $searchQuery): PageCollection
     {
         return PageCollection::from(
             $this
@@ -92,7 +92,7 @@ class PageRepository extends NewsSourceRepository implements PageRepositoryInter
 
     // queries
 
-    protected function newsSourceQuery() : Query
+    protected function newsSourceQuery(): Query
     {
         return $this->feedQuery();
     }
@@ -100,7 +100,7 @@ class PageRepository extends NewsSourceRepository implements PageRepositoryInter
     /**
      * Published + feed query.
      */
-    protected function feedQuery() : Query
+    protected function feedQuery(): Query
     {
         return $this
             ->publishedQuery()
@@ -111,7 +111,7 @@ class PageRepository extends NewsSourceRepository implements PageRepositoryInter
 
     // filters
 
-    protected function filterByFeed(Query $query) : Query
+    protected function filterByFeed(Query $query): Query
     {
         return $query->where('show_in_feed', 1);
     }

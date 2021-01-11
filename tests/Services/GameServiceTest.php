@@ -27,9 +27,9 @@ use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
 use App\Testing\Mocks\Repositories\GameRepositoryMock;
 use App\Testing\Mocks\Repositories\TurnRepositoryMock;
 use PHPUnit\Framework\TestCase;
-use Plasticode\Core\SettingsProvider;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\ObjectProxy;
+use Plasticode\Settings\SettingsProvider;
 use Plasticode\Util\Cases;
 use Plasticode\Validation\ValidationRules;
 use Plasticode\Validation\Validator;
@@ -104,7 +104,7 @@ class GameServiceTest extends TestCase
 
         $validator = new Validator();
 
-        $settingsProvider = new SettingsProvider();
+        $settingsProvider = new SettingsProvider(); // dummy
         $eventDispatcher = new EventDispatcher();
 
         $wordService = new WordService(

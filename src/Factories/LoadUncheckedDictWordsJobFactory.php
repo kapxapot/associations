@@ -6,8 +6,11 @@ use App\Factories\Interfaces\ModelJobFactoryInterface;
 use App\Jobs\LoadUncheckedDictWordsJob;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 
+/**
+ * todo: refactor this
+ */
 class LoadUncheckedDictWordsJobFactory implements ModelJobFactoryInterface
 {
     private \Closure $maker;

@@ -5,8 +5,8 @@ namespace App\Factories;
 use App\Factories\Interfaces\ModelJobFactoryInterface;
 use App\Jobs\UpdateWordsJob;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 
 class UpdateWordsJobFactory implements ModelJobFactoryInterface
 {

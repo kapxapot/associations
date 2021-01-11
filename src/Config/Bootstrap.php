@@ -76,23 +76,42 @@ use App\Services\YandexDictService;
 use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
 use Brightwood\Config\Bootstrap as BrightwoodBootstrap;
-use Plasticode\Config\Bootstrap as BootstrapBase;
+use Plasticode\Config\Bootstrap as BaseBootstrap;
+use Plasticode\Config\MappingProviders\GeneratorsProvider;
+use Plasticode\Config\MappingProviders\RepositoriesProvider;
+use Plasticode\Config\MappingProviders\ValidatorsProvider;
 use Plasticode\Config\TagsConfig;
 use Plasticode\Events\EventDispatcher;
+use Plasticode\Generators\Core\GeneratorResolver;
+use Plasticode\Generators\MenuGenerator;
+use Plasticode\Generators\MenuItemGenerator;
+use Plasticode\Generators\RoleGenerator;
+use Plasticode\Generators\UserGenerator;
 use Plasticode\ObjectProxy;
+use Plasticode\Parsing\Interfaces\ParserInterface;
 use Plasticode\Parsing\LinkMappers\NewsLinkMapper;
 use Plasticode\Parsing\LinkMappers\PageLinkMapper;
 use Plasticode\Parsing\LinkMappers\TagLinkMapper;
 use Plasticode\Parsing\LinkMapperSource;
+use Plasticode\Parsing\Parsers\CutParser;
 use Plasticode\Services\NewsAggregatorService;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 
-class Bootstrap extends BootstrapBase
+class Bootstrap extends BaseBootstrap
 {
-    /**
-     * Get mappings for DI container.
-     */
-    public function getMappings() : array
+    public function __construct(array $settings)
+    {
+        parent::__construct($settings);
+
+        $this->register(
+            new GeneratorsProvider(),
+            new RepositoriesProvider(),
+            new ValidatorsProvider()
+        );
+    }
+
+    public function getMappings(): array
     {
         $map = parent::getMappings();
 
@@ -213,9 +232,9 @@ class Bootstrap extends BootstrapBase
                     fn () =>
                     new NewsHydrator(
                         $c->userRepository,
-                        $c->cutParser,
+                        $c->get(CutParser::class),
                         $c->linker,
-                        $c->parser
+                        $c->get(ParserInterface::class)
                     )
                 )
             );
@@ -229,9 +248,9 @@ class Bootstrap extends BootstrapBase
                     new PageHydrator(
                         $c->pageRepository,
                         $c->userRepository,
-                        $c->cutParser,
+                        $c->get(CutParser::class),
                         $c->linker,
-                        $c->parser
+                        $c->get(ParserInterface::class)
                     )
                 )
             );
@@ -310,7 +329,7 @@ class Bootstrap extends BootstrapBase
 
         $map['config'] = fn (ContainerInterface $c) =>
             new Config(
-                $c->settingsProvider
+                $c->get(SettingsProviderInterface::class)
             );
 
         $map['captchaConfig'] = fn (ContainerInterface $c) =>
@@ -329,7 +348,7 @@ class Bootstrap extends BootstrapBase
 
         $map['linker'] = fn (ContainerInterface $c) =>
             new Linker(
-                $c->settingsProvider,
+                $c->get(SettingsProviderInterface::class),
                 $c->router,
                 $c->tagsConfig
             );
@@ -410,7 +429,7 @@ class Bootstrap extends BootstrapBase
             new AssociationRecountService(
                 $c->associationRepository,
                 $c->associationSpecification,
-                $c->eventDispatcher
+                $c->get(EventDispatcher::class)
             );
 
         $map['associationService'] = fn (ContainerInterface $c) =>
@@ -427,7 +446,7 @@ class Bootstrap extends BootstrapBase
             new DictionaryService(
                 $c->dictWordRepository,
                 $c->externalDictService,
-                $c->eventDispatcher
+                $c->get(EventDispatcher::class)
             );
 
         $map['externalDictService'] = fn (ContainerInterface $c) =>
@@ -448,7 +467,7 @@ class Bootstrap extends BootstrapBase
             new LanguageService(
                 $c->languageRepository,
                 $c->wordRepository,
-                $c->settingsProvider,
+                $c->get(SettingsProviderInterface::class),
                 $c->wordService
             );
 
@@ -489,7 +508,7 @@ class Bootstrap extends BootstrapBase
                 $c->turnRepository,
                 $c->wordRepository,
                 $c->associationService,
-                $c->eventDispatcher,
+                $c->get(EventDispatcher::class),
                 $c->logger
             );
 
@@ -511,7 +530,7 @@ class Bootstrap extends BootstrapBase
             new WordRecountService(
                 $c->wordSpecification,
                 $c->wordService,
-                $c->eventDispatcher
+                $c->get(EventDispatcher::class)
             );
 
         $map['wordService'] = fn (ContainerInterface $c) =>
@@ -522,7 +541,7 @@ class Bootstrap extends BootstrapBase
                 $c->validator,
                 $c->validationRules,
                 $c->config,
-                $c->eventDispatcher
+                $c->get(EventDispatcher::class)
             );
 
         // factories
@@ -530,7 +549,7 @@ class Bootstrap extends BootstrapBase
         $map['loadUncheckedDictWordsJobFactory'] = fn (ContainerInterface $c) =>
             new LoadUncheckedDictWordsJobFactory(
                 $c->wordRepository,
-                $c->settingsProvider,
+                $c->get(SettingsProviderInterface::class),
                 $c->dictionaryService
             );
 
@@ -539,21 +558,21 @@ class Bootstrap extends BootstrapBase
                 $c->dictWordRepository,
                 $c->wordRepository,
                 $c->dictionaryService,
-                $c->settingsProvider
+                $c->get(SettingsProviderInterface::class)
             );
 
         $map['updateAssociationsJobFactory'] = fn (ContainerInterface $c) =>
             new UpdateAssociationsJobFactory(
                 $c->associationRepository,
-                $c->settingsProvider,
-                $c->eventDispatcher
+                $c->get(SettingsProviderInterface::class),
+                $c->get(EventDispatcher::class)
             );
 
         $map['updateWordsJobFactory'] = fn (ContainerInterface $c) =>
             new UpdateWordsJobFactory(
                 $c->wordRepository,
-                $c->settingsProvider,
-                $c->eventDispatcher
+                $c->get(SettingsProviderInterface::class),
+                $c->get(EventDispatcher::class)
             );
 
         // external
@@ -566,9 +585,7 @@ class Bootstrap extends BootstrapBase
         // handlers
 
         $map['notFoundHandler'] = fn (ContainerInterface $c) =>
-            new NotFoundHandler(
-                $c
-            );
+            new NotFoundHandler($c);
 
         // Brightwood
 
@@ -577,7 +594,7 @@ class Bootstrap extends BootstrapBase
         return $map;
     }
 
-    private function addBrightwood(array $map) : array
+    private function addBrightwood(array $map): array
     {
         $brightwoodBootstrap = new BrightwoodBootstrap();
 
@@ -587,10 +604,23 @@ class Bootstrap extends BootstrapBase
         );
     }
 
-    public function registerEventHandlers(ContainerInterface $c) : void
+    protected function registerGenerators(ContainerInterface $c): void
+    {
+        /** @var GeneratorResolver */
+        $resolver = $c->get(GeneratorResolver::class);
+
+        $resolver->register(
+            $c->get(MenuGenerator::class),
+            $c->get(MenuItemGenerator::class),
+            $c->get(RoleGenerator::class),
+            $c->get(UserGenerator::class)
+        );
+    }
+
+    protected function registerEventHandlers(ContainerInterface $c): void
     {
         /** @var EventDispatcher */
-        $dispatcher = $c->eventDispatcher;
+        $dispatcher = $c->get(EventDispatcher::class);
 
         $dispatcher->addHandlers(
             new AssociationApprovedChangedHandler($c->wordRecountService),

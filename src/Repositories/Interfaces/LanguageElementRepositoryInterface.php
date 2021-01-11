@@ -6,19 +6,19 @@ use App\Collections\LanguageElementCollection;
 use App\Models\Language;
 use App\Models\LanguageElement;
 use App\Models\User;
-use Plasticode\Repositories\Interfaces\Basic\ChangingRepositoryInterface;
+use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
 
 interface LanguageElementRepositoryInterface extends ChangingRepositoryInterface, WithLanguageRepositoryInterface
 {
-    function get(?int $id) : ?LanguageElement;
-    function getAllByLanguage(Language $language) : LanguageElementCollection;
+    function get(?int $id): ?LanguageElement;
+    function getAllByLanguage(Language $language): LanguageElementCollection;
 
     function getAllCreatedByUser(
         User $user,
         ?Language $language = null
-    ) : LanguageElementCollection;
+    ): LanguageElementCollection;
 
-    function getAllPublic(?Language $language = null) : LanguageElementCollection;
+    function getAllPublic(?Language $language = null): LanguageElementCollection;
 
     /**
      * Returns out of date language elements.
@@ -28,14 +28,14 @@ interface LanguageElementRepositoryInterface extends ChangingRepositoryInterface
     function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
-    ) : LanguageElementCollection;
+    ): LanguageElementCollection;
 
     function getAllApproved(
         ?Language $language = null
-    ) : LanguageElementCollection;
+    ): LanguageElementCollection;
 
     function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = 0
-    ) : LanguageElementCollection;
+    ): LanguageElementCollection;
 }

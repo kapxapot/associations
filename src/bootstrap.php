@@ -2,9 +2,9 @@
 
 use App\Config\Bootstrap;
 use Plasticode\Core\Env;
-use Plasticode\Core\Settings;
 use Plasticode\Middleware\CookieAuthMiddleware;
 use Plasticode\Middleware\SlashMiddleware;
+use Plasticode\Settings\SettingsFactory;
 use Respect\Validation\Validator;
 use Slim\App;
 
@@ -14,7 +14,7 @@ $root = $dir . '/..';
 require $root . '/vendor/autoload.php';
 
 $env = Env::load($root);
-$settings = Settings::load($root . '/settings');
+$settings = SettingsFactory::make($root);
 $app = new App(['settings' => $settings]);
 $container = $app->getContainer();
 
@@ -28,6 +28,8 @@ if ($settings['debug']) {
 }
 
 session_start();
+
+dd($settings);
 
 $bootstrap = new Bootstrap($settings, $dir);
 $bootstrap->boot($container);

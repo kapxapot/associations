@@ -5,8 +5,8 @@ namespace App\Factories;
 use App\Factories\Interfaces\ModelJobFactoryInterface;
 use App\Jobs\UpdateAssociationsJob;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\EventDispatcher;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 
 class UpdateAssociationsJobFactory implements ModelJobFactoryInterface
 {

@@ -8,8 +8,8 @@ use App\Models\LanguageElement;
 use App\Models\User;
 use App\Repositories\Interfaces\LanguageElementRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
-use Plasticode\Query;
-use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
+use Plasticode\Data\Query;
+use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
 use Plasticode\Traits\Convert\ToBit;
 
@@ -19,12 +19,12 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     use ToBit;
     use WithLanguageRepository;
 
-    public function get(?int $id) : ?LanguageElement
+    public function get(?int $id): ?LanguageElement
     {
         return $this->getEntity($id);
     }
 
-    public function getAllByLanguage(Language $language) : LanguageElementCollection
+    public function getAllByLanguage(Language $language): LanguageElementCollection
     {
         return LanguageElementCollection::from(
             $this->getByLanguageQuery($language)
@@ -34,7 +34,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     public function getAllCreatedByUser(
         User $user,
         ?Language $language = null
-    ) : LanguageElementCollection
+    ): LanguageElementCollection
     {
         $query = $this->getByLanguageQuery($language);
 
@@ -45,7 +45,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     public function getAllPublic(
         ?Language $language = null
-    ) : LanguageElementCollection
+    ): LanguageElementCollection
     {
         $query = $this->getByLanguageQuery($language);
         
@@ -62,7 +62,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
-    ) : LanguageElementCollection
+    ): LanguageElementCollection
     {
         return LanguageElementCollection::from(
             $this
@@ -77,7 +77,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     public function getAllApproved(
         ?Language $language = null
-    ) : LanguageElementCollection
+    ): LanguageElementCollection
     {
         return LanguageElementCollection::from(
             $this->approvedQuery($language)
@@ -87,7 +87,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = 0
-    ) : LanguageElementCollection
+    ): LanguageElementCollection
     {
         return LanguageElementCollection::from(
             $this
@@ -98,7 +98,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     // queries
 
-    protected function publicQuery(?Language $language = null) : Query
+    protected function publicQuery(?Language $language = null): Query
     {
         return $this
             ->approvedQuery($language)
@@ -107,7 +107,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
             );
     }
 
-    protected function approvedQuery(?Language $language = null) : Query
+    protected function approvedQuery(?Language $language = null): Query
     {
         return $this
             ->getByLanguageQuery($language)
@@ -119,22 +119,22 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     // filters
 
-    protected function filterApproved(Query $query, bool $approved = true) : Query
+    protected function filterApproved(Query $query, bool $approved = true): Query
     {
         return $query->where('approved', self::toBit($approved));
     }
 
-    protected function filterNotApproved(Query $query) : Query
+    protected function filterNotApproved(Query $query): Query
     {
         return $this->filterApproved($query, false);
     }
 
-    protected function filterMature(Query $query, bool $mature = true) : Query
+    protected function filterMature(Query $query, bool $mature = true): Query
     {
         return $query->where('mature', self::toBit($mature));
     }
 
-    protected function filterNotMature(Query $query) : Query
+    protected function filterNotMature(Query $query): Query
     {
         return $this->filterMature($query, false);
     }

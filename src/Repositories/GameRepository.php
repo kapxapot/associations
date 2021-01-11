@@ -9,42 +9,42 @@ use App\Models\User;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Traits\ByUserRepository;
 use App\Repositories\Traits\WithLanguageRepository;
-use Plasticode\Query;
-use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
+use Plasticode\Data\Query;
+use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
 class GameRepository extends IdiormRepository implements GameRepositoryInterface
 {
     use ByUserRepository;
     use WithLanguageRepository;
 
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return Game::class;
     }
 
-    public function get(?int $id) : ?Game
+    public function get(?int $id): ?Game
     {
         return $this->getEntity($id);
     }
 
-    public function getAllByLanguage(Language $language) : GameCollection
+    public function getAllByLanguage(Language $language): GameCollection
     {
         return GameCollection::from(
             $this->getByLanguageQuery($language)
         );
     }
 
-    public function save(Game $game) : Game
+    public function save(Game $game): Game
     {
         return $this->saveEntity($game);
     }
 
-    public function store(array $data) : Game
+    public function store(array $data): Game
     {
         return $this->storeEntity($data);
     }
 
-    public function getCurrentByUser(User $user) : ?Game
+    public function getCurrentByUser(User $user): ?Game
     {
         return $this
             ->getAllByUserQuery($user)
@@ -53,7 +53,7 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
             ->one();
     }
 
-    public function getLastByUser(User $user) : ?Game
+    public function getLastByUser(User $user): ?Game
     {
         return $this
             ->getAllByUserQuery($user)
@@ -63,7 +63,7 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
 
     // queries
 
-    protected function getAllByUserQuery(User $user) : Query
+    protected function getAllByUserQuery(User $user): Query
     {
         return $this->filterByUser(
             $this->query(),

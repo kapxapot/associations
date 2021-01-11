@@ -7,9 +7,9 @@ use App\Events\Word\WordOutOfDateEvent;
 use App\Jobs\Interfaces\ModelJobInterface;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 
 class UpdateWordsJob implements ModelJobInterface
 {
@@ -30,7 +30,7 @@ class UpdateWordsJob implements ModelJobInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function run() : WordCollection
+    public function run(): WordCollection
     {
         $ttl = $this
             ->settingsProvider

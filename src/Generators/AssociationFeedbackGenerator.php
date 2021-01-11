@@ -4,8 +4,8 @@ namespace App\Generators;
 
 use App\Models\AssociationFeedback;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
-use Plasticode\Generators\Basic\ChangingEntityGenerator;
-use Plasticode\Generators\Basic\GeneratorContext;
+use Plasticode\Generators\Core\GeneratorContext;
+use Plasticode\Generators\Generic\ChangingEntityGenerator;
 
 class AssociationFeedbackGenerator extends ChangingEntityGenerator
 {
@@ -21,17 +21,17 @@ class AssociationFeedbackGenerator extends ChangingEntityGenerator
         $this->associationFeedbackRepository = $associationFeedbackRepository;
     }
 
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return AssociationFeedback::class;
     }
 
-    protected function getRepository() : AssociationFeedbackRepositoryInterface
+    protected function getRepository(): AssociationFeedbackRepositoryInterface
     {
         return $this->associationFeedbackRepository;
     }
 
-    public function afterLoad(array $item) : array
+    public function afterLoad(array $item): array
     {
         $item = parent::afterLoad($item);
 

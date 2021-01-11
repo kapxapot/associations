@@ -9,19 +9,19 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 
 class WordRepository extends LanguageElementRepository implements WordRepositoryInterface
 {
-    protected function entityClass() : string
+    protected string $sortField = 'word';
+
+    protected function entityClass(): string
     {
         return Word::class;
     }
 
-    protected string $sortField = 'word';
-
-    public function get(?int $id) : ?Word
+    public function get(?int $id): ?Word
     {
         return $this->getEntity($id);
     }
 
-    public function save(Word $word) : Word
+    public function save(Word $word): Word
     {
         if (!$word->isPersisted()) {
             $word['word_bin'] = $word->word;
@@ -30,14 +30,14 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         return $this->saveEntity($word);
     }
 
-    public function store(array $data) : Word
+    public function store(array $data): Word
     {
         $data['word_bin'] = $data['word'];
 
         return $this->storeEntity($data);
     }
 
-    public function getAllByLanguage(Language $language) : WordCollection
+    public function getAllByLanguage(Language $language): WordCollection
     {
         return WordCollection::from(
             parent::getAllByLanguage($language)
@@ -49,7 +49,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
      * 
      * Normalized word string expected.
      */
-    public function findInLanguage(Language $language, ?string $wordStr) : ?Word
+    public function findInLanguage(Language $language, ?string $wordStr): ?Word
     {
         return $this
             ->getByLanguageQuery($language)
@@ -65,14 +65,14 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
-    ) : WordCollection
+    ): WordCollection
     {
         return WordCollection::from(
             parent::getAllOutOfDate($ttlMin, $limit)
         );
     }
 
-    public function getAllApproved(?Language $language = null) : WordCollection
+    public function getAllApproved(?Language $language = null): WordCollection
     {
         return WordCollection::from(
             parent::getAllApproved($language)
@@ -82,7 +82,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = 0
-    ) : WordCollection
+    ): WordCollection
     {
         return WordCollection::from(
             parent::getLastAddedByLanguage($language, $limit)
@@ -92,9 +92,9 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     /**
      * Returns words without corresponding dict words.
      */
-    public function getAllUnchecked(int $limit = 0) : WordCollection
+    public function getAllUnchecked(int $limit = 0): WordCollection
     {
-        // todo: this needs to be refactored (somehow)
+        // todo: this needs to be refactored (get table name from other injected repo?)
         $dictWordTable = 'yandex_dict_words';
         $dwAlias = 'dw';
 

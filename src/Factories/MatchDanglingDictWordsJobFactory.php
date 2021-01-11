@@ -7,7 +7,7 @@ use App\Jobs\MatchDanglingDictWordsJob;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 
 class MatchDanglingDictWordsJobFactory implements ModelJobFactoryInterface
 {

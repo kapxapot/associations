@@ -7,9 +7,9 @@ use App\Events\Association\AssociationOutOfDateEvent;
 use App\Jobs\Interfaces\ModelJobInterface;
 use App\Models\Association;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
 use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 
 class UpdateAssociationsJob implements ModelJobInterface
 {
@@ -30,7 +30,7 @@ class UpdateAssociationsJob implements ModelJobInterface
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function run() : AssociationCollection
+    public function run(): AssociationCollection
     {
         $ttl = $this
             ->settingsProvider

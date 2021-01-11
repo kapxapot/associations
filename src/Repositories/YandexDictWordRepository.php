@@ -9,24 +9,24 @@ use App\Models\Word;
 use App\Models\YandexDictWord;
 use App\Repositories\Interfaces\YandexDictWordRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
-use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
+use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Webmozart\Assert\Assert;
 
 class YandexDictWordRepository extends IdiormRepository implements YandexDictWordRepositoryInterface
 {
     use WithLanguageRepository;
 
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return YandexDictWord::class;
     }
 
-    public function get(?int $id) : ?YandexDictWord
+    public function get(?int $id): ?YandexDictWord
     {
         return $this->getEntity($id);
     }
 
-    public function create(array $data) : YandexDictWord
+    public function create(array $data): YandexDictWord
     {
         return $this->createEntity($data);
     }
@@ -34,7 +34,7 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
     /**
      * @param YandexDictWord $dictWord
      */
-    public function save(DictWordInterface $dictWord) : YandexDictWord
+    public function save(DictWordInterface $dictWord): YandexDictWord
     {
         Assert::isInstanceOf($dictWord, YandexDictWord::class);
 
@@ -50,7 +50,7 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
      *
      * @param integer $ttlMin Update time-to-live in minutes.
      */
-    public function getAllDanglingOutOfDate(int $ttlMin, int $limit = 0) : DictWordCollection
+    public function getAllDanglingOutOfDate(int $ttlMin, int $limit = 0): DictWordCollection
     {
         return DictWordCollection::from(
             $this
@@ -64,7 +64,7 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
         );
     }
 
-    public function getByWord(Word $word) : ?YandexDictWord
+    public function getByWord(Word $word): ?YandexDictWord
     {
         return $this
             ->query()
@@ -75,7 +75,7 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
     public function getByWordStr(
         Language $language,
         string $wordStr
-    ) : ?YandexDictWord
+    ): ?YandexDictWord
     {
         return $this
             ->getByLanguageQuery($language)

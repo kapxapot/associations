@@ -4,8 +4,8 @@ namespace App\Generators;
 
 use App\Models\News;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
-use Plasticode\Generators\Basic\GeneratorContext;
-use Plasticode\Generators\TaggableEntityGenerator;
+use Plasticode\Generators\Core\GeneratorContext;
+use Plasticode\Generators\Generic\TaggableEntityGenerator;
 use Plasticode\Generators\Traits\Publishable;
 use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
 
@@ -29,24 +29,24 @@ class NewsGenerator extends TaggableEntityGenerator
         $this->newsRepository = $newsRepository;
     }
 
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return News::class;
     }
 
-    protected function getRepository() : NewsRepositoryInterface
+    protected function getRepository(): NewsRepositoryInterface
     {
         return $this->newsRepository;
     }
 
-    public function beforeSave(array $data, $id = null) : array
+    public function beforeSave(array $data, $id = null): array
     {
         $data = $this->publishableBeforeSave($data, $id);
 
         return $data;
     }
 
-    public function afterLoad(array $item) : array
+    public function afterLoad(array $item): array
     {
         $item = parent::afterLoad($item);
 

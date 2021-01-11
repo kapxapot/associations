@@ -14,9 +14,9 @@ use App\Testing\Factories\UserRepositoryFactory;
 use App\Testing\Mocks\Repositories\AssociationFeedbackRepositoryMock;
 use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
 use App\Tests\IntegrationTest;
-use Plasticode\Core\SettingsProvider;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\ObjectProxy;
+use Plasticode\Settings\SettingsProvider;
 use Plasticode\Validation\ValidationRules;
 use Plasticode\Validation\Validator;
 

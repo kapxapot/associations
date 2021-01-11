@@ -8,7 +8,7 @@ use App\Models\Interfaces\DictWordInterface;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 
 /**
  * For all dict words without word try to find word and map if it exists.
@@ -63,10 +63,9 @@ class MatchDanglingDictWordsJob implements ModelJobInterface
 
                     return $this->dictionaryService->link($dictWord, $word);
                 }
-            );
+            )
+            ->clean();
 
-        return DictWordCollection::from(
-            $processed->clean()
-        );
+        return DictWordCollection::from($processed);
     }
 }

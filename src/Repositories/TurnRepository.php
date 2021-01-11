@@ -12,32 +12,32 @@ use App\Models\Word;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Traits\ByUserRepository;
 use App\Repositories\Traits\WithLanguageRepository;
-use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
+use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
 class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
 {
     use ByUserRepository;
     use WithLanguageRepository;
 
-    protected function entityClass() : string
+    protected string $sortField = 'id';
+    protected bool $sortReverse = true;
+
+    protected function entityClass(): string
     {
         return Turn::class;
     }
 
-    protected string $sortField = 'id';
-    protected bool $sortReverse = true;
-
-    public function get(?int $id) : ?Turn
+    public function get(?int $id): ?Turn
     {
         return $this->getEntity($id);
     }
 
-    public function save(Turn $turn) : Turn
+    public function save(Turn $turn): Turn
     {
         return $this->saveEntity($turn);
     }
 
-    public function getAllByGame(Game $game) : TurnCollection
+    public function getAllByGame(Game $game): TurnCollection
     {
         return TurnCollection::from(
             $this
@@ -46,7 +46,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         );
     }
 
-    public function getAllByAssociation(Association $association) : TurnCollection
+    public function getAllByAssociation(Association $association): TurnCollection
     {
         return TurnCollection::from(
             $this
@@ -55,7 +55,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         );
     }
 
-    public function getAllByLanguage(Language $language) : TurnCollection
+    public function getAllByLanguage(Language $language): TurnCollection
     {
         return TurnCollection::from(
             $this->getByLanguageQuery($language)
@@ -65,7 +65,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
     public function getAllByUser(
         User $user,
         ?Language $language = null
-    ) : TurnCollection
+    ): TurnCollection
     {
         $query = $this->getByLanguageQuery($language);
 
@@ -74,7 +74,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         );
     }
 
-    public function getAllByWord(Word $word) : TurnCollection
+    public function getAllByWord(Word $word): TurnCollection
     {
         return TurnCollection::from(
             $this

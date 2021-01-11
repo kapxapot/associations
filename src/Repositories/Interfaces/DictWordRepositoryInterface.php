@@ -9,10 +9,10 @@ use App\Models\Word;
 
 interface DictWordRepositoryInterface extends WithLanguageRepositoryInterface
 {
-    function create(array $data) : DictWordInterface;
-    function save(DictWordInterface $dictWord) : DictWordInterface;
-    function getByWord(Word $word) : ?DictWordInterface;
-    function getByWordStr(Language $language, string $wordStr) : ?DictWordInterface;
+    function create(array $data): DictWordInterface;
+    function save(DictWordInterface $dictWord): DictWordInterface;
+    function getByWord(Word $word): ?DictWordInterface;
+    function getByWordStr(Language $language, string $wordStr): ?DictWordInterface;
 
     /**
      * Returns dict words without associated words that need to be updated.
@@ -22,5 +22,5 @@ interface DictWordRepositoryInterface extends WithLanguageRepositoryInterface
     public function getAllDanglingOutOfDate(
         int $ttlMin,
         int $limit = 0
-    ) : DictWordCollection;
+    ): DictWordCollection;
 }

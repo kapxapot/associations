@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Webmozart\Assert\Assert;
 
 class LanguageService

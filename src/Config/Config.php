@@ -6,9 +6,9 @@ use App\Config\Interfaces\AssociationConfigInterface;
 use App\Config\Interfaces\NewsConfigInterface;
 use App\Config\Interfaces\UserConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
-use Plasticode\Config\Config as ConfigBase;
+use Plasticode\Config\Config as BaseConfig;
 
-class Config extends ConfigBase implements AssociationConfigInterface, NewsConfigInterface, UserConfigInterface, WordConfigInterface
+class Config extends BaseConfig implements AssociationConfigInterface, NewsConfigInterface, UserConfigInterface, WordConfigInterface
 {
     public function associationUsageCoeff() : float
     {

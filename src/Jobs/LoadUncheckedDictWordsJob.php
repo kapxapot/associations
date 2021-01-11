@@ -7,7 +7,7 @@ use App\Jobs\Interfaces\ModelJobInterface;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
-use Plasticode\Core\Interfaces\SettingsProviderInterface;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 
 /**
  * For all words without dict word load dict words.
@@ -29,7 +29,7 @@ class LoadUncheckedDictWordsJob implements ModelJobInterface
         $this->dictionaryService = $dictionaryService;
     }
 
-    public function run() : DictWordCollection
+    public function run(): DictWordCollection
     {
         $limit = $this
             ->settingsProvider

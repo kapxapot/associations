@@ -6,8 +6,8 @@ use App\Core\Serializer;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
-use Plasticode\Generators\Basic\EntityGenerator;
-use Plasticode\Generators\Basic\GeneratorContext;
+use Plasticode\Generators\Core\GeneratorContext;
+use Plasticode\Generators\Generic\EntityGenerator;
 
 class GameGenerator extends EntityGenerator
 {
@@ -26,12 +26,12 @@ class GameGenerator extends EntityGenerator
         $this->serializer = $serializer;
     }
 
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return Game::class;
     }
 
-    public function afterLoad(array $item) : array
+    public function afterLoad(array $item): array
     {
         $item = parent::afterLoad($item);
 

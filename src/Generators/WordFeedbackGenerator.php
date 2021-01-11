@@ -4,8 +4,8 @@ namespace App\Generators;
 
 use App\Models\WordFeedback;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
-use Plasticode\Generators\Basic\ChangingEntityGenerator;
-use Plasticode\Generators\Basic\GeneratorContext;
+use Plasticode\Generators\Core\GeneratorContext;
+use Plasticode\Generators\Generic\ChangingEntityGenerator;
 
 class WordFeedbackGenerator extends ChangingEntityGenerator
 {
@@ -21,17 +21,17 @@ class WordFeedbackGenerator extends ChangingEntityGenerator
         $this->wordFeedbackRepository = $wordFeedbackRepository;
     }
 
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return WordFeedback::class;
     }
 
-    protected function getRepository() : WordFeedbackRepositoryInterface
+    protected function getRepository(): WordFeedbackRepositoryInterface
     {
         return $this->wordFeedbackRepository;
     }
 
-    public function afterLoad(array $item) : array
+    public function afterLoad(array $item): array
     {
         $item = parent::afterLoad($item);
 

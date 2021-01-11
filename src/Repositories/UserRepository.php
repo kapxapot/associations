@@ -8,17 +8,17 @@ use Plasticode\Repositories\Idiorm\UserRepository as BaseUserRepository;
 
 class UserRepository extends BaseUserRepository implements UserRepositoryInterface
 {
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return User::class;
     }
 
-    public function get(?int $id) : ?User
+    public function get(?int $id): ?User
     {
         return $this->getEntity($id);
     }
 
-    public function store(array $data) : User
+    public function store(array $data): User
     {
         return $this->storeEntity($data);
     }

@@ -40,7 +40,7 @@ class FeedbackController extends Controller
         $this->associationFeedbackService =
             $container->associationFeedbackService;
 
-        $this->eventDispatcher = $container->eventDispatcher;
+        $this->eventDispatcher = $container->get(EventDispatcher::class);
         $this->wordFeedbackService = $container->wordFeedbackService;
     }
 

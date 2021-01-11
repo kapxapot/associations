@@ -21,11 +21,13 @@ use Plasticode\Controllers\Auth\AuthController;
 use Plasticode\Controllers\Auth\PasswordController;
 use Plasticode\Controllers\ParserController;
 use Plasticode\Core\Response;
+use Plasticode\Generators\Basic\GeneratorResolver;
 use Plasticode\Generators\Interfaces\EntityGeneratorInterface;
 use Plasticode\Middleware\AuthMiddleware;
 use Plasticode\Middleware\GuestMiddleware;
 use Plasticode\Middleware\AccessMiddleware;
 use Plasticode\Middleware\TokenAuthMiddleware;
+use Psr\Container\ContainerInterface;
 
 /** @var ContainerInterface $container */
 
@@ -98,17 +100,16 @@ $app->group(
                     if (isset($table['api'])) {
                         /** @var EntityGeneratorInterface */
                         $gen = $container
-                            ->generatorResolver
+                            ->get(GeneratorResolver::class)
                             ->resolve($alias);
 
                         $gen->generateAPIRoutes($this, $access);
                     }
                 }
 
-                $this->post(
-                    '/parser/parse',
-                    ParserController::class . ':parse'
-                )->setName('api.parser.parse');
+                $this
+                    ->post('/parser/parse', ParserController::class)
+                    ->setName('api.parser.parse');
             }
         )->add(new TokenAuthMiddleware($container->authService));
 
@@ -127,9 +128,9 @@ $app->group(
                 foreach (array_keys($settings['entities']) as $entity) {
                     /** @var EntityGeneratorInterface */
                     $gen = $container
-                        ->generatorResolver
+                        ->get(GeneratorResolver::class)
                         ->resolve($entity);
-                    
+
                     $gen->generateAdminPageRoute($this, $access);
                 }
             }
@@ -300,12 +301,12 @@ $app->group(
             function () {
                 $this->post(
                     '/signup',
-                    AuthController::class . ':postSignUp'
+                    AuthController::class . ':signUp'
                 )->setName('auth.signup');
 
                 $this->post(
                     '/signin',
-                    AuthController::class . ':postSignIn'
+                    AuthController::class . ':signIn'
                 )->setName('auth.signin');
             }
         )->add(
@@ -321,13 +322,12 @@ $app->group(
             function () {
                 $this->post(
                     '/signout',
-                    AuthController::class . ':postSignOut'
+                    AuthController::class . ':signOut'
                 )->setName('auth.signout');
 
-                $this->post(
-                    '/password/change',
-                    PasswordController::class . ':postChangePassword'
-                )->setName('auth.password.change');
+                $this
+                    ->post('/password/change', PasswordController::class)
+                    ->setName('auth.password.change');
             }
         )->add(
             new AuthMiddleware(

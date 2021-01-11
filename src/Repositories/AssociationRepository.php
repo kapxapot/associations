@@ -10,34 +10,34 @@ use App\Repositories\Interfaces\AssociationRepositoryInterface;
 
 class AssociationRepository extends LanguageElementRepository implements AssociationRepositoryInterface
 {
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return Association::class;
     }
 
-    public function get(?int $id) : ?Association
+    public function get(?int $id): ?Association
     {
         return $this->getEntity($id);
     }
 
-    public function save(Association $association) : Association
+    public function save(Association $association): Association
     {
         return $this->saveEntity($association);
     }
 
-    public function store(array $data) : Association
+    public function store(array $data): Association
     {
         return $this->storeEntity($data);
     }
 
-    public function getAllByLanguage(Language $language) : AssociationCollection
+    public function getAllByLanguage(Language $language): AssociationCollection
     {
         return AssociationCollection::from(
             parent::getAllByLanguage($language)
         );
     }
 
-    public function getAllByWord(Word $word) : AssociationCollection
+    public function getAllByWord(Word $word): AssociationCollection
     {
         return AssociationCollection::from(
             $this
@@ -51,7 +51,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
         );
     }
 
-    public function getByPair(Word $first, Word $second) : ?Association
+    public function getByPair(Word $first, Word $second): ?Association
     {
         return $this
             ->query()
@@ -68,7 +68,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
     public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
-    ) : AssociationCollection
+    ): AssociationCollection
     {
         return AssociationCollection::from(
             parent::getAllOutOfDate($ttlMin, $limit)
@@ -78,7 +78,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
     public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = 0
-    ) : AssociationCollection
+    ): AssociationCollection
     {
         return AssociationCollection::from(
             parent::getLastAddedByLanguage($language, $limit)

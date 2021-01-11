@@ -5,28 +5,28 @@ namespace App\Repositories;
 use App\Collections\NewsCollection;
 use App\Models\News;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
-use Plasticode\Repositories\Idiorm\Basic\NewsSourceRepository;
+use Plasticode\Repositories\Idiorm\Generic\NewsSourceRepository;
 
 class NewsRepository extends NewsSourceRepository implements NewsRepositoryInterface
 {
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return News::class;
     }
 
-    public function get(?int $id) : ?News
+    public function get(?int $id): ?News
     {
         return $this->getEntity($id);
     }
 
-    public function getProtected(?int $id) : ?News
+    public function getProtected(?int $id): ?News
     {
         return $this->getProtectedEntity($id);
     }
 
     // SearchableRepositoryInterface
 
-    public function search(string $searchQuery) : NewsCollection
+    public function search(string $searchQuery): NewsCollection
     {
         return NewsCollection::from(
             $this
