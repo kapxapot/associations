@@ -29,8 +29,6 @@ if ($settings['debug']) {
 
 session_start();
 
-dd($settings);
-
 $bootstrap = new Bootstrap($settings, $dir);
 $bootstrap->boot($container);
 
