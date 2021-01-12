@@ -1,5 +1,4 @@
 association_feedbacks:
-
   name_gen: отзыва об ассоциации
   name_accus: отзыв об ассоциации
   title: Отзывы об ассоциациях
@@ -34,9 +33,7 @@ association_feedbacks:
       name: Автор
       attributes: [readonly]
 
-
 languages:
-
   name_gen: языка
   name_accus: язык
   title: Языки
@@ -67,7 +64,6 @@ languages:
       attributes: [readonly]
 
 menus:
-
   name_gen: меню
   name_accus: меню
   title: Меню
@@ -105,9 +101,7 @@ menus:
         '<a href="menus/' + row.id + '/menu_items"><button type="button" class="btn btn-success btn-pad"><span class="glyphicon glyphicon-align-justify" title="Редактировать элементы меню"></span></button></a>'
       attributes: [no_sort, readonly]
 
-
 menu_items:
-
   name_gen: элемента меню
   name_accus: элемент меню
   title: Элементы меню
@@ -137,9 +131,7 @@ menu_items:
       type: date
       attributes: [readonly]
 
-
 news:
-
   name_gen: новости
   name_accus: новость
   title: Новости
@@ -187,9 +179,7 @@ news:
       type: date
       attributes: [readonly]
 
-
 pages:
-
   name_gen: страницы
   name_accus: страницу
   title: Страницы
@@ -261,9 +251,7 @@ pages:
       type: date
       attributes: [readonly]
 
-
 roles:
-
   name_gen: роли
   name_accus: роль
   title: Роли
@@ -279,9 +267,7 @@ roles:
     tag:
       name: Тег
 
-
 users:
-
   name_gen: пользователя
   name_accus: пользователя
   title: Пользователи
@@ -325,9 +311,7 @@ users:
       type: date
       attributes: [readonly]
 
-
 word_feedbacks:
-
   name_gen: отзыва о слове
   name_accus: отзыв о о слове
   title: Отзывы о словах

@@ -3,15 +3,18 @@ association_feedbacks:
   sort: created_at
   reverse: true
   has: [created_at, created_by, updated_at]
+  entity: \App\Models\AssociaionFeedback
 
 games:
   api: read_one
+  entity: \App\Models\Game
 
 languages:
   api: full
   name_field: name
   sort: name
   has: [created_at, created_by]
+  entity: \App\Models\Language
 
 menus:
   api: full
@@ -19,12 +22,14 @@ menus:
   sort: created_at
   reverse: true
   has: [created_at, updated_at]
+  entity: \Plasticode\Models\Menu
 
 menu_items:
   api: full
   name_field: text
   sort: position
   has: [created_at, updated_at]
+  entity: \Plasticode\Models\MenuItem
 
 news:
   api: full
@@ -32,6 +37,7 @@ news:
   sort: created_at
   reverse: true
   has: [created_at, updated_at, created_by, updated_by]
+  entity: \App\Models\News
 
 pages:
   api: full
@@ -39,11 +45,13 @@ pages:
   sort: created_at
   reverse: true
   has: [created_at, updated_at, created_by, updated_by]
+  entity: \App\Models\Page
 
 roles:
   api: full
   name_field: name
   sort: name
+  entity: \Plasticode\Models\Role
 
 users:
   api: full
@@ -51,9 +59,11 @@ users:
   sort: created_at
   reverse: true
   has: [created_at, updated_at]
+  entity: \App\Models\User
 
 word_feedbacks:
   api: read
   sort: created_at
   reverse: true
   has: [created_at, created_by, updated_at]
+  entity: \App\Models\WordFeedback

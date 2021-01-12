@@ -17,43 +17,31 @@ use App\Controllers\WordController;
 use Brightwood\Controllers\BrightwoodBotController;
 use Brightwood\Controllers\CardsTestController;
 use Brightwood\Controllers\EightsTestController;
+use Plasticode\Config\Config;
 use Plasticode\Controllers\Auth\AuthController;
 use Plasticode\Controllers\Auth\PasswordController;
 use Plasticode\Controllers\ParserController;
 use Plasticode\Core\Response;
-use Plasticode\Generators\Basic\GeneratorResolver;
-use Plasticode\Generators\Interfaces\EntityGeneratorInterface;
+use Plasticode\Generators\Core\GeneratorResolver;
 use Plasticode\Middleware\AuthMiddleware;
 use Plasticode\Middleware\GuestMiddleware;
-use Plasticode\Middleware\AccessMiddleware;
 use Plasticode\Middleware\TokenAuthMiddleware;
+use Plasticode\Services\AuthService;
 use Psr\Container\ContainerInterface;
+use Slim\App;
+use Slim\Interfaces\RouterInterface;
 
+/** @var App $app */
 /** @var ContainerInterface $container */
-
-/**
- * Creates AccessMiddleware.
- * 
- * @var callable
- */
-$access = fn (string $entity, string $action, ?string $redirect = null)
-    => new AccessMiddleware(
-        $container->access,
-        $container->auth,
-        $container->router,
-        $entity,
-        $action,
-        $redirect
-    );
 
 $root = $settings['root'];
 $trueRoot = (strlen($root) == 0);
 
-$apiPrefix = '/api/v1';
-
 $app->group(
     $root,
-    function () use ($trueRoot, $settings, $access, $container, $env, $apiPrefix) {
+    function () use ($trueRoot, $settings, $container, $env) {
+        $apiPrefix = '/api/v1';
+
         // public api
 
         $this->group(
@@ -95,16 +83,21 @@ $app->group(
 
         $this->group(
             $apiPrefix,
-            function () use ($settings, $access, $container) {
-                foreach ($settings['tables'] as $alias => $table) {
-                    if (isset($table['api'])) {
-                        /** @var EntityGeneratorInterface */
-                        $gen = $container
-                            ->get(GeneratorResolver::class)
-                            ->resolve($alias);
+            function () use ($container) {
+                /** @var Config */
+                $config = $container->get(Config::class);
 
-                        $gen->generateAPIRoutes($this, $access);
+                /** @var GeneratorResolver */
+                $resolver = $container->get(GeneratorResolver::class);
+
+                foreach ($config->tableMetadata()->all() as $table) {
+                    if (!isset($table['api'])) {
+                        continue;
                     }
+
+                    $generator = $resolver->resolve($table['entity']);
+
+                    $generator->generateAPIRoutes($this);
                 }
 
                 $this
@@ -124,20 +117,31 @@ $app->group(
 
         $this->group(
             '/admin',
-            function () use ($settings, $access, $container) {
-                foreach (array_keys($settings['entities']) as $entity) {
-                    /** @var EntityGeneratorInterface */
-                    $gen = $container
-                        ->get(GeneratorResolver::class)
-                        ->resolve($entity);
+            function () use ($container) {
+                /** @var Config */
+                $config = $container->get(Config::class);
 
-                    $gen->generateAdminPageRoute($this, $access);
+                /** @var GeneratorResolver */
+                $resolver = $container->get(GeneratorResolver::class);
+
+                $entityNames = array_keys(
+                    $config->entitySettings()->all()
+                );
+
+                foreach ($entityNames as $entityName) {
+                    $entityClass = $config
+                        ->tableMetadata()
+                        ->get($entityName . '.entity');
+
+                    $generator = $resolver->resolve($entityClass);
+
+                    $generator->generateAdminPageRoute($this);
                 }
             }
         )->add(
             new AuthMiddleware(
-                $container->router,
-                $container->authService,
+                $container->get(RouterInterface::class),
+                $container->get(AuthService::class),
                 'admin.index'
             )
         );
@@ -172,7 +176,11 @@ $app->group(
                     FeedbackController::class . ':save'
                 )->setName('actions.feedback');
             }
-        )->add(new TokenAuthMiddleware($container->authService));
+        )->add(
+            new TokenAuthMiddleware(
+                $container->get(AuthService::class)
+            )
+        );
 
         $this->get(
             '/associations/{id:\d+}',
@@ -231,10 +239,12 @@ $app->group(
             );
         }
 
-        $this->get('/news/{id:\d+}', NewsController::class . ':get')
+        $this
+            ->get('/news/{id:\d+}', NewsController::class)
             ->setName('main.news');
 
-        $this->get('/tags/{tag}', TagController::class . ':get')
+        $this
+            ->get('/tags/{tag}', TagController::class)
             ->setName('main.tag');
 
         $telegramBotToken = $settings['telegram']['bot_token'];
@@ -255,7 +265,8 @@ $app->group(
             );
         }
 
-        $this->get('/{slug}', PageController::class . ':get')
+        $this
+            ->get('/{slug}', PageController::class)
             ->setName('main.page');
 
         $this->get(
@@ -311,8 +322,8 @@ $app->group(
             }
         )->add(
             new GuestMiddleware(
-                $container->router,
-                $container->authService,
+                $container->get(RouterInterface::class),
+                $container->get(AuthService::class),
                 'main.index'
             )
         );
@@ -331,8 +342,8 @@ $app->group(
             }
         )->add(
             new AuthMiddleware(
-                $container->router,
-                $container->authService,
+                $container->get(RouterInterface::class),
+                $container->get(AuthService::class),
                 'main.index'
             )
         );

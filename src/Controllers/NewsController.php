@@ -27,7 +27,7 @@ class NewsController extends Controller
         $this->notFoundHandler = $container->notFoundHandler;
     }
 
-    public function get(
+    public function __invoke(
         Request $request,
         ResponseInterface $response,
         array $args

@@ -21,7 +21,7 @@ class TagController extends Controller
         $this->notFoundHandler = $container->notFoundHandler;
     }
 
-    public function get(
+    public function __invoke(
         ServerRequestInterface $request,
         ResponseInterface $response,
         array $args
