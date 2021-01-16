@@ -36,7 +36,7 @@ foreach ($settings['validation_namespaces'] as $namespace) {
     Validator::with($namespace);
 }
 
-$container['env'] = $env;
+$container[Env::class] = $env;
 
 // middleware
 

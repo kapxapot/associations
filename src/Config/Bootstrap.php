@@ -77,10 +77,15 @@ use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
 use Brightwood\Config\Bootstrap as BrightwoodBootstrap;
 use Plasticode\Config\Bootstrap as BaseBootstrap;
+use Plasticode\Config\MappingProviders\CoreProvider;
 use Plasticode\Config\MappingProviders\GeneratorsProvider;
+use Plasticode\Config\MappingProviders\ParsingProvider;
 use Plasticode\Config\MappingProviders\RepositoriesProvider;
+use Plasticode\Config\MappingProviders\SlimProvider;
 use Plasticode\Config\MappingProviders\ValidatorsProvider;
+use Plasticode\Config\Parsing\DoubleBracketsConfig;
 use Plasticode\Config\TagsConfig;
+use Plasticode\Data\Idiorm\DatabaseInitializer;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Generators\Core\GeneratorResolver;
 use Plasticode\Generators\MenuGenerator;
@@ -105,10 +110,32 @@ class Bootstrap extends BaseBootstrap
         parent::__construct($settings);
 
         $this->register(
+            new SlimProvider(),
+            new CoreProvider($settings),
             new GeneratorsProvider(),
             new RepositoriesProvider(),
-            new ValidatorsProvider()
+            new ValidatorsProvider(),
+            new ParsingProvider()
         );
+    }
+
+    /**
+     * - Fill container.
+     * - Init database.
+     * - Register event handlers.
+     */
+    public function boot(ContainerInterface $container): void
+    {
+        parent::boot($container);
+
+        $dbInitializer = new DatabaseInitializer(
+            $container->get(SettingsProviderInterface::class)
+        );
+
+        $dbInitializer->init();
+
+        $this->registerGenerators($container);
+        $this->registerEventHandlers($container);
     }
 
     public function getMappings(): array
@@ -377,16 +404,14 @@ class Bootstrap extends BaseBootstrap
                 $c->linker
             );
 
-        $map['doubleBracketsConfig'] = function (ContainerInterface $c) {
-            $config = new LinkMapperSource();
+        $map[DoubleBracketsConfig::class] = function (ContainerInterface $c) {
+            $config = new DoubleBracketsConfig();
 
             $config->setDefaultMapper($c->pageLinkMapper);
             
             $config->registerTaggedMappers(
-                [
-                    $c->newsLinkMapper,
-                    $c->tagLinkMapper,
-                ]
+                $c->newsLinkMapper,
+                $c->tagLinkMapper
             );
 
             return $config;

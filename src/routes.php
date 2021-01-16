@@ -21,6 +21,7 @@ use Plasticode\Config\Config;
 use Plasticode\Controllers\Auth\AuthController;
 use Plasticode\Controllers\Auth\PasswordController;
 use Plasticode\Controllers\ParserController;
+use Plasticode\Core\Env;
 use Plasticode\Core\Response;
 use Plasticode\Generators\Core\GeneratorResolver;
 use Plasticode\Middleware\AuthMiddleware;
@@ -33,13 +34,14 @@ use Slim\Interfaces\RouterInterface;
 
 /** @var App $app */
 /** @var ContainerInterface $container */
+/** @var array $settings */
 
 $root = $settings['root'];
 $trueRoot = (strlen($root) == 0);
 
 $app->group(
     $root,
-    function () use ($trueRoot, $settings, $container, $env) {
+    function () use ($trueRoot, $settings, $container) {
         $apiPrefix = '/api/v1';
 
         // public api
@@ -104,7 +106,11 @@ $app->group(
                     ->post('/parser/parse', ParserController::class)
                     ->setName('api.parser.parse');
             }
-        )->add(new TokenAuthMiddleware($container->authService));
+        )->add(
+            new TokenAuthMiddleware(
+                $container->get(AuthService::class)
+            )
+        );
 
         // admin
 
@@ -216,6 +222,9 @@ $app->group(
             '/chunks/latest/associations',
             AssociationController::class . ':latestChunk'
         )->setName('main.chunks.latest.associations');
+
+        /** @var Env */
+        $env = $container->get(Env::class);
 
         if ($env->isDev()) {
             $this->get(

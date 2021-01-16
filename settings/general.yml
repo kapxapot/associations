@@ -36,7 +36,7 @@ logger:
   name: pc-associ
   path: {LOG_PATH}
 
-event_log:
+event_logger:
   name: pc-event-log
   path: {EVENT_LOG_PATH}
 
