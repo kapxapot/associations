@@ -3,7 +3,7 @@
 namespace App\Collections;
 
 use App\Models\Interfaces\DictWordInterface;
-use Plasticode\Collections\Basic\DbModelCollection;
+use Plasticode\Collections\Generic\DbModelCollection;
 
 class DictWordCollection extends DbModelCollection
 {

@@ -4,7 +4,7 @@ namespace Brightwood\Models\Cards\Events;
 
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
+use Brightwood\Models\Cards\Events\Generic\PlayerEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Webmozart\Assert\Assert;
 
@@ -24,12 +24,12 @@ class DiscardEvent extends PlayerEvent
         $this->cards = CardCollection::make($cards);
     }
 
-    public function publicChunk() : string
+    public function publicChunk(): string
     {
         return 'кладет ' . $this->cards . ' на стол';
     }
 
-    public function personalChunk() : string
+    public function personalChunk(): string
     {
         return 'кладете ' . $this->cards . ' на стол';
     }

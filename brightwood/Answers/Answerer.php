@@ -279,10 +279,11 @@ class Answerer
             ? ['⛔ Историй нет.', 'Что-то явно пошло не так.']
             : $stories->toCommands()->stringize();
 
-        return StoryMessageSequence::make(
-            new TextMessage(...$lines)
-        )
-        ->finalize();
+        return
+            StoryMessageSequence::make(
+                new TextMessage(...$lines)
+            )
+            ->finalize();
     }
 
     private function switchToStory(TelegramUser $tgUser, Story $story) : StoryMessageSequence

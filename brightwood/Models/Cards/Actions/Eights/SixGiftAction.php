@@ -6,8 +6,7 @@ use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Models\Cards\Actions\GiftAction;
 use Brightwood\Models\Cards\Actions\Interfaces\ApplicableActionInterface;
 use Brightwood\Models\Cards\Actions\Interfaces\SkipActionInterface;
-use Brightwood\Models\Cards\Events\Basic\PublicEvent;
-use Brightwood\Models\Cards\Events\DrawEvent;
+use Brightwood\Models\Cards\Events\Generic\PublicEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Player;
@@ -21,7 +20,7 @@ class SixGiftAction extends GiftAction implements ApplicableActionInterface, Ski
         );
     }
 
-    public function applyTo(CardGame $game, Player $player) : CardEventCollection
+    public function applyTo(CardGame $game, Player $player): CardEventCollection
     {
         $events = [];
 

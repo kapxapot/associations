@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Collections\PageCollection;
-use Plasticode\Collections\Basic\ArrayCollection;
+use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Models\Interfaces\PageInterface;
 use Plasticode\Models\Interfaces\ParentedInterface;
 use Plasticode\Models\Traits\Parented;
@@ -21,7 +21,7 @@ class Page extends NewsSource implements PageInterface, ParentedInterface
 {
     use Parented;
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return [
             ...parent::requiredWiths(),
@@ -30,7 +30,7 @@ class Page extends NewsSource implements PageInterface, ParentedInterface
         ];
     }
 
-    public function getSlug() : string
+    public function getSlug(): string
     {
         return $this->slug;
     }
@@ -38,7 +38,7 @@ class Page extends NewsSource implements PageInterface, ParentedInterface
     /**
      * Returns published sub-pages.
      */
-    public function subPages() : PageCollection
+    public function subPages(): PageCollection
     {
         return $this
             ->children()
@@ -48,7 +48,7 @@ class Page extends NewsSource implements PageInterface, ParentedInterface
             ->ascStr('title');
     }
 
-    public function breadcrumbs() : ArrayCollection
+    public function breadcrumbs(): ArrayCollection
     {
         $breadcrumbs = [];
 
@@ -76,19 +76,19 @@ class Page extends NewsSource implements PageInterface, ParentedInterface
         return ArrayCollection::from($bcArrays);
     }
 
-    public function isShownInFeed() : bool
+    public function isShownInFeed(): bool
     {
         return self::toBool($this->showInFeed);
     }
 
-    public function isSkippedInBreadcrumbs() : bool
+    public function isSkippedInBreadcrumbs(): bool
     {
         return self::toBool($this->skipInBreadcrumbs);
     }
 
     // SearchableInterface
 
-    public function code() : string
+    public function code(): string
     {
         $parts[] = $this->slug;
 
@@ -101,7 +101,7 @@ class Page extends NewsSource implements PageInterface, ParentedInterface
 
     // SerializableInterface
 
-    public function serialize() : array
+    public function serialize(): array
     {
         return [
             'id' => $this->getId(),
@@ -113,12 +113,12 @@ class Page extends NewsSource implements PageInterface, ParentedInterface
 
     // NewsSourceInterface
 
-    public function displayTitle() : string
+    public function displayTitle(): string
     {
         return $this->title;
     }
 
-    public function rawText() : ?string
+    public function rawText(): ?string
     {
         return $this->text;
     }

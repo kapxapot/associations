@@ -5,7 +5,7 @@ namespace Brightwood\Models\Cards\Actions\Eights;
 use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Models\Cards\Actions\GiftAction;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Events\Basic\PublicEvent;
+use Brightwood\Models\Cards\Events\Generic\PublicEvent;
 use Brightwood\Models\Cards\Events\SuitRestrictionEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Restrictions\Interfaces\RestrictionInterface;
@@ -28,7 +28,7 @@ class EightGiftAction extends GiftAction
         $this->withSuit($suit);
     }
 
-    public function suit() : Suit
+    public function suit(): Suit
     {
         Assert::notNull($this->suit);
 
@@ -38,14 +38,14 @@ class EightGiftAction extends GiftAction
     /**
      * @return $this
      */
-    public function withSuit(?Suit $suit) : self
+    public function withSuit(?Suit $suit): self
     {
         $this->suit = $suit;
 
         return $this;
     }
 
-    public function announcementEvents() : CardEventCollection
+    public function announcementEvents(): CardEventCollection
     {
         $events = CardEventCollection::empty();
 
@@ -62,7 +62,7 @@ class EightGiftAction extends GiftAction
         );
     }
 
-    public function restriction() : RestrictionInterface
+    public function restriction(): RestrictionInterface
     {
         return new SuitRestriction($this->suit());
     }
@@ -72,7 +72,7 @@ class EightGiftAction extends GiftAction
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return parent::serialize(
             ['suit' => $this->suit()]

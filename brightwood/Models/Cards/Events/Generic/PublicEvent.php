@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Models\Cards\Events\Basic;
+namespace Brightwood\Models\Cards\Events\Generic;
 
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Players\Player;

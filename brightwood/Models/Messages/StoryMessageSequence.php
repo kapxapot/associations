@@ -7,7 +7,7 @@ use Brightwood\Collections\StoryMessageCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Interfaces\SequencableInterface;
-use Plasticode\Collections\Basic\Collection;
+use Plasticode\Collections\Generic\Collection;
 
 class StoryMessageSequence implements SequencableInterface
 {
@@ -28,17 +28,20 @@ class StoryMessageSequence implements SequencableInterface
         $this->actions = [];
     }
 
-    public function messages() : MessageCollection
+    public function messages(): MessageCollection
     {
         return $this->messages;
     }
 
-    public function storyMessages() : StoryMessageCollection
+    public function storyMessages(): StoryMessageCollection
     {
         return $this->messages->storyMessages();
     }
 
-    public function isFinalized() : bool
+    /**
+     * Is message sequence "finished" (no further interaction is expected).
+     */
+    public function isFinalized(): bool
     {
         return $this->isFinalized;
     }
@@ -46,7 +49,7 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * @return $this
      */
-    public function add(MessageInterface ...$messages) : self
+    public function add(MessageInterface ...$messages): self
     {
         $this->messages = $this->messages->add(...$messages);
 
@@ -56,7 +59,7 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * Shortcut for constructor.
      */
-    public static function make(MessageInterface ...$messages) : self
+    public static function make(MessageInterface ...$messages): self
     {
         return new self(...$messages);
     }
@@ -64,7 +67,7 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * "Mashes" together messages and sequences, returning a resulting sequence.
      */
-    public static function mash(SequencableInterface ...$items) : self
+    public static function mash(SequencableInterface ...$items): self
     {
         $sequence = new self();
 
@@ -84,12 +87,12 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * Creates an empty sequence.
      */
-    public static function empty() : self
+    public static function empty(): self
     {
         return new self();
     }
 
-    public function isEmpty() : bool
+    public function isEmpty(): bool
     {
         return $this->messages->isEmpty();
     }
@@ -98,7 +101,7 @@ class StoryMessageSequence implements SequencableInterface
      * Prepends text prefix to the first message.
      * If there are no messages, adds a new one.
      */
-    public function prependPrefix(?string $prefix) : self
+    public function prependPrefix(?string $prefix): self
     {
         if (strlen($prefix) == 0) {
             return $this;
@@ -123,7 +126,7 @@ class StoryMessageSequence implements SequencableInterface
      * 
      * @return $this
      */
-    public function withActions(string ...$actions) : self
+    public function withActions(string ...$actions): self
     {
         $last = $this->messages->last();
 
@@ -141,7 +144,7 @@ class StoryMessageSequence implements SequencableInterface
      * 
      * @return $this
      */
-    public function withData(StoryData $data) : self
+    public function withData(StoryData $data): self
     {
         $this->data = $data;
 
@@ -153,14 +156,14 @@ class StoryMessageSequence implements SequencableInterface
      * 
      * @return $this
      */
-    public function finalize(bool $state = true) : self
+    public function finalize(bool $state = true): self
     {
         $this->isFinalized = $state;
 
         return $this;
     }
 
-    public function nodeId() : ?int
+    public function nodeId(): ?int
     {
         /** @var StoryMessage|null */
         $last = $this->storyMessages()->last(
@@ -172,7 +175,7 @@ class StoryMessageSequence implements SequencableInterface
             : null;
     }
 
-    public function actions() : array
+    public function actions(): array
     {
         if (!empty($this->actions)) {
             return $this->actions;
@@ -190,7 +193,7 @@ class StoryMessageSequence implements SequencableInterface
             : [];
     }
 
-    public function data() : ?StoryData
+    public function data(): ?StoryData
     {
         if ($this->data) {
             return $this->data;
@@ -208,12 +211,12 @@ class StoryMessageSequence implements SequencableInterface
             : null;
     }
 
-    public function overrideActions() : array
+    public function overrideActions(): array
     {
         return $this->actions;
     }
 
-    public function overrideData() : ?StoryData
+    public function overrideData(): ?StoryData
     {
         return $this->data;
     }
@@ -224,7 +227,7 @@ class StoryMessageSequence implements SequencableInterface
      * If there are overrides or other attributes (such as isFinalized),
      * they are taken from the added sequence (!).
      */
-    public function merge(self $other) : self
+    public function merge(self $other): self
     {
         $sequence = new self(...$this->messages);
         $sequence->add(...$other->messages());
@@ -246,16 +249,18 @@ class StoryMessageSequence implements SequencableInterface
         );
     }
 
-    public function hasText() : bool
+    public function hasText(): bool
     {
         return $this->messages->any(
             fn (MessageInterface $m) =>
-            Collection::make($m->lines())
-                ->anyFirst(fn ($s) => strlen($s) > 0)
+                Collection::make($m->lines())
+                    ->anyFirst(
+                        fn ($s) => strlen($s) > 0
+                    )
         );
     }
 
-    public function hasActions() : bool
+    public function hasActions(): bool
     {
         return !empty($this->actions);
     }

@@ -4,7 +4,7 @@ namespace App\Tests\Semantics;
 
 use App\Semantics\Sentence;
 use PHPUnit\Framework\TestCase;
-use Plasticode\Collections\Basic\Collection;
+use Plasticode\Collections\Generic\Collection;
 use Plasticode\Interfaces\ArrayableInterface;
 
 final class SentenceTest extends TestCase
@@ -14,7 +14,7 @@ final class SentenceTest extends TestCase
      * 
      * @dataProvider joinProvider
      */
-    public function testJoin($original, string $expected) : void
+    public function testJoin($original, string $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -22,7 +22,7 @@ final class SentenceTest extends TestCase
         );
     }
 
-    public function joinProvider() : array
+    public function joinProvider(): array
     {
         return [
             [[], ''],
@@ -33,7 +33,7 @@ final class SentenceTest extends TestCase
         ];
     }
 
-    public function testJoinAlternativeDelimiters() : void
+    public function testJoinAlternativeDelimiters(): void
     {
         $this->assertEquals(
             'a.b.c',
@@ -46,7 +46,7 @@ final class SentenceTest extends TestCase
      * 
      * @dataProvider homogeneousJoinProvider
      */
-    public function testHomogeneousJoin($original, string $expected) : void
+    public function testHomogeneousJoin($original, string $expected): void
     {
         $this->assertEquals(
             $expected,
@@ -54,7 +54,7 @@ final class SentenceTest extends TestCase
         );
     }
 
-    public function homogeneousJoinProvider() : array
+    public function homogeneousJoinProvider(): array
     {
         return [
             [[], ''],
@@ -65,7 +65,7 @@ final class SentenceTest extends TestCase
         ];
     }
 
-    public function testHomogeneousJoinAlternativeDelimiters() : void
+    public function testHomogeneousJoinAlternativeDelimiters(): void
     {
         $this->assertEquals(
             'a.b-c',

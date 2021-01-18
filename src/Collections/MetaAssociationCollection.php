@@ -3,7 +3,7 @@
 namespace App\Collections;
 
 use App\Models\MetaAssociation;
-use Plasticode\Collections\Basic\TypedCollection;
+use Plasticode\Collections\Generic\TypedCollection;
 
 class MetaAssociationCollection extends TypedCollection
 {

@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Cards\Events;
 
 use Brightwood\Collections\Cards\CardCollection;
-use Brightwood\Models\Cards\Events\Basic\PrivatePlayerEvent;
+use Brightwood\Models\Cards\Events\Generic\PrivatePlayerEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Plasticode\Util\Cases;
 use Webmozart\Assert\Assert;
@@ -28,12 +28,12 @@ class DrawEvent extends PrivatePlayerEvent
         $this->cases = new Cases();
     }
 
-    public function cards() : CardCollection
+    public function cards(): CardCollection
     {
         return $this->cards;
     }
 
-    public function publicChunk() : string
+    public function publicChunk(): string
     {
         $count = $this->cards->count();
         $countStr = $this->cases->caseForNumber('карта', $count, Cases::ACC);
@@ -41,17 +41,17 @@ class DrawEvent extends PrivatePlayerEvent
         return 'берет ' . $count . ' ' . $countStr . ' из колоды';
     }
 
-    public function privateChunk() : string
+    public function privateChunk(): string
     {
         return 'берет ' . $this->cards->toHomogeneousString() . ' из колоды';
     }
 
-    public function personalChunk() : string
+    public function personalChunk(): string
     {
         return 'берете ' . $this->cards->toHomogeneousString() . ' из колоды';
     }
 
-    public function glue(self $other) : self
+    public function glue(self $other): self
     {
         $this->cards = $this->cards->concat($other->cards);
 

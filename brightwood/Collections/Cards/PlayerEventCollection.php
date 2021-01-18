@@ -3,7 +3,7 @@
 namespace Brightwood\Collections\Cards;
 
 use App\Semantics\Sentence;
-use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
+use Brightwood\Models\Cards\Events\Generic\PlayerEvent;
 
 class PlayerEventCollection extends CardEventCollection
 {
@@ -13,7 +13,7 @@ class PlayerEventCollection extends CardEventCollection
         callable $extractor,
         ?string $commaDelimiter = null,
         ?string $andDelimiter = null
-    ) : string
+    ): string
     {
         $chunks = $this->map($extractor);
 

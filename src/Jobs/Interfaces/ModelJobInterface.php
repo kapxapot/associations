@@ -2,9 +2,9 @@
 
 namespace App\Jobs\Interfaces;
 
-use Plasticode\Collections\Basic\DbModelCollection;
+use Plasticode\Collections\Generic\DbModelCollection;
 
 interface ModelJobInterface
 {
-    function run() : DbModelCollection;
+    function run(): DbModelCollection;
 }

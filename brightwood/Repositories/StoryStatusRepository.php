@@ -5,22 +5,22 @@ namespace Brightwood\Repositories;
 use App\Models\TelegramUser;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
-use Plasticode\Repositories\Idiorm\Basic\IdiormRepository;
+use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Util\Date;
 
 class StoryStatusRepository extends IdiormRepository implements StoryStatusRepositoryInterface
 {
-    protected function entityClass() : string
+    protected function entityClass(): string
     {
         return StoryStatus::class;
     }
 
-    public function get(?int $id) : ?StoryStatus
+    public function get(?int $id): ?StoryStatus
     {
         return $this->getEntity($id);
     }
 
-    public function getByTelegramUser(TelegramUser $telegramUser) : ?StoryStatus
+    public function getByTelegramUser(TelegramUser $telegramUser): ?StoryStatus
     {
         return $this
             ->query()
@@ -28,7 +28,7 @@ class StoryStatusRepository extends IdiormRepository implements StoryStatusRepos
             ->one();
     }
 
-    public function save(StoryStatus $storyStatus) : StoryStatus
+    public function save(StoryStatus $storyStatus): StoryStatus
     {
         if ($storyStatus->isPersisted()) {
             $storyStatus->updatedAt = Date::dbNow();
@@ -37,7 +37,7 @@ class StoryStatusRepository extends IdiormRepository implements StoryStatusRepos
         return $this->saveEntity($storyStatus);
     }
 
-    public function store(array $data) : StoryStatus
+    public function store(array $data): StoryStatus
     {
         return $this->storeEntity($data);
     }

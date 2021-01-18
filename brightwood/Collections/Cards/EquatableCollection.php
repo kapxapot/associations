@@ -3,7 +3,7 @@
 namespace Brightwood\Collections\Cards;
 
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
-use Plasticode\Collections\Basic\TypedCollection;
+use Plasticode\Collections\Generic\TypedCollection;
 
 class EquatableCollection extends TypedCollection
 {
@@ -14,7 +14,7 @@ class EquatableCollection extends TypedCollection
      * 
      * @return static
      */
-    public function distinct() : self
+    public function distinct(): self
     {
         $col = static::make();
 
@@ -35,7 +35,7 @@ class EquatableCollection extends TypedCollection
      *
      * @return static
      */
-    public function except(EquatableInterface ...$elements) : self
+    public function except(EquatableInterface ...$elements): self
     {
         $toExclude = static::make($elements);
 
@@ -44,7 +44,7 @@ class EquatableCollection extends TypedCollection
         );
     }
 
-    public function contains(?EquatableInterface $element) : bool
+    public function contains(?EquatableInterface $element): bool
     {
         if (is_null($element)) {
             return false;

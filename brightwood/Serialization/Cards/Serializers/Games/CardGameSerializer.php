@@ -6,7 +6,7 @@ use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\Interfaces\SerializerInterface;
-use Plasticode\Collections\Basic\Collection;
+use Plasticode\Collections\Generic\Collection;
 
 abstract class CardGameSerializer implements SerializerInterface
 {
@@ -17,7 +17,7 @@ abstract class CardGameSerializer implements SerializerInterface
         RootDeserializerInterface $rootDeserializer,
         object $obj,
         array $data
-    ) : CardGame
+    ): CardGame
     {
         $players = PlayerCollection::from(
             Collection::make($data['players'])->map(

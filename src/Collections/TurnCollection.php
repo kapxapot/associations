@@ -4,14 +4,14 @@ namespace App\Collections;
 
 use App\Models\Turn;
 use App\Models\User;
-use Plasticode\Collections\Basic\DbModelCollection;
+use Plasticode\Collections\Generic\DbModelCollection;
 use Plasticode\Util\Sort;
 
 class TurnCollection extends DbModelCollection
 {
     protected string $class = Turn::class;
 
-    public function anyBy(User $user) : bool
+    public function anyBy(User $user): bool
     {
         return $this->any(
             fn (Turn $t) => $t->isBy($user)
@@ -21,7 +21,7 @@ class TurnCollection extends DbModelCollection
     /**
      * Returns only real users (no AI).
      */
-    public function users() : UserCollection
+    public function users(): UserCollection
     {
         return
             UserCollection::from(
@@ -34,14 +34,14 @@ class TurnCollection extends DbModelCollection
             ->distinct();
     }
 
-    public function hasAiTurn() : bool
+    public function hasAiTurn(): bool
     {
         return $this->any(
             fn (Turn $t) => $t->isAiTurn()
         );
     }
 
-    public function words() : WordCollection
+    public function words(): WordCollection
     {
         return
             WordCollection::from(
@@ -57,7 +57,7 @@ class TurnCollection extends DbModelCollection
      *
      * @return array<int, TurnCollection>
      */
-    public function groupByUser() : array
+    public function groupByUser(): array
     {
         return $this
             ->where(

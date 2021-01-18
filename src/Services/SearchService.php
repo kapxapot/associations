@@ -6,7 +6,7 @@ use App\Models\News;
 use App\Models\Page;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use App\Repositories\Interfaces\PageRepositoryInterface;
-use Plasticode\Collections\Basic\ArrayCollection;
+use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Core\Interfaces\LinkerInterface;
 use Plasticode\Models\Tag;
 use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
@@ -33,14 +33,13 @@ class SearchService
         $this->linker = $linker;
     }
 
-    public function search($query) : ArrayCollection
+    public function search($query): ArrayCollection
     {
         $news = $this
             ->newsRepository
             ->search($query)
             ->map(
-                fn (News $n) =>
-                [
+                fn (News $n) => [
                     'type' => 'news',
                     'data' => $n->serialize(),
                     'text' => $n->displayTitle(),
@@ -53,8 +52,7 @@ class SearchService
             ->pageRepository
             ->search($query)
             ->map(
-                fn (Page $a) =>
-                [
+                fn (Page $a) => [
                     'type' => 'page',
                     'data' => $a->serialize(),
                     'text' => $a->title,
@@ -63,14 +61,12 @@ class SearchService
                 ]
             );
 
-
         $tags = $this
             ->tagRepository
             ->search($query)
             ->distinctBy('tag')
             ->map(
-                fn (Tag $t) =>
-                [
+                fn (Tag $t) => [
                     'type' => 'tag',
                     'text' => $t->tag,
                     'code' => $t->code(),

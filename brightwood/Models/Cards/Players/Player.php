@@ -11,10 +11,10 @@ use Brightwood\Models\Cards\Sets\Hand;
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 use Brightwood\Serialization\Interfaces\SerializableInterface;
 use Brightwood\Serialization\UniformSerializer;
-use Plasticode\Collections\Basic\Collection;
+use Plasticode\Collections\Generic\Collection;
 use Plasticode\Core\Security;
 
-abstract class Player implements GenderedInterface, NamedInterface, EquatableInterface, SerializableInterface
+abstract class Player implements EquatableInterface, GenderedInterface, NamedInterface, SerializableInterface
 {
     use Gendered;
 
@@ -23,7 +23,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     protected ?Hand $hand = null;
     protected bool $isInspector = false;
 
-    public function id() : string
+    public function id(): string
     {
         $this->id ??= Security::generateToken(10);
 
@@ -33,7 +33,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     /**
      * @return $this
      */
-    public function withId(string $id) : self
+    public function withId(string $id): self
     {
         $this->id = $id;
 
@@ -43,14 +43,14 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     /**
      * @return $this
      */
-    public function withIcon(string $icon) : self
+    public function withIcon(string $icon): self
     {
         $this->icon = $icon;
 
         return $this;
     }
 
-    public function hand() : Hand
+    public function hand(): Hand
     {
         $this->hand ??= new Hand();
 
@@ -60,36 +60,36 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     /**
      * @return $this
      */
-    public function withHand(Hand $hand) : self
+    public function withHand(Hand $hand): self
     {
         $this->hand = $hand;
 
         return $this;
     }
 
-    public function handSize() : int
+    public function handSize(): int
     {
         return $this->hand()->size();
     }
 
-    abstract public function isBot() : bool;
+    abstract public function isBot(): bool;
 
-    public function addCards(CardCollection $cards) : void
+    public function addCards(CardCollection $cards): void
     {
         $this->hand()->addMany($cards);
     }
 
-    public function removeCard(Card $card) : void
+    public function removeCard(Card $card): void
     {
         $this->hand()->remove($card);
     }
 
-    public function hasCard(Card $card) : bool
+    public function hasCard(Card $card): bool
     {
         return $this->hand()->contains($card);
     }
 
-    public function equals(?EquatableInterface $obj) : bool
+    public function equals(?EquatableInterface $obj): bool
     {
         return
             $obj
@@ -97,7 +97,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
             && ($this->id() === $obj->id());
     }
 
-    public function isInspector() : bool
+    public function isInspector(): bool
     {
         return $this->isInspector;
     }
@@ -105,26 +105,26 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     /**
      * @return $this
      */
-    public function withIsInspector(bool $isInspector) : self
+    public function withIsInspector(bool $isInspector): self
     {
         $this->isInspector = $isInspector;
 
         return $this;
     }
 
-    public function nameFor(?self $other) : string
+    public function nameFor(?self $other): string
     {
         return $this->equals($other)
             ? $this->personalName()
             : $this->publicName();
     }
 
-    public function personalName() : string
+    public function personalName(): string
     {
         return $this->iconize('Вы');
     }
 
-    public function publicName() : string
+    public function publicName(): string
     {
         return $this->iconize(
             $this->name()
@@ -134,7 +134,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     /**
      * Adds the icon to the name if it's defined.
      */
-    protected function iconize(string $name) : string
+    protected function iconize(string $name): string
     {
         return
             Collection::collect(
@@ -148,23 +148,28 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     /**
      * Returns player's name with hand size.
      */
-    public function handString() : string
+    public function handString(): string
     {
         return $this . ' (' . $this->handSize() . ')';
     }
 
     public function __toString()
     {
+        return $this->toString();
+    }
+
+    public function toString(): string
+    {
         return $this->publicName();
     }
 
     // NamedInterface
 
-    abstract public function name() : string;
+    abstract public function name(): string;
 
     // GenderedInterface
 
-    abstract public function gender() : ?int;
+    abstract public function gender(): ?int;
 
     // SerializableInterface
 
@@ -176,7 +181,7 @@ abstract class Player implements GenderedInterface, NamedInterface, EquatableInt
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return UniformSerializer::serialize(
             $this,

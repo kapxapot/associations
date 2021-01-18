@@ -4,7 +4,7 @@ namespace App\Collections;
 
 use App\Models\LanguageElement;
 use App\Models\User;
-use Plasticode\Collections\Basic\DbModelCollection;
+use Plasticode\Collections\Generic\DbModelCollection;
 
 class LanguageElementCollection extends DbModelCollection
 {
@@ -13,7 +13,7 @@ class LanguageElementCollection extends DbModelCollection
     /**
      * @return static
      */
-    public function approved() : self
+    public function approved(): self
     {
         return $this->where(
             fn (LanguageElement $el) => $el->isApproved()
@@ -23,7 +23,7 @@ class LanguageElementCollection extends DbModelCollection
     /**
      * @return static
      */
-    public function notApproved() : self
+    public function notApproved(): self
     {
         return $this->where(
             fn (LanguageElement $el) => !$el->isApproved()
@@ -33,7 +33,7 @@ class LanguageElementCollection extends DbModelCollection
     /**
      * @return static
      */
-    public function mature() : self
+    public function mature(): self
     {
         return $this->where(
             fn (LanguageElement $el) => $el->isMature()
@@ -43,7 +43,7 @@ class LanguageElementCollection extends DbModelCollection
     /**
      * @return static
      */
-    public function notMature() : self
+    public function notMature(): self
     {
         return $this->where(
             fn (LanguageElement $el) => !$el->isMature()
@@ -53,7 +53,7 @@ class LanguageElementCollection extends DbModelCollection
     /**
      * @return static
      */
-    public function public() : self
+    public function public(): self
     {
         return $this->where(
             fn (LanguageElement $el) => $el->isPublic()
@@ -63,7 +63,7 @@ class LanguageElementCollection extends DbModelCollection
     /**
      * @return static
      */
-    public function visibleFor(?User $user) : self
+    public function visibleFor(?User $user): self
     {
         return $this->where(
             fn (LanguageElement $el) => $el->isVisibleFor($user)
@@ -73,7 +73,7 @@ class LanguageElementCollection extends DbModelCollection
     /**
      * @return static
      */
-    public function invisibleFor(?User $user) : self
+    public function invisibleFor(?User $user): self
     {
         return $this->where(
             fn (LanguageElement $el) => !$el->isVisibleFor($user)

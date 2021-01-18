@@ -3,7 +3,7 @@
 namespace App\Collections;
 
 use App\Models\TelegramUser;
-use Plasticode\Collections\Basic\DbModelCollection;
+use Plasticode\Collections\Generic\DbModelCollection;
 
 class TelegramUserCollection extends DbModelCollection
 {

@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Cards\Players;
 
-use Plasticode\Collections\Basic\Collection;
+use Plasticode\Collections\Generic\Collection;
 use Plasticode\Util\Cases;
 
 class Bot extends Player
@@ -29,7 +29,7 @@ class Bot extends Player
         $this->gender = $gender ?? Cases::MAS;
     }
 
-    public function isBot() : bool
+    public function isBot(): bool
     {
         return true;
     }
@@ -37,7 +37,7 @@ class Bot extends Player
     /**
      * @return $this
      */
-    public function withName(string $name) : self
+    public function withName(string $name): self
     {
         $this->name = $name;
 
@@ -47,7 +47,7 @@ class Bot extends Player
     /**
      * @return $this
      */
-    public function withGender(int $gender) : self
+    public function withGender(int $gender): self
     {
         $this->gender = $gender;
 
@@ -56,14 +56,14 @@ class Bot extends Player
 
     // NamedInterface
 
-    public function name() : string
+    public function name(): string
     {
         return $this->name;
     }
 
     // GenderedInterface
 
-    public function gender() : ?int
+    public function gender(): ?int
     {
         return $this->gender;
     }
@@ -73,7 +73,7 @@ class Bot extends Player
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return parent::serialize(
             [

@@ -243,7 +243,7 @@ class EightsStory extends Story
                                 ->add(
                                     new StoryMessage(
                                         self::AUTO_MOVES,
-                                        $events->messagesFor($player)
+                                        $events->messagesFor($player)->toArray()
                                     )
                                 )
                                 ->withData($data);

@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Cards\Events;
 
 use Brightwood\Collections\Cards\CardEventCollection;
-use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
+use Brightwood\Models\Cards\Events\Generic\PlayerEvent;
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Players\Player;
 use Plasticode\Collections\Generic\StringCollection;

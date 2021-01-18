@@ -6,7 +6,7 @@ use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Models\Cards\Actions\Interfaces\ApplicableActionInterface;
 use Brightwood\Models\Cards\Actions\Interfaces\SkipActionInterface;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Events\Basic\PublicEvent;
+use Brightwood\Models\Cards\Events\Generic\PublicEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Player;
@@ -26,7 +26,7 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface, Sk
         $this->withReason($reason);
     }
 
-    public function reason() : ?string
+    public function reason(): ?string
     {
         return $this->reason;
     }
@@ -34,21 +34,21 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface, Sk
     /**
      * @return $this
      */
-    public function withReason(?string $reason) : self
+    public function withReason(?string $reason): self
     {
         $this->reason = $reason;
 
         return $this;
     }
 
-    public function announcementEvents() : CardEventCollection
+    public function announcementEvents(): CardEventCollection
     {
         return CardEventCollection::collect(
             new PublicEvent('Следующий игрок пропускает ход')
         );
     }
 
-    public function applyTo(CardGame $game, Player $player) : CardEventCollection
+    public function applyTo(CardGame $game, Player $player): CardEventCollection
     {
         return CardEventCollection::collect(
             new SkipEvent($player, $this->reason)
@@ -60,7 +60,7 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface, Sk
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return parent::serialize(
             ['reason' => $this->reason]

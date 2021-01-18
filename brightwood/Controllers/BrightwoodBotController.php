@@ -10,7 +10,8 @@ use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Stories\Story;
 use Brightwood\Parsing\StoryParser;
-use Plasticode\Collections\Basic\ArrayCollection;
+use Exception;
+use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Controllers\Controller;
 use Plasticode\Util\Text;
 use Psr\Container\ContainerInterface;
@@ -45,7 +46,7 @@ class BrightwoodBotController extends Controller
     public function __invoke(
         ServerRequestInterface $request,
         ResponseInterface $response
-    ) : ResponseInterface
+    ): ResponseInterface
     {
         $logLevel = $this->getSettings(
             'telegram.brightwood_bot_log_level',
@@ -81,7 +82,7 @@ class BrightwoodBotController extends Controller
         return $response;
     }
 
-    private function processIncomingMessage(array $message) : ArrayCollection
+    private function processIncomingMessage(array $message): ArrayCollection
     {
         $chatId = $message['chat']['id'];
         $text = trim($message['text'] ?? null);
@@ -101,7 +102,7 @@ class BrightwoodBotController extends Controller
         return $this->tryGetAnswersFromText($tgUser, $chatId, $text);
     }
 
-    private function getTelegramUser(array $data) : TelegramUser
+    private function getTelegramUser(array $data): TelegramUser
     {
         $tgUser = $this
             ->telegramUserService
@@ -116,11 +117,11 @@ class BrightwoodBotController extends Controller
         TelegramUser $tgUser,
         string $chatId,
         string $text
-    ) : ArrayCollection
+    ): ArrayCollection
     {
         try {
             return $this->getAnswersFromText($tgUser, $chatId, $text);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
 
             $this->logger->info(
@@ -141,7 +142,7 @@ class BrightwoodBotController extends Controller
     /**
      * @return string[]
      */
-    private function exceptionTrace(\Exception $ex) : array
+    private function exceptionTrace(Exception $ex): array
     {
         $lines = [];
 
@@ -153,13 +154,13 @@ class BrightwoodBotController extends Controller
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     private function getAnswersFromText(
         TelegramUser $tgUser,
         string $chatId,
         string $text
-    ) : ArrayCollection
+    ): ArrayCollection
     {
         $sequence = $this->answerer->getAnswers($tgUser, $text);
 
@@ -180,8 +181,8 @@ class BrightwoodBotController extends Controller
             $sequence
                 ->messages()
                 ->map(
-                    fn (MessageInterface $m)
-                    => $this->toTelegramMessage($tgUser, $chatId, $m, $defaultActions)
+                    fn (MessageInterface $m) =>
+                        $this->toTelegramMessage($tgUser, $chatId, $m, $defaultActions)
                 )
         );
     }
@@ -194,7 +195,7 @@ class BrightwoodBotController extends Controller
         string $chatId,
         MessageInterface $message,
         array $defaultActions
-    ) : array
+    ): array
     {
         $message = $this->parseMessage($tgUser, $message);
         $actions = $message->actions();
@@ -221,7 +222,7 @@ class BrightwoodBotController extends Controller
         return $answer;
     }
 
-    private function buildTelegramMessage(string $chatId, string $text) : array
+    private function buildTelegramMessage(string $chatId, string $text): array
     {
         return [
             'chat_id' => $chatId,
@@ -233,7 +234,7 @@ class BrightwoodBotController extends Controller
     private function parseMessage(
         TelegramUser $tgUser,
         MessageInterface $message
-    ) : MessageInterface
+    ): MessageInterface
     {
         $lines = array_map(
             fn (string $line) => $this->parser->parse($tgUser, $line, $message->data()),
@@ -248,7 +249,7 @@ class BrightwoodBotController extends Controller
         return new Message($lines, $actions);
     }
 
-    private function messageToText(MessageInterface $message) : string
+    private function messageToText(MessageInterface $message): string
     {
         return Text::sparseJoin($message->lines());
     }

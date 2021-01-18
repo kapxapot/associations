@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Cards\Events;
 
-use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
+use Brightwood\Models\Cards\Events\Generic\PlayerEvent;
 use Brightwood\Models\Cards\Players\Player;
 
 class SkipEvent extends PlayerEvent
@@ -19,17 +19,17 @@ class SkipEvent extends PlayerEvent
         $this->reason = $reason;
     }
 
-    public function publicChunk() : string
+    public function publicChunk(): string
     {
         return $this->withReason('пропускает ход');
     }
 
-    public function personalChunk() : string
+    public function personalChunk(): string
     {
         return $this->withReason('пропускаете ход');
     }
 
-    private function withReason(string $text) : string
+    private function withReason(string $text): string
     {
         return $this->reason
             ? $text . ' (' . $this->reason . ')'

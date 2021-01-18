@@ -1,21 +1,21 @@
 <?php
 
-namespace Brightwood\Models\Cards\Events\Basic;
+namespace Brightwood\Models\Cards\Events\Generic;
 
 use Brightwood\Models\Cards\Players\Player;
 
 abstract class PrivatePlayerEvent extends PlayerEvent
 {
-    abstract public function privateChunk() : string;
+    abstract public function privateChunk(): string;
 
-    public function messageFor(?Player $player) : string
+    public function messageFor(?Player $player): string
     {
         return $player && $player->isInspector()
             ? $this->privateMessage()
             : parent::messageFor($player);
     }
 
-    private function privateMessage() : string
+    private function privateMessage(): string
     {
         $sentence = $this
             ->chain
