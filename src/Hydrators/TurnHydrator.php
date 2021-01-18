@@ -8,8 +8,8 @@ use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\Hydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class TurnHydrator extends Hydrator
 {
@@ -37,7 +37,7 @@ class TurnHydrator extends Hydrator
     /**
      * @param Turn $entity
      */
-    public function hydrate(DbModel $entity) : Turn
+    public function hydrate(DbModel $entity): Turn
     {
         return $entity
             ->withGame(

@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Models\Traits\Created;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
 
 /**
@@ -17,12 +17,12 @@ class Language extends DbModel implements CreatedAtInterface
 
     const RUSSIAN = 1;
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return ['creator'];
     }
 
-    public function serialize() : array
+    public function serialize(): array
     {
         return [
             'id' => $this->getId(),

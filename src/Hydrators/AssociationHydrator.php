@@ -10,8 +10,8 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\Hydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class AssociationHydrator extends Hydrator
 {
@@ -47,7 +47,7 @@ class AssociationHydrator extends Hydrator
     /**
      * @param Association $entity
      */
-    public function hydrate(DbModel $entity) : Association
+    public function hydrate(DbModel $entity): Association
     {
         return $entity
             ->withFirstWord(

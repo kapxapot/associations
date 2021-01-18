@@ -4,8 +4,8 @@ namespace App\Hydrators;
 
 use App\Models\Language;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\Hydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class LanguageHydrator extends Hydrator
 {
@@ -21,7 +21,7 @@ class LanguageHydrator extends Hydrator
     /**
      * @param Language $entity
      */
-    public function hydrate(DbModel $entity) : Language
+    public function hydrate(DbModel $entity): Language
     {
         return $entity
             ->withCreator(

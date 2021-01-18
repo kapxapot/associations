@@ -6,17 +6,17 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Word;
-use Plasticode\Core\Linker as LinkerBase;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Core\Linker as BaseLinker;
+use Plasticode\Models\Generic\DbModel;
 
-class Linker extends LinkerBase implements LinkerInterface
+class Linker extends BaseLinker implements LinkerInterface
 {
-    private function check(DbModel $model) : bool
+    private function check(DbModel $model): bool
     {
         return $model !== null && $model->isPersisted();
     }
 
-    public function association(Association $association) : ?string
+    public function association(Association $association): ?string
     {
         if (!$this->check($association)) {
             return null;
@@ -28,7 +28,7 @@ class Linker extends LinkerBase implements LinkerInterface
         );
     }
 
-    public function game(Game $game) : ?string
+    public function game(Game $game): ?string
     {
         if (!$this->check($game)) {
             return null;
@@ -37,7 +37,7 @@ class Linker extends LinkerBase implements LinkerInterface
         return $this->router->pathFor('main.game', ['id' => $game->getId()]);
     }
 
-    public function word(Word $word) : ?string
+    public function word(Word $word): ?string
     {
         if (!$this->check($word)) {
             return null;

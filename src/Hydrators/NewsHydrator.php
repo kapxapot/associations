@@ -3,15 +3,15 @@
 namespace App\Hydrators;
 
 use App\Models\News;
-use Plasticode\Hydrators\Basic\NewsSourceHydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\NewsSourceHydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class NewsHydrator extends NewsSourceHydrator
 {
     /**
      * @param News $entity
      */
-    public function hydrate(DbModel $entity) : News
+    public function hydrate(DbModel $entity): News
     {
         $entity = parent::hydrate($entity);
 

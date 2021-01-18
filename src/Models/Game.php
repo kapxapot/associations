@@ -5,8 +5,8 @@ namespace App\Models;
 use App\Collections\TurnCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
-use Plasticode\Collections\Basic\Collection;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Collections\Generic\Collection;
+use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Util\Date;
@@ -28,59 +28,59 @@ class Game extends DbModel implements CreatedAtInterface
 {
     use CreatedAt;
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return ['language', 'turns', 'url', 'user'];
     }
 
-    public function lastTurn() : ?Turn
+    public function lastTurn(): ?Turn
     {
         // turns are sorted backwards, so first
         return $this->turns()->first();
     }
 
-    public function beforeLastTurn() : ?Turn
+    public function beforeLastTurn(): ?Turn
     {
         return $this->lastTurn()
             ? $this->lastTurn()->prev()
             : null;
     }
 
-    public function words() : WordCollection
+    public function words(): WordCollection
     {
         return $this->turns()->words();
     }
 
-    public function lastTurnWord() : ?Word
+    public function lastTurnWord(): ?Word
     {
         return $this->lastTurn()
             ? $this->lastTurn()->word()
             : null;
     }
 
-    public function beforeLastTurnWord() : ?Word
+    public function beforeLastTurnWord(): ?Word
     {
         return $this->beforeLastTurn()
             ? $this->beforeLastTurn()->word()
             : null;
     }
 
-    public function creator() : User
+    public function creator(): User
     {
         return $this->user();
     }
 
-    public function isStarted() : bool
+    public function isStarted(): bool
     {
         return $this->turns()->any();
     }
 
-    public function isFinished() : bool
+    public function isFinished(): bool
     {
         return $this->finishedAt !== null;
     }
 
-    public function isWonByPlayer() : bool
+    public function isWonByPlayer(): bool
     {
         return
             $this->isFinished()
@@ -88,7 +88,7 @@ class Game extends DbModel implements CreatedAtInterface
             && $this->lastTurn()->isPlayerTurn();
     }
 
-    public function isWonByAi() : bool
+    public function isWonByAi(): bool
     {
         return
             $this->isFinished()
@@ -99,17 +99,17 @@ class Game extends DbModel implements CreatedAtInterface
     /**
      * Returns real players of the game (no AI).
      */
-    public function players() : UserCollection
+    public function players(): UserCollection
     {
         return $this->turns()->users();
     }
 
-    public function hasPlayer(User $user) : bool
+    public function hasPlayer(User $user): bool
     {
         return $this->players()->contains($user);
     }
 
-    public function extendedPlayers() : Collection
+    public function extendedPlayers(): Collection
     {
         $players = Collection::from(
             $this
@@ -127,19 +127,19 @@ class Game extends DbModel implements CreatedAtInterface
         return $players;
     }
 
-    public function containsWord(Word $word) : bool
+    public function containsWord(Word $word): bool
     {
         return $this
             ->words()
             ->any('id', $word->getId());
     }
 
-    public function displayName() : string
+    public function displayName(): string
     {
         return 'Игра #' . $this->getId();
     }
 
-    public function finishedAtIso() : string
+    public function finishedAtIso(): string
     {
         return Date::iso($this->finishedAt);
     }

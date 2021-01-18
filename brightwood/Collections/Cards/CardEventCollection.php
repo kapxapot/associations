@@ -4,21 +4,17 @@ namespace Brightwood\Collections\Cards;
 
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Players\Player;
-use Plasticode\Collections\Basic\TypedCollection;
+use Plasticode\Collections\Generic\StringCollection;
+use Plasticode\Collections\Generic\TypedCollection;
 
 class CardEventCollection extends TypedCollection
 {
     protected string $class = CardEventInterface::class;
 
-    /**
-     * @return string[]
-     */
-    public function messagesFor(?Player $player) : array
+    public function messagesFor(?Player $player): StringCollection
     {
-        return $this
-            ->scalarize(
-                fn (CardEventInterface $e) => $e->messageFor($player)
-            )
-            ->toArray();
+        return $this->stringize(
+            fn (CardEventInterface $e) => $e->messageFor($player)
+        );
     }
 }

@@ -4,9 +4,11 @@ namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\SuitCollection;
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
+use InvalidArgumentException;
+use JsonSerializable;
 use Webmozart\Assert\Assert;
 
-class Suit implements EquatableInterface, \JsonSerializable
+class Suit implements EquatableInterface, JsonSerializable
 {
     private const SPADES = 1;
     private const CLUBS = 2;
@@ -36,37 +38,37 @@ class Suit implements EquatableInterface, \JsonSerializable
         $this->nameRuGen = $nameRuGen;
     }
 
-    public function id() : int
+    public function id(): int
     {
         return $this->id;
     }
 
-    public function symbol() : string
+    public function symbol(): string
     {
         return $this->symbol;
     }
 
-    public function name() : string
+    public function name(): string
     {
         return $this->name;
     }
 
-    public function nameRu() : string
+    public function nameRu(): string
     {
         return $this->nameRu;
     }
 
-    public function nameRuGen() : string
+    public function nameRuGen(): string
     {
         return $this->nameRuGen;
     }
 
-    public function fullName() : string
+    public function fullName(): string
     {
         return $this->symbol . ' ' . $this->name;
     }
 
-    public function fullNameRu() : string
+    public function fullNameRu(): string
     {
         return $this->symbol . ' ' . $this->nameRu;
     }
@@ -74,12 +76,12 @@ class Suit implements EquatableInterface, \JsonSerializable
     /**
      * @param self|null $obj
      */
-    public function equals(?EquatableInterface $obj) : bool
+    public function equals(?EquatableInterface $obj): bool
     {
         return $obj && ($this->id() == $obj->id());
     }
 
-    public static function all() : SuitCollection
+    public static function all(): SuitCollection
     {
         self::$suits ??= SuitCollection::collect(
             new self(self::SPADES, '♠', 'spades', 'пики', 'пик'),
@@ -91,37 +93,37 @@ class Suit implements EquatableInterface, \JsonSerializable
         return self::$suits;
     }
 
-    public static function random() : self
+    public static function random(): self
     {
         return self::all()->random();
     }
 
-    public static function spades() : self
+    public static function spades(): self
     {
         return self::all()->get(self::SPADES);
     }
 
-    public static function clubs() : self
+    public static function clubs(): self
     {
         return self::all()->get(self::CLUBS);
     }
 
-    public static function hearts() : self
+    public static function hearts(): self
     {
         return self::all()->get(self::HEARTS);
     }
 
-    public static function diamonds() : self
+    public static function diamonds(): self
     {
         return self::all()->get(self::DIAMONDS);
     }
 
     /**
-     * Parses a suit. If not successful, throws {@see \InvalidArgumentException}.
+     * Parses a suit. If not successful, throws {@see InvalidArgumentException}.
      * 
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public static function parse(?string $str) : self
+    public static function parse(?string $str): self
     {
         $suit = self::tryParse($str);
 
@@ -136,21 +138,21 @@ class Suit implements EquatableInterface, \JsonSerializable
     /**
      * Tries to parse a suit. If not successful, returns null.
      */
-    public static function tryParse(?string $str) : ?self
+    public static function tryParse(?string $str): ?self
     {
         return self::all()->first(
             fn (self $s) => $s->symbol == $str
         );
     }
 
-    public function toString() : string
-    {
-        return $this->symbol;
-    }
-
     public function __toString()
     {
         return $this->toString();
+    }
+
+    public function toString(): string
+    {
+        return $this->symbol;
     }
 
     // JsonSerializable

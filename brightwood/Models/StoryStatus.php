@@ -3,7 +3,7 @@
 namespace Brightwood\Models;
 
 use App\Models\TelegramUser;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
@@ -22,12 +22,12 @@ class StoryStatus extends DbModel implements CreatedAtInterface
     use CreatedAt;
     use UpdatedAt;
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return ['telegramUser'];
     }
 
-    public function data() : ?array
+    public function data(): ?array
     {
         return $this->jsonData
             ? json_decode($this->jsonData, true)

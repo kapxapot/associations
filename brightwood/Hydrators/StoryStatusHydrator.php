@@ -4,8 +4,8 @@ namespace Brightwood\Hydrators;
 
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\StoryStatus;
-use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\Hydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class StoryStatusHydrator extends Hydrator
 {
@@ -21,7 +21,7 @@ class StoryStatusHydrator extends Hydrator
     /**
      * @param StoryStatus $entity
      */
-    public function hydrate(DbModel $entity) : StoryStatus
+    public function hydrate(DbModel $entity): StoryStatus
     {
         return $entity
             ->withTelegramUser(

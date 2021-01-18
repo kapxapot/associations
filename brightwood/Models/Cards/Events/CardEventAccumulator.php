@@ -6,6 +6,7 @@ use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Models\Cards\Events\Basic\PlayerEvent;
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Players\Player;
+use Plasticode\Collections\Generic\StringCollection;
 
 class CardEventAccumulator
 {
@@ -16,19 +17,25 @@ class CardEventAccumulator
         $this->events = CardEventCollection::make($events);
     }
 
-    public function events() : CardEventCollection
+    public function events(): CardEventCollection
     {
         return $this->events;
     }
 
-    public function add(CardEventInterface $event) : self
+    /**
+     * @return $this
+     */
+    public function add(CardEventInterface $event): self
     {
         $this->events = $this->events->add($event);
 
         return $this;
     }
 
-    public function addMany(CardEventCollection $events) : self
+    /**
+     * @return $this
+     */
+    public function addMany(CardEventCollection $events): self
     {
         $this->events = $this->events->concat($events);
 
@@ -38,7 +45,7 @@ class CardEventAccumulator
     /**
      * Is there a skip event in the accumulator?
      */
-    public function hasSkip() : bool
+    public function hasSkip(): bool
     {
         return $this
             ->events
@@ -47,17 +54,14 @@ class CardEventAccumulator
             );
     }
 
-    /**
-     * @return string[]
-     */
-    public function messagesFor(?Player $player) : array
+    public function messagesFor(?Player $player): StringCollection
     {
         return $this
             ->mergedEvents()
             ->messagesFor($player);
     }
 
-    public function mergedEvents() : CardEventCollection
+    public function mergedEvents(): CardEventCollection
     {
         $merged = new self();
 

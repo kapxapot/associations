@@ -3,7 +3,7 @@
 namespace Brightwood\Collections;
 
 use Brightwood\Models\StoryStatus;
-use Plasticode\Collections\Basic\DbModelCollection;
+use Plasticode\Collections\Generic\DbModelCollection;
 
 class StoryStatusCollection extends DbModelCollection
 {

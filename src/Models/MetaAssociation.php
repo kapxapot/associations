@@ -2,10 +2,10 @@
 
 namespace App\Models;
 
-use Plasticode\Models\Basic\Model;
+use Plasticode\Models\Generic\Model;
 
 /**
- * DTO for {@see Word} origin chain.
+ * DTO for {@see \App\Models\Word} origin chain.
  */
 class MetaAssociation extends Model
 {
@@ -23,22 +23,22 @@ class MetaAssociation extends Model
         $this->association = $association;
     }
 
-    public function association() : Association
+    public function association(): Association
     {
         return $this->association;
     }
 
-    public function toWord() : Word
+    public function toWord(): Word
     {
         return $this->toWord;
     }
 
-    public function user() : User
+    public function user(): User
     {
         return $this->association->creator();
     }
 
-    public function fromWord() : Word
+    public function fromWord(): Word
     {
         return $this->association->otherWord($this->toWord);
     }

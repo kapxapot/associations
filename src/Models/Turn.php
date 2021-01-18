@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
 
@@ -28,29 +28,29 @@ class Turn extends DbModel implements CreatedAtInterface
 {
     use CreatedAt;
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return ['association', 'game', 'prev', 'user', 'word'];
     }
 
-    public function isBy(?User $user) : bool
+    public function isBy(?User $user): bool
     {
         return $this->user()
             ? $this->user()->equals($user)
             : is_null($user);
     }
 
-    public function isPlayerTurn() : bool
+    public function isPlayerTurn(): bool
     {
         return !is_null($this->user());
     }
 
-    public function isAiTurn() : bool
+    public function isAiTurn(): bool
     {
         return !$this->isPlayerTurn();
     }
 
-    public function isFinished() : bool
+    public function isFinished(): bool
     {
         return !is_null($this->finishedAt);
     }

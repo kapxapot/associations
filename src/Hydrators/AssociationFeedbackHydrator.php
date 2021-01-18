@@ -5,8 +5,8 @@ namespace App\Hydrators;
 use App\Models\AssociationFeedback;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\Hydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class AssociationFeedbackHydrator extends Hydrator
 {
@@ -25,7 +25,7 @@ class AssociationFeedbackHydrator extends Hydrator
     /**
      * @param AssociationFeedback $entity
      */
-    public function hydrate(DbModel $entity) : AssociationFeedback
+    public function hydrate(DbModel $entity): AssociationFeedback
     {
         return $entity
             ->withAssociation(

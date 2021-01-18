@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Data;
 
-use Plasticode\Models\Basic\Model;
+use Plasticode\Models\Generic\Model;
 
 abstract class StoryData extends Model
 {
@@ -15,5 +15,5 @@ abstract class StoryData extends Model
         }
     }
 
-    abstract protected function init() : void;
+    abstract protected function init(): void;
 }

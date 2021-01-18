@@ -30,12 +30,12 @@ class Command
         }
     }
 
-    public function code() : string
+    public function code(): string
     {
         return $this->code;
     }
 
-    public function label() : ?string
+    public function label(): ?string
     {
         return $this->label;
     }
@@ -45,17 +45,17 @@ class Command
         return $this->toString();
     }
 
-    public function codeString() : string
-    {
-        return '/' . $this->code;
-    }
-
-    public function toString() : string
+    public function toString(): string
     {
         $codeStr = $this->codeString();
 
         return $this->label
             ? $this->label . ' ' . $codeStr
             : $codeStr;
+    }
+
+    public function codeString(): string
+    {
+        return '/' . $this->code;
     }
 }

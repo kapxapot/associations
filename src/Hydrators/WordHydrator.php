@@ -11,8 +11,8 @@ use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Services\DictionaryService;
-use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\Hydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class WordHydrator extends Hydrator
 {
@@ -53,7 +53,7 @@ class WordHydrator extends Hydrator
     /**
      * @param Word $entity
      */
-    public function hydrate(DbModel $entity) : Word
+    public function hydrate(DbModel $entity): Word
     {
         return $entity
             ->withAssociations(

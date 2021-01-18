@@ -3,7 +3,7 @@
 namespace Brightwood\Collections;
 
 use Brightwood\Models\Nodes\StoryNode;
-use Plasticode\Collections\Basic\TypedCollection;
+use Plasticode\Collections\Generic\TypedCollection;
 
 class StoryNodeCollection extends TypedCollection
 {

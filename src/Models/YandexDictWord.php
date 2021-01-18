@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\PartOfSpeech;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
@@ -26,20 +26,17 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
     use CreatedAt;
     use UpdatedAt;
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
-        return [
-            'language',
-            'linkedWord'
-        ];
+        return ['language', 'linkedWord'];
     }
 
-    public function getLanguage() : Language
+    public function getLanguage(): Language
     {
         return $this->language();
     }
 
-    public function getWord() : string
+    public function getWord(): string
     {
         return $this->word;
     }
@@ -52,7 +49,7 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
     /**
      * @return static
      */
-    public function linkWord(Word $word) : self
+    public function linkWord(Word $word): self
     {
         $this->wordId = $word->getId();
 
@@ -62,38 +59,38 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
     /**
      * @return static
      */
-    public function unlinkWord() : self
+    public function unlinkWord(): self
     {
         $this->wordId = null;
 
         return $this->withLinkedWord(null);
     }
 
-    public function isValid() : bool
+    public function isValid(): bool
     {
         return !is_null($this->pos);
     }
 
-    public function partOfSpeech() : ?PartOfSpeech
+    public function partOfSpeech(): ?PartOfSpeech
     {
         return PartOfSpeech::getByName($this->pos);
     }
 
-    public function isGood() : bool
+    public function isGood(): bool
     {
         $partOfSpeech = $this->partOfSpeech();
 
         return $partOfSpeech && $partOfSpeech->isGood();
     }
 
-    public function isBad() : bool
+    public function isBad(): bool
     {
         $partOfSpeech = $this->partOfSpeech();
 
         return $partOfSpeech && $partOfSpeech->isBad();
     }
 
-    public function isUgly() : bool
+    public function isUgly(): bool
     {
         $partOfSpeech = $this->partOfSpeech();
 

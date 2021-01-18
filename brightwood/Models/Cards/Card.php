@@ -4,9 +4,11 @@ namespace Brightwood\Models\Cards;
 
 use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 use Brightwood\Models\Cards\Restrictions\Interfaces\RestrictionInterface;
+use InvalidArgumentException;
+use JsonSerializable;
 use Webmozart\Assert\Assert;
 
-abstract class Card implements EquatableInterface, \JsonSerializable
+abstract class Card implements EquatableInterface, JsonSerializable
 {
     private ?RestrictionInterface $restriction = null;
 
@@ -15,7 +17,7 @@ abstract class Card implements EquatableInterface, \JsonSerializable
         return $this->toString();
     }
 
-    public function toString() : string
+    public function toString(): string
     {
         return $this->name();
     }
@@ -23,36 +25,36 @@ abstract class Card implements EquatableInterface, \JsonSerializable
     /**
      * @param string|null $lang 'ru' and 'en' are supported. null = 'en'.
      */
-    abstract public function name(?string $lang = null) : string;
+    abstract public function name(?string $lang = null): string;
 
     /**
      * @param string|null $lang 'ru' and 'en' are supported. null = 'en'.
      */
-    abstract public function fullName(?string $lang = null) : string;
+    abstract public function fullName(?string $lang = null): string;
 
-    abstract public function equals(?EquatableInterface $obj) : bool;
+    abstract public function equals(?EquatableInterface $obj): bool;
 
-    public function isJoker() : bool
+    public function isJoker(): bool
     {
         return false;
     }
 
-    public function isSuited() : bool
+    public function isSuited(): bool
     {
         return false;
     }
 
-    public function isSuit(Suit $suit) : bool
+    public function isSuit(Suit $suit): bool
     {
         return false;
     }
 
-    public function isRank(Rank $rank) : bool
+    public function isRank(Rank $rank): bool
     {
         return false;
     }
 
-    public function restriction() : ?RestrictionInterface
+    public function restriction(): ?RestrictionInterface
     {
         return $this->restriction;
     }
@@ -60,24 +62,24 @@ abstract class Card implements EquatableInterface, \JsonSerializable
     /**
      * @return $this
      */
-    public function withRestriction(?RestrictionInterface $restriction) : self
+    public function withRestriction(?RestrictionInterface $restriction): self
     {
         $this->restriction = $restriction;
 
         return $this;
     }
 
-    public function hasRestriction() : bool
+    public function hasRestriction(): bool
     {
         return $this->restriction !== null;
     }
 
     /**
-     * Parses a card. If unsuccessful, throws {@see \InvalidArgumentException}.
+     * Parses a card. If unsuccessful, throws {@see InvalidArgumentException}.
      * 
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public static function parse(?string $str) : self
+    public static function parse(?string $str): self
     {
         $card = self::tryParse($str);
 
@@ -92,7 +94,7 @@ abstract class Card implements EquatableInterface, \JsonSerializable
     /**
      * Tries to parse a card. If unsuccessful, returns null.
      */
-    public static function tryParse(?string $str) : ?self
+    public static function tryParse(?string $str): ?self
     {
         return SuitedCard::tryParse($str) ?? Joker::tryParse($str);
     }

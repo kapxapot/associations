@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Cards\Sets;
 
 use Brightwood\Models\Cards\Card;
+use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
 /**
@@ -12,11 +13,11 @@ final class Hand extends ExtendableCardList
 {
     /**
      * Removes the card from the set.
-     * If the card is absent, throws {@see \InvalidArgumentException}.
+     * If the card is absent, throws {@see InvalidArgumentException}.
      * 
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function remove(Card $card) : self
+    public function remove(Card $card): self
     {
         Assert::true(
             $this->cards->any(

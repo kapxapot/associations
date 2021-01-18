@@ -5,8 +5,8 @@ namespace App\Hydrators;
 use App\Models\YandexDictWord;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\Hydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class YandexDictWordHydrator extends Hydrator
 {
@@ -25,7 +25,7 @@ class YandexDictWordHydrator extends Hydrator
     /**
      * @param YandexDictWord $entity
      */
-    public function hydrate(DbModel $entity) : YandexDictWord
+    public function hydrate(DbModel $entity): YandexDictWord
     {
         return $entity
             ->withLanguage(

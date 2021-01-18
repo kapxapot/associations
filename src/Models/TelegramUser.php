@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Models\Interfaces\GenderedInterface;
 use App\Models\Interfaces\NamedInterface;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
@@ -26,37 +26,37 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
     use CreatedAt;
     use UpdatedAt;
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return ['user'];
     }
 
-    public function isValid() : bool
+    public function isValid(): bool
     {
         return $this->user() !== null;
     }
 
-    public function isNew() : bool
+    public function isNew(): bool
     {
         return $this->isValid() && is_null($this->user()->lastGame());
     }
 
-    public function privateName() : string
+    public function privateName(): string
     {
         return $this->firstName ?? $this->lastName ?? $this->username ?? self::noName();
     }
 
-    public function publicName() : string
+    public function publicName(): string
     {
         return $this->username ?? $this->fullName() ?? self::noName();
     }
 
-    public static function noName() : string
+    public static function noName(): string
     {
         return 'инкогнито';
     }
 
-    public function fullName() : ?string
+    public function fullName(): ?string
     {
         $parts = [$this->firstName, $this->lastName];
 
@@ -69,19 +69,19 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
 
     // GenderedInterface
 
-    public function hasGender() : bool
+    public function hasGender(): bool
     {
         return $this->genderId !== null;
     }
 
-    public function gender() : ?int
+    public function gender(): ?int
     {
         return $this->genderId;
     }
 
     // NamedInterface
 
-    public function name() : string
+    public function name(): string
     {
         return $this->publicName();
     }

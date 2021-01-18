@@ -4,8 +4,8 @@ namespace App\Hydrators;
 
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\Hydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class TelegramUserHydrator extends Hydrator
 {
@@ -21,7 +21,7 @@ class TelegramUserHydrator extends Hydrator
     /**
      * @param TelegramUser $entity
      */
-    public function hydrate(DbModel $entity) : TelegramUser
+    public function hydrate(DbModel $entity): TelegramUser
     {
         return $entity
             ->withUser(

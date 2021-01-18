@@ -5,8 +5,8 @@ namespace App\Hydrators;
 use App\Models\WordFeedback;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use Plasticode\Hydrators\Basic\Hydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\Hydrator;
+use Plasticode\Models\Generic\DbModel;
 
 class WordFeedbackHydrator extends Hydrator
 {
@@ -25,7 +25,7 @@ class WordFeedbackHydrator extends Hydrator
     /**
      * @param WordFeedback $entity
      */
-    public function hydrate(DbModel $entity) : WordFeedback
+    public function hydrate(DbModel $entity): WordFeedback
     {
         return $entity
             ->withWord(

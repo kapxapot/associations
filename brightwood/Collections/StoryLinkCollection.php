@@ -4,7 +4,7 @@ namespace Brightwood\Collections;
 
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\StoryLink;
-use Plasticode\Collections\Basic\TypedCollection;
+use Plasticode\Collections\Generic\TypedCollection;
 
 class StoryLinkCollection extends TypedCollection
 {
@@ -13,7 +13,7 @@ class StoryLinkCollection extends TypedCollection
     /**
      * @return static
      */
-    public function satisfying(?StoryData $data) : self
+    public function satisfying(?StoryData $data): self
     {
         return $this->where(
             fn (StoryLink $l) => $l->satisfies($data)

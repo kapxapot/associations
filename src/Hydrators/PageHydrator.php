@@ -6,8 +6,8 @@ use App\Models\Page;
 use App\Repositories\Interfaces\PageRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Core\Interfaces\LinkerInterface;
-use Plasticode\Hydrators\Basic\NewsSourceHydrator;
-use Plasticode\Models\Basic\DbModel;
+use Plasticode\Hydrators\Generic\NewsSourceHydrator;
+use Plasticode\Models\Generic\DbModel;
 use Plasticode\Parsing\Interfaces\ParserInterface;
 use Plasticode\Parsing\Parsers\CutParser;
 
@@ -36,7 +36,7 @@ class PageHydrator extends NewsSourceHydrator
     /**
      * @param Page $entity
      */
-    public function hydrate(DbModel $entity) : Page
+    public function hydrate(DbModel $entity): Page
     {
         /** @var Page */
         $entity = parent::hydrate($entity);

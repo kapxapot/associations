@@ -3,6 +3,7 @@
 namespace Brightwood\Collections;
 
 use Brightwood\Models\Links\RedirectLink;
+use Plasticode\Collections\Generic\NumericCollection;
 
 class RedirectLinkCollection extends StoryLinkCollection
 {
@@ -25,7 +26,7 @@ class RedirectLinkCollection extends StoryLinkCollection
             return $this->first();
         }
 
-        $totalWeight = $this->scalarize($weightFunc)->sum();
+        $totalWeight = $this->numerize($weightFunc)->sum();
 
         $rand = mt_rand();
         $randMax = mt_getrandmax();
