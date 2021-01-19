@@ -15,9 +15,8 @@ class NewsHydrator extends NewsSourceHydrator
     {
         $entity = parent::hydrate($entity);
 
-        return $entity
-            ->withUrl(
-                fn () => $this->linker->news($entity->getId())
-            );
+        return $entity->withUrl(
+            fn () => $this->linker->news($entity->getId())
+        );
     }
 }

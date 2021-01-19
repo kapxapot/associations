@@ -18,50 +18,42 @@ use Brightwood\Controllers\BrightwoodBotController;
 use Brightwood\Controllers\CardsTestController;
 use Brightwood\Controllers\EightsTestController;
 use Plasticode\Config\Config;
-use Plasticode\Controllers\Auth\AuthController;
-use Plasticode\Controllers\Auth\PasswordController;
+use Plasticode\Controllers\AuthController;
+use Plasticode\Controllers\CaptchaController;
 use Plasticode\Controllers\ParserController;
+use Plasticode\Controllers\PasswordController;
 use Plasticode\Core\Env;
-use Plasticode\Core\Response;
 use Plasticode\Generators\Core\GeneratorResolver;
 use Plasticode\Middleware\AuthMiddleware;
 use Plasticode\Middleware\GuestMiddleware;
 use Plasticode\Middleware\TokenAuthMiddleware;
 use Plasticode\Services\AuthService;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 use Slim\App;
 use Slim\Interfaces\RouterInterface;
 
 /** @var App $app */
 /** @var ContainerInterface $container */
-/** @var array $settings */
 
-$root = $settings['root'];
-$trueRoot = (strlen($root) == 0);
+/** @var SettingsProviderInterface */
+$settingsProvider = $container->get(SettingsProviderInterface::class);
+
+$root = $settingsProvider->get('root');
 
 $app->group(
     $root,
-    function () use ($trueRoot, $settings, $container) {
+    function () use ($root, $settingsProvider, $container) {
         $apiPrefix = '/api/v1';
 
         // public api
 
         $this->group(
             $apiPrefix,
-            function () use ($settings) {
+            function () {
                 $this->get(
                     '/captcha',
-                    function ($request, $response, $args) use ($settings) {
-                        $captcha = $this->captcha->generate(
-                            $settings['captcha_digits'],
-                            true
-                        );
-
-                        return Response::json(
-                            $response,
-                            ['captcha' => $captcha['captcha']]
-                        );
-                    }
+                    CaptchaController::class
                 );
 
                 $this->get(
@@ -116,7 +108,7 @@ $app->group(
 
         $this->get(
             '/admin',
-            function ($request, $response, $args) {
+            function ($request, $response) {
                 return $this->view->render($response, 'admin/index.twig');
             }
         )->setName('admin.index');
@@ -256,7 +248,7 @@ $app->group(
             ->get('/tags/{tag}', TagController::class)
             ->setName('main.tag');
 
-        $telegramBotToken = $settings['telegram']['bot_token'];
+        $telegramBotToken = $settingsProvider->get('telegram.bot_token');
 
         if (strlen($telegramBotToken) > 0) {
             $this->post(
@@ -265,7 +257,7 @@ $app->group(
             );
         }
 
-        $brightwoodBotToken = $settings['telegram']['brightwood_bot_token'];
+        $brightwoodBotToken = $settingsProvider->get('telegram.brightwood_bot_token');
 
         if (strlen($brightwoodBotToken) > 0) {
             $this->post(
@@ -278,6 +270,8 @@ $app->group(
             ->get('/{slug}', PageController::class)
             ->setName('main.page');
 
+        $trueRoot = (strlen($root) == 0);
+
         $this->get(
             $trueRoot ? '/' : '',
             IndexController::class . ':index'
@@ -285,7 +279,7 @@ $app->group(
 
         // jobs
 
-        $jobsSecret = $settings['jobs']['secret'];
+        $jobsSecret = $settingsProvider->get('jobs.secret');
 
         if (strlen($jobsSecret) > 0) {
             $this->group(

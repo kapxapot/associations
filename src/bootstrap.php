@@ -7,6 +7,7 @@ use Plasticode\Middleware\SlashMiddleware;
 use Plasticode\Settings\SettingsFactory;
 use Respect\Validation\Validator;
 use Slim\App;
+use Slim\Container;
 
 $dir = __DIR__;
 $root = $dir . '/..';
@@ -16,6 +17,8 @@ require $root . '/vendor/autoload.php';
 $env = Env::load($root);
 $settings = SettingsFactory::make($root);
 $app = new App(['settings' => $settings]);
+
+/** @var Container */
 $container = $app->getContainer();
 
 if ($settings['debug']) {
