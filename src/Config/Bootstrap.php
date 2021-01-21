@@ -2,10 +2,6 @@
 
 namespace App\Config;
 
-use App\Config\Interfaces\UserConfigInterface;
-use App\Config\Interfaces\WordConfigInterface;
-use App\Core\Linker;
-use App\Core\Serializer;
 use App\External\YandexDict;
 use App\Factories\LoadUncheckedDictWordsJobFactory;
 use App\Factories\MatchDanglingDictWordsJobFactory;
@@ -15,24 +11,16 @@ use App\Handlers\NotFoundHandler;
 use App\Mapping\Providers\CoreProvider;
 use App\Mapping\Providers\EventProvider;
 use App\Mapping\Providers\GeneratorProvider;
+use App\Mapping\Providers\ParsingProvider;
 use App\Mapping\Providers\RepositoryProvider;
 use App\Mapping\Providers\ServiceProvider;
-use App\Models\News;
-use App\Models\Page;
-use App\Models\Validation\AgeValidation;
-use App\Models\Validation\UserValidation;
+use App\Mapping\Providers\ValidationProvider;
 use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
 use Brightwood\Config\Bootstrap as BrightwoodBootstrap;
 use Plasticode\Mapping\Providers as CoreProviders;
-use Plasticode\Config\Parsing\DoubleBracketsConfig;
-use Plasticode\Config\TagsConfig;
-use Plasticode\Data\Idiorm\DatabaseProvider;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Mapping\MappingAggregator;
-use Plasticode\Parsing\LinkMappers\NewsLinkMapper;
-use Plasticode\Parsing\LinkMappers\PageLinkMapper;
-use Plasticode\Parsing\LinkMappers\TagLinkMapper;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 use Slim\Container;
@@ -45,12 +33,14 @@ class Bootstrap extends MappingAggregator
             new CoreProviders\SlimProvider(),
             new CoreProviders\CoreProvider($settings),
             new CoreProviders\GeneratorProvider(),
-            new CoreProviders\RepositoryProvider(),
-            new CoreProviders\ValidatorProvider(),
+            new CoreProviders\ValidationProvider(),
             new CoreProviders\ParsingProvider(),
+            new \Plasticode\Data\Idiorm\DatabaseProvider(),
+            new \Plasticode\Data\Idiorm\RepositoryProvider(),
             new CoreProvider(),
-            new DatabaseProvider(),
             new GeneratorProvider(),
+            new ValidationProvider(),
+            new ParsingProvider(),
             new RepositoryProvider(),
             new ServiceProvider(),
             new EventProvider()
@@ -69,94 +59,6 @@ class Bootstrap extends MappingAggregator
 
     public function getMappings(): array
     {
-        //aliases
-
-        $map[UserConfigInterface::class] =
-            fn (ContainerInterface $c) => $c->get(Config::class);
-
-        $map[WordConfigInterface::class] =
-            fn (ContainerInterface $c) => $c->get(Config::class);
-
-        $map[\Plasticode\Config\Config::class] =
-            fn (ContainerInterface $c) => $c->get(Config::class);
-
-        //mappings
-
-        $map[Config::class] =
-            fn (ContainerInterface $c) => new Config(
-                $c->get(SettingsProviderInterface::class)
-            );
-
-        $map['captchaConfig'] = fn (ContainerInterface $c) =>
-            new CaptchaConfig();
-
-        $map['localizationConfig'] = fn (ContainerInterface $c) =>
-            new LocalizationConfig();
-
-        $map['tagsConfig'] = fn (ContainerInterface $c) =>
-            new TagsConfig(
-                [
-                    News::class => 'news',
-                    Page::class => 'pages',
-                ]
-            );
-
-        $map['linker'] = fn (ContainerInterface $c) =>
-            new Linker(
-                $c->get(SettingsProviderInterface::class),
-                $c->router,
-                $c->tagsConfig
-            );
-
-        $map['serializer'] = fn (ContainerInterface $c) =>
-            new Serializer();
-
-        $map['tagLinkMapper'] = fn (ContainerInterface $c) =>
-            new TagLinkMapper(
-                $c->renderer,
-                $c->linker
-            );
-
-        $map['pageLinkMapper'] = fn (ContainerInterface $c) =>
-            new PageLinkMapper(
-                $c->pageRepository,
-                $c->tagRepository,
-                $c->renderer,
-                $c->linker,
-                $c->tagLinkMapper
-            );
-
-        $map['newsLinkMapper'] = fn (ContainerInterface $c) =>
-            new NewsLinkMapper(
-                $c->renderer,
-                $c->linker
-            );
-
-        $map[DoubleBracketsConfig::class] = function (ContainerInterface $c) {
-            $config = new DoubleBracketsConfig();
-
-            $config->setDefaultMapper($c->pageLinkMapper);
-            
-            $config->registerTaggedMappers(
-                $c->newsLinkMapper,
-                $c->tagLinkMapper
-            );
-
-            return $config;
-        };
-
-        $map['ageValidation'] = fn (ContainerInterface $c) =>
-            new AgeValidation(
-                $c->validationRules
-            );
-
-        $map['userValidation'] = fn (ContainerInterface $c) =>
-            new UserValidation(
-                $c->validationRules,
-                $c->ageValidation,
-                $c->userRepository
-            );
-
         $map['associationSpecification'] = fn (ContainerInterface $c) =>
             new AssociationSpecification(
                 $c->config

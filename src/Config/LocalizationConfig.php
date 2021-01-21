@@ -6,7 +6,7 @@ use Plasticode\Config\LocalizationConfig as BaseConfig;
 
 class LocalizationConfig extends BaseConfig
 {
-    protected function ru() : array
+    protected function ru(): array
     {
         return array_merge(
             parent::ru(),

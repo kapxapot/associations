@@ -215,4 +215,11 @@ class RepositoryProvider extends MappingProvider
                 ),
         ];
     }
+
+    public function getAliases(): array
+    {
+        return [
+            CoreRepositories\PageRepositoryInterface::class => PageRepositoryInterface::class,
+        ];
+    }
 }
