@@ -8,7 +8,7 @@ trait Logging
 {
     private ?LoggerInterface $logger;
 
-    private function log(string $message, ?array $data = null) : void
+    private function log(string $message, ?array $data = null): void
     {
         if (is_null($this->logger)) {
             return;

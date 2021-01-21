@@ -2,6 +2,8 @@
 
 namespace App\Config;
 
+use App\Config\Interfaces\UserConfigInterface;
+use App\Config\Interfaces\WordConfigInterface;
 use App\Core\Linker;
 use App\Core\Serializer;
 use App\External\YandexDict;
@@ -67,8 +69,21 @@ class Bootstrap extends MappingAggregator
 
     public function getMappings(): array
     {
-        $map['config'] = fn (ContainerInterface $c) =>
-            new Config(
+        //aliases
+
+        $map[UserConfigInterface::class] =
+            fn (ContainerInterface $c) => $c->get(Config::class);
+
+        $map[WordConfigInterface::class] =
+            fn (ContainerInterface $c) => $c->get(Config::class);
+
+        $map[\Plasticode\Config\Config::class] =
+            fn (ContainerInterface $c) => $c->get(Config::class);
+
+        //mappings
+
+        $map[Config::class] =
+            fn (ContainerInterface $c) => new Config(
                 $c->get(SettingsProviderInterface::class)
             );
 

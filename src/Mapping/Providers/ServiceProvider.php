@@ -2,8 +2,21 @@
 
 namespace App\Mapping\Providers;
 
+use App\Config\Interfaces\UserConfigInterface;
+use App\Config\Interfaces\WordConfigInterface;
+use App\External\YandexDict;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use App\Repositories\Interfaces\DictWordRepositoryInterface;
+use App\Repositories\Interfaces\GameRepositoryInterface;
+use App\Repositories\Interfaces\LanguageRepositoryInterface;
+use App\Repositories\Interfaces\NewsRepositoryInterface;
+use App\Repositories\Interfaces\PageRepositoryInterface;
+use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use App\Repositories\Interfaces\TurnRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\AnniversaryService;
 use App\Services\AssociationFeedbackService;
 use App\Services\AssociationRecountService;
@@ -11,6 +24,7 @@ use App\Services\AssociationService;
 use App\Services\CasesService;
 use App\Services\DictionaryService;
 use App\Services\GameService;
+use App\Services\Interfaces\ExternalDictServiceInterface;
 use App\Services\LanguageService;
 use App\Services\SearchService;
 use App\Services\TagPartsProviderService;
@@ -22,12 +36,18 @@ use App\Services\WordRecountService;
 use App\Services\WordService;
 use App\Services\YandexDictService;
 use App\Specifications\AssociationSpecification;
+use App\Specifications\WordSpecification;
+use Plasticode\Core\Interfaces as Core;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
+use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
 use Plasticode\Services\NewsAggregatorService;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
+use Plasticode\Util\Cases;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 class ServiceProvider extends MappingProvider
 {
@@ -52,115 +72,121 @@ class ServiceProvider extends MappingProvider
                     $c->get(EventDispatcher::class)
                 ),
 
-            associationService => fn (ContainerInterface $c) =>
-                new AssociationService(
-                    $c->associationRepository
+            AssociationService::class =>
+                fn (ContainerInterface $c) => new AssociationService(
+                    $c->get(AssociationRepositoryInterface::class)
                 ),
 
-            casesService => fn (ContainerInterface $c) =>
-                new CasesService(
-                    $c->cases
+            CasesService::class =>
+                fn (ContainerInterface $c) => new CasesService(
+                    $c->get(Cases::class)
                 ),
 
-            dictionaryService => fn (ContainerInterface $c) =>
-                new DictionaryService(
-                    $c->dictWordRepository,
-                    $c->externalDictService,
+            DictionaryService::class =>
+                fn (ContainerInterface $c) => new DictionaryService(
+                    $c->get(DictWordRepositoryInterface::class),
+                    $c->get(ExternalDictServiceInterface::class),
                     $c->get(EventDispatcher::class)
                 ),
 
-            externalDictService => fn (ContainerInterface $c) =>
-                new YandexDictService(
-                    $c->dictWordRepository,
-                    $c->yandexDict
+            ExternalDictServiceInterface::class =>
+                fn (ContainerInterface $c) => new YandexDictService(
+                    $c->get(DictWordRepositoryInterface::class),
+                    $c->get(YandexDict::class)
                 ),
 
-            gameService => fn (ContainerInterface $c) =>
-                new GameService(
-                    $c->gameRepository,
-                    $c->languageService,
-                    $c->turnService,
-                    $c->wordService
+            GameService::class =>
+                fn (ContainerInterface $c) => new GameService(
+                    $c->get(GameRepositoryInterface::class),
+                    $c->get(LanguageService::class),
+                    $c->get(TurnService::class),
+                    $c->get(WordService::class)
                 ),
 
-            languageService => fn (ContainerInterface $c) =>
-                new LanguageService(
-                    $c->languageRepository,
-                    $c->wordRepository,
+            LanguageService::class =>
+                fn (ContainerInterface $c) => new LanguageService(
+                    $c->get(LanguageRepositoryInterface::class),
+                    $c->get(WordRepositoryInterface::class),
                     $c->get(SettingsProviderInterface::class),
-                    $c->wordService
+                    $c->get(WordService::class)
                 ),
 
-            newsAggregatorService => function (ContainerInterface $c) {
-                $service = new NewsAggregatorService(
-                    $c->linker
-                );
+            NewsAggregatorService::class =>
+                function (ContainerInterface $c) {
+                    $service = new NewsAggregatorService(
+                        $c->get(Core\LinkerInterface::class)
+                    );
 
-                $service->registerStrictSource($c->newsRepository);
-                $service->registerSource($c->pageRepository);
+                    $service->registerStrictSource(
+                        $c->get(NewsRepositoryInterface::class)
+                    );
 
-                return $service;
-            },
+                    $service->registerSource(
+                        $c->get(PageRepositoryInterface::class)
+                    );
 
-            searchService => fn (ContainerInterface $c) =>
-                new SearchService(
-                    $c->newsRepository,
-                    $c->pageRepository,
-                    $c->tagRepository,
-                    $c->linker
+                    return $service;
+                },
+
+            SearchService::class =>
+                fn (ContainerInterface $c) => new SearchService(
+                    $c->get(NewsRepositoryInterface::class),
+                    $c->get(PageRepositoryInterface::class),
+                    $c->get(TagRepositoryInterface::class),
+                    $c->get(Core\LinkerInterface::class)
                 ),
 
-            tagPartsProviderService => fn (ContainerInterface $c) =>
-                new TagPartsProviderService(
-                    $c->newsRepository,
-                    $c->pageRepository
+            TagPartsProviderService::class =>
+                fn (ContainerInterface $c) => new TagPartsProviderService(
+                    $c->get(NewsRepositoryInterface::class),
+                    $c->get(PageRepositoryInterface::class)
                 ),
 
-            telegramUserService => fn (ContainerInterface $c) =>
-                new TelegramUserService(
-                    $c->telegramUserRepository,
-                    $c->userRepository
+            TelegramUserService::class =>
+                fn (ContainerInterface $c) => new TelegramUserService(
+                    $c->get(TelegramUserRepositoryInterface::class),
+                    $c->get(UserRepositoryInterface::class)
                 ),
 
-            turnService => fn (ContainerInterface $c) =>
-                new TurnService(
-                    $c->gameRepository,
-                    $c->turnRepository,
-                    $c->wordRepository,
-                    $c->associationService,
+            TurnService::class =>
+                fn (ContainerInterface $c) => new TurnService(
+                    $c->get(GameRepositoryInterface::class),
+                    $c->get(TurnRepositoryInterface::class),
+                    $c->get(WordRepositoryInterface::class),
+                    $c->get(AssociationService::class),
                     $c->get(EventDispatcher::class),
-                    $c->logger
+                    $c->get(LoggerInterface::class)
                 ),
 
-            userService => fn (ContainerInterface $c) =>
-                new UserService(
-                    $c->config
+            UserService::class =>
+                fn (ContainerInterface $c) => new UserService(
+                    $c->get(UserConfigInterface::class)
                 ),
 
-            wordFeedbackService => fn (ContainerInterface $c) =>
-                new WordFeedbackService(
-                    $c->wordFeedbackRepository,
-                    $c->wordRepository,
-                    $c->validator,
-                    $c->validationRules,
-                    $c->wordService
+            WordFeedbackService::class =>
+                fn (ContainerInterface $c) => new WordFeedbackService(
+                    $c->get(WordFeedbackRepositoryInterface::class),
+                    $c->get(WordRepositoryInterface::class),
+                    $c->get(ValidatorInterface::class),
+                    $c->get(ValidationRules::class),
+                    $c->get(WordService::class)
                 ),
 
-            wordRecountService => fn (ContainerInterface $c) =>
-                new WordRecountService(
-                    $c->wordSpecification,
-                    $c->wordService,
+            WordRecountService::class =>
+                fn (ContainerInterface $c) => new WordRecountService(
+                    $c->get(WordSpecification::class),
+                    $c->get(WordService::class),
                     $c->get(EventDispatcher::class)
                 ),
 
-            wordService => fn (ContainerInterface $c) =>
-                new WordService(
-                    $c->turnRepository,
-                    $c->wordRepository,
-                    $c->casesService,
-                    $c->validator,
-                    $c->validationRules,
-                    $c->config,
+            WordService::class =>
+                fn (ContainerInterface $c) => new WordService(
+                    $c->get(TurnRepositoryInterface::class),
+                    $c->get(WordRepositoryInterface::class),
+                    $c->get(CasesService::class),
+                    $c->get(ValidatorInterface::class),
+                    $c->get(ValidationRules::class),
+                    $c->get(WordConfigInterface::class),
                     $c->get(EventDispatcher::class)
                 ),
         ];
