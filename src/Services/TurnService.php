@@ -34,7 +34,7 @@ class TurnService
         WordRepositoryInterface $wordRepository,
         AssociationService $associationService,
         EventDispatcher $eventDispatcher,
-        LoggerInterface $logger
+        ?LoggerInterface $logger = null
     )
     {
         $this->gameRepository = $gameRepository;

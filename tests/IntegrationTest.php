@@ -2,9 +2,9 @@
 
 namespace App\Tests;
 
-use App\Factories\SettingsFactory;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Core\Env;
+use Plasticode\Settings\SettingsFactory;
 use Respect\Validation\Validator;
 use Webmozart\Assert\Assert;
 
