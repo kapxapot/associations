@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Services\WordService;
 use Plasticode\Core\Response;
+use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -13,11 +14,15 @@ class WordController extends Controller
 {
     private WordService $wordService;
 
+    private NotFoundHandlerInterface $notFoundHandler;
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
         $this->wordService = $container->get(WordService::class);
+
+        $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
     }
 
     public function index(

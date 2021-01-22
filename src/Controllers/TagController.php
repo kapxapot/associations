@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Services\TagPartsProviderService;
+use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -11,11 +12,15 @@ class TagController extends Controller
 {
     private TagPartsProviderService $tagPartsProviderService;
 
+    private NotFoundHandlerInterface $notFoundHandler;
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
         $this->tagPartsProviderService = $container->get(TagPartsProviderService::class);
+
+        $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
     }
 
     public function __invoke(

@@ -3,7 +3,7 @@
 namespace App\Collections;
 
 use App\Models\Interfaces\NewsSourceInterface;
-use Plasticode\Collections\NewsSourceCollection as BaseNewsSourceCollection;
+use Plasticode\Collections\Generic\NewsSourceCollection as BaseNewsSourceCollection;
 
 class NewsSourceCollection extends BaseNewsSourceCollection
 {

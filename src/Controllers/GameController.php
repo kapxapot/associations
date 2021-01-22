@@ -12,6 +12,7 @@ use Plasticode\Auth\Access;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\Http\NotFoundException;
+use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -29,6 +30,8 @@ class GameController extends Controller
 
     private Access $access;
 
+    private NotFoundHandlerInterface $notFoundHandler;
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
@@ -41,6 +44,8 @@ class GameController extends Controller
         $this->wordService = $container->get(WordService::class);
 
         $this->access = $container->get(Access::class);
+
+        $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
     }
 
     public function get(

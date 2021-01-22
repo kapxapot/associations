@@ -13,6 +13,7 @@ use Brightwood\Parsing\StoryParser;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
+use Plasticode\Util\Debug;
 use Plasticode\Util\Text;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -131,7 +132,7 @@ class BrightwoodBotController
 
             $this->logger->info(
                 Text::join(
-                    $this->exceptionTrace($ex)
+                    Debug::exceptionTrace($ex)
                 )
             );
         }
@@ -142,20 +143,6 @@ class BrightwoodBotController
         );
 
         return ArrayCollection::collect($answer);
-    }
-
-    /**
-     * @return string[]
-     */
-    private function exceptionTrace(Exception $ex): array
-    {
-        $lines = [];
-
-        foreach ($ex->getTrace() as $trace) {
-            $lines[] = ($trace['file'] ?? '') . ' (' . ($trace['line'] ?? '') . '), ' . ($trace['class'] ?? '') . ($trace['type'] ?? '') . $trace['function'];
-        }
-
-        return $lines;
     }
 
     /**

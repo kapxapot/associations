@@ -15,7 +15,6 @@ use Plasticode\Controllers\Controller as BaseController;
 use Plasticode\Core\AppContext;
 use Plasticode\Core\Interfaces\RendererInterface;
 use Plasticode\Events\EventDispatcher;
-use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
 
 class Controller extends BaseController
@@ -28,8 +27,6 @@ class Controller extends BaseController
 
     protected AssociationConfigInterface $associationConfig;
     protected WordConfigInterface $wordConfig;
-
-    protected NotFoundHandlerInterface $notFoundHandler;
 
     protected AuthInterface $auth;
     protected EventDispatcher $eventDispatcher;
@@ -54,8 +51,6 @@ class Controller extends BaseController
 
         $this->associationConfig = $container->get(AssociationConfigInterface::class);
         $this->wordConfig = $container->get(WordConfigInterface::class);
-
-        $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
 
         $this->auth = $container->get(AuthInterface::class);
         $this->eventDispatcher = $container->get(EventDispatcher::class);

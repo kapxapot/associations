@@ -42,7 +42,7 @@ event_logger:
 
 view:
   templates_path:
-    - /../views/
+    - /views/
     - {PLASTICODE_TEMPLATES_PATH}
   cache_path: false
 

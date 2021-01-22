@@ -70,6 +70,7 @@ class CoreProvider extends MappingProvider
         return [
             AuthCore\AuthInterface::class => AuthInterface::class,
             Core\LinkerInterface::class => LinkerInterface::class,
+
             \Plasticode\Config\Config::class => Config::class,
             AssociationConfigInterface::class => Config::class,
             NewsConfigInterface::class => Config::class,

@@ -3,12 +3,23 @@
 namespace App\Controllers;
 
 use Plasticode\Core\Response;
+use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request;
 
 class AssociationController extends Controller
 {
+    private NotFoundHandlerInterface $notFoundHandler;
+
+    public function __construct(ContainerInterface $container)
+    {
+        parent::__construct($container);
+
+        $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
+    }
+
     public function get(
         Request $request,
         ResponseInterface $response,

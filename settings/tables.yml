@@ -3,18 +3,18 @@ association_feedbacks:
   sort: created_at
   reverse: true
   has: [created_at, created_by, updated_at]
-  entity: \App\Models\AssociaionFeedback
+  generator: App\Generators\AssociationFeedbackGenerator
 
 games:
   api: read_one
-  entity: \App\Models\Game
+  generator: App\Generators\GameGenerator
 
 languages:
   api: full
   name_field: name
   sort: name
   has: [created_at, created_by]
-  entity: \App\Models\Language
+  generator: App\Generators\LanguageGenerator
 
 menus:
   api: full
@@ -22,14 +22,14 @@ menus:
   sort: created_at
   reverse: true
   has: [created_at, updated_at]
-  entity: \Plasticode\Models\Menu
+  generator: Plasticode\Generators\MenuGenerator
 
 menu_items:
   api: full
   name_field: text
   sort: position
   has: [created_at, updated_at]
-  entity: \Plasticode\Models\MenuItem
+  generator: Plasticode\Generators\MenuItemGenerator
 
 news:
   api: full
@@ -37,7 +37,7 @@ news:
   sort: created_at
   reverse: true
   has: [created_at, updated_at, created_by, updated_by]
-  entity: \App\Models\News
+  generator: App\Generators\NewsGenerator
 
 pages:
   api: full
@@ -45,13 +45,13 @@ pages:
   sort: created_at
   reverse: true
   has: [created_at, updated_at, created_by, updated_by]
-  entity: \App\Models\Page
+  generator: App\Generators\PageGenerator
 
 roles:
   api: full
   name_field: name
   sort: name
-  entity: \Plasticode\Models\Role
+  generator: Plasticode\Generators\RoleGenerator
 
 users:
   api: full
@@ -59,11 +59,11 @@ users:
   sort: created_at
   reverse: true
   has: [created_at, updated_at]
-  entity: \App\Models\User
+  generator: App\Generators\UserGenerator
 
 word_feedbacks:
   api: read
   sort: created_at
   reverse: true
   has: [created_at, created_by, updated_at]
-  entity: \App\Models\WordFeedback
+  generator: App\Generators\WordFeedbackGenerator

@@ -8,14 +8,17 @@ use App\Generators\GameGenerator;
 use App\Generators\LanguageGenerator;
 use App\Generators\NewsGenerator;
 use App\Generators\PageGenerator;
+use App\Generators\UserGenerator;
 use App\Generators\WordFeedbackGenerator;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use App\Repositories\Interfaces\PageRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use Plasticode\Generators\Core\GeneratorContext;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
+use Plasticode\Models\Validation\UserValidation;
 use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
 use Psr\Container\ContainerInterface;
 
@@ -54,6 +57,13 @@ class GeneratorProvider extends MappingProvider
                     $c->get(GeneratorContext::class),
                     $c->get(PageRepositoryInterface::class),
                     $c->get(TagRepositoryInterface::class)
+                ),
+
+            UserGenerator::class =>
+                fn (ContainerInterface $c) => new UserGenerator(
+                    $c->get(GeneratorContext::class),
+                    $c->get(UserRepositoryInterface::class),
+                    $c->get(UserValidation::class)
                 ),
 
             WordFeedbackGenerator::class =>

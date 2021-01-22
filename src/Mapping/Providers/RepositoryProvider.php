@@ -220,6 +220,7 @@ class RepositoryProvider extends MappingProvider
     {
         return [
             CoreRepositories\PageRepositoryInterface::class => PageRepositoryInterface::class,
+            CoreRepositories\UserRepositoryInterface::class => UserRepositoryInterface::class,
         ];
     }
 }

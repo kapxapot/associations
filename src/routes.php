@@ -11,7 +11,6 @@ use App\Controllers\PageController;
 use App\Controllers\SearchController;
 use App\Controllers\TagController;
 use App\Controllers\TelegramBotController;
-use App\Controllers\TestController;
 use App\Controllers\TurnController;
 use App\Controllers\WordController;
 use Brightwood\Controllers\BrightwoodBotController;
@@ -23,7 +22,8 @@ use Plasticode\Controllers\CaptchaController;
 use Plasticode\Controllers\ParserController;
 use Plasticode\Controllers\PasswordController;
 use Plasticode\Core\Env;
-use Plasticode\Generators\Core\GeneratorResolver;
+use Plasticode\Core\Interfaces\ViewInterface;
+use Plasticode\Generators\Interfaces\EntityGeneratorInterface;
 use Plasticode\Middleware\AuthMiddleware;
 use Plasticode\Middleware\GuestMiddleware;
 use Plasticode\Middleware\TokenAuthMiddleware;
@@ -81,15 +81,15 @@ $app->group(
                 /** @var Config */
                 $config = $container->get(Config::class);
 
-                /** @var GeneratorResolver */
-                $resolver = $container->get(GeneratorResolver::class);
-
                 foreach ($config->tableMetadata()->all() as $table) {
                     if (!isset($table['api'])) {
                         continue;
                     }
 
-                    $generator = $resolver->resolve($table['entity']);
+                    $generatorClass = $table['generator'];
+
+                    /** @var EntityGeneratorInterface */
+                    $generator = $container->get($generatorClass);
 
                     $generator->generateAPIRoutes($this);
                 }
@@ -108,8 +108,11 @@ $app->group(
 
         $this->get(
             '/admin',
-            function ($request, $response) {
-                return $this->view->render($response, 'admin/index.twig');
+            function ($request, $response) use ($container) {
+                /** @var ViewInterface */
+                $view = $container->get(ViewInterface::class);
+
+                return $view->render($response, 'admin/index.twig');
             }
         )->setName('admin.index');
 
@@ -119,19 +122,17 @@ $app->group(
                 /** @var Config */
                 $config = $container->get(Config::class);
 
-                /** @var GeneratorResolver */
-                $resolver = $container->get(GeneratorResolver::class);
-
                 $entityNames = array_keys(
                     $config->entitySettings()->all()
                 );
 
                 foreach ($entityNames as $entityName) {
-                    $entityClass = $config
+                    $generatorClass = $config
                         ->tableMetadata()
-                        ->get($entityName . '.entity');
+                        ->get($entityName . '.generator');
 
-                    $generator = $resolver->resolve($entityClass);
+                    /** @var EntityGeneratorInterface */
+                    $generator = $container->get($generatorClass);
 
                     $generator->generateAdminPageRoute($this);
                 }
@@ -318,12 +319,6 @@ $app->group(
                     AuthController::class . ':signIn'
                 )->setName('auth.signin');
             }
-        )->add(
-            new GuestMiddleware(
-                $container->get(RouterInterface::class),
-                $container->get(AuthService::class),
-                'main.index'
-            )
         );
 
         $this->group(

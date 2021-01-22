@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Repositories\Interfaces\PageRepositoryInterface;
 use Plasticode\Controllers\Traits\NewsPageDescription;
+use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Slim\Http\Request;
@@ -14,11 +15,15 @@ class PageController extends Controller
 
     private PageRepositoryInterface $pageRepository;
 
+    private NotFoundHandlerInterface $notFoundHandler;
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
         $this->pageRepository = $container->get(PageRepositoryInterface::class);
+
+        $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
     }
 
     public function __invoke(

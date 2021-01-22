@@ -1,9 +1,11 @@
 <?php
 
 use App\Mapping\Bootstrap;
+use Plasticode\Core\AppContext;
 use Plasticode\Core\Env;
 use Plasticode\Middleware\CookieAuthMiddleware;
 use Plasticode\Middleware\SlashMiddleware;
+use Plasticode\Services\AuthService;
 use Plasticode\Settings\SettingsFactory;
 use Respect\Validation\Validator;
 use Slim\App;
@@ -47,7 +49,7 @@ $app->add(new SlashMiddleware());
 
 $app->add(
     new CookieAuthMiddleware(
-        $container->authService,
+        $container->get(AuthService::class),
         $settings['auth_token_key']
     )
 );
