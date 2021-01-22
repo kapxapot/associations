@@ -220,11 +220,6 @@ $app->group(
 
         if ($env->isDev()) {
             $this->get(
-                '/test',
-                TestController::class . ':index'
-            )->setName('main.test');
-
-            $this->get(
                 '/test/deck',
                 CardsTestController::class . ':deck'
             );

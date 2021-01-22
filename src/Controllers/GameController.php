@@ -2,8 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Auth\Interfaces\AuthInterface;
-use App\Handlers\NotFoundHandler;
 use App\Models\Association;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
@@ -30,23 +28,19 @@ class GameController extends Controller
     private WordService $wordService;
 
     private Access $access;
-    private AuthInterface $auth;
-    private NotFoundHandler $notFoundHandler;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
-        $this->gameRepository = $container->gameRepository;
-        $this->languageRepository = $container->languageRepository;
+        $this->gameRepository = $container->get(GameRepositoryInterface::class);
+        $this->languageRepository = $container->get(LanguageRepositoryInterface::class);
 
-        $this->gameService = $container->gameService;
-        $this->turnService = $container->turnService;
-        $this->wordService = $container->wordService;
+        $this->gameService = $container->get(GameService::class);
+        $this->turnService = $container->get(TurnService::class);
+        $this->wordService = $container->get(WordService::class);
 
-        $this->access = $container->access;
-        $this->auth = $container->auth;
-        $this->notFoundHandler = $container->notFoundHandler;
+        $this->access = $container->get(Access::class);
     }
 
     public function get(

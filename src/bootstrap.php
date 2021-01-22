@@ -1,6 +1,6 @@
 <?php
 
-use App\Config\Bootstrap;
+use App\Mapping\Bootstrap;
 use Plasticode\Core\Env;
 use Plasticode\Middleware\CookieAuthMiddleware;
 use Plasticode\Middleware\SlashMiddleware;
@@ -32,7 +32,7 @@ if ($settings['debug']) {
 
 session_start();
 
-$bootstrap = new Bootstrap($settings, $dir);
+$bootstrap = new Bootstrap($settings);
 $bootstrap->boot($container);
 
 foreach ($settings['validation_namespaces'] as $namespace) {

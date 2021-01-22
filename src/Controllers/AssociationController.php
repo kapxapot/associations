@@ -2,30 +2,13 @@
 
 namespace App\Controllers;
 
-use App\Auth\Interfaces\AuthInterface;
-use App\Handlers\NotFoundHandler;
-use Plasticode\Core\Interfaces\RendererInterface;
 use Plasticode\Core\Response;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request;
 
 class AssociationController extends Controller
 {
-    private AuthInterface $auth;
-    private NotFoundHandler $notFoundHandler;
-    private RendererInterface $renderer;
-
-    public function __construct(ContainerInterface $container)
-    {
-        parent::__construct($container);
-
-        $this->auth = $container->auth;
-        $this->notFoundHandler = $container->notFoundHandler;
-        $this->renderer = $container->renderer;
-    }
-
     public function get(
         Request $request,
         ResponseInterface $response,

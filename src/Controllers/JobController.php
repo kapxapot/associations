@@ -2,30 +2,37 @@
 
 namespace App\Controllers;
 
-use App\Factories\Interfaces\ModelJobFactoryInterface;
-use App\Factories\LoadUncheckedDictWordsJobFactory;
-use App\Factories\MatchDanglingDictWordsJobFactory;
-use App\Factories\UpdateAssociationsJobFactory;
-use App\Factories\UpdateWordsJobFactory;
+use App\Jobs\Interfaces\ModelJobInterface;
+use App\Jobs\LoadUncheckedDictWordsJob;
+use App\Jobs\MatchDanglingDictWordsJob;
+use App\Jobs\UpdateAssociationsJob;
+use App\Jobs\UpdateWordsJob;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class JobController extends Controller
 {
-    private LoadUncheckedDictWordsJobFactory $loadUncheckedDictWordsJobFactory;
-    private MatchDanglingDictWordsJobFactory $matchDanglingDictWordsJobFactory;
-    private UpdateAssociationsJobFactory $updateAssociationsJobFactory;
-    private UpdateWordsJobFactory $updateWordsJobFactory;
+    private LoadUncheckedDictWordsJob $loadUncheckedDictWordsJob;
+    private MatchDanglingDictWordsJob $matchDanglingDictWordsJob;
+    private UpdateAssociationsJob $updateAssociationsJob;
+    private UpdateWordsJob $updateWordsJob;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
-        $this->loadUncheckedDictWordsJobFactory = $container->loadUncheckedDictWordsJobFactory;
-        $this->matchDanglingDictWordsJobFactory = $container->matchDanglingDictWordsJobFactory;
-        $this->updateAssociationsJobFactory = $container->updateAssociationsJobFactory;
-        $this->updateWordsJobFactory = $container->updateWordsJobFactory;
+        $this->loadUncheckedDictWordsJob =
+            $container->get(LoadUncheckedDictWordsJob::class);
+
+        $this->matchDanglingDictWordsJob =
+            $container->get(MatchDanglingDictWordsJob::class);
+
+        $this->updateAssociationsJob =
+            $container->get(UpdateAssociationsJob::class);
+
+        $this->updateWordsJob =
+            $container->get(UpdateWordsJob::class);
     }
 
     public function updateAssociations(
@@ -34,7 +41,7 @@ class JobController extends Controller
     )
     {
         return $this->runJob(
-            $this->updateAssociationsJobFactory,
+            $this->updateAssociationsJob,
             'Updated associations'
         );
     }
@@ -45,7 +52,7 @@ class JobController extends Controller
     )
     {
         return $this->runJob(
-            $this->updateWordsJobFactory,
+            $this->updateWordsJob,
             'Updated words'
         );
     }
@@ -56,7 +63,7 @@ class JobController extends Controller
     )
     {
         return $this->runJob(
-            $this->loadUncheckedDictWordsJobFactory,
+            $this->loadUncheckedDictWordsJob,
             'Loaded unchecked dictionary words'
         );
     }
@@ -67,19 +74,18 @@ class JobController extends Controller
     )
     {
         return $this->runJob(
-            $this->matchDanglingDictWordsJobFactory,
+            $this->matchDanglingDictWordsJob,
             'Matched dangling dictionary words'
         );
     }
 
     private function runJob(
-        ModelJobFactoryInterface $factory,
+        ModelJobInterface $job,
         string $msg
     )
     {
         $start = microtime(true);
 
-        $job = $factory->make();
         $result = $job->run();
 
         $end = microtime(true);

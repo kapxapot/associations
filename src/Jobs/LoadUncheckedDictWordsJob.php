@@ -15,18 +15,18 @@ use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 class LoadUncheckedDictWordsJob implements ModelJobInterface
 {
     private WordRepositoryInterface $wordRepository;
-    private SettingsProviderInterface $settingsProvider;
     private DictionaryService $dictionaryService;
+    private SettingsProviderInterface $settingsProvider;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
-        SettingsProviderInterface $settingsProvider,
-        DictionaryService $dictionaryService
+        DictionaryService $dictionaryService,
+        SettingsProviderInterface $settingsProvider
     )
     {
         $this->wordRepository = $wordRepository;
-        $this->settingsProvider = $settingsProvider;
         $this->dictionaryService = $dictionaryService;
+        $this->settingsProvider = $settingsProvider;
     }
 
     public function run(): DictWordCollection

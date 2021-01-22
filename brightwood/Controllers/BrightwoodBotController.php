@@ -12,20 +12,24 @@ use Brightwood\Models\Stories\Story;
 use Brightwood\Parsing\StoryParser;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;
-use Plasticode\Controllers\Controller;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Text;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
-class BrightwoodBotController extends Controller
+class BrightwoodBotController
 {
     private const LOG_DISABLED = 0;
     private const LOG_BRIEF = 1;
     private const LOG_FULL = 2;
 
     private const TROUBLESHOOT_COMMAND = 'Бот сломался! Почините!';
+
+    private SettingsProviderInterface $settingsProvider;
+    private LoggerInterface $logger;
 
     private TelegramUserService $telegramUserService;
     private TelegramTransport $telegram;
@@ -34,11 +38,12 @@ class BrightwoodBotController extends Controller
 
     public function __construct(ContainerInterface $container)
     {
-        parent::__construct($container->appContext);
+        $this->settingsProvider = $container->get(SettingsProviderInterface::class);
+        $this->logger = $container->get(LoggerInterface::class);
 
-        $this->telegramUserService = $container->telegramUserService;
-        $this->telegram = $container->brightwoodTelegramTransport;
-        $this->answerer = $container->answerer;
+        $this->telegramUserService = $container->get(TelegramUserService::class);
+        $this->telegram = $container->get(TelegramTransport::class);
+        $this->answerer = $container->get(Answerer::class);
 
         $this->parser = new StoryParser();
     }
@@ -48,7 +53,7 @@ class BrightwoodBotController extends Controller
         ResponseInterface $response
     ): ResponseInterface
     {
-        $logLevel = $this->getSettings(
+        $logLevel = $this->settingsProvider->get(
             'telegram.brightwood_bot_log_level',
             self::LOG_DISABLED
         );

@@ -9,7 +9,6 @@ use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Sets\CardList;
 use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Testing\Cards\TestDeckFactory;
-use Brightwood\Testing\Models\TestDeck;
 use Plasticode\Core\Response;
 use Plasticode\Util\Text;
 use Psr\Http\Message\ResponseInterface;

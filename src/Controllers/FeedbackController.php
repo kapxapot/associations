@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Auth\Interfaces\AuthInterface;
 use App\Events\Feedback\AssociationFeedbackCreatedEvent;
 use App\Events\Feedback\WordFeedbackCreatedEvent;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
@@ -10,7 +9,6 @@ use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Services\AssociationFeedbackService;
 use App\Services\WordFeedbackService;
 use Plasticode\Core\Response;
-use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -21,9 +19,7 @@ class FeedbackController extends Controller
     private AssociationFeedbackRepositoryInterface $associationFeedbackRepository;
     private WordFeedbackRepositoryInterface $wordFeedbackRepository;
 
-    private AuthInterface $auth;
     private AssociationFeedbackService $associationFeedbackService;
-    private EventDispatcher $eventDispatcher;
     private WordFeedbackService $wordFeedbackService;
 
     public function __construct(ContainerInterface $container)
@@ -31,17 +27,15 @@ class FeedbackController extends Controller
         parent::__construct($container);
 
         $this->associationFeedbackRepository =
-            $container->associationFeedbackRepository;
+            $container->get(AssociationFeedbackRepositoryInterface::class);
 
-        $this->wordFeedbackRepository = $container->wordFeedbackRepository;
-
-        $this->auth = $container->auth;
+        $this->wordFeedbackRepository =
+            $container->get(WordFeedbackRepositoryInterface::class);
 
         $this->associationFeedbackService =
-            $container->associationFeedbackService;
+            $container->get(AssociationFeedbackService::class);
 
-        $this->eventDispatcher = $container->get(EventDispatcher::class);
-        $this->wordFeedbackService = $container->wordFeedbackService;
+        $this->wordFeedbackService = $container->get(WordFeedbackService::class);
     }
 
     public function save(

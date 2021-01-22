@@ -12,8 +12,6 @@ use Slim\Http\Request;
 
 class IndexController extends Controller
 {
-    private AuthInterface $auth;
-
     private GameService $gameService;
     private NewsAggregatorService $newsAggregatorService;
     private NewsConfigInterface $config;
@@ -22,11 +20,9 @@ class IndexController extends Controller
     {
         parent::__construct($container);
 
-        $this->auth = $container->auth;
-
-        $this->gameService = $container->gameService;
-        $this->newsAggregatorService = $container->newsAggregatorService;
-        $this->config = $container->config;
+        $this->gameService = $container->get(GameService::class);
+        $this->newsAggregatorService = $container->get(NewsAggregatorService::class);
+        $this->config = $container->get(NewsConfigInterface::class);
     }
 
     public function index(

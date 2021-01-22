@@ -2,10 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Auth\Interfaces\AuthInterface;
-use App\Handlers\NotFoundHandler;
 use App\Services\WordService;
-use Plasticode\Core\Interfaces\RendererInterface;
 use Plasticode\Core\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -14,19 +11,13 @@ use Slim\Http\Request;
 
 class WordController extends Controller
 {
-    private AuthInterface $auth;
-    private NotFoundHandler $notFoundHandler;
     private WordService $wordService;
-    private RendererInterface $renderer;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
-        $this->auth = $container->auth;
-        $this->notFoundHandler = $container->notFoundHandler;
-        $this->wordService = $container->wordService;
-        $this->renderer = $container->renderer;
+        $this->wordService = $container->get(WordService::class);
     }
 
     public function index(

@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Handlers\NotFoundHandler;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use Plasticode\Controllers\Traits\NewsPageDescription;
 use Plasticode\Services\NewsAggregatorService;
@@ -16,15 +15,13 @@ class NewsController extends Controller
 
     private NewsRepositoryInterface $newsRepository;
     private NewsAggregatorService $newsAggregatorService;
-    private NotFoundHandler $notFoundHandler;
 
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
 
-        $this->newsRepository = $container->newsRepository;
-        $this->newsAggregatorService = $container->newsAggregatorService;
-        $this->notFoundHandler = $container->notFoundHandler;
+        $this->newsRepository = $container->get(NewsRepositoryInterface::class);
+        $this->newsAggregatorService = $container->get(NewsAggregatorService::class);
     }
 
     public function __invoke(

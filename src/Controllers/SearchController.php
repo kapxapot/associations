@@ -16,7 +16,7 @@ class SearchController extends Controller
     {
         parent::__construct($container);
 
-        $this->searchService = $container->searchService;
+        $this->searchService = $container->get(SearchService::class);
     }
 
     public function search(

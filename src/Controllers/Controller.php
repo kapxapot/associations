@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Auth\Interfaces\AuthInterface;
 use App\Config\Interfaces\AssociationConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Core\Interfaces\LinkerInterface;
@@ -11,6 +12,10 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\CasesService;
 use App\Services\LanguageService;
 use Plasticode\Controllers\Controller as BaseController;
+use Plasticode\Core\AppContext;
+use Plasticode\Core\Interfaces\RendererInterface;
+use Plasticode\Events\EventDispatcher;
+use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
 
 class Controller extends BaseController
@@ -24,24 +29,39 @@ class Controller extends BaseController
     protected AssociationConfigInterface $associationConfig;
     protected WordConfigInterface $wordConfig;
 
+    protected NotFoundHandlerInterface $notFoundHandler;
+
+    protected AuthInterface $auth;
+    protected EventDispatcher $eventDispatcher;
     protected LinkerInterface $linker;
+    protected RendererInterface $renderer;
     protected Serializer $serializer;
 
     public function __construct(ContainerInterface $container)
     {
-        parent::__construct($container->appContext);
+        parent::__construct(
+            $container->get(AppContext::class)
+        );
 
-        $this->associationRepository = $container->associationRepository;
-        $this->wordRepository = $container->wordRepository;
+        $this->associationRepository =
+            $container->get(AssociationRepositoryInterface::class);
 
-        $this->casesService = $container->casesService;
-        $this->languageService = $container->languageService;
+        $this->wordRepository =
+            $container->get(WordRepositoryInterface::class);
 
-        $this->associationConfig = $container->config;
-        $this->wordConfig = $container->config;
+        $this->casesService = $container->get(CasesService::class);
+        $this->languageService = $container->get(LanguageService::class);
 
-        $this->linker = $container->linker;
-        $this->serializer = $container->serializer;
+        $this->associationConfig = $container->get(AssociationConfigInterface::class);
+        $this->wordConfig = $container->get(WordConfigInterface::class);
+
+        $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
+
+        $this->auth = $container->get(AuthInterface::class);
+        $this->eventDispatcher = $container->get(EventDispatcher::class);
+        $this->linker = $container->get(LinkerInterface::class);
+        $this->renderer = $container->get(RendererInterface::class);
+        $this->serializer = $container->get(Serializer::class);
     }
 
     /**

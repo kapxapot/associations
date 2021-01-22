@@ -16,13 +16,18 @@ use Exception;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\ValidationException;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
-class TelegramBotController extends Controller
+class TelegramBotController
 {
+    private SettingsProviderInterface $settingsProvider;
+    private LoggerInterface $logger;
+
     private UserRepositoryInterface $userRepository;
 
     private GameService $gameService;
@@ -33,15 +38,16 @@ class TelegramBotController extends Controller
 
     public function __construct(ContainerInterface $container)
     {
-        parent::__construct($container);
+        $this->settingsProvider = $container->get(SettingsProviderInterface::class);
+        $this->logger = $container->get(LoggerInterface::class);
 
-        $this->userRepository = $container->userRepository;
+        $this->userRepository = $container->get(UserRepositoryInterface::class);
 
-        $this->gameService = $container->gameService;
-        $this->telegramUserService = $container->telegramUserService;
-        $this->turnService = $container->turnService;
+        $this->gameService = $container->get(GameService::class);
+        $this->telegramUserService = $container->get(TelegramUserService::class);
+        $this->turnService = $container->get(TurnService::class);
 
-        $this->ageValidation = $container->ageValidation;
+        $this->ageValidation = $container->get(AgeValidation::class);
     }
 
     public function __invoke(
@@ -52,7 +58,7 @@ class TelegramBotController extends Controller
         $data = $request->getParsedBody();
 
         if (!empty($data)) {
-            $logEnabled = $this->getSettings('telegram.bot_log', false);
+            $logEnabled = $this->settingsProvider->get('telegram.bot_log', false);
 
             if ($logEnabled === true) {
                 $this->logger->info('Got request', $data);

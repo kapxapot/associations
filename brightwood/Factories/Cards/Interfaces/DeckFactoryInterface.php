@@ -9,5 +9,5 @@ use Brightwood\Models\Cards\Sets\Deck;
  */
 interface DeckFactoryInterface
 {
-    function make() : Deck;
+    function make(): Deck;
 }

@@ -6,6 +6,8 @@ use App\Auth\Auth;
 use App\Auth\Interfaces\AuthInterface;
 use App\Config\CaptchaConfig;
 use App\Config\Config;
+use App\Config\Interfaces\AssociationConfigInterface;
+use App\Config\Interfaces\NewsConfigInterface;
 use App\Config\Interfaces\UserConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Config\LocalizationConfig;
@@ -69,6 +71,8 @@ class CoreProvider extends MappingProvider
             AuthCore\AuthInterface::class => AuthInterface::class,
             Core\LinkerInterface::class => LinkerInterface::class,
             \Plasticode\Config\Config::class => Config::class,
+            AssociationConfigInterface::class => Config::class,
+            NewsConfigInterface::class => Config::class,
             UserConfigInterface::class => Config::class,
             WordConfigInterface::class => Config::class,
         ];

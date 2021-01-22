@@ -9,7 +9,6 @@ use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Games\EightsGame;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\FemaleBot;
-use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Parsing\StoryParser;
@@ -70,17 +69,17 @@ class EightsTestController
         ResponseInterface $response
     )
     {
-        $repo = new TelegramUserRepositoryMock(
+        $tgUserRepo = new TelegramUserRepositoryMock(
             new TelegramUserSeeder()
         );
 
-        $data = new EightsData(
-            new Human($repo->get(1))
-        );
+        $tgUser = $tgUserRepo->get(1);
+
+        $data = new EightsData();
 
         $data->withPlayerCount(4);
+        $data->initGame($tgUser);
 
-        $data->initGame();
         $data->game()->start();
         $data->game()->run();
 

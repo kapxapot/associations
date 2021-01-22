@@ -14,14 +14,14 @@ use Brightwood\Models\Cards\SuitedCard;
  */
 class ShortDeckFactory implements DeckFactoryInterface
 {
-    public function make() : Deck
+    public function make(): Deck
     {
         return new Deck(
             $this->collectCards()
         );
     }
 
-    protected function collectCards() : CardCollection
+    protected function collectCards(): CardCollection
     {
         $suits = Suit::all();
 

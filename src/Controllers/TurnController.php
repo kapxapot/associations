@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Auth\Interfaces\AuthInterface;
 use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
@@ -23,7 +22,6 @@ class TurnController extends Controller
     private GameRepositoryInterface $gameRepository;
     private TurnRepositoryInterface $turnRepository;
 
-    private AuthInterface $auth;
     private GameService $gameService;
     private TurnService $turnService;
 
@@ -31,12 +29,11 @@ class TurnController extends Controller
     {
         parent::__construct($container);
 
-        $this->gameRepository = $container->gameRepository;
-        $this->turnRepository = $container->turnRepository;
+        $this->gameRepository = $container->get(GameRepositoryInterface::class);
+        $this->turnRepository = $container->get(TurnRepositoryInterface::class);
 
-        $this->auth = $container->auth;
-        $this->gameService = $container->gameService;
-        $this->turnService = $container->turnService;
+        $this->gameService = $container->get(GameService::class);
+        $this->turnService = $container->get(TurnService::class);
     }
 
     public function create(
