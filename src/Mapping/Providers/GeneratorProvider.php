@@ -24,7 +24,7 @@ use Psr\Container\ContainerInterface;
 
 class GeneratorProvider extends MappingProvider
 {
-    public function getGenerators(): array
+    public function getMappings(): array
     {
         return [
             AssociationFeedbackGenerator::class =>

@@ -12,6 +12,7 @@ use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use Exception;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
@@ -68,7 +69,7 @@ class WordService
         Language $language,
         string $wordStr,
         User $user
-    ) : Word
+    ): Word
     {
         $word =
             $this->wordRepository->findInLanguage(
@@ -86,7 +87,7 @@ class WordService
         return $word;
     }
 
-    public function normalize(?string $word) : ?string
+    public function normalize(?string $word): ?string
     {
         return Strings::normalize($word);
     }
@@ -101,7 +102,7 @@ class WordService
      * Two users can add the same word in parallel
      * !!!!!!!!!!!!!!!!!!!
      */
-    public function create(Language $language, string $wordStr, User $user) : Word
+    public function create(Language $language, string $wordStr, User $user): Word
     {
         Assert::notNull($language, 'Language must be non-null.');
         Assert::notEmpty($wordStr, 'Word can\'t be empty.');
@@ -133,7 +134,7 @@ class WordService
         return $word;
     }
 
-    public function update(Word $word) : Word
+    public function update(Word $word): Word
     {
         $word = $this->wordRepository->save($word);
 
@@ -147,7 +148,7 @@ class WordService
     /**
      * Returns validation rules chain for word.
      */
-    public function getRule() : Validator
+    public function getRule(): Validator
     {
         return $this
             ->validationRules
@@ -162,13 +163,13 @@ class WordService
     /**
      * Returns true if the word is valid.
      */
-    public function isWordValid(?string $wordStr) : bool
+    public function isWordValid(?string $wordStr): bool
     {
         $valid = true;
 
         try {
             $this->validateWord($wordStr);
-        } catch (\Exception $ex) {
+        } catch (Exception $ex) {
             $valid = false;
         }
 
@@ -180,7 +181,7 @@ class WordService
      * 
      * @throws ValidationException
      */
-    public function validateWord(?string $wordStr) : void
+    public function validateWord(?string $wordStr): void
     {
         $this
             ->validator
@@ -191,7 +192,7 @@ class WordService
             ->throwOnFail();
     }
 
-    public function approvedInvisibleAssociationsStr(Word $word) : ?string
+    public function approvedInvisibleAssociationsStr(Word $word): ?string
     {
         $count = $word->approvedInvisibleAssociations()->count();
 
@@ -200,7 +201,7 @@ class WordService
             ->invisibleAssociationCountStr($count);
     }
 
-    public function notApprovedInvisibleAssociationsStr(Word $word) : ?string
+    public function notApprovedInvisibleAssociationsStr(Word $word): ?string
     {
         $count = $word->notApprovedInvisibleAssociations()->count();
 
@@ -215,7 +216,7 @@ class WordService
     public function getAllUsedBy(
         User $user,
         Language $language = null
-    ) : WordCollection
+    ): WordCollection
     {
         return
             WordCollection::from(
@@ -232,7 +233,7 @@ class WordService
     /**
      * Returns word only in case it is not null and the word is visible for the user.
      */
-    public function purgeFor(?Word $word, ?User $user) : ?Word
+    public function purgeFor(?Word $word, ?User $user): ?Word
     {
         return ($word && $word->isVisibleFor($user))
             ? $word

@@ -8,7 +8,7 @@ use App\Models\Word;
 use App\Specifications\WordSpecification;
 use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
-use Plasticode\Util\Convert;
+use Plasticode\Traits\Convert\ToBit;
 use Plasticode\Util\Date;
 
 /**
@@ -17,6 +17,8 @@ use Plasticode\Util\Date;
  */
 class WordRecountService
 {
+    use ToBit;
+
     private WordSpecification $wordSpecification;
     private WordService $wordService;
     private EventDispatcher $eventDispatcher;
@@ -32,7 +34,7 @@ class WordRecountService
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function recountAll(Word $word, ?Event $sourceEvent = null) : Word
+    public function recountAll(Word $word, ?Event $sourceEvent = null): Word
     {
         $word = $this->recountApproved($word, $sourceEvent);
         $word = $this->recountMature($word, $sourceEvent);
@@ -40,7 +42,7 @@ class WordRecountService
         return $word;
     }
 
-    public function recountApproved(Word $word, ?Event $sourceEvent = null) : Word
+    public function recountApproved(Word $word, ?Event $sourceEvent = null): Word
     {
         $now = Date::dbNow();
         $changed = false;
@@ -51,7 +53,7 @@ class WordRecountService
             $word->isApproved() !== $approved
             || is_null($word->approvedUpdatedAt)
         ) {
-            $word->approved = Convert::toBit($approved);
+            $word->approved = self::toBit($approved);
             $word->approvedUpdatedAt = $now;
 
             $changed = true;
@@ -70,7 +72,7 @@ class WordRecountService
         return $word;
     }
 
-    public function recountMature(Word $word, ?Event $sourceEvent = null) : Word
+    public function recountMature(Word $word, ?Event $sourceEvent = null): Word
     {
         $now = Date::dbNow();
         $changed = false;
@@ -81,7 +83,7 @@ class WordRecountService
             $word->isMature() !== $mature
             || is_null($word->matureUpdatedAt)
         ) {
-            $word->mature = Convert::toBit($mature);
+            $word->mature = self::toBit($mature);
             $word->matureUpdatedAt = $now;
 
             $changed = true;

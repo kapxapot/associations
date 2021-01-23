@@ -20,7 +20,7 @@ class AssociationApprovedChangedHandler
         $this->wordRecountService = $wordRecountService;
     }
 
-    public function __invoke(AssociationApprovedChangedEvent $event) : void
+    public function __invoke(AssociationApprovedChangedEvent $event): void
     {
         $event
             ->getAssociation()

@@ -1,7 +1,6 @@
 <?php
 
 use App\Mapping\Bootstrap;
-use Plasticode\Core\AppContext;
 use Plasticode\Core\Env;
 use Plasticode\Middleware\CookieAuthMiddleware;
 use Plasticode\Middleware\SlashMiddleware;

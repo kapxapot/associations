@@ -9,7 +9,7 @@ use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Specifications\AssociationSpecification;
 use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
-use Plasticode\Util\Convert;
+use Plasticode\Traits\Convert\ToBit;
 use Plasticode\Util\Date;
 
 /**
@@ -18,6 +18,8 @@ use Plasticode\Util\Date;
  */
 class AssociationRecountService
 {
+    use ToBit;
+
     private AssociationRepositoryInterface $associationRepository;
     private AssociationSpecification $associationSpecification;
     private EventDispatcher $eventDispatcher;
@@ -55,7 +57,7 @@ class AssociationRecountService
             $assoc->isApproved() !== $approved
             || is_null($assoc->approvedUpdatedAt)
         ) {
-            $assoc->approved = Convert::toBit($approved);
+            $assoc->approved = self::toBit($approved);
             $assoc->approvedUpdatedAt = $now;
 
             $changed = true;
@@ -88,7 +90,7 @@ class AssociationRecountService
             $assoc->isMature() !== $mature
             || is_null($assoc->matureUpdateAt)
         ) {
-            $assoc->mature = Convert::toBit($mature);
+            $assoc->mature = self::toBit($mature);
             $assoc->matureUpdatedAt = $now;
 
             $changed = true;

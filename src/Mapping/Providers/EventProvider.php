@@ -21,63 +21,52 @@ use Psr\Container\ContainerInterface;
 
 class EventProvider extends MappingProvider
 {
-    public function getEventHandlers(): array
+    public function getEventHandlers(ContainerInterface $container): array
     {
         return [
-            fn (ContainerInterface $c) =>
-                new AssociationApprovedChangedHandler(
-                    $c->get(WordRecountService::class)
-                ),
+            new AssociationApprovedChangedHandler(
+                $container->get(WordRecountService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new AssociationFeedbackCreatedHandler(
-                    $c->get(AssociationRecountService::class)
-                ),
+            new AssociationFeedbackCreatedHandler(
+                $container->get(AssociationRecountService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new AssociationOutOfDateHandler(
-                    $c->get(AssociationRecountService::class)
-                ),
+            new AssociationOutOfDateHandler(
+                $container->get(AssociationRecountService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new DictWordLinkedHandler(
-                    $c->get(WordRecountService::class)
-                ),
+            new DictWordLinkedHandler(
+                $container->get(WordRecountService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new DictWordUnlinkedHandler(
-                    $c->get(WordRecountService::class)
-                ),
+            new DictWordUnlinkedHandler(
+                $container->get(WordRecountService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new TurnCreatedHandler(
-                    $c->get(AssociationRecountService::class)
-                ),
+            new TurnCreatedHandler(
+                $container->get(AssociationRecountService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new WordCreatedHandler(
-                    $c->get(DictionaryService::class)
-                ),
+            new WordCreatedHandler(
+                $container->get(DictionaryService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new WordFeedbackCreatedHandler(
-                    $c->get(WordRecountService::class)
-                ),
+            new WordFeedbackCreatedHandler(
+                $container->get(WordRecountService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new WordMatureChangedHandler(
-                    $c->get(AssociationRecountService::class)
-                ),
+            new WordMatureChangedHandler(
+                $container->get(AssociationRecountService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new WordOutOfDateHandler(
-                    $c->get(WordRecountService::class)
-                ),
+            new WordOutOfDateHandler(
+                $container->get(WordRecountService::class)
+            ),
 
-            fn (ContainerInterface $c) =>
-                new WordUpdatedHandler(
-                    $c->get(DictionaryService::class)
-                ),
+            new WordUpdatedHandler(
+                $container->get(DictionaryService::class)
+            ),
         ];
     }
 }

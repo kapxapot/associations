@@ -35,7 +35,7 @@ class DictionaryService
      * Returns (and loads it from remote dictionary) external dictionary word
      * by {@see Word} entity.
      */
-    public function loadByWord(Word $word) : ?DictWordInterface
+    public function loadByWord(Word $word): ?DictWordInterface
     {
         return $this->getByWord($word, true);
     }
@@ -49,7 +49,7 @@ class DictionaryService
     public function getByWord(
         Word $word,
         bool $allowRemoteLoad = false
-    ) : ?DictWordInterface
+    ): ?DictWordInterface
     {
         // searching by word
         $dictWord = $word
@@ -88,7 +88,7 @@ class DictionaryService
      * If dict word was already linked to another word, emits {@see DictWordUnlinkedEvent}
      * as well.
      */
-    public function link(DictWordInterface $dictWord, Word $word) : DictWordInterface
+    public function link(DictWordInterface $dictWord, Word $word): DictWordInterface
     {
         $unlinkedWord = $dictWord->getLinkedWord();
 
@@ -117,7 +117,7 @@ class DictionaryService
     /**
      * Unlinks word from dict word and emits {@see DictWordUnlinkedEvent}.
      */
-    public function unlink(DictWordInterface $dictWord) : DictWordInterface
+    public function unlink(DictWordInterface $dictWord): DictWordInterface
     {
         $unlinkedWord = $dictWord->getLinkedWord();
 
@@ -135,7 +135,7 @@ class DictionaryService
         return $dictWord;
     }
 
-    private function unlinkWord(DictWordInterface $dictWord, Word $word) : void
+    private function unlinkWord(DictWordInterface $dictWord, Word $word): void
     {
         $word = $word->withDictWord(null);
 

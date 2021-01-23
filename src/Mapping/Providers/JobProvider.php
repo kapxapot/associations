@@ -10,6 +10,7 @@ use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Psr\Container\ContainerInterface;

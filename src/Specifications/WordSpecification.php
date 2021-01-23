@@ -16,13 +16,13 @@ class WordSpecification
         $this->config = $config;
     }
 
-    public function isApproved(Word $word) : bool
+    public function isApproved(Word $word): bool
     {
         return $this->isApprovedByDictWord($word)
             || $this->isApprovedByAssociations($word);
     }
 
-    public function isMature(Word $word) : bool
+    public function isMature(Word $word): bool
     {
         $threshold = $this->config->wordMatureThreshold();
 
@@ -31,14 +31,14 @@ class WordSpecification
         return $score >= $threshold;
     }
 
-    private function isApprovedByDictWord(Word $word) : bool
+    private function isApprovedByDictWord(Word $word): bool
     {
         $dictWord = $word->dictWord();
 
         return $dictWord && $dictWord->isGood();
     }
 
-    private function isApprovedByAssociations(Word $word) : bool
+    private function isApprovedByAssociations(Word $word): bool
     {
         $assocCoeff = $this->config->wordApprovedAssociationCoeff();
         $dislikeCoeff = $this->config->wordDislikeCoeff();
