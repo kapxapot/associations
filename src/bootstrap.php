@@ -2,13 +2,14 @@
 
 use App\Mapping\Bootstrap;
 use Plasticode\Core\Env;
+use Plasticode\DI\Autowirer;
+use Plasticode\DI\Containers\AutowiringContainer;
+use Plasticode\DI\ParamResolvers\UntypedContainerParamResolver;
 use Plasticode\Middleware\CookieAuthMiddleware;
 use Plasticode\Middleware\SlashMiddleware;
 use Plasticode\Services\AuthService;
 use Plasticode\Settings\SettingsFactory;
 use Respect\Validation\Validator;
-use Slim\App;
-use Slim\Container;
 
 $dir = __DIR__;
 $root = $dir . '/..';
@@ -17,12 +18,10 @@ require $root . '/vendor/autoload.php';
 
 $env = Env::load($root);
 $settings = SettingsFactory::make($root);
-$app = new App(['settings' => $settings]);
 
-/** @var Container */
-$container = $app->getContainer();
+$debug = $settings['debug'] ?? false;
 
-if ($settings['debug']) {
+if ($debug) {
     error_reporting(E_ALL);
     ini_set("display_errors", 1);
     ini_set("log_errors_max_len", 0);
@@ -30,6 +29,32 @@ if ($settings['debug']) {
     $errorLevel = error_reporting();
     error_reporting($errorLevel & ~E_NOTICE & ~E_DEPRECATED);
 }
+
+
+$slimSettings = [
+    'httpVersion' => '1.1',
+    'responseChunkSize' => 4096,
+    'outputBuffering' => 'append',
+    'determineRouteBeforeAppMiddleware' => false,
+    'displayErrorDetails' => $debug,
+    'addContentLengthHeader' => true,
+    'routerCacheFile' => false,
+];
+
+$autowirer = (new Autowirer())
+    ->withUntypedParamResolver(
+        new UntypedContainerParamResolver()
+    );
+
+$container = new AutowiringContainer($autowirer);
+
+$container['settings'] = fn () => new Slim\Collection($slimSettings);
+
+$defaultSlimProvider = new Slim\DefaultServicesProvider();
+$defaultSlimProvider->register($container);
+
+
+$app = new Slim\App($container);
 
 session_start();
 

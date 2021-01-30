@@ -1,7 +1,3 @@
-displayErrorDetails: true
-addContentLengthHeader: false
-
-# constants for PHP code
 log_errors: true
 debug: {DEBUG}
 

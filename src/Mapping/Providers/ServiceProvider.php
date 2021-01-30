@@ -47,7 +47,6 @@ use Plasticode\Util\Cases;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
 use Psr\Container\ContainerInterface;
-use Psr\Log\LoggerInterface;
 
 class ServiceProvider extends MappingProvider
 {
@@ -154,8 +153,7 @@ class ServiceProvider extends MappingProvider
                     $c->get(TurnRepositoryInterface::class),
                     $c->get(WordRepositoryInterface::class),
                     $c->get(AssociationService::class),
-                    $c->get(EventDispatcher::class),
-                    $c->get(LoggerInterface::class)
+                    $c->get(EventDispatcher::class)
                 ),
 
             UserService::class =>

@@ -12,14 +12,13 @@ use App\Models\Word;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Traits\Logging;
 use Plasticode\Events\EventDispatcher;
+use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Date;
-use Psr\Log\LoggerInterface;
 
 class TurnService
 {
-    use Logging;
+    use LoggerAwareTrait;
 
     private GameRepositoryInterface $gameRepository;
     private TurnRepositoryInterface $turnRepository;
@@ -33,8 +32,7 @@ class TurnService
         TurnRepositoryInterface $turnRepository,
         WordRepositoryInterface $wordRepository,
         AssociationService $associationService,
-        EventDispatcher $eventDispatcher,
-        ?LoggerInterface $logger = null
+        EventDispatcher $eventDispatcher
     )
     {
         $this->gameRepository = $gameRepository;
@@ -42,13 +40,12 @@ class TurnService
         $this->wordRepository = $wordRepository;
         $this->associationService = $associationService;
         $this->eventDispatcher = $eventDispatcher;
-        $this->logger = $logger;
     }
 
     /**
      * Returns true on success.
      */
-    public function finishTurn(Turn $turn, ?string $finishDate = null) : bool
+    public function finishTurn(Turn $turn, ?string $finishDate = null): bool
     {
         if ($turn->isFinished()) {
             return true;
@@ -64,7 +61,7 @@ class TurnService
     /**
      * Returns new player turn and AI turn/answer if it happens.
      */
-    public function newPlayerTurn(Game $game, Word $word, User $user) : TurnCollection
+    public function newPlayerTurn(Game $game, Word $word, User $user): TurnCollection
     {
         $turn = $this->newTurn($game, $word, $user);
 
@@ -82,7 +79,7 @@ class TurnService
         return TurnCollection::make($turns);
     }
 
-    public function newAiTurn(Game $game, Word $word) : Turn
+    public function newAiTurn(Game $game, Word $word): Turn
     {
         $turn = $this->newTurn($game, $word);
 
@@ -91,7 +88,7 @@ class TurnService
         return $turn;
     }
 
-    private function newTurn(Game $game, Word $word, ?User $user = null) : Turn
+    private function newTurn(Game $game, Word $word, ?User $user = null): Turn
     {
         $language = $game->language();
 
@@ -130,12 +127,12 @@ class TurnService
         return $turn;
     }
 
-    public function processAiTurn(Turn $turn) : void
+    public function processAiTurn(Turn $turn): void
     {
         $this->finishPrevTurn($turn);
     }
 
-    private function finishPrevTurn(Turn $turn) : void
+    private function finishPrevTurn(Turn $turn): void
     {
         if ($turn->prev()) {
             $this->finishTurn(
@@ -148,14 +145,14 @@ class TurnService
     /**
      * Returns AI turn in answer to player turn (if any).
      */
-    public function processPlayerTurn(Turn $turn) : ?Turn
+    public function processPlayerTurn(Turn $turn): ?Turn
     {
         $this->finishPrevTurn($turn);
 
         return $this->nextAiTurn($turn);
     }
 
-    private function nextAiTurn(Turn $turn) : ?Turn
+    private function nextAiTurn(Turn $turn): ?Turn
     {
         $game = $turn->game();
         $word = $this->findAnswer($turn);
@@ -174,7 +171,7 @@ class TurnService
      * 
      * Todo: this should belong to GameService, but creates a circular dependency
      */
-    public function finishGame(Game $game) : bool
+    public function finishGame(Game $game): bool
     {
         if ($game->isFinished()) {
             return false;
@@ -201,7 +198,7 @@ class TurnService
      * 
      * @throws DuplicateWordException
      */
-    public function validatePlayerTurn(Game $game, string $wordStr) : void
+    public function validatePlayerTurn(Game $game, string $wordStr): void
     {
         $language = $game->language();
 
@@ -219,7 +216,7 @@ class TurnService
         };
     }
 
-    public function findAnswer(Turn $turn) : ?Word
+    public function findAnswer(Turn $turn): ?Word
     {
         $game = $turn->game();
         $user = $turn->user();
