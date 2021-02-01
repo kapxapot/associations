@@ -1,10 +1,10 @@
 <?php
 
-use App\Mapping\Bootstrap;
 use Plasticode\Core\Env;
 use Plasticode\DI\Autowirer;
 use Plasticode\DI\Containers\AutowiringContainer;
 use Plasticode\DI\ParamResolvers\UntypedContainerParamResolver;
+use Plasticode\Mapping\Aggregators\WritableMappingAggregator;
 use Plasticode\Middleware\CookieAuthMiddleware;
 use Plasticode\Middleware\SlashMiddleware;
 use Plasticode\Services\AuthService;
@@ -58,8 +58,16 @@ $app = new Slim\App($container);
 
 session_start();
 
-$bootstrap = new Bootstrap($settings);
-$bootstrap->boot($container);
+$bootstrap = new WritableMappingAggregator($container);
+
+$bootstrap->registerMany(
+    new Plasticode\Mapping\Providers($settings),
+    new Plasticode\Data\Idiorm\Providers(),
+    new App\Mapping\Providers(),
+    new Brightwood\Mapping\Providers()
+);
+
+$bootstrap->boot();
 
 foreach ($settings['validation_namespaces'] as $namespace) {
     Validator::with($namespace);

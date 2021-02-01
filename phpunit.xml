@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit bootstrap="vendor/autoload.php" cacheResult="false">
-    <testsuites>
-        <testsuite name="Associations">
-            <directory>tests</directory>
-        </testsuite>
-        <testsuite name="Brightwood">
-            <directory>brightwood_tests</directory>
-        </testsuite>
-    </testsuites>
-    <filter>
-        <whitelist>
-            <directory>src</directory>
-            <directory>brightwood</directory>
-            <exclude>
-                <directory suffix="Interface.php">.</directory>
-            </exclude>
-        </whitelist>
-    </filter>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" bootstrap="vendor/autoload.php" cacheResult="false" xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd">
+  <coverage>
+    <include>
+      <directory>src</directory>
+      <directory>brightwood</directory>
+    </include>
+    <exclude>
+      <directory suffix="Interface.php">.</directory>
+    </exclude>
+  </coverage>
+  <testsuites>
+    <testsuite name="Associations">
+      <directory>tests</directory>
+    </testsuite>
+    <testsuite name="Brightwood">
+      <directory>brightwood_tests</directory>
+    </testsuite>
+  </testsuites>
 </phpunit>
