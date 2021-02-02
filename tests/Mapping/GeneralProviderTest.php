@@ -74,7 +74,6 @@ final class GeneralProviderTest extends AbstractProviderTest
     protected function getOuterDependencies(): array
     {
         return [
-            // Core\LinkerInterface::class,
             Core\RendererInterface::class,
             Core\SessionInterface::class,
 
@@ -102,12 +101,6 @@ final class GeneralProviderTest extends AbstractProviderTest
             UserRepositoryInterface::class,
             WordFeedbackRepositoryInterface::class,
             WordRepositoryInterface::class,
-
-            // WordService::class,
-
-            // AssociationConfigInterface::class,
-            // UserConfigInterface::class,
-            // WordConfigInterface::class,
         ];
     }
 
