@@ -15,10 +15,12 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
 use App\Models\News;
 use App\Models\Page;
+use App\Models\Validation\Factories\UserValidationFactory;
 use Plasticode\Auth\Interfaces as AuthCore;
 use Plasticode\Config\Interfaces as ConfigCore;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
+use Plasticode\Models\Validation\UserValidation;
 
 class CoreProvider extends MappingProvider
 {
@@ -49,6 +51,10 @@ class CoreProvider extends MappingProvider
             NewsConfigInterface::class => Config::class,
             UserConfigInterface::class => Config::class,
             WordConfigInterface::class => Config::class,
+
+            // validation
+
+            UserValidation::class => UserValidationFactory::class,
         ];
     }
 }

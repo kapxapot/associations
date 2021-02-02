@@ -8,6 +8,7 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Testing\Mocks\Repositories\LanguageRepositoryMock;
 use App\Testing\Seeders\LanguageSeeder;
 use App\Tests\IntegrationTest;
+use Plasticode\Settings\SettingsProvider;
 
 final class YandexDictTest extends IntegrationTest
 {
@@ -26,7 +27,7 @@ final class YandexDictTest extends IntegrationTest
         $this->language = $this->languageRepository->get(Language::RUSSIAN);
 
         $this->dict = new YandexDict(
-            $this->settings['yandex_dict']['key']
+            new SettingsProvider($this->settings)
         );
     }
 

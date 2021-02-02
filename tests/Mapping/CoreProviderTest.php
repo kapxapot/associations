@@ -14,11 +14,15 @@ use App\Config\LocalizationConfig;
 use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
 use App\Core\Serializer;
+use App\External\YandexDict;
 use App\Mapping\Providers\CoreProvider;
+use App\Models\Validation\AgeValidation;
 use Plasticode\Auth\Interfaces as AuthCore;
 use Plasticode\Config\Interfaces as ConfigCore;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Mapping\Interfaces\MappingProviderInterface;
+use Plasticode\Models\Validation\UserValidation;
+use Plasticode\Repositories\Interfaces as CoreRepositories;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Testing\AbstractProviderTest;
 use Slim\Interfaces\RouterInterface;
@@ -31,6 +35,8 @@ final class CoreProviderTest extends AbstractProviderTest
             RouterInterface::class,
             Core\SessionInterface::class,
             SettingsProviderInterface::class,
+
+            CoreRepositories\UserRepositoryInterface::class,
         ];
     }
 
@@ -71,5 +77,14 @@ final class CoreProviderTest extends AbstractProviderTest
         $this->check(NewsConfigInterface::class, Config::class);
         $this->check(UserConfigInterface::class, Config::class);
         $this->check(WordConfigInterface::class, Config::class);
+
+        // external
+
+        $this->check(YandexDict::class);
+
+        // validation
+
+        $this->check(AgeValidation::class);
+        $this->check(UserValidation::class);
     }
 }

@@ -6,14 +6,14 @@ use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Generators\Core\GeneratorContext;
 use Plasticode\Generators\UserGenerator as BaseUserGenerator;
-use Plasticode\Validation\Interfaces\ValidationInterface;
+use Plasticode\Models\Validation\UserValidation;
 
 class UserGenerator extends BaseUserGenerator
 {
     public function __construct(
         GeneratorContext $context,
         UserRepositoryInterface $userRepository,
-        ValidationInterface $userValidation
+        UserValidation $userValidation
     )
     {
         parent::__construct(

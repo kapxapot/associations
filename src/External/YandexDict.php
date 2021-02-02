@@ -2,13 +2,17 @@
 
 namespace App\External;
 
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
+
 class YandexDict
 {
-    private string $key;
+    private SettingsProviderInterface $settingsProvider;
 
-    public function __construct(string $key)
+    public function __construct(
+        SettingsProviderInterface $settingsProvider
+    )
     {
-        $this->key = $key;
+        $this->settingsProvider = $settingsProvider;
     }
 
     public function request(string $languageCode, string $word) : ?string
@@ -23,6 +27,15 @@ class YandexDict
 
     private function buildUrl(string $languageCode, string $word) : string
     {
-        return 'https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key=' . $this->key . '&lang=' . $languageCode . '&text=' . urlencode($word);
+        return
+            'https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key='
+            . $this->getKey()
+            . '&lang=' . $languageCode
+            . '&text=' . urlencode($word);
+    }
+
+    private function getKey(): string
+    {
+        return $this->settingsProvider->get('yandex_dict.key');
     }
 }
