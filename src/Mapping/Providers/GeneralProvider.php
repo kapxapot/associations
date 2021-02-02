@@ -17,12 +17,18 @@ use App\Handlers\NotFoundHandler;
 use App\Models\News;
 use App\Models\Page;
 use App\Models\Validation\Factories\UserValidationFactory;
+use App\Parsing\Factories\DoubleBracketsConfigFactory;
+use App\Services\Factories\NewsAggregatorServiceFactory;
+use App\Services\Interfaces\ExternalDictServiceInterface;
+use App\Services\YandexDictService;
 use Plasticode\Auth\Interfaces as AuthCore;
 use Plasticode\Config\Interfaces as ConfigCore;
+use Plasticode\Config\Parsing\DoubleBracketsConfig;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
 use Plasticode\Models\Validation\UserValidation;
+use Plasticode\Services\NewsAggregatorService;
 
 class GeneralProvider extends MappingProvider
 {
@@ -57,6 +63,15 @@ class GeneralProvider extends MappingProvider
             // validation
 
             UserValidation::class => UserValidationFactory::class,
+
+            // services
+
+            ExternalDictServiceInterface::class => YandexDictService::class,
+            NewsAggregatorService::class => NewsAggregatorServiceFactory::class,
+
+            // parsing
+
+            DoubleBracketsConfig::class => DoubleBracketsConfigFactory::class,
 
             // slim
 

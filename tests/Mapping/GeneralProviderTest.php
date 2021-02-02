@@ -18,21 +18,51 @@ use App\External\YandexDict;
 use App\Handlers\NotFoundHandler;
 use App\Mapping\Providers\GeneralProvider;
 use App\Models\Validation\AgeValidation;
+use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use App\Repositories\Interfaces\DictWordRepositoryInterface;
+use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
+use App\Repositories\Interfaces\NewsRepositoryInterface;
+use App\Repositories\Interfaces\PageRepositoryInterface;
+use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use App\Repositories\Interfaces\TurnRepositoryInterface;
+use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\AnniversaryService;
+use App\Services\AssociationFeedbackService;
+use App\Services\AssociationRecountService;
+use App\Services\AssociationService;
+use App\Services\CasesService;
+use App\Services\DictionaryService;
+use App\Services\GameService;
+use App\Services\Interfaces\ExternalDictServiceInterface;
+use App\Services\LanguageService;
+use App\Services\SearchService;
+use App\Services\TagPartsProviderService;
+use App\Services\TelegramUserService;
+use App\Services\TurnService;
+use App\Services\UserService;
+use App\Services\WordFeedbackService;
+use App\Services\WordRecountService;
 use App\Services\WordService;
 use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
 use Plasticode\Auth\Interfaces as AuthCore;
 use Plasticode\Config\Interfaces as ConfigCore;
+use Plasticode\Config\Parsing\DoubleBracketsConfig;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Core\Interfaces\ViewInterface;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Plasticode\Mapping\Interfaces\MappingProviderInterface;
 use Plasticode\Models\Validation\UserValidation;
+use Plasticode\Parsing\LinkMappers\NewsLinkMapper;
+use Plasticode\Parsing\LinkMappers\PageLinkMapper;
+use Plasticode\Parsing\LinkMappers\TagLinkMapper;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
+use Plasticode\Services\NewsAggregatorService;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Testing\AbstractProviderTest;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
@@ -44,22 +74,40 @@ final class GeneralProviderTest extends AbstractProviderTest
     protected function getOuterDependencies(): array
     {
         return [
-            LoggerInterface::class,
+            // Core\LinkerInterface::class,
             Core\RendererInterface::class,
-            RouterInterface::class,
             Core\SessionInterface::class,
+
+            CoreRepositories\MenuRepositoryInterface::class,
+            CoreRepositories\PageRepositoryInterface::class,
+            CoreRepositories\TagRepositoryInterface::class,
+            CoreRepositories\UserRepositoryInterface::class,
+
+            LoggerInterface::class,
+            RouterInterface::class,
             SettingsProviderInterface::class,
             TranslatorInterface::class,
             ValidatorInterface::class,
             ViewInterface::class,
 
+            AssociationFeedbackRepositoryInterface::class,
             AssociationRepositoryInterface::class,
+            DictWordRepositoryInterface::class,
+            GameRepositoryInterface::class,
             LanguageRepositoryInterface::class,
-            CoreRepositories\MenuRepositoryInterface::class,
-            CoreRepositories\UserRepositoryInterface::class,
+            NewsRepositoryInterface::class,
+            PageRepositoryInterface::class,
+            TelegramUserRepositoryInterface::class,
+            TurnRepositoryInterface::class,
+            UserRepositoryInterface::class,
+            WordFeedbackRepositoryInterface::class,
             WordRepositoryInterface::class,
 
-            WordService::class,
+            // WordService::class,
+
+            // AssociationConfigInterface::class,
+            // UserConfigInterface::class,
+            // WordConfigInterface::class,
         ];
     }
 
@@ -114,6 +162,34 @@ final class GeneralProviderTest extends AbstractProviderTest
 
         $this->check(AssociationSpecification::class);
         $this->check(WordSpecification::class);
+
+        // services
+
+        $this->check(AnniversaryService::class);
+        $this->check(AssociationFeedbackService::class);
+        $this->check(AssociationRecountService::class);
+        $this->check(AssociationService::class);
+        $this->check(CasesService::class);
+        $this->check(DictionaryService::class);
+        $this->check(ExternalDictServiceInterface::class);
+        $this->check(GameService::class);
+        $this->check(LanguageService::class);
+        $this->check(NewsAggregatorService::class);
+        $this->check(SearchService::class);
+        $this->check(TagPartsProviderService::class);
+        $this->check(TelegramUserService::class);
+        $this->check(TurnService::class);
+        $this->check(UserService::class);
+        $this->check(WordFeedbackService::class);
+        $this->check(WordRecountService::class);
+        $this->check(WordService::class);
+
+        // parsing
+
+        $this->check(DoubleBracketsConfig::class);
+        $this->check(NewsLinkMapper::class);
+        $this->check(PageLinkMapper::class);
+        $this->check(TagLinkMapper::class);
 
         // slim
 

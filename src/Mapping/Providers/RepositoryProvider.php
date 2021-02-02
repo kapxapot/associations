@@ -147,6 +147,8 @@ class RepositoryProvider extends MappingProvider
                     )
                 ),
 
+            CoreRepositories\PageRepositoryInterface::class => PageRepositoryInterface::class,
+    
             TelegramUserRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new TelegramUserRepository(
                     $c->get(RepositoryContext::class),
@@ -186,6 +188,8 @@ class RepositoryProvider extends MappingProvider
                     )
                 ),
 
+            CoreRepositories\UserRepositoryInterface::class => UserRepositoryInterface::class,
+
             WordFeedbackRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new WordFeedbackRepository(
                     $c->get(RepositoryContext::class),
@@ -213,14 +217,6 @@ class RepositoryProvider extends MappingProvider
                         )
                     )
                 ),
-        ];
-    }
-
-    public function getAliases(): array
-    {
-        return [
-            CoreRepositories\PageRepositoryInterface::class => PageRepositoryInterface::class,
-            CoreRepositories\UserRepositoryInterface::class => UserRepositoryInterface::class,
         ];
     }
 }
