@@ -13,16 +13,18 @@ use App\Config\Interfaces\WordConfigInterface;
 use App\Config\LocalizationConfig;
 use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
+use App\Handlers\NotFoundHandler;
 use App\Models\News;
 use App\Models\Page;
 use App\Models\Validation\Factories\UserValidationFactory;
 use Plasticode\Auth\Interfaces as AuthCore;
 use Plasticode\Config\Interfaces as ConfigCore;
 use Plasticode\Core\Interfaces as Core;
+use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
 use Plasticode\Models\Validation\UserValidation;
 
-class CoreProvider extends MappingProvider
+class GeneralProvider extends MappingProvider
 {
     public function getMappings(): array
     {
@@ -55,6 +57,10 @@ class CoreProvider extends MappingProvider
             // validation
 
             UserValidation::class => UserValidationFactory::class,
+
+            // slim
+
+            NotFoundHandlerInterface::class => NotFoundHandler::class,
         ];
     }
 }

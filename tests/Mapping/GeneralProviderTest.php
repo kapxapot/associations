@@ -15,34 +15,57 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
 use App\Core\Serializer;
 use App\External\YandexDict;
-use App\Mapping\Providers\CoreProvider;
+use App\Handlers\NotFoundHandler;
+use App\Mapping\Providers\GeneralProvider;
 use App\Models\Validation\AgeValidation;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use App\Repositories\Interfaces\LanguageRepositoryInterface;
+use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\WordService;
+use App\Specifications\AssociationSpecification;
+use App\Specifications\WordSpecification;
 use Plasticode\Auth\Interfaces as AuthCore;
 use Plasticode\Config\Interfaces as ConfigCore;
 use Plasticode\Core\Interfaces as Core;
+use Plasticode\Core\Interfaces\TranslatorInterface;
+use Plasticode\Core\Interfaces\ViewInterface;
+use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Plasticode\Mapping\Interfaces\MappingProviderInterface;
 use Plasticode\Models\Validation\UserValidation;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Testing\AbstractProviderTest;
+use Plasticode\Validation\Interfaces\ValidatorInterface;
+use Psr\Log\LoggerInterface;
 use Slim\Interfaces\RouterInterface;
 
-final class CoreProviderTest extends AbstractProviderTest
+final class GeneralProviderTest extends AbstractProviderTest
 {
     protected function getOuterDependencies(): array
     {
         return [
+            LoggerInterface::class,
+            Core\RendererInterface::class,
             RouterInterface::class,
             Core\SessionInterface::class,
             SettingsProviderInterface::class,
+            TranslatorInterface::class,
+            ValidatorInterface::class,
+            ViewInterface::class,
 
+            AssociationRepositoryInterface::class,
+            LanguageRepositoryInterface::class,
+            CoreRepositories\MenuRepositoryInterface::class,
             CoreRepositories\UserRepositoryInterface::class,
+            WordRepositoryInterface::class,
+
+            WordService::class,
         ];
     }
 
     protected function getProvider(): ?MappingProviderInterface
     {
-        return new CoreProvider();
+        return new GeneralProvider();
     }
 
     public function testWiring(): void
@@ -86,5 +109,14 @@ final class CoreProviderTest extends AbstractProviderTest
 
         $this->check(AgeValidation::class);
         $this->check(UserValidation::class);
+
+        // specifications
+
+        $this->check(AssociationSpecification::class);
+        $this->check(WordSpecification::class);
+
+        // slim
+
+        $this->check(NotFoundHandlerInterface::class, NotFoundHandler::class);
     }
 }
