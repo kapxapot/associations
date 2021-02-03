@@ -41,10 +41,12 @@ class UserGenerator extends BaseUserGenerator
 
         $user = $this->getRepository()->get($id);
 
-        $item['display_name'] = $user->displayName();
+        $item['display_name'] = $user->isTelegramUser()
+            ? $user->telegramUser()->fullName()
+            : $user->displayName();
 
         $item['telegram'] = $user->isTelegramUser()
-            ? $user->telegramUser()->username
+            ? $user->telegramUser()->publicName()
             : null;
 
         $item['gender'] = $user->gender();

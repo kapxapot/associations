@@ -302,13 +302,13 @@ users:
       name: E-mail / Telegram
       attributes: [readonly]
       template: >
-        (row.telegram ? row.telegram : row.email)
+        (row.telegram ? row.telegram + ' <i class="fab fa-telegram-plane telegram-color" title="Telegram" data-toggle="tooltip"></i>' : row.email)
 
     gender:
       name: Пол
       attributes: [readonly]
       template: >
-        (row.gender ? (row.gender == 1 ? 'М' : 'Ж') : '?')
+        (row.gender ? (row.gender == 1 ? 'М' : 'Ж') : '')
 
     age:
       name: Возраст
