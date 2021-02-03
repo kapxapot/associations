@@ -63,8 +63,11 @@ $bootstrap = new WritableMappingAggregator($container);
 $bootstrap->registerMany(
     new Plasticode\Mapping\Providers($settings),
     new Plasticode\Data\Idiorm\Providers(),
-    new App\Mapping\Providers(),
-    new Brightwood\Mapping\Providers()
+    new App\Mapping\Providers()
+);
+
+$bootstrap->register(
+    new Brightwood\Mapping\Providers\GeneralProvider()
 );
 
 $bootstrap->boot();
