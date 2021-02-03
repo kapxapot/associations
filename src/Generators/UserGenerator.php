@@ -32,4 +32,23 @@ class UserGenerator extends BaseUserGenerator
     {
         return parent::getRepository();
     }
+
+    public function afterLoad(array $item): array
+    {
+        $item = parent::afterLoad($item);
+
+        $id = $item[$this->idField()];
+
+        $user = $this->getRepository()->get($id);
+
+        $item['display_name'] = $user->displayName();
+
+        $item['telegram'] = $user->isTelegramUser()
+            ? $user->telegramUser()->username
+            : null;
+
+        $item['gender'] = $user->gender();
+
+        return $item;
+    }
 }

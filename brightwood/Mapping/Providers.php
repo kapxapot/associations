@@ -2,10 +2,7 @@
 
 namespace Brightwood\Mapping;
 
-use Brightwood\Mapping\Providers\CardsProvider;
-use Brightwood\Mapping\Providers\CoreProvider;
-use Brightwood\Mapping\Providers\ExternalProvider;
-use Brightwood\Mapping\Providers\RepositoryProvider;
+use Brightwood\Mapping\Providers\GeneralProvider;
 use Plasticode\Collections\MappingProviderCollection;
 
 class Providers extends MappingProviderCollection
@@ -14,10 +11,7 @@ class Providers extends MappingProviderCollection
     {
         parent::__construct(
             [
-                new CoreProvider(),
-                new RepositoryProvider(),
-                new ExternalProvider(),
-                new CardsProvider()
+                new GeneralProvider()
             ]
         );
     }

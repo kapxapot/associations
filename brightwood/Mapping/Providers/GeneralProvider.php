@@ -9,20 +9,20 @@ use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Repositories\StoryRepository;
 use Brightwood\Repositories\StoryStatusRepository;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
+use Brightwood\Serialization\Cards\RootDeserializer;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
 use Plasticode\ObjectProxy;
 use Plasticode\Repositories\Idiorm\Core\RepositoryContext;
 use Psr\Container\ContainerInterface;
 
-class RepositoryProvider extends MappingProvider
+class GeneralProvider extends MappingProvider
 {
     public function getMappings(): array
     {
         return [
-            StoryRepositoryInterface::class =>
-                fn (ContainerInterface $c) => new StoryRepository(
-                    $c->get(RootDeserializerInterface::class)
-                ),
+            // repositories
+
+            StoryRepositoryInterface::class => StoryRepository::class,
 
             StoryStatusRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new StoryStatusRepository(
@@ -33,6 +33,10 @@ class RepositoryProvider extends MappingProvider
                         )
                     )
                 ),
+
+            // cards
+
+            RootDeserializerInterface::class => RootDeserializer::class,
         ];
     }
 }

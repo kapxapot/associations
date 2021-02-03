@@ -279,6 +279,7 @@ users:
 
     login:
       name: Логин
+      attributes: [hidden]
       template: >
         row.login + (row.name ? ' (' + row.name + ')' : '')
 
@@ -287,9 +288,27 @@ users:
       attributes: [nullable, hidden]
       tooltip: По умолчанию совпадает с логином.
 
+    display_name:
+      name: Имя
+      attributes: [readonly]
+      template: row.display_name
+
     email:
       name: E-mail
       type: email
+      attributes: [hidden]
+
+    email_or_telegram:
+      name: E-mail / Telegram
+      attributes: [readonly]
+      template: >
+        (row.telegram ? row.telegram : row.email)
+
+    gender:
+      name: Пол
+      attributes: [readonly]
+      template: >
+        (row.gender ? (row.gender == 1 ? 'М' : 'Ж') : '?')
 
     age:
       name: Возраст

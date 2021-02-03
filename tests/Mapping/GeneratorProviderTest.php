@@ -15,10 +15,10 @@ use App\Repositories\Interfaces\NewsRepositoryInterface;
 use App\Repositories\Interfaces\PageRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
-use Plasticode\Core\Interfaces\ViewInterface;
+use Plasticode\Core\Interfaces as Core;
 use Plasticode\Data\Interfaces\ApiInterface;
 use Plasticode\Middleware\Factories\AccessMiddlewareFactory;
-use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
+use Plasticode\Repositories\Interfaces as CoreRepositories;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Testing\AbstractProviderTest;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
@@ -34,14 +34,14 @@ final class GeneratorProviderTest extends AbstractProviderTest
             RouterInterface::class,
             SettingsProviderInterface::class,
             ValidatorInterface::class,
-            ViewInterface::class,
+            Core\ViewInterface::class,
 
             AssociationFeedbackRepositoryInterface::class,
             GameRepositoryInterface::class,
             NewsRepositoryInterface::class,
             PageRepositoryInterface::class,
-            TagRepositoryInterface::class,
-            \Plasticode\Repositories\Interfaces\UserRepositoryInterface::class,
+            CoreRepositories\TagRepositoryInterface::class,
+            CoreRepositories\UserRepositoryInterface::class,
             UserRepositoryInterface::class,
             WordFeedbackRepositoryInterface::class,
         ];

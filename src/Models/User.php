@@ -22,7 +22,7 @@ class User extends UserBase implements GenderedInterface
 {
     use Gendered;
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return [
             ...parent::requiredWiths(),
@@ -32,7 +32,7 @@ class User extends UserBase implements GenderedInterface
         ];
     }
 
-    public function serialize() : array
+    public function serialize(): array
     {
         return [
             'id' => $this->getId(),
@@ -40,19 +40,19 @@ class User extends UserBase implements GenderedInterface
         ];
     }
 
-    public function hasAge() : bool
+    public function hasAge(): bool
     {
         return $this->age > 0;
     }
 
-    public function ageNow() : int
+    public function ageNow(): int
     {
         $yearsPassed = Date::age($this->createdAt)->y;
 
         return $this->age + $yearsPassed;
     }
 
-    public function displayName() : string
+    public function displayName(): string
     {
         $name = parent::displayName();
 
@@ -67,14 +67,14 @@ class User extends UserBase implements GenderedInterface
             : 'глюк какой-то';
     }
 
-    public function isTelegramUser() : bool
+    public function isTelegramUser(): bool
     {
         return $this->telegramUser() !== null;
     }
 
     // GenderedInterface
 
-    public function gender() : ?int
+    public function gender(): ?int
     {
         return $this->isTelegramUser()
             ? $this->telegramUser()->gender()

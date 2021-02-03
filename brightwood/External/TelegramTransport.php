@@ -2,15 +2,17 @@
 
 namespace Brightwood\External;
 
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
+
 class TelegramTransport
 {
-    private string $token;
+    private SettingsProviderInterface $settingsProvider;
 
     public function __construct(
-        string $token
+        SettingsProviderInterface $settingsProvider
     )
     {
-        $this->token = $token;
+        $this->settingsProvider = $settingsProvider;
     }
 
     /**
@@ -18,7 +20,7 @@ class TelegramTransport
      */
     public function sendMessage(array $message)
     {
-        $url = 'https://api.telegram.org/bot' . $this->token . '/sendMessage';
+        $url = 'https://api.telegram.org/bot' . $this->getToken() . '/sendMessage';
 
         $ch = curl_init();
 
@@ -43,5 +45,10 @@ class TelegramTransport
             fn ($item) => is_array($item) ? json_encode($item) : $item,
             $message
         );
+    }
+
+    private function getToken(): string
+    {
+        return $this->settingsProvider->get('telegram.brightwood_bot_token');
     }
 }

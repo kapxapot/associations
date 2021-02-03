@@ -3,37 +3,39 @@
 namespace Brightwood\Serialization\Cards;
 
 use Brightwood\Collections\Cards\PlayerCollection;
+use Brightwood\Config\SerializationConfig;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Suit;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
-use Brightwood\Serialization\Cards\Interfaces\SerializerSourceInterface;
 use Brightwood\Serialization\Cards\Serializers\CardSerializer;
 use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
+use Exception;
+use InvalidArgumentException;
 use Plasticode\Exceptions\InvalidConfigurationException;
 use Webmozart\Assert\Assert;
 
 class RootDeserializer implements RootDeserializerInterface
 {
-    private SerializerSourceInterface $serializerSource;
+    private SerializationConfig $config;
     private CardSerializer $cardSerializer;
     private SuitSerializer $suitSerializer;
     private PlayerCollection $players;
 
     public function __construct(
-        SerializerSourceInterface $serializerSource,
+        SerializationConfig $config,
         CardSerializer $cardSerializer,
         SuitSerializer $suitSerializer
     )
     {
-        $this->serializerSource = $serializerSource;
+        $this->config = $config;
         $this->cardSerializer = $cardSerializer;
         $this->suitSerializer = $suitSerializer;
         $this->players = PlayerCollection::empty();
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws InvalidConfigurationException
      */
     public function deserialize(?array $jsonData) : ?object
@@ -42,7 +44,7 @@ class RootDeserializer implements RootDeserializerInterface
             return null;
         }
 
-        /** @var string */
+        /** @var string $type */
         $type = $jsonData['type'] ?? '';
 
         Assert::stringNotEmpty(
@@ -50,7 +52,7 @@ class RootDeserializer implements RootDeserializerInterface
             'No type name found in the serialized data.'
         );
 
-        $serializer = $this->serializerSource->getSerializer($type);
+        $serializer = $this->config->getSerializer($type);
 
         if (is_null($serializer)) {
             throw new InvalidConfigurationException(
@@ -60,7 +62,7 @@ class RootDeserializer implements RootDeserializerInterface
 
         $obj = new $type();
 
-        /** @var array */
+        /** @var array $data */
         $data = $jsonData['data'] ?? [];
 
         return $serializer->deserialize($this, $obj, $data);
@@ -90,11 +92,11 @@ class RootDeserializer implements RootDeserializerInterface
     }
 
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     function resolvePlayer(?string $id) : ?Player
     {
-        if (strlen($id) == 0) {
+        if (strlen($id) === 0) {
             return null;
         }
 
@@ -104,6 +106,6 @@ class RootDeserializer implements RootDeserializerInterface
             return $player;
         }
 
-        throw new \Exception('Player [' . $id . '] not found.');
+        throw new Exception('Player [' . $id . '] not found.');
     }
 }

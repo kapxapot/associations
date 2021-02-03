@@ -53,8 +53,6 @@ use Plasticode\Auth\Interfaces as AuthCore;
 use Plasticode\Config\Interfaces as ConfigCore;
 use Plasticode\Config\Parsing\DoubleBracketsConfig;
 use Plasticode\Core\Interfaces as Core;
-use Plasticode\Core\Interfaces\TranslatorInterface;
-use Plasticode\Core\Interfaces\ViewInterface;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Plasticode\Mapping\Interfaces\MappingProviderInterface;
 use Plasticode\Models\Validation\UserValidation;
@@ -76,6 +74,8 @@ final class GeneralProviderTest extends AbstractProviderTest
         return [
             Core\RendererInterface::class,
             Core\SessionInterface::class,
+            Core\TranslatorInterface::class,
+            Core\ViewInterface::class,
 
             CoreRepositories\MenuRepositoryInterface::class,
             CoreRepositories\PageRepositoryInterface::class,
@@ -85,9 +85,7 @@ final class GeneralProviderTest extends AbstractProviderTest
             LoggerInterface::class,
             RouterInterface::class,
             SettingsProviderInterface::class,
-            TranslatorInterface::class,
             ValidatorInterface::class,
-            ViewInterface::class,
 
             AssociationFeedbackRepositoryInterface::class,
             AssociationRepositoryInterface::class,
