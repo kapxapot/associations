@@ -26,7 +26,7 @@ class YandexDictService implements ExternalDictServiceInterface
     public function loadFromDictionary(
         Language $language,
         string $wordStr
-    ) : ?YandexDictWord
+    ): ?YandexDictWord
     {
         Assert::notNull($language->yandexDictCode);
 
@@ -53,7 +53,7 @@ class YandexDictService implements ExternalDictServiceInterface
         return $dictWord;
     }
 
-    private function parseApiResult(?string $result) : ?array
+    private function parseApiResult(?string $result): ?array
     {
         return strlen($result) > 0
             ? json_decode($result, true)
@@ -63,7 +63,7 @@ class YandexDictService implements ExternalDictServiceInterface
     private function applyParsedData(
         YandexDictWord $dictWord,
         ?array $data
-    ) : YandexDictWord
+    ): YandexDictWord
     {
         if (is_array($data)) {
             $def = $data['def'][0] ?? null;

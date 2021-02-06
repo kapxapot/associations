@@ -1,26 +1,26 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\DTO;
 
-use Plasticode\Models\Generic\Model;
+use App\Models\Association;
+use App\Models\User;
+use App\Models\Word;
 
 /**
  * DTO for {@see \App\Models\Word} origin chain.
  */
-class MetaAssociation extends Model
+class MetaAssociation
 {
     private Association $association;
     private Word $toWord;
 
     public function __construct(
-        Word $toWord,
-        Association $association
+        Association $association,
+        Word $toWord
     )
     {
-        parent::__construct();
-
-        $this->toWord = $toWord;
         $this->association = $association;
+        $this->toWord = $toWord;
     }
 
     public function association(): Association

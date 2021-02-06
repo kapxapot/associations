@@ -6,6 +6,7 @@ use App\Collections\AssociationCollection;
 use App\Collections\MetaAssociationCollection;
 use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
+use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 
 /**
@@ -18,7 +19,7 @@ use App\Models\Interfaces\DictWordInterface;
  */
 class Word extends LanguageElement
 {
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return [
             ...parent::requiredWiths(),
@@ -26,36 +27,36 @@ class Word extends LanguageElement
         ];
     }
 
-    public function feedbacks() : WordFeedbackCollection
+    public function feedbacks(): WordFeedbackCollection
     {
         return WordFeedbackCollection::from(
             parent::feedbacks()
         );
     }
 
-    public function dislikes() : WordFeedbackCollection
+    public function dislikes(): WordFeedbackCollection
     {
         return $this->feedbacks()->dislikes();
     }
 
-    public function matures() : WordFeedbackCollection
+    public function matures(): WordFeedbackCollection
     {
         return $this->feedbacks()->matures();
     }
 
-    public function feedbackBy(User $user) : ?WordFeedback
+    public function feedbackBy(User $user): ?WordFeedback
     {
         return $this->feedbacks()->firstBy($user);
     }
 
-    public function feedbackByMe() : ?WordFeedback
+    public function feedbackByMe(): ?WordFeedback
     {
         return $this->me()
             ? $this->feedbackBy($this->me())
             : null;
     }
 
-    public function associationByWord(Word $word) : ?Association
+    public function associationByWord(Word $word): ?Association
     {
         return $this
             ->associations()
@@ -64,7 +65,7 @@ class Word extends LanguageElement
             );
     }
 
-    public function approvedAssociations() : AssociationCollection
+    public function approvedAssociations(): AssociationCollection
     {
         return $this
             ->associations()
@@ -77,28 +78,28 @@ class Word extends LanguageElement
     /**
      * Returns approved associations that are visible for everyone (public).
      */
-    public function publicAssociations() : AssociationCollection
+    public function publicAssociations(): AssociationCollection
     {
         return $this
             ->approvedAssociations()
             ->public();
     }
 
-    public function approvedVisibleAssociations() : AssociationCollection
+    public function approvedVisibleAssociations(): AssociationCollection
     {
         return $this
             ->approvedAssociations()
             ->visibleFor($this->me());
     }
 
-    public function approvedInvisibleAssociations() : AssociationCollection
+    public function approvedInvisibleAssociations(): AssociationCollection
     {
         return $this
             ->approvedAssociations()
             ->invisibleFor($this->me());
     }
 
-    public function notApprovedAssociations() : AssociationCollection
+    public function notApprovedAssociations(): AssociationCollection
     {
         return $this
             ->associations()
@@ -108,14 +109,14 @@ class Word extends LanguageElement
             );
     }
 
-    public function notApprovedVisibleAssociations() : AssociationCollection
+    public function notApprovedVisibleAssociations(): AssociationCollection
     {
         return $this
             ->notApprovedAssociations()
             ->visibleFor($this->me());
     }
 
-    public function notApprovedInvisibleAssociations() : AssociationCollection
+    public function notApprovedInvisibleAssociations(): AssociationCollection
     {
         return $this
             ->notApprovedAssociations()
@@ -131,7 +132,7 @@ class Word extends LanguageElement
      * it is considered as an origin association.
      * - Otherwise, there is no origin association.
      */
-    public function originAssociation() : ?Association
+    public function originAssociation(): ?Association
     {
         $oldest = $this->associations()->oldest();
 
@@ -150,7 +151,7 @@ class Word extends LanguageElement
      * If the origin association exists, the other word in it is
      * considered as an origin word.
      */
-    public function originWord() : ?Word
+    public function originWord(): ?Word
     {
         $originAssociation = $this->originAssociation();
 
@@ -159,20 +160,20 @@ class Word extends LanguageElement
             : null;
     }
 
-    public function originChain() : MetaAssociationCollection
+    public function originChain(): MetaAssociationCollection
     {
         $chain = MetaAssociationCollection::empty();
         $originAssociation = $this->originAssociation();
 
         return $originAssociation
             ? $chain->add(
-                new MetaAssociation($this, $originAssociation),
+                new MetaAssociation($originAssociation, $this),
                 ...$this->originWord()->originChain()
             )
             : $chain;
     }
 
-    public function associatedWordsFor(User $user) : WordCollection
+    public function associatedWordsFor(User $user): WordCollection
     {
         return WordCollection::from(
             $this
@@ -184,7 +185,7 @@ class Word extends LanguageElement
         );
     }
 
-    public function serialize() : array
+    public function serialize(): array
     {
         return [
             'id' => $this->getId(),
@@ -196,7 +197,7 @@ class Word extends LanguageElement
         ];
     }
 
-    public function proposedTypos() : array
+    public function proposedTypos(): array
     {
         return $this
             ->feedbacks()
@@ -206,7 +207,7 @@ class Word extends LanguageElement
             );
     }
 
-    public function proposedDuplicates() : array
+    public function proposedDuplicates(): array
     {
         return $this
             ->feedbacks()
@@ -219,7 +220,7 @@ class Word extends LanguageElement
     /**
      * Returns the typo provided by the current user.
      */
-    public function typoByMe() : ?string
+    public function typoByMe(): ?string
     {
         $feedback = $this->feedbackByMe();
 
@@ -231,7 +232,7 @@ class Word extends LanguageElement
     /**
      * Returns the duplicate provided by the current user.
      */
-    public function duplicateByMe() : ?Word
+    public function duplicateByMe(): ?Word
     {
         $feedback = $this->feedbackByMe();
 
@@ -243,7 +244,7 @@ class Word extends LanguageElement
     /**
      * Returns word or typo by the current user with '*' (if any).
      */
-    public function displayName() : string
+    public function displayName(): string
     {
         $typo = $this->typoByMe();
 
@@ -255,7 +256,7 @@ class Word extends LanguageElement
     /**
      * Returns the original word + typo by the current user.
      */
-    public function fullDisplayName() : string
+    public function fullDisplayName(): string
     {
         $name = $this->displayName();
 

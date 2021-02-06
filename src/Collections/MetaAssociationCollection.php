@@ -2,7 +2,7 @@
 
 namespace App\Collections;
 
-use App\Models\MetaAssociation;
+use App\Models\DTO\MetaAssociation;
 use Plasticode\Collections\Generic\TypedCollection;
 
 class MetaAssociationCollection extends TypedCollection

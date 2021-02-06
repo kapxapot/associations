@@ -3,13 +3,11 @@
 namespace App\Tests\External;
 
 use App\External\DictionaryApi;
-use App\External\YandexDict;
 use App\Models\Language;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Testing\Mocks\Repositories\LanguageRepositoryMock;
 use App\Testing\Seeders\LanguageSeeder;
 use App\Tests\IntegrationTest;
-use Plasticode\Settings\SettingsProvider;
 
 final class DictionaryApiTest extends IntegrationTest
 {
@@ -46,7 +44,7 @@ final class DictionaryApiTest extends IntegrationTest
     {
         $result = $this->dictApi->request($this->language->code, $word);
 
-        $data = json_decode($result, true);
+        $data = json_decode($result->data(), true);
 
         $this->assertIsArray($data);
 
@@ -71,7 +69,8 @@ final class DictionaryApiTest extends IntegrationTest
     {
         $result = $this->dictApi->request($this->language->code, $word);
 
-        $this->assertNull($result);
+        $this->assertNull($result->data());
+        $this->assertTrue($result->isEmpty());
     }
 
     public function notExistingWordsProvider(): array

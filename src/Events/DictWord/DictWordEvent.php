@@ -17,12 +17,12 @@ abstract class DictWordEvent extends EntityEvent
         $this->dictWord = $dictWord;
     }
 
-    public function getDictWord() : DictWordInterface
+    public function getDictWord(): DictWordInterface
     {
         return $this->dictWord;
     }
 
-    public function getEntity() : DictWordInterface
+    public function getEntity(): DictWordInterface
     {
         return $this->getDictWord();
     }

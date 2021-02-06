@@ -14,6 +14,7 @@ use App\Config\LocalizationConfig;
 use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
 use App\Core\Serializer;
+use App\External\DictionaryApi;
 use App\External\YandexDict;
 use App\Handlers\NotFoundHandler;
 use App\Mapping\Providers\GeneralProvider;
@@ -143,6 +144,7 @@ final class GeneralProviderTest extends AbstractProviderTest
         // external
 
         $this->check(YandexDict::class);
+        $this->check(DictionaryApi::class);
 
         // validation
 

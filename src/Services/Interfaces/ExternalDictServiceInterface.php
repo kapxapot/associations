@@ -10,5 +10,5 @@ interface ExternalDictServiceInterface
     function loadFromDictionary(
         Language $language,
         string $wordStr
-    ) : ?DictWordInterface;
+    ): ?DictWordInterface;
 }
