@@ -42,16 +42,16 @@ templates:
     author: [read_own, create, edit_own]
 
   public_immutable:
-    admin: [full]
+    admin: [read]
     editor: [read]
-    author: [read_own, create]
+    author: [read_own, api_create]
 
 rights:
   association_feedbacks:
     template: strict_read
 
   associations:
-    template: editor
+    template: strict_read
 
   games:
     template: public_immutable
@@ -84,4 +84,4 @@ rights:
     template: strict_read
 
   words:
-    template: editor
+    template: strict_read

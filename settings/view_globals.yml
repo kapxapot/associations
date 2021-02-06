@@ -38,8 +38,14 @@ word_max_length: 100
 
 admin_menu:
   - languages
-  - news
-  - pages
+  - games
+  - words
+  - associations
+  - group:
+      title: Лента
+      items:
+        - news
+        - pages
   - group:
       title: Отзывы
       items:

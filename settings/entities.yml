@@ -1,3 +1,42 @@
+associations:
+  name_gen: ассоциации
+  name_accus: ассоциацию
+  title: Ассоциации
+
+  columns:
+    id:
+      name: id
+      attributes: [readonly]
+
+    language:
+      name: Язык
+      attributes: [readonly]
+
+    association:
+      name: Ассоциация
+      template: >
+        '<a href="' + row.url + '">' + row.name + '</a>'
+      attributes: [readonly]
+
+    mature:
+      name: 16+
+      type: bool
+      attributes: [readonly]
+
+    approved:
+      name: Общая
+      type: bool
+      attributes: [readonly]
+
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [readonly]
+
+    created_by_name:
+      name: Автор
+      attributes: [readonly]
+
 association_feedbacks:
   name_gen: отзыва об ассоциации
   name_accus: отзыв об ассоциации
@@ -20,7 +59,7 @@ association_feedbacks:
       attributes: [readonly]
 
     mature:
-      name: Не для детей
+      name: 16+
       type: bool
       attributes: [readonly]
 
@@ -31,6 +70,40 @@ association_feedbacks:
 
     created_by_name:
       name: Автор
+      attributes: [readonly]
+
+games:
+  name_gen: игры
+  name_accus: игру
+  title: Игры
+
+  columns:
+    id:
+      name: id
+      attributes: [readonly]
+
+    language:
+      name: Язык
+      attributes: [readonly]
+
+    game:
+      name: Игра
+      template: >
+        '<a href="' + row.url + '">' + row.id + '</a>'
+      attributes: [readonly]
+
+    user_name:
+      name: Игрок
+      attributes: [readonly]
+
+    created_at:
+      name: Дата начала
+      type: date
+      attributes: [readonly]
+
+    finished_at:
+      name: Дата конца
+      type: date
       attributes: [readonly]
 
 languages:
@@ -330,9 +403,48 @@ users:
       type: date
       attributes: [readonly]
 
+words:
+  name_gen: слова
+  name_accus: слово
+  title: Слова
+
+  columns:
+    id:
+      name: id
+      attributes: [readonly]
+
+    language:
+      name: Язык
+      attributes: [readonly]
+
+    word:
+      name: Слово
+      template: >
+        '<a href="' + row.url + '">' + row.name + '</a>'
+      attributes: [readonly]
+
+    mature:
+      name: 16+
+      type: bool
+      attributes: [readonly]
+
+    approved:
+      name: Общее
+      type: bool
+      attributes: [readonly]
+
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [readonly]
+
+    created_by_name:
+      name: Автор
+      attributes: [readonly]
+
 word_feedbacks:
   name_gen: отзыва о слове
-  name_accus: отзыв о о слове
+  name_accus: отзыв о слове
   title: Отзывы о словах
 
   columns:
@@ -340,7 +452,7 @@ word_feedbacks:
       name: id
       attributes: [readonly]
 
-    association:
+    word:
       name: Слово
       template: >
         '<a href="' + row.word.url + '">' + row.word.name + '</a>'
@@ -362,7 +474,7 @@ word_feedbacks:
       attributes: [readonly]
 
     mature:
-      name: Не для детей
+      name: 16+
       type: bool
       attributes: [readonly]
 

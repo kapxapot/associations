@@ -40,6 +40,8 @@ class GameGenerator extends EntityGenerator
         $game = $this->gameRepository->get($id);
 
         if ($game) {
+            $item['language'] = $game->language()->name;
+            $item['user_name'] = $game->user()->displayName();
             $item['url'] = $game->url();
 
             $item['history'] = $game->turns()->reverse()->map(

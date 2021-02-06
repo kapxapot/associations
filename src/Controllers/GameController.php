@@ -10,6 +10,7 @@ use App\Services\TurnService;
 use App\Services\WordService;
 use Plasticode\Auth\Access;
 use Plasticode\Core\Response;
+use Plasticode\Data\Rights;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\Http\NotFoundException;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
@@ -65,7 +66,7 @@ class GameController extends Controller
             return ($this->notFoundHandler)($request, $response);
         }
 
-        $canSeeAllGames = $this->access->checkActionRights('games', 'edit', $user);
+        $canSeeAllGames = $this->access->checkActionRights('games', Rights::READ, $user);
         $isPlayer = $game->hasPlayer($user);
 
         if (!$canSeeAllGames && !$isPlayer) {
@@ -87,71 +88,11 @@ class GameController extends Controller
     }
 
     /**
-     * @deprecated
-     */
-    public function start(
-        Request $request,
-        ResponseInterface $response
-    ) : ResponseInterface
-    {
-        $user = $this->auth->getUser();
-
-        $languageId = $request->getParam('language_id');
-        $language = $this->languageRepository->get($languageId);
-
-        if (is_null($language)) {
-            throw new NotFoundException('Language not found.');
-        }
-
-        if ($user->currentGame() !== null) {
-            throw new BadRequestException('Game is already on.');
-        };
-
-        $this->gameService->createGameFor($user, $language);
-
-        return Response::json(
-            $response,
-            ['message' => $this->translate('New game started.')]
-        );
-    }
-
-    /**
-     * @deprecated
-     */
-    public function finish(
-        ServerRequestInterface $request,
-        ResponseInterface $response
-    ) : ResponseInterface
-    {
-        $user = $this->auth->getUser();
-
-        Assert::notNull($user);
-
-        $game = $user->currentGame();
-
-        /** @var string */
-        $msg = null;
-
-        if ($game !== null) {
-            $this->turnService->finishGame($game);
-            $msg = 'Game finished.';
-        } else {
-            $msg = 'No current game found.';
-        }
-
-        return Response::json(
-            $response,
-            ['message' => $this->translate($msg)]
-        );
-    }
-
-    /**
      * Play out of game context.
      */
     public function play(
         Request $request,
-        ResponseInterface $response,
-        array $args
+        ResponseInterface $response
     ) : ResponseInterface
     {
         $user = $this->auth->getUser();

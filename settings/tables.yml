@@ -1,3 +1,10 @@
+associations:
+  api: read
+  sort: created_at
+  reverse: true
+  has: [created_at, created_by, updated_at]
+  generator: App\Generators\AssociationGenerator
+
 association_feedbacks:
   api: read
   sort: created_at
@@ -6,7 +13,10 @@ association_feedbacks:
   generator: App\Generators\AssociationFeedbackGenerator
 
 games:
-  api: read_one
+  api: read
+  sort: created_at
+  reverse: true
+  has: [created_at]
   generator: App\Generators\GameGenerator
 
 languages:
@@ -60,6 +70,13 @@ users:
   reverse: true
   has: [created_at, updated_at]
   generator: App\Generators\UserGenerator
+
+words:
+  api: read
+  sort: created_at
+  reverse: true
+  has: [created_at, created_by, updated_at]
+  generator: App\Generators\WordGenerator
 
 word_feedbacks:
   api: read

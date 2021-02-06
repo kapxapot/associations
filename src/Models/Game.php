@@ -106,7 +106,8 @@ class Game extends DbModel implements CreatedAtInterface
 
     public function hasPlayer(User $user): bool
     {
-        return $this->players()->contains($user);
+        return $this->players()->contains($user)
+            || $this->creator()->equals($user);
     }
 
     public function extendedPlayers(): Collection

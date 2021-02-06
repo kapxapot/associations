@@ -25,7 +25,6 @@ use Plasticode\Core\Env;
 use Plasticode\Core\Interfaces\ViewInterface;
 use Plasticode\Generators\Interfaces\EntityGeneratorInterface;
 use Plasticode\Middleware\AuthMiddleware;
-use Plasticode\Middleware\GuestMiddleware;
 use Plasticode\Middleware\TokenAuthMiddleware;
 use Plasticode\Services\AuthService;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
