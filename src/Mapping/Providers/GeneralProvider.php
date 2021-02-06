@@ -13,6 +13,8 @@ use App\Config\Interfaces\WordConfigInterface;
 use App\Config\LocalizationConfig;
 use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
+use App\External\DictionaryApi;
+use App\External\Interfaces\DefinitionSourceInterface;
 use App\Handlers\NotFoundHandler;
 use App\Models\News;
 use App\Models\Page;
@@ -63,6 +65,10 @@ class GeneralProvider extends MappingProvider
             // validation
 
             UserValidation::class => UserValidationFactory::class,
+
+            // external
+
+            DefinitionSourceInterface::class => DictionaryApi::class,
 
             // services
 

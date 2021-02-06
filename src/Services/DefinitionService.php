@@ -3,12 +3,15 @@
 namespace App\Services;
 
 use App\Events\Definition\DefinitionUpdatedEvent;
-use App\External\DefinitionSourceInterface;
+use App\External\Interfaces\DefinitionSourceInterface;
 use App\Models\Definition;
 use App\Models\Word;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use Plasticode\Events\EventDispatcher;
 
+/**
+ * @emits DefinitionUpdatedEvent
+ */
 class DefinitionService
 {
     private DefinitionRepositoryInterface $definitionRepository;

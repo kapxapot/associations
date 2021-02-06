@@ -2,6 +2,7 @@
 
 namespace App\External;
 
+use App\External\Interfaces\DefinitionSourceInterface;
 use App\Models\DTO\DefinitionData;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\External;
+namespace App\External\Interfaces;
 
 use App\Models\DTO\DefinitionData;
 

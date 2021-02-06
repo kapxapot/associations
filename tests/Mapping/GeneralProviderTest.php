@@ -15,12 +15,14 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
 use App\Core\Serializer;
 use App\External\DictionaryApi;
+use App\External\Interfaces\DefinitionSourceInterface;
 use App\External\YandexDict;
 use App\Handlers\NotFoundHandler;
 use App\Mapping\Providers\GeneralProvider;
 use App\Models\Validation\AgeValidation;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
@@ -36,6 +38,7 @@ use App\Services\AssociationFeedbackService;
 use App\Services\AssociationRecountService;
 use App\Services\AssociationService;
 use App\Services\CasesService;
+use App\Services\DefinitionService;
 use App\Services\DictionaryService;
 use App\Services\GameService;
 use App\Services\Interfaces\ExternalDictServiceInterface;
@@ -90,6 +93,7 @@ final class GeneralProviderTest extends AbstractProviderTest
 
             AssociationFeedbackRepositoryInterface::class,
             AssociationRepositoryInterface::class,
+            DefinitionRepositoryInterface::class,
             DictWordRepositoryInterface::class,
             GameRepositoryInterface::class,
             LanguageRepositoryInterface::class,
@@ -144,7 +148,7 @@ final class GeneralProviderTest extends AbstractProviderTest
         // external
 
         $this->check(YandexDict::class);
-        $this->check(DictionaryApi::class);
+        $this->check(DefinitionSourceInterface::class, DictionaryApi::class);
 
         // validation
 
@@ -163,6 +167,7 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(AssociationRecountService::class);
         $this->check(AssociationService::class);
         $this->check(CasesService::class);
+        $this->check(DefinitionService::class);
         $this->check(DictionaryService::class);
         $this->check(ExternalDictServiceInterface::class);
         $this->check(GameService::class);

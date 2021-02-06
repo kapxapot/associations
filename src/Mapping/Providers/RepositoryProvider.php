@@ -6,6 +6,7 @@ use App\Auth\Interfaces\AuthInterface;
 use App\Core\Interfaces\LinkerInterface;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
+use App\Hydrators\DefinitionHydrator;
 use App\Hydrators\GameHydrator;
 use App\Hydrators\LanguageHydrator;
 use App\Hydrators\NewsHydrator;
@@ -18,9 +19,11 @@ use App\Hydrators\WordHydrator;
 use App\Hydrators\YandexDictWordHydrator;
 use App\Repositories\AssociationFeedbackRepository;
 use App\Repositories\AssociationRepository;
+use App\Repositories\DefinitionRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
@@ -80,6 +83,16 @@ class RepositoryProvider extends MappingProvider
                             $c->get(WordRepositoryInterface::class),
                             $c->get(AuthInterface::class),
                             $c->get(LinkerInterface::class)
+                        )
+                    )
+                ),
+
+            DefinitionRepositoryInterface::class =>
+                fn (ContainerInterface $c) => new DefinitionRepository(
+                    $c->get(RepositoryContext::class),
+                    new ObjectProxy(
+                        fn () => new DefinitionHydrator(
+                            $c->get(WordRepositoryInterface::class)
                         )
                     )
                 ),
@@ -148,7 +161,7 @@ class RepositoryProvider extends MappingProvider
                 ),
 
             CoreRepositories\PageRepositoryInterface::class => PageRepositoryInterface::class,
-    
+
             TelegramUserRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new TelegramUserRepository(
                     $c->get(RepositoryContext::class),
