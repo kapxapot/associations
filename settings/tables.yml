@@ -16,7 +16,7 @@ games:
   api: read
   sort: created_at
   reverse: true
-  has: [created_at]
+  has: [created_at, created_by]
   generator: App\Generators\GameGenerator
 
 languages:

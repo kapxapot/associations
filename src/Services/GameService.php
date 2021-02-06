@@ -53,6 +53,7 @@ class GameService
             [
                 'language_id' => $language->getId(),
                 'user_id' => $user->getId(),
+                'created_by' => $user->getId(),
             ]
         );
 

@@ -5,10 +5,10 @@ namespace App\Models;
 use App\Collections\TurnCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
+use App\Models\Traits\Created;
 use Plasticode\Collections\Generic\Collection;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
-use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Util\Date;
 
 /**
@@ -26,7 +26,7 @@ use Plasticode\Util\Date;
  */
 class Game extends DbModel implements CreatedAtInterface
 {
-    use CreatedAt;
+    use Created;
 
     protected function requiredWiths(): array
     {
@@ -63,11 +63,6 @@ class Game extends DbModel implements CreatedAtInterface
         return $this->beforeLastTurn()
             ? $this->beforeLastTurn()->word()
             : null;
-    }
-
-    public function creator(): User
-    {
-        return $this->user();
     }
 
     public function isStarted(): bool
