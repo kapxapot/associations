@@ -47,6 +47,9 @@ class GameHydrator extends Hydrator
             ->withUser(
                 fn () => $this->userRepository->get($entity->userId)
             )
+            ->withCreator(
+                fn () => $this->userRepository->get($entity->createdBy)
+            )
             ->withUrl(
                 fn () => $this->linker->game($entity)
             );
