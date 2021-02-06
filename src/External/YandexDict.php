@@ -15,7 +15,7 @@ class YandexDict
         $this->settingsProvider = $settingsProvider;
     }
 
-    public function request(string $languageCode, string $word) : ?string
+    public function request(string $languageCode, string $word): ?string
     {
         $url = $this->buildUrl($languageCode, $word);
         $result = @file_get_contents($url);
@@ -25,7 +25,7 @@ class YandexDict
             : null;
     }
 
-    private function buildUrl(string $languageCode, string $word) : string
+    private function buildUrl(string $languageCode, string $word): string
     {
         return
             'https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key='

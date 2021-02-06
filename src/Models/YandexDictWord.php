@@ -47,7 +47,7 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function linkWord(Word $word): self
     {
@@ -57,7 +57,7 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
     }
 
     /**
-     * @return static
+     * @return $this
      */
     public function unlinkWord(): self
     {
@@ -68,7 +68,7 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
 
     public function isValid(): bool
     {
-        return !is_null($this->pos);
+        return $this->pos !== null;
     }
 
     public function partOfSpeech(): ?PartOfSpeech
@@ -94,6 +94,6 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
     {
         $partOfSpeech = $this->partOfSpeech();
 
-        return is_null($partOfSpeech) || $partOfSpeech->isUgly();
+        return $partOfSpeech === null || $partOfSpeech->isUgly();
     }
 }
