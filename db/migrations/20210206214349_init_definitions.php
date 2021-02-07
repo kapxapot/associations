@@ -11,7 +11,7 @@ class InitDefinitions extends AbstractMigration
         $table
             ->addColumn('source', 'string', ['limit' => 100])
             ->addColumn('url', 'string', ['limit' => 250])
-            ->addColumn('data', 'text', ['null' => true])
+            ->addColumn('json_data', 'text', ['null' => true])
             ->addColumn('word_id', 'integer')
             ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
             ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])

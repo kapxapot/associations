@@ -8,14 +8,21 @@ use App\Models\Language;
 use App\Models\Word;
 use App\Models\YandexDictWord;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
+use App\Repositories\Interfaces\LanguageRepositoryInterface;
 
 class DictWordRepositoryMock implements DictWordRepositoryInterface
 {
     private DictWordCollection $dictWords;
 
-    public function __construct()
+    private LanguageRepositoryInterface $languageRepository;
+
+    public function __construct(
+        LanguageRepositoryInterface $languageRepository
+    )
     {
         $this->dictWords = DictWordCollection::empty();
+
+        $this->languageRepository = $languageRepository;
     }
 
     public function getCountByLanguage(Language $language): int
@@ -28,24 +35,26 @@ class DictWordRepositoryMock implements DictWordRepositoryInterface
             ->count();
     }
 
-    public function create(array $data) : DictWordInterface
+    public function create(array $data): DictWordInterface
     {
         /** @var YandexDictWord */
         $dictWord = YandexDictWord::create($data);
 
         return $dictWord
-            ->withLanguage($dictWord->languageId)
+            ->withLanguage(
+                $this->languageRepository->get($dictWord->languageId)
+            )
             ->withLinkedWord(null);
     }
 
-    public function save(DictWordInterface $dictWord) : DictWordInterface
+    public function save(DictWordInterface $dictWord): DictWordInterface
     {
         $this->dictWords = $this->dictWords->add($dictWord);
 
         return $dictWord;
     }
 
-    public function getByWord(Word $word) : ?DictWordInterface
+    public function getByWord(Word $word): ?DictWordInterface
     {
         return $this
             ->dictWords
@@ -54,7 +63,7 @@ class DictWordRepositoryMock implements DictWordRepositoryInterface
             );
     }
 
-    public function getByWordStr(Language $language, string $wordStr) : ?DictWordInterface
+    public function getByWordStr(Language $language, string $wordStr): ?DictWordInterface
     {
         return $this
             ->dictWords
@@ -73,7 +82,7 @@ class DictWordRepositoryMock implements DictWordRepositoryInterface
     public function getAllDanglingOutOfDate(
         int $ttlMin,
         int $limit = 0
-    ) : DictWordCollection
+    ): DictWordCollection
     {
         // placeholder
         return DictWordCollection::empty();

@@ -11,7 +11,7 @@ class WordRepositoryFactory
 {
     public static function make(
         ?LanguageRepositoryInterface $languageRepository = null
-    ) : WordRepositoryInterface
+    ): WordRepositoryInterface
     {
         $languageRepository ??= LanguageRepositoryFactory::make();
 

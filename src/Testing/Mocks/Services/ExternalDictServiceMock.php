@@ -21,7 +21,7 @@ class ExternalDictServiceMock implements ExternalDictServiceInterface
     public function loadFromDictionary(
         Language $language,
         string $wordStr
-    ) : ?DictWordInterface
+    ): ?DictWordInterface
     {
         if ($wordStr == 'стол') {
             $dictWord = $this->dictWordRepository->create(

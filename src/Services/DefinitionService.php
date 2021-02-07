@@ -59,11 +59,11 @@ class DefinitionService
                 ->definitionSource
                 ->request($word->language(), $word->word);
 
-            $definition = $this->definitionRepository->create(
+            $definition = $this->definitionRepository->store(
                 [
                     'source' => $defData->source(),
                     'url' => $defData->url(),
-                    'data' => $defData->data(),
+                    'json_data' => $defData->jsonData(),
                     'word_id' => $word->getId(),
                 ]
             );

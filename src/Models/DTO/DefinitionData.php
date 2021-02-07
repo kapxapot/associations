@@ -6,13 +6,13 @@ class DefinitionData
 {
     private string $source;
     private string $url;
-    private ?string $data;
+    private ?string $jsonData;
 
-    public function __construct(string $source, string $url, ?string $data)
+    public function __construct(string $source, string $url, ?string $jsonData)
     {
         $this->source = $source;
         $this->url = $url;
-        $this->data = $data;
+        $this->jsonData = $jsonData;
     }
 
     public function source(): string
@@ -25,13 +25,13 @@ class DefinitionData
         return $this->url;
     }
 
-    public function data(): ?string
+    public function jsonData(): ?string
     {
-        return $this->data;
+        return $this->jsonData;
     }
 
     public function isEmpty(): bool
     {
-        return $this->data === null;
+        return $this->jsonData === null;
     }
 }

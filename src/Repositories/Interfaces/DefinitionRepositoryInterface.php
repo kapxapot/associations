@@ -8,9 +8,9 @@ use Plasticode\Repositories\Interfaces\Generic\GetRepositoryInterface;
 
 interface DefinitionRepositoryInterface extends GetRepositoryInterface
 {
-    function create(array $data): Definition;
-
     function save(Definition $definition): Definition;
+
+    function store(array $data): Definition;
 
     function getByWord(Word $word): ?Definition;
 }

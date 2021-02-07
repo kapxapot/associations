@@ -12,8 +12,10 @@ use App\Models\Interfaces\DictWordInterface;
 /**
  * @property string $word
  * @method AssociationCollection associations()
+ * @method Definition|null definition()
  * @method DictWordInterface|null dictWord()
  * @method static withAssociations(AssociationCollection|callable $associations)
+ * @method static withDefinition(Definition|callable|null $definition)
  * @method static withDictWord(DictWordInterface|callable|null $dictWord)
  * @method static withFeedbacks(WordFeedbackCollection|callable $feedbacks)
  */

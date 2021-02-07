@@ -6,7 +6,9 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
 use App\Testing\Factories\WordRepositoryFactory;
 use App\Testing\Mocks\Repositories\DictWordRepositoryMock;
+use App\Testing\Mocks\Repositories\LanguageRepositoryMock;
 use App\Testing\Mocks\Services\ExternalDictServiceMock;
+use App\Testing\Seeders\LanguageSeeder;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Events\EventDispatcher;
 
@@ -21,10 +23,18 @@ final class DictionaryServiceTest extends TestCase
 
         $this->wordRepository = WordRepositoryFactory::make();
 
+        $languageRepository = new LanguageRepositoryMock(
+            new LanguageSeeder()
+        );
+
+        $dictWordRepository = new DictWordRepositoryMock(
+            $languageRepository
+        );
+
         $this->dictService = new DictionaryService(
-            new DictWordRepositoryMock(),
+            $dictWordRepository,
             new ExternalDictServiceMock(
-                new DictWordRepositoryMock()
+                $dictWordRepository
             ),
             new EventDispatcher()
         );

@@ -19,12 +19,12 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
         $this->associations = AssociationCollection::empty();
     }
 
-    public function get(?int $id) : ?Association
+    public function get(?int $id): ?Association
     {
         return $this->associations->first('id', $id);
     }
 
-    public function save(Association $association) : Association
+    public function save(Association $association): Association
     {
         if ($this->associations->contains($association)) {
             return $association;
@@ -39,21 +39,21 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
         return $association;
     }
 
-    public function store(array $data) : Association
+    public function store(array $data): Association
     {
         $association = Association::create($data);
 
         return $this->save($association);
     }
 
-    private function getAllByLanguageConditional(?Language $language) : AssociationCollection
+    private function getAllByLanguageConditional(?Language $language): AssociationCollection
     {
         return $language
             ? $this->getAllByLanguage($language)
             : $this->associations;
     }
 
-    public function getAllByLanguage(Language $language) : AssociationCollection
+    public function getAllByLanguage(Language $language): AssociationCollection
     {
         return $this
             ->associations
@@ -62,7 +62,7 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
             );
     }
 
-    public function getAllByWord(Word $word) : AssociationCollection
+    public function getAllByWord(Word $word): AssociationCollection
     {
         return $this
             ->associations
@@ -73,7 +73,7 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
             );
     }
 
-    public function getByPair(Word $first, Word $second) : ?Association
+    public function getByPair(Word $first, Word $second): ?Association
     {
         return $this
             ->associations
@@ -92,7 +92,7 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
     public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
-    ) : AssociationCollection
+    ): AssociationCollection
     {
         // placeholder
         return AssociationCollection::empty();
@@ -101,7 +101,7 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
     public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = 0
-    ) : AssociationCollection
+    ): AssociationCollection
     {
         // placeholder
         return $this
@@ -109,7 +109,7 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
             ->take($limit);
     }
 
-    public function getCountByLanguage(Language $language) : int
+    public function getCountByLanguage(Language $language): int
     {
         return $this->getAllByLanguage($language)->count();
     }
@@ -117,13 +117,13 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
     public function getAllCreatedByUser(
         User $user,
         ?Language $language = null
-    ) : LanguageElementCollection
+    ): LanguageElementCollection
     {
         // placeholder
         return LanguageElementCollection::empty();
     }
 
-    public function getAllPublic(?Language $language = null) : LanguageElementCollection
+    public function getAllPublic(?Language $language = null): LanguageElementCollection
     {
         return $this
             ->getAllByLanguageConditional($language)
@@ -134,7 +134,7 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
 
     public function getAllApproved(
         ?Language $language = null
-    ) : LanguageElementCollection
+    ): LanguageElementCollection
     {
         return $this
             ->getAllByLanguageConditional($language)

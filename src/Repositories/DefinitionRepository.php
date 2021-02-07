@@ -19,14 +19,14 @@ class DefinitionRepository extends IdiormRepository implements DefinitionReposit
         return $this->getEntity($id);
     }
 
-    public function create(array $data): Definition
-    {
-        return $this->createEntity($data);
-    }
-
     public function save(Definition $definition): Definition
     {
         return $this->saveEntity($definition);
+    }
+
+    public function store(array $data): Definition
+    {
+        return $this->storeEntity($data);
     }
 
     public function getByWord(Word $word): ?Definition

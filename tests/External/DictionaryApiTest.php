@@ -44,7 +44,7 @@ final class DictionaryApiTest extends IntegrationTest
     {
         $result = $this->dictApi->request($this->language->code, $word);
 
-        $data = json_decode($result->data(), true);
+        $data = json_decode($result->jsonData(), true);
 
         $this->assertIsArray($data);
 
@@ -69,7 +69,7 @@ final class DictionaryApiTest extends IntegrationTest
     {
         $result = $this->dictApi->request($this->language->code, $word);
 
-        $this->assertNull($result->data());
+        $this->assertNull($result->jsonData());
         $this->assertTrue($result->isEmpty());
     }
 
