@@ -29,9 +29,4 @@ class DefinitionData
     {
         return $this->jsonData;
     }
-
-    public function isEmpty(): bool
-    {
-        return $this->jsonData === null;
-    }
 }

@@ -48,33 +48,36 @@ class DefinitionService
         bool $allowRemoteLoad = false
     ): ?Definition
     {
-        // searching by word
-        $definition = $word
-            ? $this->definitionRepository->getByWord($word)
-            : null;
+        $definition = $this->definitionRepository->getByWord($word);
 
-        if ($definition === null && $allowRemoteLoad) {
-            // no word found, loading from the source
-            $defData = $this
-                ->definitionSource
-                ->request(
-                    $word->language()->code,
-                    $word->word
-                );
-
-            $definition = $this->definitionRepository->store(
-                [
-                    'source' => $defData->source(),
-                    'url' => $defData->url(),
-                    'json_data' => $defData->jsonData(),
-                    'word_id' => $word->getId(),
-                ]
-            );
-
-            $this->eventDispatcher->dispatch(
-                new DefinitionUpdatedEvent($definition)
-            );
+        if ($definition !== null && !$allowRemoteLoad) {
+            return $definition;
         }
+
+        // no word found, trying loading from the source
+        $defData = $this
+            ->definitionSource
+            ->request(
+                $word->language()->code,
+                $word->word
+            );
+
+        if ($defData === null) {
+            return null;
+        }
+
+        $definition = $this->definitionRepository->store(
+            [
+                'source' => $defData->source(),
+                'url' => $defData->url(),
+                'json_data' => $defData->jsonData(),
+                'word_id' => $word->getId(),
+            ]
+        );
+
+        $this->eventDispatcher->dispatch(
+            new DefinitionUpdatedEvent($definition)
+        );
 
         return $definition;
     }

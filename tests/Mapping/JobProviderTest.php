@@ -10,6 +10,7 @@ use App\Jobs\UpdateWordsJob;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\DefinitionService;
 use App\Services\Interfaces\ExternalDictServiceInterface;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Testing\AbstractProviderTest;
@@ -25,6 +26,8 @@ final class JobProviderTest extends AbstractProviderTest
             DictWordRepositoryInterface::class,
             ExternalDictServiceInterface::class,
             WordRepositoryInterface::class,
+
+            DefinitionService::class,
         ];
     }
 

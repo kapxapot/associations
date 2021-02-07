@@ -51,6 +51,11 @@ class PartOfSpeech
      */
     const PREDICATIVE = 'predicative';
 
+    /**
+     * Междометие
+     */
+    const INTERJECTION = 'interjection';
+
     const GOOD = 1;
     const BAD = 2;
     const UGLY = 3;
@@ -68,6 +73,7 @@ class PartOfSpeech
         self::PREPOSITION => self::UGLY,
         self::CONJUNCTION => self::UGLY,
         self::PREDICATIVE => self::UGLY,
+        self::INTERJECTION => self::UGLY,
     ];
 
     private string $name;

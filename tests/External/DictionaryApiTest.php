@@ -8,6 +8,7 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Testing\Mocks\Repositories\LanguageRepositoryMock;
 use App\Testing\Seeders\LanguageSeeder;
 use App\Tests\IntegrationTest;
+use Plasticode\Core\Factories\ConsoleLoggerFactory;
 
 final class DictionaryApiTest extends IntegrationTest
 {
@@ -25,7 +26,9 @@ final class DictionaryApiTest extends IntegrationTest
 
         $this->language = $this->languageRepository->get(Language::RUSSIAN);
 
-        $this->dictApi = new DictionaryApi();
+        $this->dictApi = new DictionaryApi(
+            (new ConsoleLoggerFactory())()
+        );
     }
 
     public function tearDown(): void
@@ -69,8 +72,11 @@ final class DictionaryApiTest extends IntegrationTest
     {
         $result = $this->dictApi->request($this->language->code, $word);
 
-        $this->assertNull($result->jsonData());
-        $this->assertTrue($result->isEmpty());
+        $data = json_decode($result->jsonData(), true);
+
+        $this->assertIsArray($data);
+
+        $this->assertNull($data[0] ?? null);
     }
 
     public function notExistingWordsProvider(): array

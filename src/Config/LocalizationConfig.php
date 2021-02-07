@@ -22,6 +22,7 @@ class LocalizationConfig extends BaseConfig
                 'preposition' => 'предлог',
                 'conjunction' => 'союз',
                 'predicative' => 'частица',
+                'interjection' => 'междометие',
 
                 'Language not found.' => 'Язык не найден.',
                 'New game started.' => 'Начата новая игра.',
