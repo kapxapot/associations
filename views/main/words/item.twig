@@ -129,7 +129,7 @@
                 <p>
                     {% for meta_assoc in word.origin_chain %}
                         {% if loop.first %}
-                            {{ lm.word(meta_assoc.to_word) }}
+                            {{ lm.word(meta_assoc.toWord) }}
                         {% endif %}
 
                         {% include 'components/association.twig' with {
@@ -142,7 +142,7 @@
                             {{ lm.user(meta_assoc.user) }}
                         {% endif %}
 
-                        {{ lm.word(meta_assoc.from_word) }}
+                        {{ lm.word(meta_assoc.fromWord) }}
                     {% endfor %}
                 </p>
             {% else %}
@@ -154,7 +154,7 @@
     <div class="panel-secondary-heading">Определение</div>
     <div class="panel panel-primary">
         <div class="panel-body">
-            <p class="i">Определение отсутствует.</p>
+            <p class="i">{{ definition ?? 'Определение отсутствует.' }}</p>
 
             <p>Искать на <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x">Грамоте.ру</a>, в <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}">Викисловаре</a> или в <a href="https://www.google.com/search?q=define:{{ word.word|url_encode }}">Google</a>.</p>
         </div>

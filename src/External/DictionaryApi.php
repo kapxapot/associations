@@ -18,7 +18,7 @@ class DictionaryApi implements DefinitionSourceInterface
 {
     use LoggerAwareTrait;
 
-    private const SOURCE = 'dictionaryapi.dev';
+    public const SOURCE = 'dictionaryapi.dev';
 
     public function __construct(
         LoggerInterface $logger

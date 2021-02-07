@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Models\DTO\MetaAssociation;
+use App\Parsing\DefinitionParser;
 use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
@@ -91,12 +93,17 @@ class WordController extends Controller
             ->wordService
             ->notApprovedInvisibleAssociationsStr($word);
 
+        $parsedDefinition = $word->definition()
+            ? (new DefinitionParser())->parse($word->definition())
+            : null;
+
         $params = $this->buildParams(
             [
                 'params' => [
                     'word' => $word,
                     'approved_invisible_associations_str' => $approvedStr,
                     'not_approved_invisible_associations_str' => $notApprovedStr,
+                    'definition' => $parsedDefinition,
                     'disqus_id' => 'word' . $word->getId(),
                     'debug' => $debug,
                 ],
