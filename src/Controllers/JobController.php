@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Jobs\Interfaces\ModelJobInterface;
+use App\Jobs\LoadMissingDefinitionsJob;
 use App\Jobs\LoadUncheckedDictWordsJob;
 use App\Jobs\MatchDanglingDictWordsJob;
 use App\Jobs\UpdateAssociationsJob;
@@ -13,6 +14,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class JobController extends Controller
 {
+    private LoadMissingDefinitionsJob $loadMissingDefinitionsJob;
     private LoadUncheckedDictWordsJob $loadUncheckedDictWordsJob;
     private MatchDanglingDictWordsJob $matchDanglingDictWordsJob;
     private UpdateAssociationsJob $updateAssociationsJob;
@@ -21,6 +23,9 @@ class JobController extends Controller
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
+
+        $this->loadMissingDefinitionsJob =
+            $container->get(LoadMissingDefinitionsJob::class);
 
         $this->loadUncheckedDictWordsJob =
             $container->get(LoadUncheckedDictWordsJob::class);
@@ -76,6 +81,17 @@ class JobController extends Controller
         return $this->runJob(
             $this->matchDanglingDictWordsJob,
             'Matched dangling dictionary words'
+        );
+    }
+
+    public function loadMissingDefinitions(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    )
+    {
+        return $this->runJob(
+            $this->loadMissingDefinitionsJob,
+            'Loaded missing word definitions'
         );
     }
 

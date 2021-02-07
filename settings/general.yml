@@ -93,3 +93,5 @@ jobs:
   match_dangling_dict_words:
     ttl_min: 10
     batch_size: 10
+  load_missing_definitions:
+    batch_size: 10

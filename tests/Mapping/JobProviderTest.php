@@ -2,6 +2,7 @@
 
 namespace App\Tests\Mapping;
 
+use App\Jobs\LoadMissingDefinitionsJob;
 use App\Jobs\LoadUncheckedDictWordsJob;
 use App\Jobs\MatchDanglingDictWordsJob;
 use App\Jobs\UpdateAssociationsJob;
@@ -29,6 +30,7 @@ final class JobProviderTest extends AbstractProviderTest
 
     public function testWiring(): void
     {
+        $this->check(LoadMissingDefinitionsJob::class);
         $this->check(LoadUncheckedDictWordsJob::class);
         $this->check(MatchDanglingDictWordsJob::class);
         $this->check(UpdateAssociationsJob::class);

@@ -73,11 +73,6 @@ class WordRepositoryMock implements WordRepositoryInterface
             );
     }
 
-    /**
-     * Returns out of date language elements.
-     *
-     * @param integer $ttlMin Time to live in minutes
-     */
     public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
@@ -99,7 +94,7 @@ class WordRepositoryMock implements WordRepositoryInterface
     public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = 0
-    ) : WordCollection
+    ): WordCollection
     {
         // placeholder
         return $this
@@ -107,16 +102,21 @@ class WordRepositoryMock implements WordRepositoryInterface
             ->take($limit);
     }
 
-    /**
-     * Returns words without corresponding dict words.
-     */
-    public function getAllUnchecked(int $limit = 0) : WordCollection
+    public function getAllUnchecked(int $limit = 0): WordCollection
     {
         // placeholder
         return $this->words;
     }
 
-    public function getCountByLanguage(Language $language) : int
+    public function getAllUndefined(int $limit = 0): WordCollection
+    {
+        // placeholder
+        return $this->words->where(
+            fn (Word $w) => $w->definition() === null
+        );
+    }
+
+    public function getCountByLanguage(Language $language): int
     {
         return $this->getAllByLanguage($language)->count();
     }
@@ -124,13 +124,13 @@ class WordRepositoryMock implements WordRepositoryInterface
     public function getAllCreatedByUser(
         User $user,
         ?Language $language = null
-    ) : LanguageElementCollection
+    ): WordCollection
     {
         // placeholder
-        return LanguageElementCollection::empty();
+        return WordCollection::empty();
     }
 
-    public function getAllPublic(?Language $language = null) : LanguageElementCollection
+    public function getAllPublic(?Language $language = null): WordCollection
     {
         return $this
             ->getAllByLanguageConditional($language)

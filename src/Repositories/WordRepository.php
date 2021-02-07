@@ -57,11 +57,6 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             ->one();
     }
 
-    /**
-     * Returns out of date language elements.
-     *
-     * @param integer $ttlMin Time to live in minutes
-     */
     public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
@@ -89,9 +84,6 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         );
     }
 
-    /**
-     * Returns words without corresponding dict words.
-     */
     public function getAllUnchecked(int $limit = 0): WordCollection
     {
         // todo: this needs to be refactored (get table name from other injected repo?)
@@ -112,6 +104,30 @@ class WordRepository extends LanguageElementRepository implements WordRepository
                     $dwAlias
                 )
                 ->whereNull($dwAlias . '.id')
+                ->limit($limit)
+        );
+    }
+
+    public function getAllUndefined(int $limit = 0): WordCollection
+    {
+        // todo: this needs to be refactored (get table name from other injected repo?)
+        $definitionTable = 'definitions';
+        $defAlias = 'def';
+
+        return WordCollection::from(
+            $this
+                ->query()
+                ->select($this->getTable() . '.*')
+                ->leftOuterJoin(
+                    $definitionTable,
+                    [
+                        $this->getTable() . '.' . $this->idField(),
+                        '=',
+                        $defAlias . '.word_id'
+                    ],
+                    $defAlias
+                )
+                ->whereNull($defAlias . '.id')
                 ->limit($limit)
         );
     }

@@ -9,9 +9,13 @@ use App\Models\Word;
 interface WordRepositoryInterface extends LanguageElementRepositoryInterface
 {
     function get(?int $id): ?Word;
+
     function save(Word $word): Word;
+
     function store(array $data): Word;
+
     function getAllByLanguage(Language $language): WordCollection;
+
     function findInLanguage(Language $language, ?string $wordStr): ?Word;
 
     /**
@@ -32,4 +36,9 @@ interface WordRepositoryInterface extends LanguageElementRepositoryInterface
      * Returns words without corresponding dict words.
      */
     function getAllUnchecked(int $limit = 0): WordCollection;
+
+    /**
+     * Returns words without definitions.
+     */
+    function getAllUndefined(int $limit = 0): WordCollection;
 }

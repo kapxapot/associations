@@ -57,7 +57,10 @@ class DefinitionService
             // no word found, loading from the source
             $defData = $this
                 ->definitionSource
-                ->request($word->language(), $word->word);
+                ->request(
+                    $word->language()->code,
+                    $word->word
+                );
 
             $definition = $this->definitionRepository->store(
                 [

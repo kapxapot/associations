@@ -299,6 +299,11 @@ $app->group(
                         '/match_dangling_dict_words',
                         JobController::class . ':matchDanglingDictWords'
                     )->setName('main.jobs.match_dangling_dict_words');
+
+                    $this->get(
+                        '/load_missing_definitions',
+                        JobController::class . ':loadMissingDefinitions'
+                    )->setName('main.jobs.load_missing_definitions');
                 }
             );
         }

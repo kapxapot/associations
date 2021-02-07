@@ -220,6 +220,7 @@ class RepositoryProvider extends MappingProvider
                     new ObjectProxy(
                         fn () => new WordHydrator(
                             $c->get(AssociationRepositoryInterface::class),
+                            $c->get(DefinitionRepositoryInterface::class),
                             $c->get(LanguageRepositoryInterface::class),
                             $c->get(TurnRepositoryInterface::class),
                             $c->get(UserRepositoryInterface::class),
