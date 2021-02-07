@@ -4,10 +4,12 @@ namespace App\Parsing;
 
 use App\External\DictionaryApi;
 use App\Models\Definition;
+use App\Semantics\Definition\DefinitionAggregate;
+use App\Semantics\Definition\DefinitionEntry;
 
 class DefinitionParser
 {
-    public function parse(Definition $definition): ?string
+    public function parse(Definition $definition): ?DefinitionAggregate
     {
         switch ($definition->source) {
             case DictionaryApi::SOURCE:
@@ -17,7 +19,7 @@ class DefinitionParser
         return null;
     }
 
-    private function parseDictionaryApi(string $jsonData): ?string
+    private function parseDictionaryApi(string $jsonData): ?DefinitionAggregate
     {
         $data = json_decode($jsonData, true);
 
@@ -25,10 +27,11 @@ class DefinitionParser
             return null;
         }
 
-        /** @var string[] $result */
-        $results = [];
+        $result = new DefinitionAggregate();
 
         foreach ($data as $entry) {
+            $defEntry = new DefinitionEntry();
+
             $meanings = $entry['meanings'] ?? [];
 
             foreach ($meanings as $meaning) {
@@ -38,14 +41,18 @@ class DefinitionParser
                     $definition = $definitionEntry['definition'] ?? null;
 
                     if (strlen($definition) > 0) {
-                        $results[] = $definition;
+                        $defEntry->addDefinition($definition);
                     }
                 }
             }
+
+            if (!$defEntry->isEmpty()) {
+                $result->addEntry($defEntry);
+            }
         }
 
-        return !empty($results)
-            ? implode('; ', $results)
+        return !$result->isEmpty()
+            ? $result
             : null;
     }
 }
