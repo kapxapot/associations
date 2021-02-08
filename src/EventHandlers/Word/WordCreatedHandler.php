@@ -3,6 +3,7 @@
 namespace App\EventHandlers\Word;
 
 use App\Events\Word\WordCreatedEvent;
+use App\Services\DefinitionService;
 use App\Services\DictionaryService;
 
 /**
@@ -10,12 +11,15 @@ use App\Services\DictionaryService;
  */
 class WordCreatedHandler
 {
+    private DefinitionService $definitionService;
     private DictionaryService $dictionaryService;
 
     public function __construct(
+        DefinitionService $definitionService,
         DictionaryService $dictionaryService
     )
     {
+        $this->definitionService = $definitionService;
         $this->dictionaryService = $dictionaryService;
     }
 
@@ -24,5 +28,6 @@ class WordCreatedHandler
         $word = $event->getWord();
 
         $this->dictionaryService->loadByWord($word);
+        $this->definitionService->loadByWord($word);
     }
 }

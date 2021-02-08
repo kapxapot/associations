@@ -4,21 +4,26 @@ namespace App\Specifications;
 
 use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Word;
+use App\Services\WordService;
 
 class WordSpecification
 {
     private WordConfigInterface $config;
+    private WordService $wordService;
 
     public function __construct(
-        WordConfigInterface $config
+        WordConfigInterface $config,
+        WordService $wordService
     )
     {
         $this->config = $config;
+        $this->wordService = $wordService;
     }
 
     public function isApproved(Word $word): bool
     {
         return $this->isApprovedByDictWord($word)
+            || $this->isApprovedByDefinition($word)
             || $this->isApprovedByAssociations($word);
     }
 
@@ -36,6 +41,13 @@ class WordSpecification
         $dictWord = $word->dictWord();
 
         return $dictWord && $dictWord->isGood();
+    }
+
+    private function isApprovedByDefinition(Word $word): bool
+    {
+        $parsedDefinition = $this->wordService->getParsedDefinition($word);
+
+        return $parsedDefinition !== null;
     }
 
     private function isApprovedByAssociations(Word $word): bool

@@ -14,6 +14,7 @@ use App\EventHandlers\Word\WordMatureChangedHandler;
 use App\EventHandlers\Word\WordOutOfDateHandler;
 use App\EventHandlers\Word\WordUpdatedHandler;
 use App\Services\AssociationRecountService;
+use App\Services\DefinitionService;
 use App\Services\DictionaryService;
 use App\Services\WordRecountService;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
@@ -49,6 +50,7 @@ class EventProvider extends MappingProvider
             ),
 
             new WordCreatedHandler(
+                $container->get(DefinitionService::class),
                 $container->get(DictionaryService::class)
             ),
 
