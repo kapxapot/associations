@@ -26,6 +26,7 @@ templates:
   strict_read:
     admin: [read]
     editor: [read]
+    author: [read_own]
 
   editor_strict:
     admin: [full]

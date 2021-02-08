@@ -3,8 +3,8 @@
 {% import 'macros.twig' as gm %}
 {% import 'main/local_macros.twig' as lm %}
 
-{% set can_see_all_games = can('games', 'edit') %}
-{% set is_moderator = can('associations', 'edit') %}
+{% set can_see_all_games = can('games', 'read') %}
+{% set is_moderator = can('associations', 'read') %}
 
 {% set title = lm.association(association, null, true)|upper %}
 

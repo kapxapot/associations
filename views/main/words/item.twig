@@ -4,7 +4,7 @@
 {% import 'main/macros.twig' as m %}
 {% import 'main/local_macros.twig' as lm %}
 
-{% set is_moderator = can('associations', 'edit') %}
+{% set is_moderator = can('associations', 'read') %}
 
 {% set word_upper = word.full_display_name|upper %}
 {% set title = word_upper ~ ' - Слова' %}
@@ -67,6 +67,10 @@
                         <li>
                             {% if word.origin_association and word.origin_association.id == assoc.id %}
                                 <i class="fab fa-envira dendro-color" title="Источник" data-toggle="tooltip"></i>
+                                <i class="far fa-lightbulb"></i>
+                                <i class="fas fa-lightbulb"></i>
+                                <i class="fas fa-map-marker"></i>
+                                <i class="fas fa-map-marker-alt"></i>
                             {% endif %}
 
                             {{ lm.association(assoc, word) }}
@@ -119,6 +123,32 @@
         </div>
     </div>
 
+    <div class="panel-secondary-heading">Определение</div>
+    <div class="panel panel-primary">
+        <div class="panel-body">
+            {% if definition %}
+                {% for def_entry in definition.entries %}
+                    <p><strong>{{ word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}</p>
+
+                    {% if def_entry.definitions|length == 1 %}
+                        <p>{{ def_entry.definitions[0] }}</p>
+                    {% else %}
+                        <ol{% if loop.last %} class="mb-0"{% endif %}>
+                            {% for def in def_entry.definitions %}
+                                <li>{{ def }}</li>
+                            {% endfor %}
+                        </ol>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <p class="i">Определение отсутствует.</p>
+            {% endif %}
+        </div>
+        <div class="panel-footer">
+            <i class="fas fa-info-circle"></i> <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x" class="mr-2">Грамота.ру</a> <i class="fas fa-info-circle"></i> <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}" class="mr-2">Викисловарь</a> <i class="fas fa-info-circle"></i> <a href="https://www.google.com/search?q=define:{{ word.word|url_encode }}">Google</a>
+        </div>
+    </div>
+
     <div class="panel-secondary-heading">Происхождение</div>
     <div class="panel panel-primary">
         <div class="panel-body">
@@ -148,32 +178,6 @@
             {% else %}
                 <p class="i">Неизвестно, как возникло это слово.</p>
             {% endif %}
-        </div>
-    </div>
-
-    <div class="panel-secondary-heading">Определение</div>
-    <div class="panel panel-primary">
-        <div class="panel-body">
-            {% if definition %}
-                {% for def_entry in definition.entries %}
-                    <p><strong>{{ word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}</p>
-
-                    {% if def_entry.definitions|length == 1 %}
-                        <p>{{ def_entry.definitions[0] }}</p>
-                    {% else %}
-                        <ol{% if loop.last %} class="mb-0"{% endif %}>
-                            {% for def in def_entry.definitions %}
-                                <li>{{ def }}</li>
-                            {% endfor %}
-                        </ol>
-                    {% endif %}
-                {% endfor %}
-            {% else %}
-                <p class="i">Определение отсутствует.</p>
-            {% endif %}
-        </div>
-        <div class="panel-footer">
-            <i class="fas fa-info-circle"></i> <a href="http://gramota.ru/slovari/dic/?word={{ word.word|url_encode }}&all=x" class="mr-2">Грамота.ру</a> <i class="fas fa-info-circle"></i> <a href="https://ru.wiktionary.org/wiki/{{ word.word|url_encode }}" class="mr-2">Викисловарь</a> <i class="fas fa-info-circle"></i> <a href="https://www.google.com/search?q=define:{{ word.word|url_encode }}">Google</a>
         </div>
     </div>
 
