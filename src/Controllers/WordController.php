@@ -93,9 +93,7 @@ class WordController extends Controller
             ->wordService
             ->notApprovedInvisibleAssociationsStr($word);
 
-        $parsedDefinition = $word->definition()
-            ? (new DefinitionParser())->parse($word->definition())
-            : null;
+        $parsedDefinition = $this->wordService->getParsedDefinition($word);
 
         $params = $this->buildParams(
             [

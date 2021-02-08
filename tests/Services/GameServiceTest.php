@@ -6,6 +6,7 @@ use App\Collections\WordCollection;
 use App\Hydrators\GameHydrator;
 use App\Hydrators\TurnHydrator;
 use App\Models\Word;
+use App\Parsing\DefinitionParser;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
@@ -114,7 +115,8 @@ class GameServiceTest extends TestCase
             $validator,
             new ValidationRules($settingsProvider),
             new WordConfigMock(),
-            $eventDispatcher
+            $eventDispatcher,
+            new DefinitionParser()
         );
 
         $languageService = new LanguageService(

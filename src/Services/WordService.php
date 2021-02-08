@@ -10,8 +10,10 @@ use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
+use App\Parsing\DefinitionParser;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Definition\DefinitionAggregate;
 use Exception;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\InvalidOperationException;
@@ -40,6 +42,8 @@ class WordService
 
     private EventDispatcher $eventDispatcher;
 
+    private DefinitionParser $definitionParser;
+
     public function __construct(
         TurnRepositoryInterface $turnRepository,
         WordRepositoryInterface $wordRepository,
@@ -47,7 +51,8 @@ class WordService
         ValidatorInterface $validator,
         ValidationRules $validationRules,
         WordConfigInterface $config,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher,
+        DefinitionParser $definitionParser
     )
     {
         $this->turnRepository = $turnRepository;
@@ -60,6 +65,8 @@ class WordService
         $this->config = $config;
 
         $this->eventDispatcher = $eventDispatcher;
+
+        $this->definitionParser = $definitionParser;
     }
 
     /**
@@ -237,6 +244,13 @@ class WordService
     {
         return ($word && $word->isVisibleFor($user))
             ? $word
+            : null;
+    }
+
+    public function getParsedDefinition(Word $word): ?DefinitionAggregate
+    {
+        return $word->definition()
+            ? $this->definitionParser->parse($word->definition())
             : null;
     }
 }

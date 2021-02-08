@@ -7,6 +7,7 @@ use App\Hydrators\TurnHydrator;
 use App\Hydrators\WordFeedbackHydrator;
 use App\Models\Word;
 use App\Models\WordFeedback;
+use App\Parsing\DefinitionParser;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -103,7 +104,8 @@ final class WordFeedbackTest extends IntegrationTest
             $validator,
             $validationRules,
             new WordConfigMock(),
-            new EventDispatcher()
+            new EventDispatcher(),
+            new DefinitionParser()
         );
 
         $this->wordFeedbackService = new WordFeedbackService(

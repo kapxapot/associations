@@ -37,6 +37,12 @@
                     {% endif %}
                 {% endif %}
 
+                {% if definition %}
+                    <span class="label label-success" title="Есть определение" data-toggle="tooltip"><i class="fas fa-check"></i> определение</span>
+                {% else %}
+                    <span class="label label-danger" title="Нет определения" data-toggle="tooltip"><i class="fas fa-times"></i> определение</span>
+                {% endif %}
+
                 {% if word.is_mature %}
                     <span class="label label-danger" title="Не для детей" data-toggle="tooltip">16+</span>
                 {% endif %}
@@ -66,11 +72,7 @@
                     {% for assoc in word.approved_visible_associations %}
                         <li>
                             {% if word.origin_association and word.origin_association.id == assoc.id %}
-                                <i class="fab fa-envira dendro-color" title="Источник" data-toggle="tooltip"></i>
-                                <i class="far fa-lightbulb"></i>
-                                <i class="fas fa-lightbulb"></i>
-                                <i class="fas fa-map-marker"></i>
-                                <i class="fas fa-map-marker-alt"></i>
+                                <i class="fas fa-lightbulb dendro-color" title="Источник" data-toggle="tooltip"></i>
                             {% endif %}
 
                             {{ lm.association(assoc, word) }}
@@ -94,7 +96,7 @@
                     {% for assoc in word.not_approved_visible_associations %}
                         <li>
                             {% if word.origin_association and word.origin_association.id == assoc.id %}
-                                <i class="fab fa-envira dendro-color" title="Источник" data-toggle="tooltip"></i>
+                                <i class="fas fa-lightbulb dendro-color" title="Источник" data-toggle="tooltip"></i>
                             {% endif %}
 
                             {{ lm.association(assoc, word) }}
