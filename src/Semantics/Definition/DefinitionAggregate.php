@@ -2,15 +2,19 @@
 
 namespace App\Semantics\Definition;
 
+use App\Collections\DefinitionEntryCollection;
+use App\Collections\PartOfSpeechCollection;
+
 class DefinitionAggregate
 {
-    /** @var DefinitionEntry[] */
-    private array $entries = [];
+    private DefinitionEntryCollection $entries;
 
-    /**
-     * @return DefinitionEntry[]
-     */
-    public function entries(): array
+    public function __construct()
+    {
+        $this->entries = DefinitionEntryCollection::empty();
+    }
+
+    public function entries(): DefinitionEntryCollection
     {
         return $this->entries;
     }
@@ -20,13 +24,18 @@ class DefinitionAggregate
      */
     public function addEntry(DefinitionEntry $entry): self
     {
-        $this->entries[] = $entry;
+        $this->entries = $this->entries->add($entry);
 
         return $this;
     }
 
     public function isEmpty(): bool
     {
-        return empty($this->entries);
+        return $this->entries->isEmpty();
+    }
+
+    public function partsOfSpeech(): PartOfSpeechCollection
+    {
+        return $this->entries->partsOfSpeech();
     }
 }

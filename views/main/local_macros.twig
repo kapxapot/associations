@@ -2,6 +2,8 @@
 
 {% macro word(word) %}{% if word.is_visible_for_me %}{% include 'components/word.twig' with { 'word': word } only %}{% else %}слово скрыто{% endif %}{% endmacro %}
 
+{% macro part_of_speech(pos, raw = null, bare = false) %}{% include 'components/part_of_speech.twig' with { 'pos': pos, 'raw': raw, 'bare': bare } %}{% endmacro %}
+
 {% macro user(user, full = false, big = false) %}{% include 'components/user.twig' with { 'user': user, 'full': full, 'big': big } only %}{% endmacro %}
 
 {% macro user_full(user, big = false) %}{% import _self as m %}{{ m.user(user, true, big) }}{% endmacro %}

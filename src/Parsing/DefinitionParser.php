@@ -4,8 +4,10 @@ namespace App\Parsing;
 
 use App\External\DictionaryApi;
 use App\Models\Definition;
+use App\Models\Language;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Definition\DefinitionEntry;
+use App\Semantics\PartOfSpeech;
 
 class DefinitionParser
 {
@@ -13,13 +15,19 @@ class DefinitionParser
     {
         switch ($definition->source) {
             case DictionaryApi::SOURCE:
-                return $this->parseDictionaryApi($definition->jsonData);
+                return $this->parseDictionaryApi(
+                    $definition->language(),
+                    $definition->jsonData
+                );
         }
 
         return null;
     }
 
-    private function parseDictionaryApi(string $jsonData): ?DefinitionAggregate
+    private function parseDictionaryApi(
+        Language $language,
+        string $jsonData
+    ): ?DefinitionAggregate
     {
         $data = json_decode($jsonData, true);
 
@@ -44,6 +52,15 @@ class DefinitionParser
                         $defEntry->addDefinition($definition);
                     }
                 }
+
+                $partOfSpeech = $this->parsePartOfSpeech(
+                    $language,
+                    $meaning['partOfSpeech'] ?? null
+                );
+
+                if ($partOfSpeech !== null) {
+                    $defEntry->withPartOfSpeech($partOfSpeech);
+                }
             }
 
             if (!$defEntry->isEmpty()) {
@@ -54,5 +71,44 @@ class DefinitionParser
         return !$result->isEmpty()
             ? $result
             : null;
+    }
+
+    private function parsePartOfSpeech(Language $language, ?string $posText): ?PartOfSpeech
+    {
+        if (strlen($posText) === 0) {
+            return null;
+        }
+
+        $posMap = [
+            'ru' => [
+                'мужской род' => PartOfSpeech::NOUN,
+                'женский род' => PartOfSpeech::NOUN,
+                'средний род' => PartOfSpeech::NOUN,
+                'междометие' => PartOfSpeech::INTERJECTION,
+                'частица' => PartOfSpeech::PREDICATIVE,
+            ],
+            'en' => [
+                'noun' => PartOfSpeech::NOUN,
+                'verb' => PartOfSpeech::VERB,
+                'transitive verb' => PartOfSpeech::VERB,
+                'adjective' => PartOfSpeech::ADJECTIVE,
+            ],
+        ];
+
+        $langCode = $language->code;
+
+        if ($langCode === null) {
+            return null;
+        }
+
+        $langMap = $posMap[$langCode] ?? null;
+
+        if ($langMap === null) {
+            return null;
+        }
+
+        $posName = $langMap[mb_strtolower($posText)] ?? null;
+
+        return PartOfSpeech::getByName($posName);
     }
 }

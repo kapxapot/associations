@@ -29,9 +29,7 @@
                     {% if dw.is_valid %}
                         <span class="label label-success" title="Есть в словаре" data-toggle="tooltip"><i class="fas fa-check"></i> словарь</span>
 
-                        {% set pos = dw.part_of_speech %}
-
-                        <span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}">{{ pos ? translate(pos.name) : dw.pos }}</span>
+                        {{ lm.part_of_speech(dw.part_of_speech, dw.pos) }}
                     {% else %}
                         <span class="label label-danger" title="Нет в словаре" data-toggle="tooltip"><i class="fas fa-times"></i> словарь</span>
                     {% endif %}
@@ -130,7 +128,7 @@
         <div class="panel-body">
             {% if definition %}
                 {% for def_entry in definition.entries %}
-                    <p><strong>{{ word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}</p>
+                    <p><strong>{{ word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}{% if def_entry.partOfSpeech %} <i class="gray-9 ml-1">{{ lm.part_of_speech(def_entry.partOfSpeech, null, true) }}</i>{% endif %}</p>
 
                     {% if def_entry.definitions|length == 1 %}
                         <p>{{ def_entry.definitions[0] }}</p>

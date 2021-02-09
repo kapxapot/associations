@@ -4,6 +4,7 @@ namespace App\Specifications;
 
 use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Word;
+use App\Semantics\PartOfSpeech;
 use App\Services\WordService;
 
 class WordSpecification
@@ -40,14 +41,16 @@ class WordSpecification
     {
         $dictWord = $word->dictWord();
 
-        return $dictWord && $dictWord->isGood();
+        return $dictWord !== null
+            && $dictWord->isGood();
     }
 
     private function isApprovedByDefinition(Word $word): bool
     {
         $parsedDefinition = $this->wordService->getParsedDefinition($word);
 
-        return $parsedDefinition !== null;
+        return $parsedDefinition !== null
+            && $parsedDefinition->partsOfSpeech()->isAnyGood();
     }
 
     private function isApprovedByAssociations(Word $word): bool

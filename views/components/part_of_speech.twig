@@ -1,0 +1,2 @@
+{% set raw = raw ?? 'undefined part of speech' %}
+{% if not bare %}<span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}">{% endif %}{{ pos ? translate(pos.name) : raw }}{% if not bare %}</span>{% endif %}

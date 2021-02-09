@@ -30,4 +30,9 @@ class Definition extends DbModel implements CreatedAtInterface, UpdatedAtInterfa
     {
         return $this->jsonData !== null;
     }
+
+    public function language(): Language
+    {
+        return $this->word()->language();
+    }
 }
