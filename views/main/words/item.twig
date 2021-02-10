@@ -29,17 +29,17 @@
                     {% if dw.is_valid %}
                         <span class="label label-success" title="Есть в словаре" data-toggle="tooltip"><i class="fas fa-check"></i> словарь</span>
 
-                        {{ lm.part_of_speech(dw.part_of_speech, dw.pos) }}
-                    {% else %}
+                        {% include 'components/part_of_speech.twig' with { 'pos': dw.part_of_speech, 'raw': dw.pos } only %}
+                    {#% else %}
                         <span class="label label-danger" title="Нет в словаре" data-toggle="tooltip"><i class="fas fa-times"></i> словарь</span>
-                    {% endif %}
+                    #}{% endif %}
                 {% endif %}
 
                 {% if definition %}
                     <span class="label label-success" title="Есть определение" data-toggle="tooltip"><i class="fas fa-check"></i> определение</span>
-                {% else %}
+                {#% else %}
                     <span class="label label-danger" title="Нет определения" data-toggle="tooltip"><i class="fas fa-times"></i> определение</span>
-                {% endif %}
+                #}{% endif %}
 
                 {% if word.is_mature %}
                     <span class="label label-danger" title="Не для детей" data-toggle="tooltip">16+</span>
@@ -128,7 +128,7 @@
         <div class="panel-body">
             {% if definition %}
                 {% for def_entry in definition.entries %}
-                    <p><strong>{{ word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}{% if def_entry.partOfSpeech %} <i class="gray-9 ml-1">{{ lm.part_of_speech(def_entry.partOfSpeech, null, true) }}</i>{% endif %}</p>
+                    <p><strong>{{ word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}{% if def_entry.partOfSpeech %} <i class="gray-9 ml-1">{% include 'components/part_of_speech.twig' with { 'pos': def_entry.partOfSpeech, 'bare': true, 'short': true, 'lang': definition.language.code } only %}</i>{% endif %}</p>
 
                     {% if def_entry.definitions|length == 1 %}
                         <p>{{ def_entry.definitions[0] }}</p>

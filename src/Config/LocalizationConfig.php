@@ -24,6 +24,17 @@ class LocalizationConfig extends BaseConfig
                 'predicative' => 'частица',
                 'interjection' => 'междометие',
 
+                'n.' => 'сущ.',
+                'adj.' => 'прил.',
+                'v.' => 'гл.',
+                'adv.' => 'нареч.',
+                'pron.' => 'местоим.',
+                'num.' => 'числ.',
+                'prep.' => 'предл.',
+                'conj.' => 'союз',
+                'pred.' => 'част.',
+                'interj.' => 'межд.',
+
                 'Language not found.' => 'Язык не найден.',
                 'New game started.' => 'Начата новая игра.',
                 'Association not found.' => 'Ассоциация не найдена.',

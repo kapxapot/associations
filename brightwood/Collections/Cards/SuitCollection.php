@@ -9,10 +9,10 @@ class SuitCollection extends EquatableCollection
 {
     protected string $class = Suit::class;
 
-    public function get(int $id) : Suit
+    public function get(int $id): Suit
     {
         $suit = $this->first(
-            fn (Suit $s) => $s->id() == $id
+            fn (Suit $s) => $s->id() === $id
         );
 
         Assert::notNull($suit);

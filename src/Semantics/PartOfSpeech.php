@@ -2,134 +2,127 @@
 
 namespace App\Semantics;
 
-use Webmozart\Assert\Assert;
+use App\Collections\PartOfSpeechCollection;
 
 class PartOfSpeech
 {
     /**
      * Существительное
      */
-    const NOUN = 'noun';
+    public const NOUN = 'noun';
 
     /**
      * Прилагательное
      */
-    const ADJECTIVE = 'adjective';
+    public const ADJECTIVE = 'adjective';
 
     /**
      * Глагол
      */
-    const VERB = 'verb';
+    public const VERB = 'verb';
 
     /**
      * Наречие
      */
-    const ADVERB = 'adverb';
+    public const ADVERB = 'adverb';
 
     /**
      * Местоимение
      */
-    const PRONOUN = 'pronoun';
+    public const PRONOUN = 'pronoun';
 
     /**
      * Числительное
      */
-    const NUMERAL = 'numeral';
+    public const NUMERAL = 'numeral';
 
     /**
      * Предлог
      */
-    const PREPOSITION = 'preposition';
+    public const PREPOSITION = 'preposition';
 
     /**
      * Союз
      */
-    const CONJUNCTION = 'conjunction';
+    public const CONJUNCTION = 'conjunction';
 
     /**
      * Частица
      */
-    const PREDICATIVE = 'predicative';
+    public const PREDICATIVE = 'predicative';
 
     /**
      * Междометие
      */
-    const INTERJECTION = 'interjection';
+    public const INTERJECTION = 'interjection';
 
-    const GOOD = 1;
-    const BAD = 2;
-    const UGLY = 3;
+    public const GOOD = 1;
+    public const BAD = 2;
+    public const UGLY = 3;
 
-    /**
-     * @var array<string, integer> Known parts of speech and their quality.
-     */
-    protected static array $known = [
-        self::NOUN => self::GOOD,
-        self::ADJECTIVE => self::BAD,
-        self::VERB => self::UGLY,
-        self::ADVERB => self::UGLY,
-        self::PRONOUN => self::BAD,
-        self::NUMERAL => self::BAD,
-        self::PREPOSITION => self::UGLY,
-        self::CONJUNCTION => self::UGLY,
-        self::PREDICATIVE => self::UGLY,
-        self::INTERJECTION => self::UGLY,
-    ];
+    protected static ?PartOfSpeechCollection $known = null;
 
     private string $name;
+    private string $shortName;
     private int $quality;
 
-    protected function __construct(string $name, int $quality)
+    protected function __construct(string $name, string $shortName, int $quality)
     {
         $this->name = $name;
+        $this->shortName = $shortName;
         $this->quality = $quality;
     }
 
-    public function name() : string
+    public function name(): string
     {
         return $this->name;
     }
 
-    public function quality() : int
+    public function shortName(): string
+    {
+        return $this->shortName;
+    }
+
+    public function quality(): int
     {
         return $this->quality;
     }
 
-    public function isGood() : bool
+    public function isGood(): bool
     {
         return $this->quality == self::GOOD;
     }
 
-    public function isBad() : bool
+    public function isBad(): bool
     {
         return $this->quality == self::BAD;
     }
 
-    public function isUgly() : bool
+    public function isUgly(): bool
     {
         return $this->quality == self::UGLY;
     }
 
-    protected static function isKnown(?string $name) : bool
+    public static function known(): PartOfSpeechCollection
     {
-        return in_array($name, array_keys(self::$known));
+        self::$known ??= PartOfSpeechCollection::collect(
+            new self(self::NOUN, 'n.', self::GOOD),
+            new self(self::ADJECTIVE, 'adj.', self::BAD),
+            new self(self::PRONOUN, 'pron.', self::BAD),
+            new self(self::NUMERAL, 'num.', self::BAD),
+            new self(self::VERB, 'v.', self::UGLY),
+            new self(self::ADVERB, 'adv.', self::UGLY),
+            new self(self::PREPOSITION, 'prep.', self::UGLY),
+            new self(self::CONJUNCTION, 'conj.', self::UGLY),
+            new self(self::PREDICATIVE, 'pred.', self::UGLY),
+            new self(self::INTERJECTION, 'interj.', self::UGLY)
+        );
+
+        return self::$known;
     }
 
-    protected static function getQualityByName(string $name) : ?int
+    public static function getByName(?string $name): ?self
     {
-        return self::$known[$name] ?? null;
-    }
-
-    public static function getByName(?string $name) : ?self
-    {
-        if (!self::isKnown($name)) {
-            return null;
-        }
-
-        $quality = self::getQualityByName($name);
-
-        Assert::notNull($quality);
-
-        return new self($name, $quality);
+        return self::known()->get($name);
     }
 }

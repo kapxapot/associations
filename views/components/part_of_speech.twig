@@ -1,2 +1,12 @@
-{% set raw = raw ?? 'undefined part of speech' %}
-{% if not bare %}<span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}">{% endif %}{{ pos ? translate(pos.name) : raw }}{% if not bare %}</span>{% endif %}
+{% set raw = raw ?? 'undefined POS' %}
+{% if bare %}
+    {% if short and pos %}
+        <span title="{{ translate(pos.name, lang) }}" data-toggle="tooltip">{{ translate(pos.shortName, lang) }}</span>
+    {% else %}
+        {{ translate(pos ? pos.name : raw, lang) }}
+    {% endif %}
+{% elseif pos %}
+    <span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}">{{ translate(short ? pos.shortName : pos.name, lang) }}</span>
+{% else %}
+    <span class="label label-danger">{{ translate(raw, lang) }}</span>
+{% endif %}

@@ -35,7 +35,7 @@ class DefinitionParser
             return null;
         }
 
-        $result = new DefinitionAggregate();
+        $result = new DefinitionAggregate($language);
 
         foreach ($data as $entry) {
             $defEntry = new DefinitionEntry();

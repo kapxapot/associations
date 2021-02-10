@@ -4,14 +4,24 @@ namespace App\Semantics\Definition;
 
 use App\Collections\DefinitionEntryCollection;
 use App\Collections\PartOfSpeechCollection;
+use App\Models\Language;
 
 class DefinitionAggregate
 {
+    private Language $language;
     private DefinitionEntryCollection $entries;
 
-    public function __construct()
+    public function __construct(
+        Language $language
+    )
     {
+        $this->language = $language;
         $this->entries = DefinitionEntryCollection::empty();
+    }
+
+    public function language(): Language
+    {
+        return $this->language;
     }
 
     public function entries(): DefinitionEntryCollection
