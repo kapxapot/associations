@@ -23,15 +23,12 @@ class TurnCollection extends DbModelCollection
      */
     public function users(): UserCollection
     {
-        return
-            UserCollection::from(
-                $this
-                    ->map(
-                        fn (Turn $t) => $t->user()
-                    )
-                    ->clean()
+        return UserCollection::from(
+            $this->cleanMap(
+                fn (Turn $t) => $t->user()
             )
-            ->distinct();
+        )
+        ->distinct();
     }
 
     public function hasAiTurn(): bool

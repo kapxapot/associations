@@ -50,7 +50,7 @@ class MatchDanglingDictWordsJob implements ModelJobInterface
         $processed = $this
             ->dictWordRepository
             ->getAllDanglingOutOfDate($danglingTtl, $limit)
-            ->map(
+            ->cleanMap(
                 function (DictWordInterface $dictWord) {
                     $language = $dictWord->getLanguage();
                     $wordStr = $dictWord->getWord();
@@ -63,8 +63,7 @@ class MatchDanglingDictWordsJob implements ModelJobInterface
 
                     return $this->dictionaryService->link($dictWord, $word);
                 }
-            )
-            ->clean();
+            );
 
         return DictWordCollection::from($processed);
     }

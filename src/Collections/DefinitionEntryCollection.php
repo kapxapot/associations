@@ -3,7 +3,6 @@
 namespace App\Collections;
 
 use App\Semantics\Definition\DefinitionEntry;
-use App\Semantics\PartOfSpeech;
 use Plasticode\Collections\Generic\TypedCollection;
 
 class DefinitionEntryCollection extends TypedCollection
@@ -13,14 +12,10 @@ class DefinitionEntryCollection extends TypedCollection
     public function partsOfSpeech(): PartOfSpeechCollection
     {
         return PartOfSpeechCollection::from(
-            $this
-                ->map(
-                    fn (DefinitionEntry $de) => $de->partOfSpeech()
-                )
-                ->clean()
-                ->distinctBy(
-                    fn (?PartOfSpeech $p) => $p->name()
-                )
-        );
+            $this->cleanMap(
+                fn (DefinitionEntry $de) => $de->partOfSpeech()
+            )
+        )
+        ->distinct();
     }
 }

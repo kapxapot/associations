@@ -16,6 +16,13 @@ class PartOfSpeechCollection extends TypedCollection
         );
     }
 
+    public function distinct(): self
+    {
+        return $this->distinctBy(
+            fn (PartOfSpeech $p) => $p->name()
+        );
+    }
+
     public function isAnyGood(): bool
     {
         return $this->any(

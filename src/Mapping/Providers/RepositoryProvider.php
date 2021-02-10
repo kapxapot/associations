@@ -45,6 +45,7 @@ use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
 use App\Services\DictionaryService;
 use App\Services\UserService;
+use App\Services\WordService;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\External\Gravatar;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
@@ -227,7 +228,8 @@ class RepositoryProvider extends MappingProvider
                             $c->get(WordFeedbackRepositoryInterface::class),
                             $c->get(AuthInterface::class),
                             $c->get(LinkerInterface::class),
-                            $c->get(DictionaryService::class)
+                            $c->get(DictionaryService::class),
+                            $c->get(WordService::class)
                         )
                     )
                 ),

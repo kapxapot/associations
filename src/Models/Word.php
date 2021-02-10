@@ -4,20 +4,26 @@ namespace App\Models;
 
 use App\Collections\AssociationCollection;
 use App\Collections\MetaAssociationCollection;
+use App\Collections\PartOfSpeechCollection;
 use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
 use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
+use App\Semantics\Definition\DefinitionAggregate;
+use App\Semantics\PartOfSpeech;
+use Plasticode\Collections\Generic\Collection;
 
 /**
  * @property string $word
  * @method AssociationCollection associations()
  * @method Definition|null definition()
  * @method DictWordInterface|null dictWord()
+ * @method DefinitionAggregate|null parsedDefinition()
  * @method static withAssociations(AssociationCollection|callable $associations)
  * @method static withDefinition(Definition|callable|null $definition)
  * @method static withDictWord(DictWordInterface|callable|null $dictWord)
  * @method static withFeedbacks(WordFeedbackCollection|callable $feedbacks)
+ * @method static withParsedDefinition(DefinitionAggregate|callable|null $parsedDefinition)
  */
 class Word extends LanguageElement
 {
@@ -267,5 +273,26 @@ class Word extends LanguageElement
         }
 
         return $name;
+    }
+
+    public function partsOfSpeech(): PartOfSpeechCollection
+    {
+        $poses = PartOfSpeechCollection::empty();
+
+        $dw = $this->dictWord();
+
+        if ($dw !== null && $dw->partOfSpeech() !== null) {
+            $poses = $poses->add(
+                $dw->partOfSpeech()
+            );
+        }
+
+        if ($this->parsedDefinition() !== null) {
+            $poses = $poses->concat(
+                $this->parsedDefinition()->partsOfSpeech()
+            );
+        }
+
+        return $poses->distinct();
     }
 }

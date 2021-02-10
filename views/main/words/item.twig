@@ -28,8 +28,6 @@
 
                     {% if dw.is_valid %}
                         <span class="label label-success" title="Есть в словаре" data-toggle="tooltip"><i class="fas fa-check"></i> словарь</span>
-
-                        {% include 'components/part_of_speech.twig' with { 'pos': dw.part_of_speech, 'raw': dw.pos } only %}
                     {#% else %}
                         <span class="label label-danger" title="Нет в словаре" data-toggle="tooltip"><i class="fas fa-times"></i> словарь</span>
                     #}{% endif %}
@@ -40,6 +38,10 @@
                 {#% else %}
                     <span class="label label-danger" title="Нет определения" data-toggle="tooltip"><i class="fas fa-times"></i> определение</span>
                 #}{% endif %}
+
+                {% for pos in word.partsOfSpeech %}
+                    {% include 'components/part_of_speech.twig' with { 'pos': pos } only %}
+                {% endfor %}
 
                 {% if word.is_mature %}
                     <span class="label label-danger" title="Не для детей" data-toggle="tooltip">16+</span>
