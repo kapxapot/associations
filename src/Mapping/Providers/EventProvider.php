@@ -4,6 +4,7 @@ namespace App\Mapping\Providers;
 
 use App\EventHandlers\Association\AssociationApprovedChangedHandler;
 use App\EventHandlers\Association\AssociationOutOfDateHandler;
+use App\EventHandlers\Definition\DefinitionUpdatedHandler;
 use App\EventHandlers\DictWord\DictWordLinkedHandler;
 use App\EventHandlers\DictWord\DictWordUnlinkedHandler;
 use App\EventHandlers\Feedback\AssociationFeedbackCreatedHandler;
@@ -35,6 +36,10 @@ class EventProvider extends MappingProvider
 
             new AssociationOutOfDateHandler(
                 $container->get(AssociationRecountService::class)
+            ),
+
+            new DefinitionUpdatedHandler(
+                $container->get(WordRecountService::class)
             ),
 
             new DictWordLinkedHandler(
