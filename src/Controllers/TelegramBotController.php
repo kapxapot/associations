@@ -458,6 +458,6 @@ class TelegramBotController
 
     private function turnStr(Turn $turn): string
     {
-        return '<b>' . $turn->word()->word . '</b>';
+        return '<b>' . mb_strtoupper($turn->word()->word) . '</b>';
     }
 }
