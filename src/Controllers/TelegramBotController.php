@@ -17,7 +17,6 @@ use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -36,24 +35,32 @@ class TelegramBotController
 
     private AgeValidation $ageValidation;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(
+        SettingsProviderInterface $settingsProvider,
+        LoggerInterface $logger,
+        UserRepositoryInterface $userRepository,
+        GameService $gameService,
+        TelegramUserService $telegramUserService,
+        TurnService $turnService,
+        AgeValidation $ageValidation
+    )
     {
-        $this->settingsProvider = $container->get(SettingsProviderInterface::class);
-        $this->logger = $container->get(LoggerInterface::class);
+        $this->settingsProvider = $settingsProvider;
+        $this->logger = $logger;
 
-        $this->userRepository = $container->get(UserRepositoryInterface::class);
+        $this->userRepository = $userRepository;
 
-        $this->gameService = $container->get(GameService::class);
-        $this->telegramUserService = $container->get(TelegramUserService::class);
-        $this->turnService = $container->get(TurnService::class);
+        $this->gameService = $gameService;
+        $this->telegramUserService = $telegramUserService;
+        $this->turnService = $turnService;
 
-        $this->ageValidation = $container->get(AgeValidation::class);
+        $this->ageValidation = $ageValidation;
     }
 
     public function __invoke(
         ServerRequestInterface $request,
         ResponseInterface $response
-    ) : ResponseInterface
+    ): ResponseInterface
     {
         $data = $request->getParsedBody();
 
@@ -78,7 +85,7 @@ class TelegramBotController
         throw new BadRequestException();
     }
 
-    private function processMessage(array $message) : ?array
+    private function processMessage(array $message): ?array
     {
         $result = [];
 
@@ -117,7 +124,7 @@ class TelegramBotController
     /**
      * @return string[]
      */
-    private function getAnswer(TelegramUser $tgUser, string $text) : array
+    private function getAnswer(TelegramUser $tgUser, string $text): array
     {
         if (strpos($text, '/start') === 0) {
             return $this->startCommand($tgUser);
@@ -139,7 +146,7 @@ class TelegramBotController
     /**
      * @return string[]
      */
-    private function startCommand(TelegramUser $tgUser) : array
+    private function startCommand(TelegramUser $tgUser): array
     {
         $user = $tgUser->user();
 
@@ -162,7 +169,7 @@ class TelegramBotController
     /**
      * @return string[]
      */
-    private function readAge(TelegramUser $tgUser, string $text) : array
+    private function readAge(TelegramUser $tgUser, string $text): array
     {
         $validationData = ['age' => $text];
         $rules = $this->ageValidation->getRules($validationData);
@@ -193,7 +200,7 @@ class TelegramBotController
     /**
      * @return string[]
      */
-    private function askAge() : array
+    private function askAge(): array
     {
         return [
             'Пожалуйста, укажите ваш возраст (цифрами):'
@@ -203,7 +210,7 @@ class TelegramBotController
     /**
      * @return string[]
      */
-    private function skipCommand(TelegramUser $tgUser) : array
+    private function skipCommand(TelegramUser $tgUser): array
     {
         $user = $tgUser->user();
         $game = $user->currentGame();
@@ -221,7 +228,7 @@ class TelegramBotController
     /**
      * @return string[]
      */
-    private function sayWord(TelegramUser $tgUser, string $text) : array
+    private function sayWord(TelegramUser $tgUser, string $text): array
     {
         $user = $tgUser->user();
         $game = $user->currentGame();
@@ -260,7 +267,7 @@ class TelegramBotController
     /**
      * @return string[]
      */
-    private function startGame(TelegramUser $tgUser) : array
+    private function startGame(TelegramUser $tgUser): array
     {
         $user = $tgUser->user();
         $isNewUser = $tgUser->isNew();
@@ -281,7 +288,7 @@ class TelegramBotController
     /**
      * @return string[]
      */
-    private function newGame(User $user, string $message) : array
+    private function newGame(User $user, string $message): array
     {
         $newGame = $this->gameService->createGameFor($user);
 
@@ -299,7 +306,7 @@ class TelegramBotController
         ?Turn $question,
         ?Turn $answer,
         ?string $noQuestionMessage = null
-    ) : array
+    ): array
     {
         if (is_null($answer)) {
             return [
@@ -335,7 +342,7 @@ class TelegramBotController
         ];
     }
 
-    private function turnStr(Turn $turn) : string
+    private function turnStr(Turn $turn): string
     {
         return '<b>' . $turn->word()->word . '</b>';
     }
