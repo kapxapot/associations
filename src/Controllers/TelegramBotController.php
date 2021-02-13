@@ -8,15 +8,19 @@ use App\Models\TelegramUser;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Validation\AgeValidation;
+use App\Parsing\DefinitionParser;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use App\Semantics\Definition\DefinitionEntry;
 use App\Services\GameService;
 use App\Services\TelegramUserService;
 use App\Services\TurnService;
 use Exception;
+use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
+use Plasticode\Util\Text;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -26,6 +30,7 @@ class TelegramBotController
 {
     private SettingsProviderInterface $settingsProvider;
     private LoggerInterface $logger;
+    private TranslatorInterface $translator;
 
     private UserRepositoryInterface $userRepository;
 
@@ -35,18 +40,25 @@ class TelegramBotController
 
     private AgeValidation $ageValidation;
 
+    private DefinitionParser $definitionParser;
+
+    private string $languageCode;
+
     public function __construct(
         SettingsProviderInterface $settingsProvider,
         LoggerInterface $logger,
+        TranslatorInterface $translator,
         UserRepositoryInterface $userRepository,
         GameService $gameService,
         TelegramUserService $telegramUserService,
         TurnService $turnService,
-        AgeValidation $ageValidation
+        AgeValidation $ageValidation,
+        DefinitionParser $definitionParser
     )
     {
         $this->settingsProvider = $settingsProvider;
         $this->logger = $logger;
+        $this->translator = $translator;
 
         $this->userRepository = $userRepository;
 
@@ -55,6 +67,10 @@ class TelegramBotController
         $this->turnService = $turnService;
 
         $this->ageValidation = $ageValidation;
+
+        $this->definitionParser = $definitionParser;
+
+        $this->languageCode = 'ru';
     }
 
     public function __invoke(
@@ -140,6 +156,10 @@ class TelegramBotController
             return $this->skipCommand($tgUser);
         }
 
+        if (strpos($text, '/what') === 0) {
+            return $this->whatCommand($tgUser);
+        }
+
         return $this->sayWord($tgUser, $text);
     }
 
@@ -223,6 +243,84 @@ class TelegramBotController
             $user,
             'Сдаетесь? 😏 Ок, начинаем заново!'
         );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function whatCommand(TelegramUser $tgUser): array
+    {
+        $user = $tgUser->user();
+        $game = $user->currentGame();
+
+        Assert::notNull($game);
+
+        /** @var Turn $lastTurn */
+        $lastTurn = $game->turns()->first();
+
+        if ($lastTurn === null) {
+            return ['Вы о чем?'];
+        }
+
+        $noDefinition = ['Определение отсутствует.'];
+
+        $word = $lastTurn->word();
+        $definition = $word->definition();
+
+        if ($definition === null || !$definition->isValid()) {
+            return $noDefinition;
+        }
+
+        $parsedDefinition = $this->definitionParser->parse($definition);
+
+        if ($parsedDefinition === null) {
+            return $noDefinition;
+        }
+
+        $defText = [];
+
+        $defEntries = $parsedDefinition->entries();
+
+        for ($index = 0; $index < $defEntries->count(); $index++) {
+            /** @var DefinitionEntry $defEntry */
+            $defEntry = $defEntries[$index];
+
+            $defTitle = '<b>' . mb_strtoupper($word->word) . '</b>';
+
+            if ($defEntries->count() > 1) {
+                $defTitle .= ' (' . ($index + 1) . ')';
+            }
+
+            if ($defEntry->partOfSpeech() !== null) {
+                $pos = $this->translator->translate(
+                    $defEntry->partOfSpeech()->shortName(),
+                    $this->languageCode
+                );
+
+                $defTitle .= ' <i>' . $pos . '</i>';
+            }
+
+            $defText[] = $defTitle;
+
+            $defEntryLines = [];
+
+            $defEntryDefs = $defEntry->definitions();
+
+            for ($subIndex = 0; $subIndex < $defEntryDefs->count(); $subIndex++) {
+                /** @var string $defEntryDef */
+                $defEntryDef = $defEntryDefs[$subIndex];
+
+                if ($defEntryDefs->count() > 1) {
+                    $defEntryDef = ($subIndex + 1) . '. ' . $defEntryDef;
+                }
+
+                $defEntryLines[] = $defEntryDef;
+            }
+
+            $defText[] = Text::join($defEntryLines);
+        }
+
+        return $defText;
     }
 
     /**
@@ -316,18 +414,33 @@ class TelegramBotController
 
         Assert::true($answer->isAiTurn());
 
-        $answerWord = $this->turnStr($answer);
+        $answerWordStr = $this->turnStr($answer);
+
+        $commands = [];
+
+        $definition = $answer->word()->definition();
+
+        if ($definition && $definition->isValid()) {
+            $parsedDefinition = $this->definitionParser->parse($definition);
+
+            if ($parsedDefinition) {
+                $commands[] = '/what Что такое "' . $answer->word()->word . '"?';
+            }
+        }
+
+        $commands[] = '/skip Другое слово';
 
         if (is_null($question)) {
             return array_filter(
                 [
                     $noQuestionMessage,
-                    $answerWord
+                    $answerWordStr,
+                    ...$commands
                 ]
             );
         }
 
-        $questionWord = $this->turnStr($question);
+        $questionWordStr = $this->turnStr($question);
 
         $association = $answer->association();
 
@@ -335,10 +448,11 @@ class TelegramBotController
             ? $association->sign()
             : Association::DEFAULT_SIGN;
 
-        $associationStr = $questionWord . ' ' . $sign . ' ' . $answerWord;
+        $associationStr = $questionWordStr . ' ' . $sign . ' ' . $answerWordStr;
 
         return [
-            $associationStr
+            $associationStr,
+            ...$commands
         ];
     }
 
