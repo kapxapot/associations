@@ -43,6 +43,12 @@ class WordGenerator extends ChangingEntityGenerator
             $item['name'] = $word->word;
             $item['url'] = $word->url();
             $item['language'] = $word->language()->name;
+
+            $dw = $word->dictWord();
+            $item['has_dict_word'] = $dw && $dw->isValid();
+
+            $def = $word->definition();
+            $item['has_definition'] = $def && $def->isValid();
         }
 
         return $item;

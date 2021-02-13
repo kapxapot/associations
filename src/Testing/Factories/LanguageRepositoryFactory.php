@@ -8,7 +8,7 @@ use App\Testing\Seeders\LanguageSeeder;
 
 class LanguageRepositoryFactory
 {
-    public static function make() : LanguageRepositoryInterface
+    public static function make(): LanguageRepositoryInterface
     {
         return new LanguageRepositoryMock(
             new LanguageSeeder()

@@ -433,6 +433,16 @@ words:
       type: bool
       attributes: [readonly]
 
+    has_dict_word:
+      name: Словарь
+      type: bool
+      attributes: [readonly]
+
+    has_definition:
+      name: Определение
+      type: bool
+      attributes: [readonly]
+
     created_at:
       name: Дата создания
       type: date

@@ -10,8 +10,6 @@ use App\Collections\WordFeedbackCollection;
 use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
-use App\Semantics\PartOfSpeech;
-use Plasticode\Collections\Generic\Collection;
 
 /**
  * @property string $word

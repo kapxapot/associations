@@ -10,7 +10,7 @@ class LanguageSeeder implements ArraySeederInterface
     /**
      * @return Language[]
      */
-    public function seed() : array
+    public function seed(): array
     {
         return [
             new Language(

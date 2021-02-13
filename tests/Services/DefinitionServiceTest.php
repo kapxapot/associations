@@ -2,6 +2,7 @@
 
 namespace App\Tests\Services;
 
+use App\Parsing\DefinitionParser;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DefinitionService;
 use App\Testing\Factories\WordRepositoryFactory;
@@ -26,6 +27,7 @@ final class DefinitionServiceTest extends TestCase
                 $this->wordRepository
             ),
             new DefinitionSourceMock(),
+            new DefinitionParser(),
             new EventDispatcher()
         );
     }

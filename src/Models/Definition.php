@@ -9,6 +9,7 @@ use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
 
 /**
+ * @property int $valid
  * @property string|null $jsonData
  * @property string $source
  * @property string $url
@@ -28,7 +29,7 @@ class Definition extends DbModel implements CreatedAtInterface, UpdatedAtInterfa
 
     public function isValid(): bool
     {
-        return $this->jsonData !== null;
+        return $this->valid == 1;
     }
 
     public function language(): Language
