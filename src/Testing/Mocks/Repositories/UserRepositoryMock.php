@@ -65,4 +65,13 @@ class UserRepositoryMock implements UserRepositoryInterface
     {
         return $this->users->first('login', $login);
     }
+
+    public function isValidField(string $field, $value, ?int $exceptId = null): bool
+    {
+        return $this
+            ->users
+            ->where($field, $value)
+            ->whereNotIn('id', [$exceptId])
+            ->count() == 0;
+    }
 }

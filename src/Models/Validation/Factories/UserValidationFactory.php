@@ -16,7 +16,7 @@ class UserValidationFactory
     ): UserValidation
     {
         $userValidation = new UserValidation($validationRules, $userRepository);
-        
+
         return $userValidation->extendWith($ageValidation);
     }
 }
