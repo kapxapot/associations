@@ -12,21 +12,16 @@ use Plasticode\Auth\Access;
 use Plasticode\Core\Response;
 use Plasticode\Data\Rights;
 use Plasticode\Exceptions\Http\BadRequestException;
-use Plasticode\Exceptions\Http\NotFoundException;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use Slim\Http\Request;
-use Webmozart\Assert\Assert;
 
 class GameController extends Controller
 {
     private GameRepositoryInterface $gameRepository;
     private LanguageRepositoryInterface $languageRepository;
 
-    private GameService $gameService;
-    private TurnService $turnService;
     private WordService $wordService;
 
     private Access $access;
@@ -40,8 +35,6 @@ class GameController extends Controller
         $this->gameRepository = $container->get(GameRepositoryInterface::class);
         $this->languageRepository = $container->get(LanguageRepositoryInterface::class);
 
-        $this->gameService = $container->get(GameService::class);
-        $this->turnService = $container->get(TurnService::class);
         $this->wordService = $container->get(WordService::class);
 
         $this->access = $container->get(Access::class);
@@ -49,6 +42,9 @@ class GameController extends Controller
         $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
     }
 
+    /**
+     * Get game by id.
+     */
     public function get(
         Request $request,
         ResponseInterface $response,
@@ -135,7 +131,7 @@ class GameController extends Controller
                 )
             : null;
 
-        $wordAssociation = $word
+        $wordAssociation = ($word && $prevWord)
             ? $word->associationByWord($prevWord)
             : null;
 

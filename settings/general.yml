@@ -79,6 +79,9 @@ telegram:
   brightwood_bot_token: {BRIGHTWOOD_BOT_TOKEN}
   brightwood_bot_log_level: {BRIGHTWOOD_BOT_LOG_LEVEL}
 
+alice:
+  bot_secret: {ALICE_BOT_SECRET}
+
 jobs:
   secret: {JOBS_SECRET}
   update_associations:

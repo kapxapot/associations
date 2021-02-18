@@ -1,5 +1,6 @@
 <?php
 
+use App\Controllers\AliceBotController;
 use App\Controllers\AssociationController;
 use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
@@ -258,6 +259,15 @@ $app->group(
             $this->post(
                 '/bots/telegram/' . $brightwoodBotToken,
                 BrightwoodBotController::class
+            );
+        }
+
+        $aliceBotSecret = $settingsProvider->get('alice.bot_secret');
+
+        if (strlen($aliceBotSecret) > 0) {
+            $this->post(
+                '/bots/alice/' . $aliceBotSecret,
+                AliceBotController::class
             );
         }
 
