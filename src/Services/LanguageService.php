@@ -60,30 +60,40 @@ class LanguageService
             : $this->getDefaultLanguage();
     }
 
-    public function getRandomPublicWord(?Language $language = null) : ?Word
+    public function getRandomPublicWord(
+        ?Language $language = null,
+        ?Word $exceptWord = null
+    ) : ?Word
     {
-        return $this->getRandomWordFor(null, $language);
+        return $this->getRandomWordFor(null, $language, $exceptWord);
     }
 
     public function getRandomWordFor(
         ?User $user,
-        ?Language $language = null
+        ?Language $language = null,
+        ?Word $exceptWord = null
     ) : ?Word
     {
         // get common words
-        $approvedWords = $this->wordRepository->getAllApproved($language);
+        $words = $this->wordRepository->getAllApproved($language);
 
         if ($user) {
             // get user's words
             $userWords = $this->wordService->getAllUsedBy($user, $language);
 
             // union them & distinct
-            $approvedWords = $approvedWords
+            $words = $words
                 ->concat($userWords)
                 ->distinct();
         }
 
-        return $approvedWords
+        if ($exceptWord !== null) {
+            $words = $words->where(
+                fn (Word $w) => !$w->equals($exceptWord)
+            );
+        }
+
+        return $words
             ->where(
                 fn (Word $w) => $w->isPlayableAgainst($user)
             )

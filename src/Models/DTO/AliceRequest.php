@@ -11,6 +11,9 @@ class AliceRequest
     public ?array $userState;
     public ?array $applicationState;
 
+    public ?string $type;
+    public ?string $payload;
+
     public function __construct(array $data)
     {
         $this->command = $data['request']['command'] ?? null;
@@ -19,6 +22,9 @@ class AliceRequest
         $this->applicationId = $data['session']['application']['application_id'] ?? null;
         $this->userState = $data['state']['user'] ?? null;
         $this->applicationState = $data['state']['application'] ?? null;
+
+        $this->type = $data['request']['type'] ?? null;
+        $this->payload = $data['request']['payload'] ?? null;
     }
 
     public function hasUser(): bool
@@ -46,5 +52,14 @@ class AliceRequest
         }
 
         return $state[$name] ?? $default;
+    }
+
+    public function buttonPayload(): ?string
+    {
+        if ($this->type === 'ButtonPressed') {
+            return $this->payload;
+        }
+
+        return null;
     }
 }
