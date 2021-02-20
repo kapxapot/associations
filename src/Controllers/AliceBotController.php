@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\LanguageService;
 use App\Services\WordService;
 use Exception;
+use Plasticode\Collections\Generic\StringCollection;
 use Plasticode\Core\Response;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
@@ -28,6 +29,9 @@ class AliceBotController
 
     private const BUTTON_HELP = 'help';
     private const BUTTON_CAN = 'can';
+
+    private const COMMAND_HELP = 'помощь';
+    private const COMMAND_CAN = 'что ты умеешь';
 
     private WordRepositoryInterface $wordRepository;
 
@@ -86,7 +90,6 @@ class AliceBotController
     private function getResponse(AliceRequest $request): AliceResponse
     {
         $question = $request->command;
-        $buttonPayload = $request->buttonPayload();
         $isNewSession = $request->isNewSession;
 
         if ($isNewSession) {
@@ -96,38 +99,57 @@ class AliceBotController
             );
         }
 
-        if ($buttonPayload === self::BUTTON_HELP) {
-            return new AliceResponse('Говорим по очереди слово, которое ассоциируется с предыдущим. Желательно использовать существительные. Скажите \'другое слово\' или \'пропустить\', если не хотите отвечать на слово. В ассоциации также можно играть у нас на сайте associ.ru и в нашем Telegram-боте t.me/AssociRuBot.');
-        }
-
-        if ($buttonPayload === self::BUTTON_CAN) {
-            return new AliceResponse('Я умею играть в ассоциации!');
-        }
-
         if (strlen($question) === 0) {
             return new AliceResponse('Повторите, пожалуйста');
         }
 
-        $skipPhrases = [
-            'другое слово',
-            'пропустить'
+        $prevWordId = $request->var(self::VAR_PREV_WORD);
+        $prevWord = $this->wordRepository->get($prevWordId);
+
+        $helpCommands = [
+            self::COMMAND_HELP,
+            self::COMMAND_CAN,
         ];
 
-        if (in_array(mb_strtolower($question), $skipPhrases)) {
+        if (in_array($question, $helpCommands)) {
+            return $this
+                ->answerWithWord(
+                    $request,
+                    $prevWord,
+                    'В игре в ассоциации Алиса и игрок говорят по очереди слово, которое ассоциируется с предыдущим. Желательно использовать существительные. Скажите \'другое слово\' или \'пропустить\', если не хотите отвечать на слово.',
+                    'Продолжаем.',
+                    'Мое слово:'
+                )
+                ->withStateFrom($request);
+        }
+
+        $skipPhrases = [
+            'другое слово',
+            'пропустить',
+        ];
+
+        if (in_array($question, $skipPhrases)) {
             return $this->answerWithAnyWord(
                 $request,
                 'Хорошо. Начинаем заново:'
             );
         }
 
-        $prevWordId = $request->var(self::VAR_PREV_WORD);
-
-        $turn = $this->getWordFor($question, $prevWordId);
+        $turn = $this->getWordFor($question, $prevWord);
         $word = $turn->word();
 
         return ($word !== null)
             ? $this->answerWithWord($request, $word)
-            : $this->answerWithAnyWord($request, 'У меня нет ассоциаций. Начинаем заново:');
+            : $this->answerWithAnyWord(
+                $request,
+                StringCollection::collect(
+                    'У меня нет ассоциаций.',
+                    'Мне нечего сказать.',
+                    'Я в тупике.',
+                    'Я сдаюсь.'
+                )->random(),
+                'Начинаем заново:'
+            );
     }
 
     private function answerWithAnyWord(
@@ -154,35 +176,19 @@ class AliceBotController
             Text::join($answerParts, ' ')
         );
 
-        if ($word !== null && $request->hasUser()) {
-            $response->withUserVar(self::VAR_PREV_WORD, $word->getId());
-        } else {
-            $response->withApplicationVar(self::VAR_PREV_WORD, $word->getId());
+        if ($word !== null) {
+            $response->withVarBy($request, self::VAR_PREV_WORD, $word->getId());
         }
 
         return $response;
     }
 
-    private function getWordFor(?string $question, ?int $prevWordId): MetaTurn
+    private function getWordFor(?string $question, ?Word $prevWord): MetaTurn
     {
         $word = $this->findWord($question);
 
-        $prevWord = ($prevWordId > 0)
-            ? $this->wordRepository->get($prevWordId)
-            : null;
-
-        // don't reveal invisible words
-        $user = null;
-        $word = $this->wordService->purgeFor($word, $user);
-        $prevWord = $this->wordService->purgeFor($prevWord, $user);
-
         $answerAssociation = $word
-            ? $word
-                ->publicAssociations()
-                ->where(
-                    fn (Association $a) => !$a->otherWord($word)->equals($prevWord)
-                )
-                ->random()
+            ? $word->randomPublicAssociation($prevWord)
             : null;
 
         $answer = $answerAssociation
@@ -222,18 +228,6 @@ class AliceBotController
             'response' => [
                 'text' => $response->text,
                 'end_session' => $response->endSession,
-                'buttons' => [
-                    [
-                        'title' => 'Помощь',
-                        'payload' => self::BUTTON_HELP,
-                        'hide' => true,
-                    ],
-                    [
-                        'title' => 'Что ты умеешь?',
-                        'payload' => self::BUTTON_CAN,
-                        'hide' => true,
-                    ],
-                ],
             ],
             'version' => '1.0',
         ];

@@ -123,20 +123,12 @@ class GameController extends Controller
         $word = $this->wordService->purgeFor($word, $user);
         $prevWord = $this->wordService->purgeFor($prevWord, $user);
 
-        $associations = $word
-            ? $word
-                ->publicAssociations()
-                ->where(
-                    fn (Association $a) => !$a->otherWord($word)->equals($prevWord)
-                )
-            : null;
-
         $wordAssociation = ($word && $prevWord)
             ? $word->associationByWord($prevWord)
             : null;
 
-        $answerAssociation = $associations
-            ? $associations->random()
+        $answerAssociation = $word
+            ? $word->randomPublicAssociation($prevWord)
             : null;
 
         $answer = $answerAssociation

@@ -62,7 +62,7 @@ class Word extends LanguageElement
             : null;
     }
 
-    public function associationByWord(Word $word): ?Association
+    public function associationByWord(self $word): ?Association
     {
         return $this
             ->associations()
@@ -79,6 +79,16 @@ class Word extends LanguageElement
             ->ascStr(
                 fn (Association $a) => $a->otherWord($this)->word
             );
+    }
+
+    public function randomPublicAssociation(?self $excludeOtherWord = null): ?Association
+    {
+        return $this
+            ->publicAssociations()
+            ->where(
+                fn (Association $a) => !$a->otherWord($this)->equals($excludeOtherWord)
+            )
+            ->random();
     }
 
     /**
@@ -157,7 +167,7 @@ class Word extends LanguageElement
      * If the origin association exists, the other word in it is
      * considered as an origin word.
      */
-    public function originWord(): ?Word
+    public function originWord(): ?self
     {
         $originAssociation = $this->originAssociation();
 
@@ -238,7 +248,7 @@ class Word extends LanguageElement
     /**
      * Returns the duplicate provided by the current user.
      */
-    public function duplicateByMe(): ?Word
+    public function duplicateByMe(): ?self
     {
         $feedback = $this->feedbackByMe();
 

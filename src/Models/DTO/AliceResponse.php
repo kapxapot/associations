@@ -27,6 +27,27 @@ class AliceResponse
     }
 
     /**
+     * @param mixed $value
+     * @return $this
+     */
+    public function withVarBy(AliceRequest $request, string $name, $value): self
+    {
+        return $request->hasUser()
+            ? $this->withUserVar($name, $value)
+            : $this->withApplicationVar($name, $value);
+    }
+
+    /**
+     * @return $this
+     */
+    public function withStateFrom(AliceRequest $request): self
+    {
+        return $request->hasUser()
+            ? $this->withUserState($request->userState)
+            : $this->withApplicationState($request->applicationState);
+    }
+
+    /**
      * @return $this
      */
     public function withUserState(array $userState): self
