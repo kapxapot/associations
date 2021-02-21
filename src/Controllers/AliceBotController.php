@@ -136,20 +136,40 @@ class AliceBotController
         }
 
         $turn = $this->getWordFor($question, $prevWord);
-        $word = $turn->word();
 
-        return ($word !== null)
-            ? $this->answerWithWord($request, $word)
-            : $this->answerWithAnyWord(
-                $request,
-                StringCollection::collect(
-                    'У меня нет ассоциаций.',
-                    'Мне нечего сказать.',
-                    'Я в тупике.',
-                    'Я сдаюсь.'
-                )->random(),
-                'Начинаем заново:'
-            );
+        return $this->turnToAnswer($request, $turn);
+    }
+
+    private function turnToAnswer(AliceRequest $request, MetaTurn $turn): AliceResponse
+    {
+        $questionWord = $turn->prevWord();
+        $answerWord = $turn->word();
+
+        $answerParts = [];
+
+        if ($questionWord !== null && $questionWord->isMature()) {
+            $answerParts[] = StringCollection::collect(
+                'Ой! Надеюсь, рядом нет детей.',
+                'Вы вгоняете меня в краску.',
+                'Ну у вас и словечки!',
+                'Хм... Как скажете.'
+            )->random();
+        }
+
+        if ($answerWord === null) {
+            $answerParts[] = StringCollection::collect(
+                'У меня нет ассоциаций.',
+                'Мне нечего сказать.',
+                'Я в тупике.',
+                'Я сдаюсь.'
+            )->random();
+
+            $answerParts[] = 'Начинаем заново:';
+
+            return $this->answerWithAnyWord($request, ...$answerParts);
+        }
+
+        return $this->answerWithWord($request, $answerWord, ...$answerParts);
     }
 
     private function answerWithAnyWord(
@@ -195,7 +215,7 @@ class AliceBotController
             ? $answerAssociation->otherWord($word)
             : null;
 
-        return new MetaTurn($answerAssociation, $answer);
+        return new MetaTurn($answerAssociation, $answer, $word);
     }
 
     private function getAnyWord(?AliceRequest $request = null): ?Word

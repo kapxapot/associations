@@ -9,14 +9,17 @@ class MetaTurn
 {
     private ?Association $association;
     private ?Word $word;
+    private ?Word $prevWord;
 
     public function __construct(
         ?Association $association,
-        ?Word $word
+        ?Word $word,
+        ?Word $prevWord
     )
     {
         $this->association = $association;
         $this->word = $word;
+        $this->prevWord = $prevWord;
     }
 
     public function association(): ?Association
@@ -27,5 +30,10 @@ class MetaTurn
     public function word(): ?Word
     {
         return $this->word;
+    }
+
+    public function prevWord(): ?Word
+    {
+        return $this->prevWord;
     }
 }
