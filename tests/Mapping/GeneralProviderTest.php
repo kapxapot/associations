@@ -20,6 +20,7 @@ use App\External\YandexDict;
 use App\Handlers\NotFoundHandler;
 use App\Mapping\Providers\GeneralProvider;
 use App\Models\Validation\AgeValidation;
+use App\Repositories\Interfaces\AliceUserRepositoryInterface;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
@@ -33,6 +34,7 @@ use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\AliceUserService;
 use App\Services\AnniversaryService;
 use App\Services\AssociationFeedbackService;
 use App\Services\AssociationRecountService;
@@ -91,6 +93,7 @@ final class GeneralProviderTest extends AbstractProviderTest
             SettingsProviderInterface::class,
             ValidatorInterface::class,
 
+            AliceUserRepositoryInterface::class,
             AssociationFeedbackRepositoryInterface::class,
             AssociationRepositoryInterface::class,
             DefinitionRepositoryInterface::class,
@@ -162,6 +165,7 @@ final class GeneralProviderTest extends AbstractProviderTest
 
         // services
 
+        $this->check(AliceUserService::class);
         $this->check(AnniversaryService::class);
         $this->check(AssociationFeedbackService::class);
         $this->check(AssociationRecountService::class);

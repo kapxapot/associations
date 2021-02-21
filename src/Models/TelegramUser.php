@@ -15,7 +15,7 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @property integer $id
  * @property int|null $userId
  * @property integer $telegramId
- * @property string $username
+ * @property string|null $username
  * @property string|null $firstName
  * @property string|null $lastName
  * @method User|null user()
@@ -38,7 +38,7 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
 
     public function isNew(): bool
     {
-        return $this->isValid() && is_null($this->user()->lastGame());
+        return $this->isValid() && $this->user()->lastGame() === null;
     }
 
     public function privateName(): string

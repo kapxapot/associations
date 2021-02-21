@@ -21,7 +21,7 @@ class TelegramUserService
         $this->userRepository = $userRepository;
     }
 
-    public function getOrCreateTelegramUser(array $data) : TelegramUser
+    public function getOrCreateTelegramUser(array $data): TelegramUser
     {
         $tgUserId = $data['id'] ?? null;
 
@@ -29,7 +29,7 @@ class TelegramUserService
 
         $tgUser = $this->telegramUserRepository->getByTelegramId($tgUserId);
 
-        if (is_null($tgUser)) {
+        if ($tgUser === null) {
             $tgUser = $this->telegramUserRepository->store(
                 [
                     'telegram_id' => $tgUserId,
@@ -46,9 +46,9 @@ class TelegramUserService
     }
 
     /**
-     * Checks that the telegram user has a corresponding local user.
+     * Checks that the Telegram user has a corresponding local user.
      */
-    private function ensureTelegramUserIsValid(TelegramUser $tgUser) : TelegramUser
+    private function ensureTelegramUserIsValid(TelegramUser $tgUser): TelegramUser
     {
         if ($tgUser->isValid()) {
             return $tgUser;

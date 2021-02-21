@@ -4,6 +4,7 @@ namespace App\Mapping\Providers;
 
 use App\Auth\Interfaces\AuthInterface;
 use App\Core\Interfaces\LinkerInterface;
+use App\Hydrators\AliceUserHydrator;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
 use App\Hydrators\DefinitionHydrator;
@@ -17,10 +18,12 @@ use App\Hydrators\UserHydrator;
 use App\Hydrators\WordFeedbackHydrator;
 use App\Hydrators\WordHydrator;
 use App\Hydrators\YandexDictWordHydrator;
+use App\Repositories\AliceUserRepository;
 use App\Repositories\AssociationFeedbackRepository;
 use App\Repositories\AssociationRepository;
 use App\Repositories\DefinitionRepository;
 use App\Repositories\GameRepository;
+use App\Repositories\Interfaces\AliceUserRepositoryInterface;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
@@ -61,6 +64,16 @@ class RepositoryProvider extends MappingProvider
     public function getMappings(): array
     {
         return [
+            AliceUserRepositoryInterface::class =>
+                fn (ContainerInterface $c) => new AliceUserRepository(
+                    $c->get(RepositoryContext::class),
+                    new ObjectProxy(
+                        fn () => new AliceUserHydrator(
+                            $c->get(UserRepositoryInterface::class)
+                        )
+                    )
+                ),
+
             AssociationFeedbackRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new AssociationFeedbackRepository(
                     $c->get(RepositoryContext::class),

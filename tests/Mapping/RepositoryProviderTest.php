@@ -3,10 +3,12 @@
 namespace App\Tests\Mapping;
 
 use App\Mapping\Providers\RepositoryProvider;
+use App\Repositories\AliceUserRepository;
 use App\Repositories\AssociationFeedbackRepository;
 use App\Repositories\AssociationRepository;
 use App\Repositories\DefinitionRepository;
 use App\Repositories\GameRepository;
+use App\Repositories\Interfaces\AliceUserRepositoryInterface;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
@@ -60,6 +62,11 @@ final class RepositoryProviderTest extends AbstractProviderTest
 
     public function testWiring(): void
     {
+        $this->check(
+            AliceUserRepositoryInterface::class,
+            AliceUserRepository::class
+        );
+
         $this->check(
             AssociationFeedbackRepositoryInterface::class,
             AssociationFeedbackRepository::class
