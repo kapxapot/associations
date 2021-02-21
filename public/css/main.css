@@ -100,8 +100,46 @@ a.assoc-arrow {
 
 /* footer */
 
-.social-links img {
+.social-links img,
+.social-links svg {
     width: 32px;
     height: 32px;
     vertical-align: top;
+}
+
+/* alice */
+
+:root {
+    --color-alice-start: #C926FF;
+    --color-alice-end: #4A26FF;
+    --color-alice-inner: white;
+}
+
+.alice-start {
+    stop-color: var(--color-alice-start);
+}
+
+.alice-end {
+    stop-color: var(--color-alice-end);
+}
+
+.social-links {
+    --color-alice-start: currentColor;
+    --color-alice-end: currentColor;
+    --color-alice-inner: transparent;
+}
+
+.alice-inline svg {
+    width: 16px;
+    height: 16px;
+    margin-bottom: -2px;
+}
+
+/* sidebar */
+
+.sidebar-links img,
+.sidebar-links svg {
+    width: 32px;
+    height: 32px;
+    vertical-align: middle;
 }
