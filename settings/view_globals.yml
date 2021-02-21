@@ -28,6 +28,7 @@ google_analytics_id: {GOOGLE_ANALYTICS_ID}
 telegram_bot_name: AssociRuBot
 twitter_alias: AssociRu
 vk_alias: associ_ru
+alice_url: https://dialogs.yandex.ru/store/skills/36d6b4ed-associacii
 
 angular:
   app: bsApp

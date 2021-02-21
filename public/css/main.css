@@ -97,3 +97,11 @@ a.assoc-arrow {
     max-width: 300px;
     word-break: break-word;
 }
+
+/* footer */
+
+.social-links img {
+    width: 32px;
+    height: 32px;
+    vertical-align: top;
+}
