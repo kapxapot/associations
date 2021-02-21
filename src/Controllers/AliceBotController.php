@@ -148,21 +148,21 @@ class AliceBotController
         $answerParts = [];
 
         if ($questionWord !== null && $questionWord->isMature()) {
-            $answerParts[] = StringCollection::collect(
+            $answerParts[] = $this->randomString(
                 'Ой! Надеюсь, рядом нет детей.',
                 'Вы вгоняете меня в краску.',
                 'Ну у вас и словечки!',
                 'Хм... Как скажете.'
-            )->random();
+            );
         }
 
         if ($answerWord === null) {
-            $answerParts[] = StringCollection::collect(
+            $answerParts[] = $this->randomString(
                 'У меня нет ассоциаций.',
                 'Мне нечего сказать.',
                 'Я в тупике.',
                 'Я сдаюсь.'
-            )->random();
+            );
 
             $answerParts[] = 'Начинаем заново:';
 
@@ -240,6 +240,11 @@ class AliceBotController
     private function getLanguage(): Language
     {
         return $this->languageService->getDefaultLanguage();
+    }
+
+    private function randomString(string ...$strings): ?string
+    {
+        return StringCollection::make($strings)->random();
     }
 
     private function buildMessage(AliceRequest $request, AliceResponse $response): array
