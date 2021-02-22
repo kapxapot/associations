@@ -13,10 +13,14 @@ use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
 use Plasticode\Exceptions\ValidationException;
+use Plasticode\Traits\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
 class UserAnswerer extends AbstractAnswerer
 {
+    use LoggerAwareTrait;
+
     private GameService $gameService;
     private TurnService $turnService;
 
@@ -24,13 +28,16 @@ class UserAnswerer extends AbstractAnswerer
         WordRepositoryInterface $wordRepository,
         GameService $gameService,
         LanguageService $languageService,
-        TurnService $turnService
+        TurnService $turnService,
+        LoggerInterface $logger
     )
     {
         parent::__construct($wordRepository, $languageService);
 
         $this->gameService = $gameService;
         $this->turnService = $turnService;
+
+        $this->logger = $logger;
     }
 
     public function getResponse(AliceRequest $request, AliceUser $aliceUser): AliceResponse
@@ -121,9 +128,11 @@ class UserAnswerer extends AbstractAnswerer
             $answerParts[] = $this->matureWordMessage();
         }
 
+        // $this->log(json_encode($turns));
+
         if ($turns->count() > 1) {
             // continuing current game
-            $answerParts[] = $this->renderAiTurn($turns->first());
+            $answerParts[] = $this->renderAiTurn($turns->skip(1)->first());
 
             return $this->buildResponse(...$answerParts);
         }
