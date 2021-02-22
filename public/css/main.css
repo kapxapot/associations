@@ -135,6 +135,12 @@ a.assoc-arrow {
     margin-bottom: -2px;
 }
 
+.alice-avatar svg {
+    width: 22px;
+    height: 22px;
+    margin-bottom: -5px;
+}
+
 /* sidebar */
 
 .sidebar-links img,

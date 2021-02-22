@@ -9,10 +9,12 @@ use Plasticode\Util\Date;
 
 /**
  * @property integer $age
+ * @method AliceUser|null aliceUser()
  * @method Game|null currentGame()
  * @method bool isMature()
  * @method Game|null lastGame()
  * @method TelegramUser|null telegramUser()
+ * @method static withAliceUser(AliceUser|callable|null $aliceUser)
  * @method static withCurrentGame(Game|callable|null $currentGame)
  * @method static withIsMature(bool|callable $mature)
  * @method static withLastGame(Game|callable|null $lastGame)
@@ -62,14 +64,25 @@ class User extends UserBase implements GenderedInterface
 
         $tgUser = $this->telegramUser();
 
-        return $tgUser
-            ? $tgUser->publicName()
+        if ($tgUser !== null) {
+            return $tgUser->publicName();
+        }
+
+        $aliceUser = $this->aliceUser();
+
+        return $aliceUser
+            ? $aliceUser->name()
             : 'глюк какой-то';
     }
 
     public function isTelegramUser(): bool
     {
         return $this->telegramUser() !== null;
+    }
+
+    public function isAliceUser(): bool
+    {
+        return $this->aliceUser() !== null;
     }
 
     // GenderedInterface

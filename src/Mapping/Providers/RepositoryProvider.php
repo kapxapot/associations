@@ -205,6 +205,7 @@ class RepositoryProvider extends MappingProvider
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
                         fn () => new UserHydrator(
+                            $c->get(AliceUserRepositoryInterface::class),
                             $c->get(GameRepositoryInterface::class),
                             $c->get(CoreRepositories\RoleRepositoryInterface::class),
                             $c->get(TelegramUserRepositoryInterface::class),
