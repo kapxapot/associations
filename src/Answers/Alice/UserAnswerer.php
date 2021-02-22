@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
+use Plasticode\Collections\Generic\StringCollection;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Traits\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -45,6 +46,7 @@ class UserAnswerer extends AbstractAnswerer
         Assert::true($aliceUser->isValid());
 
         $question = $request->command;
+        $tokens = $request->tokens;
         $isNewSession = $request->isNewSession;
 
         if ($isNewSession) {
@@ -55,12 +57,24 @@ class UserAnswerer extends AbstractAnswerer
             return $this->emptyQuestionResponse();
         }
 
+        // if ($this->whatCommand($tokens)) {
+
+        // }
+
+        if (in_array($question, ['повтори', 'еще раз', 'я не расслышал', 'я не расслышала'])) {
+            return $this->repeatCommand($aliceUser);
+        }
+
         if ($this->isHelpCommand($question)) {
             return $this->helpCommand($aliceUser);
         }
 
         if ($this->isSkipCommand($question)) {
             return $this->skipCommand($aliceUser);
+        }
+
+        if (count($request->tokens) > 2) {
+            return $this->tooManyWords($aliceUser);
         }
 
         return $this->sayWord($aliceUser, $question);
@@ -74,6 +88,14 @@ class UserAnswerer extends AbstractAnswerer
 
         return $this->buildResponse(
             $greeting,
+            $this->renderGameFor($aliceUser)
+        );
+    }
+
+    private function tooManyWords(AliceUser $aliceUser): AliceResponse
+    {
+        return $this->buildResponse(
+            'Давайте не больше двух слов сразу. Итак, я говорю:',
             $this->renderGameFor($aliceUser)
         );
     }
@@ -96,6 +118,14 @@ class UserAnswerer extends AbstractAnswerer
             self::MESSAGE_SKIP,
             self::MESSAGE_START_ANEW,
             $this->newGameFor($aliceUser)
+        );
+    }
+
+    private function repeatCommand(AliceUser $aliceUser): AliceResponse
+    {
+        return $this->buildResponse(
+            $this->randomString('Повторяю', 'Хорошо', 'Еще раз') . ':',
+            $this->renderGameFor($aliceUser)
         );
     }
 
@@ -127,8 +157,6 @@ class UserAnswerer extends AbstractAnswerer
         if ($isMatureQuestion) {
             $answerParts[] = $this->matureWordMessage();
         }
-
-        // $this->log(json_encode($turns));
 
         if ($turns->count() > 1) {
             // continuing current game

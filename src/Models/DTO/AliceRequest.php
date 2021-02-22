@@ -5,6 +5,8 @@ namespace App\Models\DTO;
 class AliceRequest
 {
     public ?string $command;
+    public array $tokens;
+
     public bool $isNewSession;
     public ?string $userId;
     public string $applicationId;
@@ -17,6 +19,7 @@ class AliceRequest
     public function __construct(array $data)
     {
         $this->command = $data['request']['command'] ?? null;
+        $this->tokens = $data['request']['nlu']['tokens'] ?? [];
         $this->isNewSession = $data['session']['new'] ?? true;
         $this->userId = $data['session']['user']['user_id'] ?? null;
         $this->applicationId = $data['session']['application']['application_id'] ?? null;

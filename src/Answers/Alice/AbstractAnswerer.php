@@ -15,7 +15,7 @@ abstract class AbstractAnswerer
     protected const COMMAND_HELP = 'помощь';
     protected const COMMAND_CAN = 'что ты умеешь';
 
-    protected const MESSAGE_EMPTY_QUESTION = 'Повторите, пожалуйста';
+    protected const MESSAGE_EMPTY_QUESTION = 'Извините, не поняла';
     protected const MESSAGE_WELCOME = 'Привет! Поиграем в Ассоциации? Говорим по очереди слово, которое ассоциируется с предыдущим. Я начинаю:';
     protected const MESSAGE_WELCOME_BACK = 'С возвращением! Я продолжаю:';
     protected const MESSAGE_HELP = 'В игре в ассоциации Алиса и игрок говорят по очереди слово, которое ассоциируется с предыдущим. Желательно использовать существительные. Скажите \'другое слово\' или \'пропустить\', если не хотите отвечать на слово. Продолжаем. Мое слово:';
@@ -78,6 +78,9 @@ abstract class AbstractAnswerer
         $skipPhrases = [
             'другое слово',
             'пропустить',
+            'я в тупике',
+            'я не знаю',
+            'не знаю',
         ];
 
         return in_array($question, $skipPhrases);
