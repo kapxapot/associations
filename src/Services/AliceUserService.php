@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\AliceUser;
+use App\Models\DTO\AliceRequest;
 use App\Repositories\Interfaces\AliceUserRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Webmozart\Assert\Assert;
@@ -21,9 +22,9 @@ class AliceUserService
         $this->userRepository = $userRepository;
     }
 
-    public function getOrCreateAliceUser(array $data): AliceUser
+    public function getOrCreateAliceUser(AliceRequest $request): AliceUser
     {
-        $aliceUserId = $data['id'] ?? null;
+        $aliceUserId = $request->userId;
 
         Assert::stringNotEmpty($aliceUserId);
 

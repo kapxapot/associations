@@ -52,7 +52,7 @@ class Answerer
         $this->logger = $logger;
     }
 
-    public function getAnswers(TelegramUser $tgUser, string $text) : StoryMessageSequence
+    public function getAnswers(TelegramUser $tgUser, string $text): StoryMessageSequence
     {
         // start command
         if (Strings::startsWith($text, '/start')) {
@@ -99,7 +99,7 @@ class Answerer
         return $this->nextStep($tgUser, $text);
     }
 
-    private function startCommand(TelegramUser $tgUser) : StoryMessageSequence
+    private function startCommand(TelegramUser $tgUser): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
         $isReader = !is_null($status);
@@ -122,7 +122,7 @@ class Answerer
         );
     }
 
-    private function readGender(TelegramUser $tgUser, string $text) : StoryMessageSequence
+    private function readGender(TelegramUser $tgUser, string $text): StoryMessageSequence
     {
         /** @var integer|null */
         $gender = null;
@@ -159,7 +159,7 @@ class Answerer
         );
     }
 
-    private function askGender() : MessageInterface
+    private function askGender(): MessageInterface
     {
         return new Message(
             [
@@ -175,7 +175,7 @@ class Answerer
     private function executeStoryCommand(
         TelegramUser $tgUser,
         string $command
-    ) : StoryMessageSequence
+    ): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
 
@@ -193,7 +193,7 @@ class Answerer
     /**
      * Starts the default story or continues the current one.
      */
-    private function startOrContinueStory(TelegramUser $tgUser) : StoryMessageSequence
+    private function startOrContinueStory(TelegramUser $tgUser): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
 
@@ -207,7 +207,7 @@ class Answerer
         );
     }
 
-    private function continueStory(StoryStatus $status) : StoryMessageSequence
+    private function continueStory(StoryStatus $status): StoryMessageSequence
     {
         return StoryMessageSequence::mash(
             new TextMessage('Итак, продолжим...'),
@@ -215,7 +215,7 @@ class Answerer
         );
     }
 
-    private function startStory(TelegramUser $tgUser, int $storyId) : StoryMessageSequence
+    private function startStory(TelegramUser $tgUser, int $storyId): StoryMessageSequence
     {
         $story = $this->storyRepository->get($storyId);
 
@@ -236,16 +236,11 @@ class Answerer
         return $sequence;
     }
 
-    private function nextStep(TelegramUser $tgUser, string $text) : StoryMessageSequence
+    private function nextStep(TelegramUser $tgUser, string $text): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
 
         Assert::notNull($status);
-
-        // $this->logger->info(
-        //     'we got status data? ' . ($status->data() ? 'yes' : 'no'),
-        //     $status->data() ?? []
-        // );
 
         $story = $this->storyRepository->get($status->storyId);
         $node = $story->getNode($status->stepId);
@@ -271,7 +266,7 @@ class Answerer
         );
     }
 
-    private function storySelection() : StoryMessageSequence
+    private function storySelection(): StoryMessageSequence
     {
         $stories = $this->storyRepository->getAllPublished();
 
@@ -286,7 +281,7 @@ class Answerer
             ->finalize();
     }
 
-    private function switchToStory(TelegramUser $tgUser, Story $story) : StoryMessageSequence
+    private function switchToStory(TelegramUser $tgUser, Story $story): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
 
@@ -303,7 +298,7 @@ class Answerer
         return $sequence;
     }
 
-    private function currentStatusMessages(TelegramUser $tgUser) : StoryMessageSequence
+    private function currentStatusMessages(TelegramUser $tgUser): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
 
@@ -312,7 +307,7 @@ class Answerer
         return $this->statusToMessages($status);
     }
 
-    private function statusToMessages(StoryStatus $status) : StoryMessageSequence
+    private function statusToMessages(StoryStatus $status): StoryMessageSequence
     {
         $story = $this->storyRepository->get($status->storyId);
 
@@ -326,7 +321,7 @@ class Answerer
         );
     }
 
-    private function getStatus(TelegramUser $tgUser) : ?StoryStatus
+    private function getStatus(TelegramUser $tgUser): ?StoryStatus
     {
         return $this->storyStatusRepository->getByTelegramUser($tgUser);
     }

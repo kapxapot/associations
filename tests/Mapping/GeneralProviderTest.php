@@ -11,6 +11,7 @@ use App\Config\Interfaces\NewsConfigInterface;
 use App\Config\Interfaces\UserConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Config\LocalizationConfig;
+use App\Controllers\AliceBotController;
 use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
 use App\Core\Serializer;
@@ -196,5 +197,9 @@ final class GeneralProviderTest extends AbstractProviderTest
         // slim
 
         $this->check(NotFoundHandlerInterface::class, NotFoundHandler::class);
+
+        // controllers
+
+        $this->check(AliceBotController::class);
     }
 }
