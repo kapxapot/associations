@@ -30,7 +30,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         $prevWordId = $request->var(self::VAR_PREV_WORD);
         $prevWord = $this->wordRepository->get($prevWordId);
 
-        if ($this->isHelpCommand($question)) {
+        if ($this->isHelpCommand($request)) {
             return $this
                 ->answerWithWord(
                     $request,
@@ -40,7 +40,7 @@ class ApplicationAnswerer extends AbstractAnswerer
                 ->withStateFrom($request);
         }
 
-        if ($this->isSkipCommand($question)) {
+        if ($this->isSkipCommand($request)) {
             return $this->answerWithAnyWord(
                 $request,
                 self::MESSAGE_SKIP,

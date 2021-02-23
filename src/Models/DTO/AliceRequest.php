@@ -2,6 +2,8 @@
 
 namespace App\Models\DTO;
 
+use Plasticode\Util\Strings;
+
 class AliceRequest
 {
     public ?string $command;
@@ -19,7 +21,9 @@ class AliceRequest
     public function __construct(array $data)
     {
         $this->command = $data['request']['command'] ?? null;
-        $this->tokens = $data['request']['nlu']['tokens'] ?? [];
+
+        $this->tokens = explode(' ', $this->command);
+
         $this->isNewSession = $data['session']['new'] ?? true;
         $this->userId = $data['session']['user']['user_id'] ?? null;
         $this->applicationId = $data['session']['application']['application_id'] ?? null;
@@ -64,5 +68,21 @@ class AliceRequest
         }
 
         return null;
+    }
+
+    public function isAny(string ...$commands): bool
+    {
+        return in_array($this->command, $commands);
+    }
+
+    public function hasAnyToken(string ...$tokens): bool
+    {
+        foreach ($tokens as $token) {
+            if (in_array($token, $this->tokens)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

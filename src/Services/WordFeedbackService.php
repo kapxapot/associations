@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Events\Feedback\WordFeedbackCreatedEvent;
 use App\Models\User;
 use App\Models\WordFeedback;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 use Plasticode\Util\Strings;
@@ -22,12 +24,15 @@ class WordFeedbackService
     private ValidationRules $validationRules;
     private WordService $wordService;
 
+    private EventDispatcher $eventDispatcher;
+
     public function __construct(
         WordFeedbackRepositoryInterface $wordFeedbackRepository,
         WordRepositoryInterface $wordRepository,
         ValidatorInterface $validator,
         ValidationRules $validationRules,
-        WordService $wordService
+        WordService $wordService,
+        EventDispatcher $eventDispatcher
     )
     {
         $this->wordFeedbackRepository = $wordFeedbackRepository;
@@ -36,20 +41,22 @@ class WordFeedbackService
         $this->validator = $validator;
         $this->validationRules = $validationRules;
         $this->wordService = $wordService;
+
+        $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function toModel(array $data, User $user) : WordFeedback
+    public function toModel(array $data, User $user): WordFeedback
     {
         $this->validate($data);
-        
+
         return $this->convertToModel($data, $user);
     }
 
-    private function convertToModel(array $data, User $user) : WordFeedback
+    private function convertToModel(array $data, User $user): WordFeedback
     {
         $wordId = $data['word_id'];
         $word = $this->wordRepository->get($wordId);
-        
+
         $model =
             $word->feedbackBy($user)
             ??
@@ -59,7 +66,7 @@ class WordFeedbackService
                     'created_by' => $user->getId(),
                 ]
             );
-        
+
         $model->dislike = Convert::toBit($data['dislike'] ?? null);
 
         $typo = Strings::normalize($data['typo'] ?? null);
@@ -85,11 +92,11 @@ class WordFeedbackService
         if ($model->isPersisted()) {
             $model->updatedAt = Date::dbNow();
         }
-        
+
         return $model;
     }
 
-    private function validate(array $data)
+    private function validate(array $data): void
     {
         $rules = $this->getRules($data);
 
@@ -99,7 +106,7 @@ class WordFeedbackService
             ->throwOnFail();
     }
 
-    private function getRules(array $data) : array
+    private function getRules(array $data): array
     {
         $result = [
             'word_id' => $this
@@ -107,16 +114,16 @@ class WordFeedbackService
                 ->get('posInt')
                 ->wordExists($this->wordRepository)
         ];
-        
+
         if (($data['typo'] ?? null) !== null) {
             $result['typo'] = $this->wordService->getRule();
         }
-        
+
         if (($data['duplicate'] ?? null) !== null) {
             $word = $this
                 ->wordRepository
                 ->get($data['word_id'] ?? null);
-            
+
             if ($word) {
                 $result['duplicate'] =
                     Validator::mainWordExists(
@@ -126,7 +133,21 @@ class WordFeedbackService
                     );
             }
         }
-        
+
         return $result;
+    }
+
+    public function save(array $data, User $user): WordFeedback
+    {
+        $feedback = $this->toModel($data, $user);
+
+        $feedback = $this
+            ->wordFeedbackRepository
+            ->save($feedback);
+
+        $event = new WordFeedbackCreatedEvent($feedback);
+        $this->eventDispatcher->dispatch($event);
+
+        return $feedback;
     }
 }

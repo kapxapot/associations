@@ -2,6 +2,7 @@
 
 namespace App\Answers\Alice;
 
+use App\Models\DTO\AliceRequest;
 use App\Models\DTO\AliceResponse;
 use App\Models\Language;
 use App\Models\Word;
@@ -18,9 +19,10 @@ abstract class AbstractAnswerer
     protected const MESSAGE_EMPTY_QUESTION = 'Извините, не поняла';
     protected const MESSAGE_WELCOME = 'Привет! Поиграем в Ассоциации? Говорим по очереди слово, которое ассоциируется с предыдущим. Я начинаю:';
     protected const MESSAGE_WELCOME_BACK = 'С возвращением! Я продолжаю:';
-    protected const MESSAGE_HELP = 'В игре в ассоциации Алиса и игрок говорят по очереди слово, которое ассоциируется с предыдущим. Желательно использовать существительные. Скажите \'другое слово\' или \'пропустить\', если не хотите отвечать на слово. Продолжаем. Мое слово:';
+    protected const MESSAGE_HELP = 'В игре в ассоциации Алиса и игрок говорят по очереди слово, которое ассоциируется с предыдущим. Желательно использовать существительные. Скажите \'дальше\' или \'пропустить\', если не хотите отвечать на слово. Продолжаем. Мое слово:';
     protected const MESSAGE_SKIP = 'Хорошо.';
     protected const MESSAGE_START_ANEW = 'Начинаем заново:';
+    protected const MESSAGE_ERROR = 'Что-то пошло не так';
 
     protected WordRepositoryInterface $wordRepository;
     protected LanguageService $languageService;
@@ -63,27 +65,33 @@ abstract class AbstractAnswerer
         );
     }
 
-    protected function isHelpCommand(string $question): bool
+    protected function isHelpCommand(AliceRequest $request): bool
     {
-        $helpCommands = [
+        return $request->isAny(
             self::COMMAND_HELP,
-            self::COMMAND_CAN,
-        ];
-
-        return in_array($question, $helpCommands);
+            self::COMMAND_CAN
+        );
     }
 
-    protected function isSkipCommand(string $question): bool
+    protected function isSkipCommand(AliceRequest $request): bool
     {
         $skipPhrases = [
             'другое слово',
-            'пропустить',
             'я в тупике',
             'я не знаю',
             'не знаю',
         ];
 
-        return in_array($question, $skipPhrases);
+        $tokens = [
+            'пропустить',
+            'продолжить',
+            'продолжаем',
+            'дальше',
+            'заново',
+        ];
+
+        return $request->isAny(...$skipPhrases)
+            || $request->hasAnyToken(...$tokens);
     }
 
     protected function matureWordMessage(): string

@@ -9,10 +9,11 @@ use App\Models\DTO\AliceResponse;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\AssociationFeedbackService;
 use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
-use Plasticode\Collections\Generic\StringCollection;
+use App\Services\WordFeedbackService;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Traits\LoggerAwareTrait;
 use Psr\Log\LoggerInterface;
@@ -22,21 +23,27 @@ class UserAnswerer extends AbstractAnswerer
 {
     use LoggerAwareTrait;
 
+    private AssociationFeedbackService $associationFeedbackService;
     private GameService $gameService;
     private TurnService $turnService;
+    private WordFeedbackService $wordFeedbackService;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
+        AssociationFeedbackService $associationFeedbackService,
         GameService $gameService,
         LanguageService $languageService,
         TurnService $turnService,
+        WordFeedbackService $wordFeedbackService,
         LoggerInterface $logger
     )
     {
         parent::__construct($wordRepository, $languageService);
 
+        $this->associationFeedbackService = $associationFeedbackService;
         $this->gameService = $gameService;
         $this->turnService = $turnService;
+        $this->wordFeedbackService = $wordFeedbackService;
 
         $this->logger = $logger;
     }
@@ -61,19 +68,27 @@ class UserAnswerer extends AbstractAnswerer
 
         // }
 
-        if (in_array($question, ['повтори', 'еще раз', 'я не расслышал', 'я не расслышала'])) {
+        if ($request->isAny('повтори', 'еще раз', 'я не расслышал', 'я не расслышала')) {
             return $this->repeatCommand($aliceUser);
         }
 
-        if ($this->isHelpCommand($question)) {
+        if ($request->isAny('плохое слово', 'не нравится', 'не нравится слово')) {
+            return $this->wordDislikeFeedback($aliceUser);
+        }
+
+        if ($request->isAny('плохая ассоциация', 'не нравится ассоциация')) {
+            return $this->associationDislikeFeedback($aliceUser);
+        }
+
+        if ($this->isHelpCommand($request)) {
             return $this->helpCommand($aliceUser);
         }
 
-        if ($this->isSkipCommand($question)) {
+        if ($this->isSkipCommand($request)) {
             return $this->skipCommand($aliceUser);
         }
 
-        if (count($request->tokens) > 2) {
+        if (count($tokens) > 2) {
             return $this->tooManyWords($aliceUser);
         }
 
@@ -97,6 +112,60 @@ class UserAnswerer extends AbstractAnswerer
         return $this->buildResponse(
             'Давайте не больше двух слов сразу. Итак, я говорю:',
             $this->renderGameFor($aliceUser)
+        );
+    }
+
+    private function wordDislikeFeedback(AliceUser $aliceUser): AliceResponse
+    {
+        $game = $this->getGame($aliceUser);
+        $turn = $game->lastTurn();
+
+        if ($turn === null) {
+            return $this->buildResponse(self::MESSAGE_ERROR);
+        }
+
+        $word = $turn->word();
+
+        $this->wordFeedbackService->save(
+            ['word_id' => $word->getId(), 'dislike' => true],
+            $aliceUser->user()
+        );
+
+        return $this->buildResponse(
+            'Спасибо, ваш отзыв сохранен.',
+            self::MESSAGE_START_ANEW,
+            $this->newGameFor($aliceUser)
+        );
+    }
+
+    private function associationDislikeFeedback(AliceUser $aliceUser): AliceResponse
+    {
+        $game = $this->getGame($aliceUser);
+        $turn = $game->lastTurn();
+
+        if ($turn === null) {
+            return $this->buildResponse(self::MESSAGE_ERROR);
+        }
+
+        $association = $turn->association();
+
+        if ($association === null) {
+            return $this->buildResponse(
+                'Я назвала слово без ассоциации, скажите \'плохое слово\' или \'не нравится\', если вам не нравится слово.',
+                'Я говорю:',
+                $this->renderGameFor($aliceUser)
+            );
+        }
+
+        $this->associationFeedbackService->save(
+            ['association_id' => $association->getId(), 'dislike' => true],
+            $aliceUser->user()
+        );
+
+        return $this->buildResponse(
+            'Спасибо, ваш отзыв сохранен.',
+            self::MESSAGE_START_ANEW,
+            $this->newGameFor($aliceUser)
         );
     }
 

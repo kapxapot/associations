@@ -2,10 +2,12 @@
 
 namespace App\Services;
 
+use App\Events\Feedback\AssociationFeedbackCreatedEvent;
 use App\Models\AssociationFeedback;
 use App\Models\User;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
@@ -19,11 +21,14 @@ class AssociationFeedbackService
     private ValidatorInterface $validator;
     private ValidationRules $validationRules;
 
+    private EventDispatcher $eventDispatcher;
+
     public function __construct(
         AssociationFeedbackRepositoryInterface $associationFeedbackRepository,
         AssociationRepositoryInterface $associationRepository,
         ValidatorInterface $validator,
-        ValidationRules $validationRules
+        ValidationRules $validationRules,
+        EventDispatcher $eventDispatcher
     )
     {
         $this->associationFeedbackRepository = $associationFeedbackRepository;
@@ -31,16 +36,18 @@ class AssociationFeedbackService
 
         $this->validator = $validator;
         $this->validationRules = $validationRules;
+
+        $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function toModel(array $data, User $user) : AssociationFeedback
+    public function toModel(array $data, User $user): AssociationFeedback
     {
         $this->validate($data);
 
         return $this->convertToModel($data, $user);
     }
 
-    private function convertToModel(array $data, User $user) : AssociationFeedback
+    private function convertToModel(array $data, User $user): AssociationFeedback
     {
         $associationId = $data['association_id'];
 
@@ -68,7 +75,7 @@ class AssociationFeedbackService
         return $model;
     }
 
-    private function validate(array $data)
+    private function validate(array $data): void
     {
         $rules = $this->getRules($data);
 
@@ -78,7 +85,7 @@ class AssociationFeedbackService
             ->throwOnFail();
     }
 
-    private function getRules(array $data) : array
+    private function getRules(array $data): array
     {
         return [
             'association_id' => $this
@@ -86,5 +93,19 @@ class AssociationFeedbackService
                 ->get('posInt')
                 ->associationExists($this->associationRepository)
         ];
+    }
+
+    public function save(array $data, User $user): AssociationFeedback
+    {
+        $feedback = $this->toModel($data, $user);
+
+        $feedback = $this
+            ->associationFeedbackRepository
+            ->save($feedback);
+
+        $event = new AssociationFeedbackCreatedEvent($feedback);
+        $this->eventDispatcher->dispatch($event);
+
+        return $feedback;
     }
 }

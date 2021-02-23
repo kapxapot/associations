@@ -95,6 +95,8 @@ final class WordFeedbackTest extends IntegrationTest
             new SettingsProvider($this->settings)
         );
 
+        $eventDispatcher = new EventDispatcher();
+
         $wordService = new WordService(
             $this->turnRepository,
             $this->wordRepository,
@@ -104,7 +106,7 @@ final class WordFeedbackTest extends IntegrationTest
             $validator,
             $validationRules,
             new WordConfigMock(),
-            new EventDispatcher(),
+            $eventDispatcher,
             new DefinitionParser()
         );
 
@@ -113,7 +115,8 @@ final class WordFeedbackTest extends IntegrationTest
             $this->wordRepository,
             $validator,
             $validationRules,
-            $wordService
+            $wordService,
+            $eventDispatcher
         );
     }
 

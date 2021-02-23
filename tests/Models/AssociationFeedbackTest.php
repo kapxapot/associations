@@ -14,6 +14,7 @@ use App\Testing\Factories\UserRepositoryFactory;
 use App\Testing\Mocks\Repositories\AssociationFeedbackRepositoryMock;
 use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
 use App\Tests\IntegrationTest;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\ObjectProxy;
 use Plasticode\Settings\SettingsProvider;
@@ -56,7 +57,8 @@ final class AssociationFeedbackTest extends IntegrationTest
             new Validator(),
             new ValidationRules(
                 new SettingsProvider($this->settings)
-            )
+            ),
+            new EventDispatcher()
         );
     }
 
