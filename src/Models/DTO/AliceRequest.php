@@ -2,11 +2,11 @@
 
 namespace App\Models\DTO;
 
-use Plasticode\Util\Strings;
-
 class AliceRequest
 {
     public ?string $command;
+
+    /** @var string[] */
     public array $tokens;
 
     public bool $isNewSession;
@@ -18,11 +18,16 @@ class AliceRequest
     public ?string $type;
     public ?string $payload;
 
+    private const TOKENS_TO_PURGE = [
+        'алиса'
+    ];
+
     public function __construct(array $data)
     {
-        $this->command = $data['request']['command'] ?? null;
+        $originalCommand = $data['request']['command'] ?? null;
 
-        $this->tokens = explode(' ', $this->command);
+        $this->tokens = $this->parseTokens($originalCommand);
+        $this->command = $this->rebuildFrom($this->tokens);
 
         $this->isNewSession = $data['session']['new'] ?? true;
         $this->userId = $data['session']['user']['user_id'] ?? null;
@@ -32,6 +37,31 @@ class AliceRequest
 
         $this->type = $data['request']['type'] ?? null;
         $this->payload = $data['request']['payload'] ?? null;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function parseTokens(?string $originalCommand): array
+    {
+        $tokens = explode(' ', $originalCommand);
+
+        if (count($tokens) <= 1) {
+            return $tokens;
+        }
+
+        return array_filter(
+            $tokens,
+            fn (string $t) => !in_array($t, self::TOKENS_TO_PURGE)
+        );
+    }
+
+    /**
+     * @param string[] $tokens
+     */
+    private function rebuildFrom(array $tokens): string
+    {
+        return implode(' ', $tokens);
     }
 
     public function hasUser(): bool
