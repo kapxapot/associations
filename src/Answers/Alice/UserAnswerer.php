@@ -8,6 +8,7 @@ use App\Models\DTO\AliceRequest;
 use App\Models\DTO\AliceResponse;
 use App\Models\Game;
 use App\Models\Turn;
+use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\AssociationFeedbackService;
 use App\Services\GameService;
@@ -16,6 +17,7 @@ use App\Services\TurnService;
 use App\Services\WordFeedbackService;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Traits\LoggerAwareTrait;
+use Plasticode\Util\Strings;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
@@ -64,9 +66,9 @@ class UserAnswerer extends AbstractAnswerer
             return $this->emptyQuestionResponse();
         }
 
-        // if ($this->whatCommand($tokens)) {
-
-        // }
+        if ($this->isWhatCommand($request)) {
+            return $this->whatCommand($aliceUser, $request);
+        }
 
         if ($request->isAny('повтори', 'еще раз', 'я не расслышал', 'я не расслышала')) {
             return $this->repeatCommand($aliceUser);
@@ -107,6 +109,61 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
+    private function isWhatCommand(AliceRequest $request): bool
+    {
+        return $request->hasAnyToken('кто', 'что', 'чего');
+    }
+
+    private function whatCommand(AliceUser $aliceUser, AliceRequest $request): AliceResponse
+    {
+        /** @var string|null $askedFor */
+        $askedFor = null;
+
+        if ($request->matches('что такое *')) {
+            $askedFor = $request->tokens[2];
+        }
+
+        if (
+            $request->matches('* это что')
+            || $request->matches('* что это')
+            || $request->matches('* это что такое')
+            || $request->matches('* что это такое')
+        ) {
+            $askedFor = $request->tokens[0];
+        }
+
+        $lastWord = $this->getLastTurn($aliceUser)->word();
+
+        $word = ($askedFor !== null)
+            ? $this->findWord($askedFor)
+            : $lastWord;
+
+        $definition = $this->getDefinition($word);
+
+        return $this->buildResponse(
+            $definition,
+            $lastWord->equals($word)
+                ? null
+                : 'Итак, я говорю: ' . $this->renderGameFor($aliceUser)
+        );
+    }
+
+    private function getDefinition(?Word $word): string
+    {
+        if ($word === null) {
+            return 'Я не знаю такого слова.';
+        }
+
+        $wordStr = $word->word;
+        $parsedDefinition = $word->parsedDefinition();
+
+        return ($parsedDefinition !== null)
+            ? Strings::upperCaseFirst($wordStr)
+                . ' - это '
+                . Strings::lowerCaseFirst($parsedDefinition->firstDefinition())
+            : 'Я не знаю, что такое ' . $this->renderWordStr($wordStr);
+    }
+
     private function tooManyWords(AliceUser $aliceUser): AliceResponse
     {
         return $this->buildResponse(
@@ -117,14 +174,7 @@ class UserAnswerer extends AbstractAnswerer
 
     private function wordDislikeFeedback(AliceUser $aliceUser): AliceResponse
     {
-        $game = $this->getGame($aliceUser);
-        $turn = $game->lastTurn();
-
-        if ($turn === null) {
-            return $this->buildResponse(self::MESSAGE_ERROR);
-        }
-
-        $word = $turn->word();
+        $word = $this->getLastTurn($aliceUser)->word();
 
         $this->wordFeedbackService->save(
             ['word_id' => $word->getId(), 'dislike' => true],
@@ -140,14 +190,7 @@ class UserAnswerer extends AbstractAnswerer
 
     private function associationDislikeFeedback(AliceUser $aliceUser): AliceResponse
     {
-        $game = $this->getGame($aliceUser);
-        $turn = $game->lastTurn();
-
-        if ($turn === null) {
-            return $this->buildResponse(self::MESSAGE_ERROR);
-        }
-
-        $association = $turn->association();
+        $association = $this->getLastTurn($aliceUser)->association();
 
         if ($association === null) {
             return $this->buildResponse(
@@ -253,6 +296,15 @@ class UserAnswerer extends AbstractAnswerer
         $newGame = $this->gameService->createGameFor($user);
 
         return $this->renderLastTurn($newGame);
+    }
+
+    private function getLastTurn(AliceUser $aliceUser): Turn
+    {
+        $turn = $this->getGame($aliceUser)->lastTurn();
+
+        Assert::notNull($turn);
+
+        return $turn;
     }
 
     /**

@@ -48,11 +48,6 @@ abstract class AbstractAnswerer
             : 'У меня нет слов';
     }
 
-    protected function renderWordStr(string $word): string
-    {
-        return mb_strtoupper($word);
-    }
-
     protected function emptyQuestionResponse(): AliceResponse
     {
         return $this->buildResponse(self::MESSAGE_EMPTY_QUESTION);
@@ -83,6 +78,7 @@ abstract class AbstractAnswerer
         ];
 
         $tokens = [
+            'сдаюсь',
             'пропусти',
             'пропустить',
             'продолжить',
@@ -128,5 +124,10 @@ abstract class AbstractAnswerer
         $wordStr = $this->languageService->normalizeWord($language, $wordStr);
 
         return $this->wordRepository->findInLanguage($language, $wordStr);
+    }
+
+    protected function renderWordStr(string $word): string
+    {
+        return mb_strtoupper($word);
     }
 }

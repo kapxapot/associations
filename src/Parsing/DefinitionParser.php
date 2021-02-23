@@ -49,7 +49,11 @@ class DefinitionParser
                     $definition = $definitionEntry['definition'] ?? null;
 
                     if (strlen($definition) > 0) {
-                        $defEntry->addDefinition($definition);
+                        $defEntry->addDefinition(
+                            $this->postProcessDefinition(
+                                $definition
+                            )
+                        );
                     }
                 }
 
@@ -71,6 +75,30 @@ class DefinitionParser
         return !$result->isEmpty()
             ? $result
             : null;
+    }
+
+    private function postProcessDefinition(string $def): string
+    {
+        $replaces = [
+            'первонач.' => 'первоначально',
+            'какую-н.' => 'какую-нибудь',
+            'кого-чего-н.' => 'кого-/чего-нибудь',
+            'чего-н.' => 'чего-нибудь',
+            'кого-н.' => 'кого-нибудь',
+            'что-н.' => 'что-нибудь',
+            'кто-н.' => 'кто-нибудь',
+            'к-рою' => 'которой',
+            'к-рого' => 'которого',
+            'к-рыми' => 'которыми',
+        ];
+
+        $def = str_replace(
+            array_keys($replaces),
+            array_values($replaces),
+            $def
+        );
+
+        return trim($def, ".") . '.';
     }
 
     private function parsePartOfSpeech(Language $language, ?string $posText): ?PartOfSpeech

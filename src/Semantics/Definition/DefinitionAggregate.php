@@ -5,6 +5,7 @@ namespace App\Semantics\Definition;
 use App\Collections\DefinitionEntryCollection;
 use App\Collections\PartOfSpeechCollection;
 use App\Models\Language;
+use Plasticode\Collections\Generic\StringCollection;
 
 class DefinitionAggregate
 {
@@ -47,5 +48,19 @@ class DefinitionAggregate
     public function partsOfSpeech(): PartOfSpeechCollection
     {
         return $this->entries->partsOfSpeech();
+    }
+
+    public function firstDefinition(): ?string
+    {
+        return $this->flatDefinitions()->first();
+    }
+
+    public function flatDefinitions(): StringCollection
+    {
+        return StringCollection::from(
+            $this->entries->flatMap(
+                fn (DefinitionEntry $de) => $de->definitions()
+            )
+        );
     }
 }

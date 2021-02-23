@@ -4,6 +4,15 @@ namespace App\Models\DTO;
 
 class AliceRequest
 {
+    private const TOKENS_TO_PURGE = [
+        'алиса',
+        'а',
+        '-',
+        '=',
+    ];
+
+    public const WILDCARD = '*';
+
     public ?string $command;
 
     /** @var string[] */
@@ -17,10 +26,6 @@ class AliceRequest
 
     public ?string $type;
     public ?string $payload;
-
-    private const TOKENS_TO_PURGE = [
-        'алиса'
-    ];
 
     public function __construct(array $data)
     {
@@ -50,10 +55,12 @@ class AliceRequest
             return $tokens;
         }
 
-        return array_filter(
+        $filteredTokens = array_filter(
             $tokens,
             fn (string $t) => !in_array($t, self::TOKENS_TO_PURGE)
         );
+
+        return array_values($filteredTokens);
     }
 
     /**
@@ -114,5 +121,28 @@ class AliceRequest
         }
 
         return false;
+    }
+
+    public function matches(string $pattern): bool
+    {
+        $patternTokens = explode(' ', $pattern);
+
+        if (count($this->tokens) !== count($patternTokens)) {
+            return false;
+        }
+
+        for ($i = 0; $i < count($patternTokens); $i++) {
+            $token = $patternTokens[$i];
+
+            if ($token === self::WILDCARD) {
+                continue;
+            }
+
+            if ($token !== $this->tokens[$i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
