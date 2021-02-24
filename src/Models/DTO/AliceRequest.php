@@ -107,12 +107,32 @@ class AliceRequest
         return null;
     }
 
+    /**
+     * Checks if the request matches any of the commands.
+     */
     public function isAny(string ...$commands): bool
     {
         return in_array($this->command, $commands);
     }
 
-    public function hasAnyToken(string ...$tokens): bool
+    /**
+     * Checks if the request has all the tokens.
+     */
+    public function has(string ...$tokens): bool
+    {
+        foreach ($tokens as $token) {
+            if (!in_array($token, $this->tokens)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Checks if the request has any of the tokens.
+     */
+    public function hasAny(string ...$tokens): bool
     {
         foreach ($tokens as $token) {
             if (in_array($token, $this->tokens)) {
@@ -123,6 +143,25 @@ class AliceRequest
         return false;
     }
 
+    /**
+     * Checks if the request has all the tokens in any of the token sets.
+     * 
+     * @param string[] $tokenSets
+     */
+    public function hasAnySet(array ...$tokenSets): bool
+    {
+        foreach ($tokenSets as $set) {
+            if ($this->has(...$set)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if the request matches patterns such as "что такое *".
+     */
     public function matches(string $pattern): bool
     {
         $patternTokens = explode(' ', $pattern);

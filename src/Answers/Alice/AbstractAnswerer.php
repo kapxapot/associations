@@ -60,6 +60,32 @@ abstract class AbstractAnswerer
         );
     }
 
+    protected function isNativeAliceCommand(AliceRequest $request): bool
+    {
+        return $request->hasAny(
+            'включи',
+            'открой',
+            'выйти',
+            'выходить'
+        );
+    }
+
+    protected function isWhatCommand(AliceRequest $request): bool
+    {
+        return $request->hasAny('кто', 'что', 'чего');
+    }
+
+    protected function isRepeatCommand(AliceRequest $request): bool
+    {
+        return $request->hasAnySet(
+            ['повтори'],
+            ['еще', 'раз'],
+            ['не', 'расслышал'],
+            ['не', 'расслышала'],
+            ['не слышно']
+        );
+    }
+
     protected function isHelpCommand(AliceRequest $request): bool
     {
         return $request->isAny(
@@ -70,27 +96,25 @@ abstract class AbstractAnswerer
 
     protected function isSkipCommand(AliceRequest $request): bool
     {
-        $skipPhrases = [
-            'другое слово',
-            'я в тупике',
-            'я не знаю',
-            'не знаю',
-        ];
-
-        $tokens = [
+        return $request->hasAny(
             'сдаюсь',
             'пропусти',
             'пропустить',
-            'продолжить',
-            'продолжаем',
+            'продолжи',
             'продолжим',
             'продолжай',
+            'продолжить',
+            'продолжаем',
             'дальше',
-            'заново',
-        ];
-
-        return $request->isAny(...$skipPhrases)
-            || $request->hasAnyToken(...$tokens);
+            'заново'
+        )
+        || $request->hasAnySet(
+            ['нет', 'слов'],
+            ['нечего', 'сказать'],
+            ['не', 'знаю'],
+            ['в', 'тупике'],
+            ['другое', 'слово']
+        );
     }
 
     protected function matureWordMessage(): string

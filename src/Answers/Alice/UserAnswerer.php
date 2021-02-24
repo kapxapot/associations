@@ -66,11 +66,15 @@ class UserAnswerer extends AbstractAnswerer
             return $this->emptyQuestionResponse();
         }
 
+        if ($this->isNativeAliceCommand($request)) {
+            return $this->nativeAliceCommand($aliceUser);
+        }
+
         if ($this->isWhatCommand($request)) {
             return $this->whatCommand($aliceUser, $request);
         }
 
-        if ($request->isAny('повтори', 'еще раз', 'я не расслышал', 'я не расслышала')) {
+        if ($this->isRepeatCommand($request)) {
             return $this->repeatCommand($aliceUser);
         }
 
@@ -109,9 +113,12 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function isWhatCommand(AliceRequest $request): bool
+    private function nativeAliceCommand(AliceUser $aliceUser): AliceResponse
     {
-        return $request->hasAnyToken('кто', 'что', 'чего');
+        return $this->buildResponse(
+            'Я не могу выполнить эту команду в игре. Скажите \'хватит\', чтобы выйти. А мое слово:',
+            $this->renderGameFor($aliceUser)
+        );
     }
 
     private function whatCommand(AliceUser $aliceUser, AliceRequest $request): AliceResponse
