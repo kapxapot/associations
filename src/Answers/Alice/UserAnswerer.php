@@ -10,6 +10,7 @@ use App\Models\Game;
 use App\Models\Turn;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Sentence;
 use App\Services\AssociationFeedbackService;
 use App\Services\GameService;
 use App\Services\LanguageService;
@@ -147,18 +148,21 @@ class UserAnswerer extends AbstractAnswerer
 
         $definition = $this->getDefinition($word);
 
+        if ($lastWord->equals($word)) {
+            return $this->buildResponse($definition);
+        }
+
         return $this->buildResponse(
-            $definition,
-            $lastWord->equals($word)
-                ? null
-                : 'Итак, я говорю: ' . $this->renderGameFor($aliceUser)
+            Sentence::tailPeriod($definition),
+            'Итак, я говорю:',
+            $this->renderGameFor($aliceUser)
         );
     }
 
     private function getDefinition(?Word $word): string
     {
         if ($word === null) {
-            return 'Я не знаю такого слова.';
+            return 'Я не знаю такого слова';
         }
 
         $wordStr = $word->word;

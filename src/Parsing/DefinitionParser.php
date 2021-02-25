@@ -8,6 +8,7 @@ use App\Models\Language;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Definition\DefinitionEntry;
 use App\Semantics\PartOfSpeech;
+use App\Semantics\Sentence;
 
 class DefinitionParser
 {
@@ -100,7 +101,7 @@ class DefinitionParser
             $def
         );
 
-        return trim($def, ".") . '.';
+        return Sentence::tailPeriod($def);
     }
 
     private function parsePartOfSpeech(Language $language, ?string $posText): ?PartOfSpeech

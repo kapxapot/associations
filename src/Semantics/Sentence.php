@@ -65,4 +65,12 @@ class Sentence
 
         return $result;
     }
+
+    /**
+     * Ensures that the string ends with one (and only one) period ('.').
+     */
+    public static function tailPeriod(string $str): string
+    {
+        return trim($str, ".") . '.';
+    }
 }
