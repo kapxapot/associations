@@ -428,7 +428,7 @@ class TelegramBotController
             }
         }
 
-        $commands[] = '/skip Другое слово';
+        // $commands[] = '/skip Другое слово';
 
         if (is_null($question)) {
             return array_filter(
