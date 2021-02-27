@@ -73,7 +73,12 @@ abstract class AbstractAnswerer
 
     protected function isWhatCommand(AliceRequest $request): bool
     {
-        return $request->hasAny('кто', 'что', 'чего');
+        return $request->hasAny('кто', 'что', 'чего')
+            || $request->hasAnySet(
+                ['не', 'понял'],
+                ['не', 'поняла'],
+                ['не', 'понятно']
+            );
     }
 
     protected function isRepeatCommand(AliceRequest $request): bool
