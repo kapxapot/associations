@@ -215,7 +215,8 @@ abstract class AbstractAnswerer
             'продолжить',
             'продолжаем',
             'дальше',
-            'заново'
+            'заново',
+            'сначала'
         )
         || $request->hasAnySet(
             ['нет', 'слов'],
