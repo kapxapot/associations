@@ -77,6 +77,22 @@ class UserAnswerer extends AbstractAnswerer
             return $this->cluelessResponse();
         }
 
+        if ($request->isAny(
+            self::COMMAND_HELP,
+            self::COMMAND_COMMANDS,
+            self::COMMAND_RULES
+        )) {
+            return $this->confirmCommand($command);
+        }
+
+        if ($this->isHelpCommand($request)) {
+            return $this->helpCommand($request);
+        }
+
+        if ($this->isHelpRulesCommand($request)) {
+            return $this->rulesCommand();
+        }
+
         if ($this->isNativeAliceCommand($request)) {
             return $this->nativeAliceCommand($aliceUser);
         }
@@ -95,22 +111,6 @@ class UserAnswerer extends AbstractAnswerer
 
         if ($request->isAny('плохая ассоциация', 'не нравится ассоциация')) {
             return $this->associationDislikeFeedback($aliceUser);
-        }
-
-        if ($request->isAny(
-            self::COMMAND_HELP,
-            self::COMMAND_COMMANDS,
-            self::COMMAND_RULES
-        )) {
-            return $this->confirmCommand($command);
-        }
-
-        if ($this->isHelpCommand($request)) {
-            return $this->helpCommand($request);
-        }
-
-        if ($this->isHelpRulesCommand($request)) {
-            return $this->rulesCommand();
         }
 
         if ($this->isSkipCommand($request)) {
@@ -203,8 +203,7 @@ class UserAnswerer extends AbstractAnswerer
                 ->buildResponse(
                     $aliceUser->isNew() ? 'Я начинаю:' : 'Я продолжаю:',
                     $this->renderGameFor($aliceUser)
-                )
-                ->withUserVar(self::VAR_STATE, null);
+                );
         }
 
         return $this->helpCommand(
@@ -464,5 +463,22 @@ class UserAnswerer extends AbstractAnswerer
         return $turn !== null
             ? $this->renderWord($turn->word())
             : 'Мне нечего сказать. Начинайте вы';
+    }
+
+    protected function buildResponse(...$parts): AliceResponse
+    {
+        $response = parent::buildResponse(...$parts);
+
+        $vars = $response->userState;
+
+        foreach ($this->getKnownVars() as $knownVar) {
+            if (array_key_exists($knownVar, $vars)) {
+                continue;
+            }
+
+            $response->withUserVar($knownVar, null);
+        }
+
+        return $response;
     }
 }

@@ -263,4 +263,15 @@ abstract class AbstractAnswerer
     {
         return mb_strtoupper($word);
     }
+
+    /**
+     * @return string[]
+     */
+    protected function getKnownVars(): array
+    {
+        return [
+            self::VAR_STATE,
+            self::VAR_COMMAND,
+        ];
+    }
 }
