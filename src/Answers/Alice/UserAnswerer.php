@@ -302,7 +302,7 @@ class UserAnswerer extends AbstractAnswerer
     private function tooManyWords(AliceUser $aliceUser): AliceResponse
     {
         return $this->buildResponse(
-            'Давайте не больше двух слов сразу. Итак, я говорю:',
+            'Давайте не больше трех слов сразу. Итак, я говорю:',
             $this->renderGameFor($aliceUser)
         );
     }
