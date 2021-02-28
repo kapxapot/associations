@@ -93,6 +93,10 @@ class UserAnswerer extends AbstractAnswerer
             return $this->rulesCommand();
         }
 
+        // if ($request->isAny('выйти', 'выходить', 'прекратить')) {
+        //     return $this->buildResponse()->withEndSession(true);
+        // }
+
         if ($this->isNativeAliceCommand($request)) {
             return $this->nativeAliceCommand($aliceUser);
         }
@@ -472,11 +476,9 @@ class UserAnswerer extends AbstractAnswerer
         $vars = $response->userState;
 
         foreach ($this->getKnownVars() as $knownVar) {
-            if (array_key_exists($knownVar, $vars)) {
-                continue;
+            if ($vars === null || !array_key_exists($knownVar, $vars)) {
+                $response->withUserVar($knownVar, null);
             }
-
-            $response->withUserVar($knownVar, null);
         }
 
         return $response;
