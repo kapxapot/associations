@@ -16,13 +16,36 @@ abstract class AbstractAnswerer
     protected const COMMAND_HELP = 'помощь';
     protected const COMMAND_CAN = 'что ты умеешь';
 
+    protected const VAR_STATE = 'state';
+
+    protected const STATE_HELP = 'help';
+    protected const STATE_RULES = 'rules';
+    protected const STATE_COMMANDS = 'commands';
+
     protected const MESSAGE_EMPTY_QUESTION = 'Извините, не поняла';
-    protected const MESSAGE_WELCOME = 'Привет! Поиграем в Ассоциации? Говорим по очереди слово, которое ассоциируется с предыдущим. Я начинаю:';
-    protected const MESSAGE_WELCOME_BACK = 'С возвращением! Я продолжаю:';
-    protected const MESSAGE_HELP = 'В игре в ассоциации Алиса и игрок говорят по очереди слово, которое ассоциируется с предыдущим. Желательно использовать существительные. Скажите \'дальше\' или \'пропустить\', если не хотите отвечать на слово. Продолжаем. Мое слово:';
+    protected const MESSAGE_WELCOME = 'Привет! Поиграем в ассоциации?';
+    protected const MESSAGE_WELCOME_BACK = 'С возвращением!';
+
+    protected const CHUNK_RULES = 'Чтобы узнать, как играть, скажите \'правила\'.';
+    protected const CHUNK_COMMANDS = 'Чтобы узнать, как управлять игрой, скажите \'команды\'.';
+    protected const CHUNK_PLAY = 'Чтобы перейти к игре, скажите \'играть\'.';
+
+    protected const MESSAGE_DEMO = 'Игра идет в демо-режиме. Для полной игры, пожалуйста, авторизуйтесь.';
+
+    private const MESSAGE_RULES_COMMON = 'В игре в ассоциации мы с вами говорим по очереди слово, которое ассоциируется с предыдущим. Например, я говорю \'лес\', вы отвечаете \'заяц\', я говорю \'морковка\' и т.д.';
+
+    protected const MESSAGE_RULES_APPLICATION = self::MESSAGE_RULES_COMMON . ' Лучше использовать существительные.';
+
+    protected const MESSAGE_RULES_USER = self::MESSAGE_RULES_COMMON . ' При этом игра запоминает ваши слова и ассоциации и учится на них. Лучше использовать существительные.';
+
+    protected const MESSAGE_COMMANDS_APPLICATION = 'Для пропуска слова скажите \'другое слово\' или \'дальше\'. Для выхода из игры скажите \'хватит\'.';
+
+    protected const MESSAGE_COMMANDS_USER = 'Для пропуска слова скажите \'другое слово\' или \'дальше\'. Для повтора последнего слова скажите \'повтори\'. Спросите \'что?\' или \'что это?\', чтобы узнать значение слова. Если вам не нравится слово или ассоциация, скажите \'плохое слово\' или \'плохая ассоциация\'. Для выхода из игры скажите \'хватит\'.';
+
     protected const MESSAGE_SKIP = 'Хорошо.';
     protected const MESSAGE_START_ANEW = 'Начинаем заново:';
     protected const MESSAGE_ERROR = 'Что-то пошло не так';
+    protected const MESSAGE_CONTINUE = 'Продолжаем. Мое слово:';
 
     protected WordRepositoryInterface $wordRepository;
     protected LanguageService $languageService;
@@ -53,11 +76,82 @@ abstract class AbstractAnswerer
         return $this->buildResponse(self::MESSAGE_EMPTY_QUESTION);
     }
 
-    protected function buildResponse(?string ...$parts): AliceResponse
+    /**
+     * @param string[]|string|null $parts
+     */
+    protected function buildResponse(...$parts): AliceResponse
     {
+        $lines = [];
+
+        foreach ($parts as $part) {
+            if ($part === null) {
+                continue;
+            }
+
+            if (is_array($part)) {
+                $lines = array_merge($lines, $part);
+            } else {
+                $lines[] = $part;
+            }
+        }
+
         return new AliceResponse(
-            Text::join(array_filter($parts), ' ')
+            Text::join($lines, ' ')
         );
+    }
+
+    protected function isHelpDialog(AliceRequest $request): bool
+    {
+        $state = $request->var(self::VAR_STATE);
+
+        $helpStates = [
+            self::STATE_HELP,
+            self::STATE_RULES,
+            self::STATE_COMMANDS,
+        ];
+
+        return in_array($state, $helpStates);
+    }
+
+    protected function isHelpRulesCommand(AliceRequest $request): bool
+    {
+        return $request->hasAnySet(
+            ['правила'],
+            ['как', 'играть']
+        );
+    }
+
+    protected function isHelpCommandsCommand(AliceRequest $request): bool
+    {
+        return $request->hasAny(
+            'команды',
+            'команда'
+        );
+    }
+
+    protected function isHelpPlayCommand(AliceRequest $request): bool
+    {
+        return $request->hasAny(
+            'играть',
+            'игра',
+            'играю',
+            'играем'
+        );
+    }
+
+    public function helpCommand(
+        AliceRequest $request,
+        string ...$prependMessages
+    ): AliceResponse
+    {
+        return $this
+            ->buildResponse(
+                $prependMessages,
+                self::CHUNK_RULES,
+                self::CHUNK_COMMANDS,
+                self::CHUNK_PLAY
+            )
+            ->withVarBy($request, self::VAR_STATE, self::STATE_HELP);
     }
 
     protected function isNativeAliceCommand(AliceRequest $request): bool

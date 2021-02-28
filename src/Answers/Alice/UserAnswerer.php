@@ -26,6 +26,8 @@ class UserAnswerer extends AbstractAnswerer
 {
     use LoggerAwareTrait;
 
+    private const MAX_TOKENS = 3;
+
     private AssociationFeedbackService $associationFeedbackService;
     private GameService $gameService;
     private TurnService $turnService;
@@ -55,15 +57,15 @@ class UserAnswerer extends AbstractAnswerer
     {
         Assert::true($aliceUser->isValid());
 
-        $question = $request->command;
-        $tokens = $request->tokens;
-        $isNewSession = $request->isNewSession;
-
-        if ($isNewSession) {
-            return $this->startCommand($aliceUser);
+        if ($request->isNewSession) {
+            return $this->startCommand($aliceUser, $request);
         }
 
-        if (strlen($question) === 0) {
+        if ($this->isHelpDialog($request)) {
+            return $this->helpDialog($aliceUser, $request);
+        }
+
+        if (strlen($request->command) === 0) {
             return $this->emptyQuestionResponse();
         }
 
@@ -88,29 +90,67 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         if ($this->isHelpCommand($request)) {
-            return $this->helpCommand($aliceUser);
+            return $this->helpCommand($request);
         }
 
         if ($this->isSkipCommand($request)) {
             return $this->skipCommand($aliceUser);
         }
 
-        if (count($tokens) > 2) {
+        if (count($request->tokens) > self::MAX_TOKENS) {
             return $this->tooManyWords($aliceUser);
         }
 
-        return $this->sayWord($aliceUser, $question);
+        return $this->sayWord($aliceUser, $request->command);
     }
 
-    private function startCommand(AliceUser $aliceUser): AliceResponse
+    private function startCommand(AliceUser $aliceUser, AliceRequest $request): AliceResponse
     {
-        $greeting = $aliceUser->isNew()
-            ? self::MESSAGE_WELCOME
-            : self::MESSAGE_WELCOME_BACK;
+        if ($aliceUser->isNew()) {
+            return $this->helpCommand($request, self::MESSAGE_WELCOME);
+        }
 
         return $this->buildResponse(
-            $greeting,
+            self::MESSAGE_WELCOME_BACK,
+            'Я продолжаю:',
             $this->renderGameFor($aliceUser)
+        );
+    }
+
+    private function helpDialog(AliceUser $aliceUser, AliceRequest $request): AliceResponse
+    {
+        if ($this->isHelpRulesCommand($request)) {
+            return $this
+                ->buildResponse(
+                    self::MESSAGE_RULES_USER,
+                    self::CHUNK_COMMANDS,
+                    self::CHUNK_PLAY
+                )
+                ->withVarBy($request, self::VAR_STATE, self::STATE_RULES);
+        }
+
+        if ($this->isHelpCommandsCommand($request)) {
+            return $this
+                ->buildResponse(
+                    self::MESSAGE_COMMANDS_USER,
+                    self::CHUNK_RULES,
+                    self::CHUNK_PLAY
+                )
+                ->withVarBy($request, self::VAR_STATE, self::STATE_COMMANDS);
+        }
+
+        if ($this->isHelpPlayCommand($request)) {
+            return $this
+                ->buildResponse(
+                    $aliceUser->isNew() ? 'Я начинаю:' : 'Я продолжаю:',
+                    $this->renderGameFor($aliceUser)
+                )
+                ->withVarBy($request, self::VAR_STATE, null);
+        }
+
+        return $this->helpCommand(
+            $request,
+            Sentence::tailPeriod(self::MESSAGE_EMPTY_QUESTION)
         );
     }
 
@@ -220,14 +260,6 @@ class UserAnswerer extends AbstractAnswerer
             'Спасибо, ваш отзыв сохранен.',
             self::MESSAGE_START_ANEW,
             $this->newGameFor($aliceUser)
-        );
-    }
-
-    private function helpCommand(AliceUser $aliceUser): AliceResponse
-    {
-        return $this->buildResponse(
-            self::MESSAGE_HELP,
-            $this->renderGameFor($aliceUser)
         );
     }
 

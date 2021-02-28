@@ -14,6 +14,7 @@ use Plasticode\Traits\LoggerAwareTrait;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
+use stdClass;
 
 class AliceBotController
 {
@@ -64,7 +65,7 @@ class AliceBotController
 
             return Response::json(
                 $response,
-                $this->buildMessage($aliceRequest, $aliceResponse)
+                $this->buildMessage($aliceResponse)
             );
         } catch (Exception $ex) {
             $this->logEx($ex);
@@ -84,7 +85,7 @@ class AliceBotController
             : $this->userAnswerer->getResponse($request, $aliceUser);
     }
 
-    private function buildMessage(AliceRequest $request, AliceResponse $response): array
+    private function buildMessage(AliceResponse $response): array
     {
         $data = [
             'response' => [
@@ -94,11 +95,8 @@ class AliceBotController
             'version' => '1.0',
         ];
 
-        if ($request->hasUser()) {
-            $data['user_state_update'] = $response->userState;
-        } else {
-            $data['application_state'] = $response->applicationState;
-        }
+        $data['user_state_update'] = $response->userState ?? new stdClass();
+        $data['application_state'] = $response->applicationState ?? new stdClass();
 
         return $data;
     }

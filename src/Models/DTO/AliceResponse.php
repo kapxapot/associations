@@ -9,9 +9,7 @@ class AliceResponse
     public ?array $userState = null;
     public ?array $applicationState = null;
 
-    public function __construct(
-        ?string $text
-    )
+    public function __construct(?string $text)
     {
         $this->text = $text;
     }
@@ -50,7 +48,7 @@ class AliceResponse
     /**
      * @return $this
      */
-    public function withUserState(array $userState): self
+    public function withUserState(?array $userState): self
     {
         $this->userState = $userState;
 
@@ -73,7 +71,7 @@ class AliceResponse
     /**
      * @return $this
      */
-    public function withApplicationState(array $applicationState): self
+    public function withApplicationState(?array $applicationState): self
     {
         $this->applicationState = $applicationState;
 

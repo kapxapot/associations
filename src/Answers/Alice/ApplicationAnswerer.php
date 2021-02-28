@@ -6,6 +6,7 @@ use App\Models\DTO\AliceRequest;
 use App\Models\DTO\AliceResponse;
 use App\Models\DTO\MetaTurn;
 use App\Models\Word;
+use App\Semantics\Sentence;
 
 class ApplicationAnswerer extends AbstractAnswerer
 {
@@ -17,10 +18,15 @@ class ApplicationAnswerer extends AbstractAnswerer
         $isNewSession = $request->isNewSession;
 
         if ($isNewSession) {
-            return $this->answerWithAnyWord(
+            return $this->helpCommand(
                 $request,
-                self::MESSAGE_WELCOME
+                self::MESSAGE_WELCOME,
+                self::MESSAGE_DEMO
             );
+        }
+
+        if ($this->isHelpDialog($request)) {
+            return $this->helpDialog($request);
         }
 
         if (strlen($question) === 0) {
@@ -31,13 +37,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         $prevWord = $this->wordRepository->get($prevWordId);
 
         if ($this->isHelpCommand($request)) {
-            return $this
-                ->answerWithWord(
-                    $request,
-                    $prevWord,
-                    self::MESSAGE_HELP
-                )
-                ->withStateFrom($request);
+            return $this->helpCommand($request);
         }
 
         if ($this->isSkipCommand($request)) {
@@ -51,6 +51,41 @@ class ApplicationAnswerer extends AbstractAnswerer
         $turn = $this->getWordFor($question, $prevWord);
 
         return $this->turnToAnswer($request, $turn);
+    }
+
+    private function helpDialog(AliceRequest $request): AliceResponse
+    {
+        if ($this->isHelpRulesCommand($request)) {
+            return $this
+                ->buildResponse(
+                    self::MESSAGE_RULES_APPLICATION,
+                    self::CHUNK_COMMANDS,
+                    self::CHUNK_PLAY
+                )
+                ->withVarBy($request, self::VAR_STATE, self::STATE_RULES);
+        }
+
+        if ($this->isHelpCommandsCommand($request)) {
+            return $this
+                ->buildResponse(
+                    self::MESSAGE_COMMANDS_APPLICATION,
+                    self::CHUNK_RULES,
+                    self::CHUNK_PLAY
+                )
+                ->withVarBy($request, self::VAR_STATE, self::STATE_COMMANDS);
+        }
+
+        if ($this->isHelpPlayCommand($request)) {
+            return $this->answerWithAnyWord(
+                $request,
+                'Я начинаю:'
+            );
+        }
+
+        return $this->helpCommand(
+            $request,
+            Sentence::tailPeriod(self::MESSAGE_EMPTY_QUESTION)
+        );
     }
 
     private function turnToAnswer(AliceRequest $request, MetaTurn $turn): AliceResponse
@@ -67,7 +102,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         }
 
         if ($answerWord !== null) {
-            return $this->answerWithWord($request, $answerWord, ...$answerParts);
+            return $this->answerWithWord($answerWord, ...$answerParts);
         }
 
         if (!$isMatureQuestion) {
@@ -86,11 +121,10 @@ class ApplicationAnswerer extends AbstractAnswerer
     {
         $word = $this->getAnyWord($request);
 
-        return $this->answerWithWord($request, $word, ...$answerParts);
+        return $this->answerWithWord($word, ...$answerParts);
     }
 
     private function answerWithWord(
-        AliceRequest $request,
         ?Word $word,
         string ...$answerParts
     ): AliceResponse
@@ -100,7 +134,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         $response = $this->buildResponse(...$answerParts);
 
         if ($word !== null) {
-            $response->withVarBy($request, self::VAR_PREV_WORD, $word->getId());
+            $response->withApplicationVar(self::VAR_PREV_WORD, $word->getId());
         }
 
         return $response;
