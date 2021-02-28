@@ -6,6 +6,7 @@ class AliceRequest
 {
     private const TOKENS_TO_PURGE = [
         'алиса',
+        'блядь',
         'а',
         '-',
         '=',

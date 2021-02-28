@@ -57,7 +57,11 @@ class UserAnswerer extends AbstractAnswerer
     {
         Assert::true($aliceUser->isValid());
 
-        if ($request->isNewSession) {
+        $command = $request->command;
+        $tokens = $request->tokens;
+        $isNewSession = $request->isNewSession;
+
+        if ($isNewSession) {
             return $this->startCommand($aliceUser, $request);
         }
 
@@ -65,8 +69,12 @@ class UserAnswerer extends AbstractAnswerer
             return $this->helpDialog($aliceUser, $request);
         }
 
-        if (strlen($request->command) === 0) {
-            return $this->emptyQuestionResponse();
+        if ($this->isConfirmDialog($request)) {
+            return $this->checkCommandConfirmation($aliceUser, $request);
+        }
+
+        if (strlen($command) === 0) {
+            return $this->cluelessResponse();
         }
 
         if ($this->isNativeAliceCommand($request)) {
@@ -89,19 +97,31 @@ class UserAnswerer extends AbstractAnswerer
             return $this->associationDislikeFeedback($aliceUser);
         }
 
+        if ($request->isAny(
+            self::COMMAND_HELP,
+            self::COMMAND_COMMANDS,
+            self::COMMAND_RULES
+        )) {
+            return $this->confirmCommand($command);
+        }
+
         if ($this->isHelpCommand($request)) {
             return $this->helpCommand($request);
+        }
+
+        if ($this->isHelpRulesCommand($request)) {
+            return $this->rulesCommand();
         }
 
         if ($this->isSkipCommand($request)) {
             return $this->skipCommand($aliceUser);
         }
 
-        if (count($request->tokens) > self::MAX_TOKENS) {
+        if (count($tokens) > self::MAX_TOKENS) {
             return $this->tooManyWords($aliceUser);
         }
 
-        return $this->sayWord($aliceUser, $request->command);
+        return $this->sayWord($aliceUser, $command);
     }
 
     private function startCommand(AliceUser $aliceUser, AliceRequest $request): AliceResponse
@@ -117,41 +137,102 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
+    private function confirmCommand(
+        string $command,
+        string ...$prependMessages
+    ): AliceResponse
+    {
+        return $this
+            ->buildResponse(
+                $prependMessages,
+                'Для подтверждения команды \'' . $command . '\' скажите \'' . self::COMMAND_COMMAND . '\' или повторите ее. Если вы хотите сказать это слово в игре, скажите \'' . self::COMMAND_PLAYING . '\'.'
+            )
+            ->withUserVar(self::VAR_STATE, self::STATE_COMMAND_CONFIRM)
+            ->withUserVar(self::VAR_COMMAND, $command);
+    }
+
+    private function isConfirmDialog(AliceRequest $request): bool
+    {
+        return $request->var(self::VAR_STATE) === self::STATE_COMMAND_CONFIRM
+            && $request->var(self::VAR_COMMAND) !== null;
+    }
+
+    private function checkCommandConfirmation(
+        AliceUser $aliceUser,
+        AliceRequest $request
+    ): AliceResponse
+    {
+        $command = $request->command;
+        $commandToConfirm = $request->var(self::VAR_COMMAND);
+
+        if ($command === self::COMMAND_COMMAND || $command === $commandToConfirm) {
+            switch ($commandToConfirm) {
+                case self::COMMAND_HELP:
+                    return $this->helpCommand($request);
+
+                case self::COMMAND_RULES:
+                    return $this->rulesCommand();
+
+                case self::COMMAND_COMMANDS:
+                    return $this->commandsCommand();
+            }
+        }
+        
+        if ($this->isPlayCommand($request)) {
+            return $this->sayWord($aliceUser, $commandToConfirm);
+        }
+
+        return $this->confirmCommand(
+            $commandToConfirm,
+            Sentence::tailPeriod(self::MESSAGE_CLUELESS)
+        );
+    }
+
     private function helpDialog(AliceUser $aliceUser, AliceRequest $request): AliceResponse
     {
         if ($this->isHelpRulesCommand($request)) {
-            return $this
-                ->buildResponse(
-                    self::MESSAGE_RULES_USER,
-                    self::CHUNK_COMMANDS,
-                    self::CHUNK_PLAY
-                )
-                ->withVarBy($request, self::VAR_STATE, self::STATE_RULES);
+            return $this->rulesCommand();
         }
 
         if ($this->isHelpCommandsCommand($request)) {
-            return $this
-                ->buildResponse(
-                    self::MESSAGE_COMMANDS_USER,
-                    self::CHUNK_RULES,
-                    self::CHUNK_PLAY
-                )
-                ->withVarBy($request, self::VAR_STATE, self::STATE_COMMANDS);
+            return $this->commandsCommand();
         }
 
-        if ($this->isHelpPlayCommand($request)) {
+        if ($this->isPlayCommand($request)) {
             return $this
                 ->buildResponse(
                     $aliceUser->isNew() ? 'Я начинаю:' : 'Я продолжаю:',
                     $this->renderGameFor($aliceUser)
                 )
-                ->withVarBy($request, self::VAR_STATE, null);
+                ->withUserVar(self::VAR_STATE, null);
         }
 
         return $this->helpCommand(
             $request,
-            Sentence::tailPeriod(self::MESSAGE_EMPTY_QUESTION)
+            Sentence::tailPeriod(self::MESSAGE_CLUELESS)
         );
+    }
+
+    private function rulesCommand(): AliceResponse
+    {
+        return $this
+            ->buildResponse(
+                self::MESSAGE_RULES_USER,
+                self::CHUNK_COMMANDS,
+                self::CHUNK_PLAY
+            )
+            ->withUserVar(self::VAR_STATE, self::STATE_RULES);
+    }
+
+    private function commandsCommand(): AliceResponse
+    {
+        return $this
+            ->buildResponse(
+                self::MESSAGE_COMMANDS_USER,
+                self::CHUNK_RULES,
+                self::CHUNK_PLAY
+            )
+            ->withUserVar(self::VAR_STATE, self::STATE_COMMANDS);
     }
 
     private function nativeAliceCommand(AliceUser $aliceUser): AliceResponse
@@ -382,6 +463,6 @@ class UserAnswerer extends AbstractAnswerer
 
         return $turn !== null
             ? $this->renderWord($turn->word())
-            : 'Мне нечего сказать. Начинайте вы.';
+            : 'Мне нечего сказать. Начинайте вы';
     }
 }

@@ -30,7 +30,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         }
 
         if (strlen($question) === 0) {
-            return $this->emptyQuestionResponse();
+            return $this->cluelessResponse();
         }
 
         $prevWordId = $request->var(self::VAR_PREV_WORD);
@@ -75,7 +75,7 @@ class ApplicationAnswerer extends AbstractAnswerer
                 ->withVarBy($request, self::VAR_STATE, self::STATE_COMMANDS);
         }
 
-        if ($this->isHelpPlayCommand($request)) {
+        if ($this->isPlayCommand($request)) {
             return $this->answerWithAnyWord(
                 $request,
                 'Я начинаю:'
@@ -84,7 +84,7 @@ class ApplicationAnswerer extends AbstractAnswerer
 
         return $this->helpCommand(
             $request,
-            Sentence::tailPeriod(self::MESSAGE_EMPTY_QUESTION)
+            Sentence::tailPeriod(self::MESSAGE_CLUELESS)
         );
     }
 

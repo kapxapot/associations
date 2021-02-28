@@ -13,16 +13,21 @@ use Plasticode\Util\Text;
 
 abstract class AbstractAnswerer
 {
-    protected const COMMAND_HELP = 'помощь';
-    protected const COMMAND_CAN = 'что ты умеешь';
-
     protected const VAR_STATE = 'state';
+    protected const VAR_COMMAND = 'command';
 
     protected const STATE_HELP = 'help';
     protected const STATE_RULES = 'rules';
     protected const STATE_COMMANDS = 'commands';
+    protected const STATE_COMMAND_CONFIRM = 'command_confirm';
 
-    protected const MESSAGE_EMPTY_QUESTION = 'Извините, не поняла';
+    protected const COMMAND_HELP = 'помощь';
+    protected const COMMAND_RULES = 'правила';
+    protected const COMMAND_COMMAND = 'команда';
+    protected const COMMAND_COMMANDS = 'команды';
+    protected const COMMAND_PLAYING = 'играем';
+
+    protected const MESSAGE_CLUELESS = 'Извините, не поняла';
     protected const MESSAGE_WELCOME = 'Привет! Поиграем в ассоциации?';
     protected const MESSAGE_WELCOME_BACK = 'С возвращением!';
 
@@ -71,9 +76,9 @@ abstract class AbstractAnswerer
             : 'У меня нет слов';
     }
 
-    protected function emptyQuestionResponse(): AliceResponse
+    protected function cluelessResponse(): AliceResponse
     {
-        return $this->buildResponse(self::MESSAGE_EMPTY_QUESTION);
+        return $this->buildResponse(self::MESSAGE_CLUELESS);
     }
 
     /**
@@ -116,7 +121,8 @@ abstract class AbstractAnswerer
     protected function isHelpRulesCommand(AliceRequest $request): bool
     {
         return $request->hasAnySet(
-            ['правила'],
+            [self::COMMAND_RULES],
+            ['правила', 'игры'],
             ['как', 'играть']
         );
     }
@@ -124,18 +130,18 @@ abstract class AbstractAnswerer
     protected function isHelpCommandsCommand(AliceRequest $request): bool
     {
         return $request->hasAny(
-            'команды',
+            self::COMMAND_COMMANDS,
             'команда'
         );
     }
 
-    protected function isHelpPlayCommand(AliceRequest $request): bool
+    protected function isPlayCommand(AliceRequest $request): bool
     {
         return $request->hasAny(
             'играть',
             'игра',
             'играю',
-            'играем'
+            self::COMMAND_PLAYING
         );
     }
 
@@ -190,7 +196,7 @@ abstract class AbstractAnswerer
     {
         return $request->isAny(
             self::COMMAND_HELP,
-            self::COMMAND_CAN
+            'что ты умеешь'
         );
     }
 
