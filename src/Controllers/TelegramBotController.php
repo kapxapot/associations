@@ -21,6 +21,7 @@ use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Text;
+use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -38,6 +39,7 @@ class TelegramBotController
     private TelegramUserService $telegramUserService;
     private TurnService $turnService;
 
+    private ValidatorInterface $validator;
     private AgeValidation $ageValidation;
 
     private DefinitionParser $definitionParser;
@@ -52,6 +54,7 @@ class TelegramBotController
         GameService $gameService,
         TelegramUserService $telegramUserService,
         TurnService $turnService,
+        ValidatorInterface $validator,
         AgeValidation $ageValidation,
         DefinitionParser $definitionParser
     )
@@ -66,6 +69,7 @@ class TelegramBotController
         $this->telegramUserService = $telegramUserService;
         $this->turnService = $turnService;
 
+        $this->validator = $validator;
         $this->ageValidation = $ageValidation;
 
         $this->definitionParser = $definitionParser;
