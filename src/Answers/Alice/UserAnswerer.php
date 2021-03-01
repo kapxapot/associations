@@ -373,6 +373,8 @@ class UserAnswerer extends AbstractAnswerer
         $user = $aliceUser->user();
         $game = $this->getGame($aliceUser);
 
+        $question = $this->deduplicate($question);
+
         try {
             $turns = $this->gameService->makeTurn($user, $game, $question);
         } catch (ValidationException $vEx) {
@@ -414,6 +416,42 @@ class UserAnswerer extends AbstractAnswerer
 
         // no answer, starting new game
         return $this->buildResponse(...$answerParts);
+    }
+
+    /**
+     * Converts 'word word' to 'word' for approved words.
+     */
+    private function deduplicate(string $question): string
+    {
+        $tokens = explode(' ', $question);
+
+        $originalCount = count($tokens);
+
+        if ($originalCount <= 1) {
+            return $question;
+        }
+
+        $deduplicatedTokens = array_unique($tokens);
+
+        if (count($deduplicatedTokens) !== 1) {
+            return $question;
+        }
+
+        $originalWord = $this->findWord($question);
+
+        if ($originalWord !== null && $originalWord->isApproved()) {
+            return $question;
+        }
+
+        $deduplicatedCandidate = $deduplicatedTokens[0];
+
+        $deduplicatedWord = $this->findWord($deduplicatedCandidate);
+
+        if ($deduplicatedWord !== null && $deduplicatedWord->isApproved()) {
+            return $deduplicatedWord->word;
+        }
+
+        return $question;
     }
 
     private function newGameFor(AliceUser $aliceUser): string
