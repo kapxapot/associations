@@ -5,11 +5,7 @@ namespace App\Models\DTO;
 class AliceRequest
 {
     private const TOKENS_TO_PURGE = [
-        'алиса',
-        'блядь',
-        'а',
-        '-',
-        '=',
+        'алиса', 'блядь', 'это', 'да', 'ты', 'ой', 'я', 'а', '-', '='
     ];
 
     public const WILDCARD = '*';
