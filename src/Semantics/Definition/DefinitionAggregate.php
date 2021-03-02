@@ -5,9 +5,10 @@ namespace App\Semantics\Definition;
 use App\Collections\DefinitionEntryCollection;
 use App\Collections\PartOfSpeechCollection;
 use App\Models\Language;
+use App\Semantics\Interfaces\PartOfSpeechableInterface;
 use Plasticode\Collections\Generic\StringCollection;
 
-class DefinitionAggregate
+class DefinitionAggregate implements PartOfSpeechableInterface
 {
     private Language $language;
     private DefinitionEntryCollection $entries;

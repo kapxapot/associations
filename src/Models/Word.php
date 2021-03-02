@@ -10,6 +10,7 @@ use App\Collections\WordFeedbackCollection;
 use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
+use App\Semantics\Interfaces\PartOfSpeechableInterface;
 
 /**
  * @property string $word
@@ -23,7 +24,7 @@ use App\Semantics\Definition\DefinitionAggregate;
  * @method static withFeedbacks(WordFeedbackCollection|callable $feedbacks)
  * @method static withParsedDefinition(DefinitionAggregate|callable|null $parsedDefinition)
  */
-class Word extends LanguageElement
+class Word extends LanguageElement implements PartOfSpeechableInterface
 {
     protected function requiredWiths(): array
     {
