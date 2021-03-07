@@ -194,14 +194,15 @@ abstract class AbstractAnswerer
 
     protected function isRepeatCommand(AliceRequest $request): bool
     {
-        return $request->hasAnySet(
-            ['играть'],
-            ['играем'],
-            ['повтори'],
+        return $request->hasAny(
+            'играть',
+            'играем',
+            'повтори'
+        ) || $request->hasAnySet(
             ['еще', 'раз'],
             ['не', 'расслышал'],
             ['не', 'расслышала'],
-            ['не слышно']
+            ['не', 'слышно']
         );
     }
 
