@@ -363,7 +363,7 @@ class UserAnswerer extends AbstractAnswerer
     private function repeatCommand(AliceUser $aliceUser): AliceResponse
     {
         return $this->buildResponse(
-            $this->randomString('Повторяю', 'Хорошо', 'Еще раз') . ':',
+            $this->randomString('Повторяю', 'Хорошо', 'Еще раз', 'Мое слово', 'Я говорю') . ':',
             $this->renderGameFor($aliceUser)
         );
     }

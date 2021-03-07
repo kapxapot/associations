@@ -177,6 +177,8 @@ abstract class AbstractAnswerer
             'прекратить',
             'прекращай',
             'прекращаем'
+        ) || $request->hasAnySet(
+            ['стоп', 'игра']
         );
     }
 
@@ -193,6 +195,7 @@ abstract class AbstractAnswerer
     protected function isRepeatCommand(AliceRequest $request): bool
     {
         return $request->hasAnySet(
+            ['играем'],
             ['повтори'],
             ['еще', 'раз'],
             ['не', 'расслышал'],
@@ -226,6 +229,9 @@ abstract class AbstractAnswerer
             'дальше',
             'заново',
             'сначала',
+            'начинай',
+            'начни',
+            'начинаем',
             'следующая',
             'следующее',
             'следующий'
