@@ -38,6 +38,9 @@ class TurnCollection extends DbModelCollection
         );
     }
 
+    /**
+     * Returns _distinct_ words from turns.
+     */
     public function words(): WordCollection
     {
         return
