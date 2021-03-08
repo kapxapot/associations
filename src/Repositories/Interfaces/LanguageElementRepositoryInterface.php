@@ -11,6 +11,7 @@ use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
 interface LanguageElementRepositoryInterface extends ChangingRepositoryInterface, WithLanguageRepositoryInterface
 {
     function get(?int $id): ?LanguageElement;
+
     function getAllByLanguage(Language $language): LanguageElementCollection;
 
     function getAllCreatedByUser(
