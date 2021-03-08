@@ -6,9 +6,9 @@ use App\Collections\WordCollection;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Events\Word\WordCreatedEvent;
 use App\Events\Word\WordUpdatedEvent;
+use App\Models\DTO\Search\SearchParams;
 use App\Models\DTO\Search\WordSearchResult;
 use App\Models\Language;
-use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
 use App\Parsing\DefinitionParser;
@@ -233,18 +233,21 @@ class WordService
     }
 
     public function searchAllNonMature(
-        ?Language $language = null,
-        ?int $offset = null,
-        ?int $limit = null
+        SearchParams $searchParams,
+        ?Language $language = null
     ): WordSearchResult
     {
         $data = $this
             ->wordRepository
-            ->searchAllNonMature($language, $offset, $limit);
+            ->searchAllNonMature($searchParams, $language);
 
         $totalCount = $this->wordRepository->getNonMatureCount($language);
 
-        return new WordSearchResult($data, $totalCount);
+        $filteredCount = $searchParams->hasFilter()
+            ? $this->wordRepository->getNonMatureCount($language, $searchParams->filter())
+            : $totalCount;
+
+        return new WordSearchResult($data, $totalCount, $filteredCount);
     }
 
     /**

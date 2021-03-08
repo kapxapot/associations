@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Collections\WordCollection;
+use App\Models\DTO\Search\SearchParams;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
@@ -59,28 +60,41 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     }
 
     public function searchAllNonMature(
-        ?Language $language = null,
-        ?int $offset = null,
-        ?int $limit = null
+        SearchParams $searchParams,
+        ?Language $language = null
     ): WordCollection
     {
         $query = $this
             ->nonMatureQuery($language)
             ->applyIf(
-                $offset !== null,
-                fn (Query $q) => $q->offset($offset)
+                $searchParams->hasFilter(),
+                fn (Query $q) => $this->filterBySubstr($q, $searchParams->filter())
             )
             ->applyIf(
-                $limit !== null,
-                fn (Query $q) => $q->limit($limit)
+                $searchParams->hasSort(),
+                fn (Query $q) => $q->withSort($searchParams->sort())
+            )
+            ->applyIf(
+                $searchParams->hasOffset(),
+                fn (Query $q) => $q->offset($searchParams->offset())
+            )
+            ->applyIf(
+                $searchParams->hasLimit(),
+                fn (Query $q) => $q->limit($searchParams->limit())
             );
 
         return WordCollection::from($query);
     }
 
-    public function getNonMatureCount(?Language $language = null): int
+    public function getNonMatureCount(?Language $language = null, ?string $substr = null): int
     {
-        return $this->nonMatureQuery($language)->count();
+        return $this
+            ->nonMatureQuery($language)
+            ->applyIf(
+                strlen($substr) > 0,
+                fn (Query $q) => $this->filterBySubstr($q, $substr)
+            )
+            ->count();
     }
 
     public function getAllOutOfDate(
@@ -155,6 +169,16 @@ class WordRepository extends LanguageElementRepository implements WordRepository
                 )
                 ->whereNull($defAlias . '.id')
                 ->limit($limit)
+        );
+    }
+
+    // filters
+
+    protected function filterBySubstr(Query $query, string $substr): Query
+    {
+        return $query->search(
+            mb_strtolower($substr),
+            '(word_bin like ?)'
         );
     }
 }

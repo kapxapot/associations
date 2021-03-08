@@ -30,6 +30,8 @@
 
 {% block more_js %}
     <script>
+        var spinnerShown = false;
+
         $('#words-table').DataTable({
             dom: "<'row'<'col-sm-12'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-6'i><'col-sm-6'l>><'row'<'col-sm-12'p>>", //'ftrilp',
             language: {
@@ -37,15 +39,30 @@
             },
             serverSide: true,
             orderMulti: false,
-            ajax: '{{ api }}public/words?format=dt',
+            ajax: {
+                url: '{{ api }}public/words',
+                beforeSend: function() {
+                    if (!spinnerShown) {
+                        $('#words-table > tbody').html(
+                            '<tr class="even">' +
+                            '<td valign="top" colspan="5" class="dataTables_empty"><i class="fas fa-yin-yang fa-spin fa-2x fa-fw"></i></td>' +
+                            '</tr>'
+                        );
+
+                        spinnerShown = true;
+                    }
+                }
+            },
             order: [[4, 'desc']],
             rowId: 'id',
             columns: [
                 {
+                    name: 'id',
                     data: 'id',
                     searchable: false
                 },
                 {
+                    name: 'word',
                     data: 'word',
                     render: function (data, type, row) {
                         if (type === 'display' || type === 'filter') {
@@ -56,16 +73,19 @@
                     }
                 },
                 {
+                    name: 'language.name',
                     data: 'language.name',
                     searchable: false,
                     orderable: false
                 },
                 {
+                    name: 'creator.name',
                     data: 'creator.name',
                     searchable: false,
                     orderable: false
                 },
                 {
+                    name: 'created_at',
                     data: 'created_at',
                     searchable: false,
                     render: function (data, type, row) {

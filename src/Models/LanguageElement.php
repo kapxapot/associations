@@ -68,8 +68,10 @@ abstract class LanguageElement extends DbModel implements CreatedAtInterface, Li
 
     /**
      * Is visible for everyone.
+     * 
+     * Equivalent to "non mature".
      */
-    public function isPublic(): bool
+    public function isVisible(): bool
     {
         return $this->isVisibleFor(null);
     }

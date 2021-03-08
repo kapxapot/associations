@@ -3,6 +3,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Collections\WordCollection;
+use App\Models\DTO\Search\SearchParams;
 use App\Models\Language;
 use App\Models\Word;
 
@@ -19,12 +20,11 @@ interface WordRepositoryInterface extends LanguageElementRepositoryInterface
     function findInLanguage(Language $language, ?string $wordStr): ?Word;
 
     function searchAllNonMature(
-        ?Language $language = null,
-        ?int $offset = null,
-        ?int $limit = null
+        SearchParams $searchParams,
+        ?Language $language = null
     ): WordCollection;
 
-    function getNonMatureCount(?Language $language = null): int;
+    function getNonMatureCount(?Language $language = null, ?string $substr = null): int;
 
     /**
      * Returns out of date language elements.

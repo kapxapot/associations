@@ -51,12 +51,14 @@ class LanguageElementCollection extends DbModelCollection
     }
 
     /**
+     * Returns elements visible to everyone (equivalent to "non mature").
+     * 
      * @return static
      */
-    public function public(): self
+    public function visible(): self
     {
         return $this->where(
-            fn (LanguageElement $el) => $el->isPublic()
+            fn (LanguageElement $el) => $el->isVisible()
         );
     }
 

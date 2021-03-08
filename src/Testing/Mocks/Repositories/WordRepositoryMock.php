@@ -4,6 +4,7 @@ namespace App\Testing\Mocks\Repositories;
 
 use App\Collections\LanguageElementCollection;
 use App\Collections\WordCollection;
+use App\Models\DTO\Search\SearchParams;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
@@ -74,20 +75,22 @@ class WordRepositoryMock implements WordRepositoryInterface
     }
 
     public function searchAllNonMature(
-        ?Language $language = null,
-        ?int $offset = null,
-        ?int $limit = null
+        SearchParams $searchParams,
+        ?Language $language = null
     ): WordCollection
     {
         $public = $this->getAllNonMature($language);
-        
-        return ($offset !== null && $limit !== null)
-            ? $public->slice($offset, $limit)
+
+        // todo: add filter & sort
+
+        return ($searchParams->hasOffset() && $searchParams->hasLimit())
+            ? $public->slice($searchParams->offset(), $searchParams->limit())
             : $public;
     }
 
-    public function getNonMatureCount(?Language $language = null): int
+    public function getNonMatureCount(?Language $language = null, ?string $substr = null): int
     {
+        // todo: add filtering by substr
         return $this->getAllNonMature($language)->count();
     }
 

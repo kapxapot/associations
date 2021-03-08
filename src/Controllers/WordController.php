@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\Word;
+use App\Models\DTO\Search\SearchParams;
 use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
@@ -50,26 +50,13 @@ class WordController extends Controller
         ResponseInterface $response
     ): ResponseInterface
     {
-        // order[0][column]: 1
-        // order[0][dir]: asc
-        // order[1][column]: 2
-        // order[1][dir]: asc
-        // start: 0
-        // length: 10
-
-        $queryParams = $request->getQueryParams();
-
-        $offset = $queryParams['start'] ?? null;
-        $limit = $queryParams['length'] ?? null;
+        $searchParams = SearchParams::fromRequest($request);
 
         $searchResult = $this
             ->wordService
-            ->searchAllNonMature(null, $offset, $limit);
+            ->searchAllNonMature($searchParams);
 
-        return Response::json(
-            $response,
-            $searchResult
-        );
+        return Response::json($response, $searchResult);
     }
 
     public function get(

@@ -72,16 +72,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             );
     }
 
-    public function approvedAssociations(): AssociationCollection
-    {
-        return $this
-            ->associations()
-            ->approved()
-            ->ascStr(
-                fn (Association $a) => $a->otherWord($this)->word
-            );
-    }
-
     public function randomPublicAssociation(?self $excludeOtherWord = null): ?Association
     {
         return $this
@@ -99,9 +89,12 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     {
         return $this
             ->approvedAssociations()
-            ->public();
+            ->visible();
     }
 
+    /**
+     * Returns approved associations visible for _the current user_.
+     */
     public function approvedVisibleAssociations(): AssociationCollection
     {
         return $this
@@ -109,11 +102,44 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             ->visibleFor($this->me());
     }
 
+    /**
+     * Returns approved associations invisible for _the current user_.
+     */
     public function approvedInvisibleAssociations(): AssociationCollection
     {
         return $this
             ->approvedAssociations()
             ->invisibleFor($this->me());
+    }
+
+    /**
+     * Returns not approved associations visible for _the current user_.
+     */
+    public function notApprovedVisibleAssociations(): AssociationCollection
+    {
+        return $this
+            ->notApprovedAssociations()
+            ->visibleFor($this->me());
+    }
+
+    /**
+     * Returns not approved associations invisible for _the current user_.
+     */
+    public function notApprovedInvisibleAssociations(): AssociationCollection
+    {
+        return $this
+            ->notApprovedAssociations()
+            ->invisibleFor($this->me());
+    }
+
+    public function approvedAssociations(): AssociationCollection
+    {
+        return $this
+            ->associations()
+            ->approved()
+            ->ascStr(
+                fn (Association $a) => $a->otherWord($this)->word
+            );
     }
 
     public function notApprovedAssociations(): AssociationCollection
@@ -124,20 +150,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             ->ascStr(
                 fn (Association $a) => $a->otherWord($this)->word
             );
-    }
-
-    public function notApprovedVisibleAssociations(): AssociationCollection
-    {
-        return $this
-            ->notApprovedAssociations()
-            ->visibleFor($this->me());
-    }
-
-    public function notApprovedInvisibleAssociations(): AssociationCollection
-    {
-        return $this
-            ->notApprovedAssociations()
-            ->invisibleFor($this->me());
     }
 
     /**
