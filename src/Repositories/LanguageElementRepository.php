@@ -48,7 +48,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     ): LanguageElementCollection
     {
         $query = $this->getByLanguageQuery($language);
-        
+
         return LanguageElementCollection::from(
             $this->filterNotMature($query)
         );
@@ -98,6 +98,9 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     // queries
 
+    /**
+     * Filters approved & non-mature elements, ordered by `approved_updated_at` DESC.
+     */
     protected function publicQuery(?Language $language = null): Query
     {
         return $this
@@ -107,6 +110,9 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
             );
     }
 
+    /**
+     * Filters approved elements, ordering them by `approved_updated_at` DESC.
+     */
     protected function approvedQuery(?Language $language = null): Query
     {
         return $this
