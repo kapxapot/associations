@@ -73,6 +73,24 @@ class WordRepositoryMock implements WordRepositoryInterface
             );
     }
 
+    public function searchAllNonMature(
+        ?Language $language = null,
+        ?int $offset = null,
+        ?int $limit = null
+    ): WordCollection
+    {
+        $public = $this->getAllNonMature($language);
+        
+        return ($offset !== null && $limit !== null)
+            ? $public->slice($offset, $limit)
+            : $public;
+    }
+
+    public function getNonMatureCount(?Language $language = null): int
+    {
+        return $this->getAllNonMature($language)->count();
+    }
+
     public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
@@ -130,7 +148,7 @@ class WordRepositoryMock implements WordRepositoryInterface
         return WordCollection::empty();
     }
 
-    public function getAllPublic(?Language $language = null): WordCollection
+    public function getAllNonMature(?Language $language = null): WordCollection
     {
         return $this
             ->getAllByLanguageConditional($language)

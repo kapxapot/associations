@@ -6,6 +6,7 @@ use App\Collections\WordCollection;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Events\Word\WordCreatedEvent;
 use App\Events\Word\WordUpdatedEvent;
+use App\Models\DTO\Search\WordSearchResult;
 use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
@@ -225,16 +226,25 @@ class WordService
         Language $language = null
     ): WordCollection
     {
-        return
-            WordCollection::from(
-                $this
-                    ->turnRepository
-                    ->getAllByUser($user, $language)
-                    ->map(
-                        fn (Turn $t) => $t->word()
-                    )
-            )
-            ->distinct();
+        return $this
+            ->turnRepository
+            ->getAllByUser($user, $language)
+            ->words();
+    }
+
+    public function searchAllNonMature(
+        ?Language $language = null,
+        ?int $offset = null,
+        ?int $limit = null
+    ): WordSearchResult
+    {
+        $data = $this
+            ->wordRepository
+            ->searchAllNonMature($language, $offset, $limit);
+
+        $totalCount = $this->wordRepository->getNonMatureCount($language);
+
+        return new WordSearchResult($data, $totalCount);
     }
 
     /**

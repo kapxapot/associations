@@ -2,8 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Models\DTO\MetaAssociation;
-use App\Parsing\DefinitionParser;
+use App\Models\Word;
 use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
@@ -30,7 +29,7 @@ class WordController extends Controller
     public function index(
         Request $request,
         ResponseInterface $response
-    ) : ResponseInterface
+    ): ResponseInterface
     {
         $debug = $request->getQueryParam('debug', null) !== null;
 
@@ -49,19 +48,27 @@ class WordController extends Controller
     public function publicWords(
         ServerRequestInterface $request,
         ResponseInterface $response
-    ) : ResponseInterface
+    ): ResponseInterface
     {
-        $words = $this
-            ->wordRepository
-            ->getAllPublic()
-            ->map(
-                fn ($word) => $word->serialize()
-            );
+        // order[0][column]: 1
+        // order[0][dir]: asc
+        // order[1][column]: 2
+        // order[1][dir]: asc
+        // start: 0
+        // length: 10
+
+        $queryParams = $request->getQueryParams();
+
+        $offset = $queryParams['start'] ?? null;
+        $limit = $queryParams['length'] ?? null;
+
+        $searchResult = $this
+            ->wordService
+            ->searchAllNonMature(null, $offset, $limit);
 
         return Response::json(
             $response,
-            $words,
-            ['params' => $request->getQueryParams()]
+            $searchResult
         );
     }
 
@@ -69,7 +76,7 @@ class WordController extends Controller
         Request $request,
         ResponseInterface $response,
         array $args
-    ) : ResponseInterface
+    ): ResponseInterface
     {
         $id = $args['id'];
 
@@ -114,7 +121,7 @@ class WordController extends Controller
     public function latestChunk(
         ServerRequestInterface $request,
         ResponseInterface $response
-    ) : ResponseInterface
+    ): ResponseInterface
     {
         $user = $this->auth->getUser();
 

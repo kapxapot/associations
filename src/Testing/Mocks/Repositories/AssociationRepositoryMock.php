@@ -123,7 +123,7 @@ class AssociationRepositoryMock implements AssociationRepositoryInterface
         return LanguageElementCollection::empty();
     }
 
-    public function getAllPublic(?Language $language = null): LanguageElementCollection
+    public function getAllNonMature(?Language $language = null): LanguageElementCollection
     {
         return $this
             ->getAllByLanguageConditional($language)

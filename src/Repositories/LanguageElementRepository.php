@@ -43,7 +43,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         );
     }
 
-    public function getAllPublic(
+    public function getAllNonMature(
         ?Language $language = null
     ): LanguageElementCollection
     {
@@ -105,6 +105,15 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     {
         return $this
             ->approvedQuery($language)
+            ->apply(
+                fn (Query $q) => $this->filterNotMature($q)
+            );
+    }
+
+    protected function nonMatureQuery(?Language $language = null): Query
+    {
+        return $this
+            ->getByLanguageQuery($language)
             ->apply(
                 fn (Query $q) => $this->filterNotMature($q)
             );

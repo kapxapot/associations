@@ -6,6 +6,7 @@ use App\Collections\WordCollection;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use Plasticode\Data\Query;
 
 class WordRepository extends LanguageElementRepository implements WordRepositoryInterface
 {
@@ -55,6 +56,31 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             ->getByLanguageQuery($language)
             ->where('word_bin', $wordStr)
             ->one();
+    }
+
+    public function searchAllNonMature(
+        ?Language $language = null,
+        ?int $offset = null,
+        ?int $limit = null
+    ): WordCollection
+    {
+        $query = $this
+            ->nonMatureQuery($language)
+            ->applyIf(
+                $offset !== null,
+                fn (Query $q) => $q->offset($offset)
+            )
+            ->applyIf(
+                $limit !== null,
+                fn (Query $q) => $q->limit($limit)
+            );
+
+        return WordCollection::from($query);
+    }
+
+    public function getNonMatureCount(?Language $language = null): int
+    {
+        return $this->nonMatureQuery($language)->count();
     }
 
     public function getAllOutOfDate(

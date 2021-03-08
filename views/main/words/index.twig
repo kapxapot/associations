@@ -35,12 +35,15 @@
             language: {
                 url: '{{ folders.global }}datatables/ru.json'
             },
+            serverSide: true,
+            orderMulti: false,
             ajax: '{{ api }}public/words?format=dt',
-            order: [[ 4, 'desc' ]],
+            order: [[4, 'desc']],
             rowId: 'id',
             columns: [
                 {
-                    data: 'id'
+                    data: 'id',
+                    searchable: false
                 },
                 {
                     data: 'word',
@@ -48,23 +51,28 @@
                         if (type === 'display' || type === 'filter') {
                             return '<a class="ellipsis w-200" href="' + row.url + '">' + data + '</a>';
                         }
-                 
+
                         return data;
                     }
                 },
                 {
-                    data: 'language.name'
+                    data: 'language.name',
+                    searchable: false,
+                    orderable: false
                 },
                 {
-                    data: 'creator.name'
+                    data: 'creator.name',
+                    searchable: false,
+                    orderable: false
                 },
                 {
                     data: 'created_at',
+                    searchable: false,
                     render: function (data, type, row) {
                         if (type === 'display' || type === 'filter') {
                             return moment(data).format('DD.MM.Y HH:mm');
                         }
-                 
+
                         return moment(data).format('X');
                     }
                 }
