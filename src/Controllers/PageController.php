@@ -7,7 +7,7 @@ use Plasticode\Controllers\Traits\NewsPageDescription;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 class PageController extends Controller
 {
@@ -27,10 +27,10 @@ class PageController extends Controller
     }
 
     public function __invoke(
-        Request $request,
+        ServerRequestInterface $request,
         ResponseInterface $response,
         array $args
-    ) : ResponseInterface
+    ): ResponseInterface
     {
         $slug = $args['slug'];
 

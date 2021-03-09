@@ -8,7 +8,7 @@ use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Plasticode\Services\NewsAggregatorService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Container\ContainerInterface;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 class NewsController extends Controller
 {
@@ -30,10 +30,10 @@ class NewsController extends Controller
     }
 
     public function __invoke(
-        Request $request,
+        ServerRequestInterface $request,
         ResponseInterface $response,
         array $args
-    ) : ResponseInterface
+    ): ResponseInterface
     {
         $id = $args['id'];
 

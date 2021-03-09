@@ -30,36 +30,38 @@ $scope.play = {
     saving: false,
     alertError: null,
     reloadGame: function(gameId) {
-        $http
-            .get('{{ api }}games/' + gameId)
-            .then(
-                response => {
-                    const data = response.data;
+        $scope.ajax({
+            method: 'get',
+            headers: {
+                'Accept': 'application/json'
+            },
+            url: '{{ root }}/games/' + gameId,
+            noSuccessMessage: true,
+            onSuccess: (data) => {
+                const gameIndex = $scope.play.games.findIndex(
+                    game => game.id == gameId
+                );
 
-                    const gameIndex = $scope.play.games.findIndex(
-                        game => game.id == gameId
-                    );
-
-                    if (gameIndex >= 0) {
-                        $scope.play.games[gameIndex] = data;
-                    } else {
-                        $scope.play.games.push(data);
-                    }
-
-                    $scope.updateUi();
-
-                    if ($scope.play.loading) {
-                        $scope.play.loading = false;
-                    }
-
-                    setTimeout(() => {
-                        autofocus();
-                    }, 100);
-                },
-                response => {
-                    $scope.showError(response.statusText);
+                if (gameIndex >= 0) {
+                    $scope.play.games[gameIndex] = data;
+                } else {
+                    $scope.play.games.push(data);
                 }
-            );
+
+                $scope.updateUi();
+
+                if ($scope.play.loading) {
+                    $scope.play.loading = false;
+                }
+
+                setTimeout(() => {
+                    autofocus();
+                }, 100);
+            },
+            setError: (message) => {
+                $scope.showError(message);
+            }
+        });
     },
     refreshGames: function() {
         for (let i = 0; i < this.games.length; i++) {

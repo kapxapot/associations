@@ -16,6 +16,7 @@ use Plasticode\Core\AppContext;
 use Plasticode\Core\Interfaces\RendererInterface;
 use Plasticode\Events\EventDispatcher;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ServerRequestInterface;
 
 class Controller extends BaseController
 {
@@ -83,5 +84,15 @@ class Controller extends BaseController
         }
 
         return parent::buildParams(['params' => $params]);
+    }
+
+    /**
+     * Checks if the query params contain "debug" var.
+     */
+    protected function isDebug(ServerRequestInterface $request): bool
+    {
+        $debug = $request->getQueryParams()['debug'] ?? null;
+
+        return $debug !== null;
     }
 }

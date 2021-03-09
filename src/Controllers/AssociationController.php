@@ -7,7 +7,6 @@ use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Http\Request;
 
 class AssociationController extends Controller
 {
@@ -21,14 +20,14 @@ class AssociationController extends Controller
     }
 
     public function get(
-        Request $request,
+        ServerRequestInterface $request,
         ResponseInterface $response,
         array $args
     ) : ResponseInterface
     {
         $id = $args['id'];
 
-        $debug = $request->getQueryParam('debug', null) !== null;
+        $debug = $this->isDebug($request);
 
         $association = $this->associationRepository->get($id);
 

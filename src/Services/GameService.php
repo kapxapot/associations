@@ -37,7 +37,7 @@ class GameService
     /**
      * Returns user's current game or creates and starts a new one for them.
      */
-    public function getOrCreateGameFor(User $user) : Game
+    public function getOrCreateGameFor(User $user): Game
     {
         return $user->currentGame() ?? $this->createGameFor($user);
     }
@@ -45,7 +45,7 @@ class GameService
     /**
      * Creates and starts a new game for a user.
      */
-    public function createGameFor(User $user, ?Language $language = null) : Game
+    public function createGameFor(User $user, ?Language $language = null): Game
     {
         $language ??= $this->languageService->getCurrentLanguageFor($user);
 
@@ -62,7 +62,7 @@ class GameService
         return $game;
     }
 
-    public function startGame(Game $game) : ?Turn
+    public function startGame(Game $game): ?Turn
     {
         Assert::notNull($game, 'Game can\'t be null.');
 
@@ -87,7 +87,7 @@ class GameService
      * Returns true, if the provided turn is the last turn of the game
      * OR turn is null and game contains no turns.
      */
-    public function validateLastTurn(Game $game, Turn $turn) : bool
+    public function validateLastTurn(Game $game, Turn $turn): bool
     {
         $lastTurn = $game->lastTurn();
 
@@ -103,7 +103,7 @@ class GameService
      * @throws ValidationException
      * @throws DuplicateWordException
      */
-    public function makeTurn(User $user, Game $game, string $wordStr) : TurnCollection
+    public function makeTurn(User $user, Game $game, ?string $wordStr): TurnCollection
     {
         $language = $game->language();
 

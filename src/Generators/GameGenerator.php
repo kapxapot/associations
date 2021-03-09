@@ -2,9 +2,7 @@
 
 namespace App\Generators;
 
-use App\Core\Serializer;
 use App\Models\Game;
-use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use Plasticode\Generators\Core\GeneratorContext;
 use Plasticode\Generators\Generic\EntityGenerator;
@@ -12,18 +10,15 @@ use Plasticode\Generators\Generic\EntityGenerator;
 class GameGenerator extends EntityGenerator
 {
     private GameRepositoryInterface $gameRepository;
-    private Serializer $serializer;
 
     public function __construct(
         GeneratorContext $context,
-        GameRepositoryInterface $gameRepository,
-        Serializer $serializer
+        GameRepositoryInterface $gameRepository
     )
     {
         parent::__construct($context);
 
         $this->gameRepository = $gameRepository;
-        $this->serializer = $serializer;
     }
 
     protected function entityClass(): string
@@ -43,10 +38,6 @@ class GameGenerator extends EntityGenerator
             $item['language'] = $game->language()->name;
             $item['user_name'] = $game->user()->displayName();
             $item['url'] = $game->url();
-
-            $item['history'] = $game->turns()->reverse()->map(
-                fn (Turn $t) => $this->serializer->serializeTurn($t)
-            );
         }
 
         return $item;

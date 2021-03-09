@@ -14,7 +14,6 @@ use Plasticode\Exceptions\InvalidResultException;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Slim\Http\Request;
 use Webmozart\Assert\Assert;
 
 class TurnController extends Controller
@@ -37,14 +36,15 @@ class TurnController extends Controller
     }
 
     public function create(
-        Request $request,
+        ServerRequestInterface $request,
         ResponseInterface $response
     ) : ResponseInterface
     {
+        $data = $request->getParsedBody();
         $user = $this->auth->getUser();
 
         // validate game
-        $gameId = $request->getParam('game_id');
+        $gameId = $data['game_id'] ?? null;
         $game = $this->gameRepository->get($gameId);
 
         if (is_null($game)) {
@@ -60,7 +60,7 @@ class TurnController extends Controller
         }
 
         // validate prev turn
-        $prevTurnId = $request->getParam('prev_turn_id');
+        $prevTurnId = $data['prev_turn_id'] ?? null;
         $prevTurn = $this->turnRepository->get($prevTurnId);
 
         if ($prevTurn && !$this->gameService->validateLastTurn($game, $prevTurn)) {
@@ -70,7 +70,7 @@ class TurnController extends Controller
         }
 
         // validate word
-        $wordStr = $request->getParam('word');
+        $wordStr = $data['word'] ?? null;
 
         try {
             $turns = $this->gameService->makeTurn($user, $game, $wordStr);

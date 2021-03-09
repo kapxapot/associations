@@ -2,13 +2,12 @@
 
 namespace App\Controllers;
 
-use App\Auth\Interfaces\AuthInterface;
 use App\Config\Interfaces\NewsConfigInterface;
 use App\Services\GameService;
 use Plasticode\Services\NewsAggregatorService;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
-use Slim\Http\Request;
+use Psr\Http\Message\ServerRequestInterface;
 
 class IndexController extends Controller
 {
@@ -26,11 +25,11 @@ class IndexController extends Controller
     }
 
     public function index(
-        Request $request,
+        ServerRequestInterface $request,
         ResponseInterface $response
     ) : ResponseInterface
     {
-        $debug = $request->getQueryParam('debug', null) !== null;
+        $debug = $this->isDebug($request);
 
         $user = $this->auth->getUser();
 
