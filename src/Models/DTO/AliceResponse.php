@@ -41,8 +41,8 @@ class AliceResponse
     public function withStateFrom(AliceRequest $request): self
     {
         return $request->hasUser()
-            ? $this->withUserState($request->userState)
-            : $this->withApplicationState($request->applicationState);
+            ? $this->withUserState($request->userState())
+            : $this->withApplicationState($request->applicationState());
     }
 
     /**

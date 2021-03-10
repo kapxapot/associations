@@ -14,8 +14,8 @@ class ApplicationAnswerer extends AbstractAnswerer
 
     public function getResponse(AliceRequest $request): AliceResponse
     {
-        $question = $request->command;
-        $isNewSession = $request->isNewSession;
+        $question = $request->command();
+        $isNewSession = $request->isNewSession();
 
         if ($isNewSession) {
             return $this->helpCommand(
@@ -160,7 +160,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         $language = $this->getLanguage();
 
         $word = ($request !== null)
-            ? $this->findWord($request->command)
+            ? $this->findWord($request->command())
             : null;
 
         return $this->languageService->getRandomPublicWord($language, $word);

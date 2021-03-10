@@ -24,7 +24,7 @@ class AliceUserService
 
     public function getOrCreateAliceUser(AliceRequest $request): AliceUser
     {
-        $aliceUserId = $request->userId;
+        $aliceUserId = $request->userId();
 
         Assert::stringNotEmpty($aliceUserId);
 

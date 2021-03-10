@@ -4,36 +4,48 @@ namespace App\Models\DTO;
 
 class AliceRequest
 {
-    private const TOKENS_TO_PURGE = [
-        'алиса', 'блядь', 'это', 'да', 'ты', 'ой', 'я', 'а', 'в', '-', '='
+    private const TRASH_TOKENS = [
+        'алиса', 'блядь', 'алис', 'ты', 'я', '-', '='
     ];
 
     public const WILDCARD = '*';
 
+    private ?string $originalCommand;
+    private ?string $originalUtterance;
+
+    /** @var string[] */
+    private array $originalTokens;
+
     public ?string $command;
 
     /** @var string[] */
-    public array $tokens;
+    private array $tokens;
 
-    public bool $isNewSession;
-    public ?string $userId;
-    public string $applicationId;
-    public ?array $userState;
-    public ?array $applicationState;
+    private bool $isNewSession;
 
-    public ?string $type;
-    public ?string $payload;
+    private ?string $userId;
+    private string $applicationId;
+
+    private ?array $userState;
+    private ?array $applicationState;
+
+    private ?string $type;
+    private ?string $payload;
 
     public function __construct(array $data)
     {
-        $originalCommand = $data['request']['command'] ?? null;
+        $this->originalCommand = $data['request']['command'] ?? null;
+        $this->originalUtterance = $data['request']['original_utterance'] ?? null;
+        $this->originalTokens = $data['request']['nlu']['tokens'] ?? [];
 
-        $this->tokens = $this->parseTokens($originalCommand);
+        $this->tokens = $this->parseTokens($this->originalUtterance);
         $this->command = $this->rebuildFrom($this->tokens);
 
         $this->isNewSession = $data['session']['new'] ?? true;
+
         $this->userId = $data['session']['user']['user_id'] ?? null;
         $this->applicationId = $data['session']['application']['application_id'] ?? null;
+
         $this->userState = $data['state']['user'] ?? null;
         $this->applicationState = $data['state']['application'] ?? null;
 
@@ -42,19 +54,48 @@ class AliceRequest
     }
 
     /**
+     * Sanitized command.
+     */
+    public function command(): ?string
+    {
+        return $this->command;
+    }
+
+    /**
+     * Sanitized tokens.
+     *
      * @return string[]
      */
-    private function parseTokens(?string $originalCommand): array
+    public function tokens(): array
     {
-        $tokens = explode(' ', $originalCommand);
+        return $this->tokens;
+    }
+
+    /**
+     * @return string[]
+     */
+    private function parseTokens(?string $command): array
+    {
+        $tokens = explode(' ', $command);
 
         if (count($tokens) <= 1) {
             return $tokens;
         }
 
+        return $this->filterTokens($tokens);
+    }
+
+    /**
+     * Filters trash tokens.
+     *
+     * @param string[] $tokens
+     * @return string[]
+     */
+    private function filterTokens(array $tokens): array
+    {
         $filteredTokens = array_filter(
             $tokens,
-            fn (string $t) => !in_array($t, self::TOKENS_TO_PURGE)
+            fn (string $t) => !in_array($t, self::TRASH_TOKENS)
         );
 
         return array_values($filteredTokens);
@@ -68,9 +109,34 @@ class AliceRequest
         return implode(' ', $tokens);
     }
 
+    public function isNewSession(): bool
+    {
+        return $this->isNewSession;
+    }
+
     public function hasUser(): bool
     {
         return $this->userId !== null;
+    }
+
+    public function userId(): ?string
+    {
+        return $this->userId;
+    }
+
+    public function applicationId(): string
+    {
+        return $this->applicationId;
+    }
+
+    public function userState(): ?array
+    {
+        return $this->userState;
+    }
+
+    public function applicationState(): ?array
+    {
+        return $this->applicationState;
     }
 
     public function state(): ?array
@@ -109,7 +175,8 @@ class AliceRequest
      */
     public function isAny(string ...$commands): bool
     {
-        return in_array($this->command, $commands);
+        return in_array($this->originalCommand, $commands)
+            || in_array($this->command, $commands);
     }
 
     /**
@@ -118,7 +185,7 @@ class AliceRequest
     public function has(string ...$tokens): bool
     {
         foreach ($tokens as $token) {
-            if (!in_array($token, $this->tokens)) {
+            if (!in_array($token, $this->originalTokens)) {
                 return false;
             }
         }
@@ -132,7 +199,7 @@ class AliceRequest
     public function hasAny(string ...$tokens): bool
     {
         foreach ($tokens as $token) {
-            if (in_array($token, $this->tokens)) {
+            if (in_array($token, $this->originalTokens)) {
                 return true;
             }
         }
@@ -157,28 +224,44 @@ class AliceRequest
     }
 
     /**
-     * Checks if the request matches patterns such as "что такое *".
+     * Checks if the request matches patterns such as "что такое *" and returns words
+     * matched by asterisks.
+     *
+     * @return string[]|null
      */
-    public function matches(string $pattern): bool
+    public function matches(string $pattern): ?array
+    {
+        return $this->matchesTokens($pattern, $this->tokens)
+            ?? $this->matchesTokens($pattern, $this->originalTokens);
+    }
+
+    /**
+     * @param string[] $tokens
+     * @return string[]|null
+     */
+    private function matchesTokens(string $pattern, array $tokens): ?array
     {
         $patternTokens = explode(' ', $pattern);
 
-        if (count($this->tokens) !== count($patternTokens)) {
-            return false;
+        if (count($tokens) !== count($patternTokens)) {
+            return null;
         }
+
+        $matches = [];
 
         for ($i = 0; $i < count($patternTokens); $i++) {
             $token = $patternTokens[$i];
 
             if ($token === self::WILDCARD) {
+                $matches[] = $tokens[$i];
                 continue;
             }
 
-            if ($token !== $this->tokens[$i]) {
-                return false;
+            if ($token !== $tokens[$i]) {
+                return null;
             }
         }
 
-        return true;
+        return $matches;
     }
 }

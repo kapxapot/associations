@@ -187,7 +187,11 @@
         <div class="panel-secondary-heading">Модераторская панель</div>
         <div class="panel panel-secondary">
             <div class="panel-body">
-                {% if is_moderator and word.proposed_typos|length > 0 %}
+                {% if word.feedbacks|length > 0 %}
+                    Feedbacks: {{ word.feedbacks.count }}
+                {% endif %}
+
+                {% if word.proposed_typos|length > 0 %}
                     <p>Возможно, <strong>{{ word.word }}</strong> правильно писать как:</p>
 
                     <ul class="vgap-2">
@@ -203,7 +207,7 @@
                     </ul>
                 {% endif %}
                 
-                {% if is_moderator and word.proposed_duplicates|length > 0 %}
+                {% if word.proposed_duplicates|length > 0 %}
                     <p>Возможно, <strong>{{ word.word }}</strong> дублирует:</p>
 
                     <ul class="vgap-2">
@@ -225,6 +229,9 @@
                 <strong>...не для детей:</strong> {{ gm.moment_local(word.mature_updated_at_iso, 'никогда') }}
                 {% if word.dict_word %}
                     <br/><strong>...проверено в словаре:</strong> {{ gm.moment_local(word.dict_word.updated_at_iso) }}
+                {% endif %}
+                {% if word.definition %}
+                    <br/><strong>...проверено определение:</strong> {{ gm.moment_local(word.definition.updated_at_iso) }}
                 {% endif %}
             </div>
         </div>

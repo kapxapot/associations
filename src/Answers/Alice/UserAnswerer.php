@@ -57,9 +57,9 @@ class UserAnswerer extends AbstractAnswerer
     {
         Assert::true($aliceUser->isValid());
 
-        $command = $request->command;
-        $tokens = $request->tokens;
-        $isNewSession = $request->isNewSession;
+        $command = $request->command();
+        $tokens = $request->tokens();
+        $isNewSession = $request->isNewSession();
 
         if ($isNewSession) {
             return $this->startCommand($aliceUser, $request);
@@ -166,7 +166,7 @@ class UserAnswerer extends AbstractAnswerer
         AliceRequest $request
     ): AliceResponse
     {
-        $command = $request->command;
+        $command = $request->command();
         $commandToConfirm = $request->var(self::VAR_COMMAND);
 
         if ($command === self::COMMAND_COMMAND || $command === $commandToConfirm) {
@@ -248,21 +248,15 @@ class UserAnswerer extends AbstractAnswerer
 
     private function whatCommand(AliceUser $aliceUser, AliceRequest $request): AliceResponse
     {
-        /** @var string|null $askedFor */
-        $askedFor = null;
+        $matches = $request->matches('что такое *')
+            ?? $request->matches('* это что')
+            ?? $request->matches('* что это')
+            ?? $request->matches('* это что такое')
+            ?? $request->matches('* что это такое');
 
-        if ($request->matches('что такое *')) {
-            $askedFor = $request->tokens[2];
-        }
-
-        if (
-            $request->matches('* это что')
-            || $request->matches('* что это')
-            || $request->matches('* это что такое')
-            || $request->matches('* что это такое')
-        ) {
-            $askedFor = $request->tokens[0];
-        }
+        $askedFor = !empty($matches)
+            ? $matches[0]
+            : null;
 
         $lastWord = $this->getLastTurn($aliceUser)->word();
 
