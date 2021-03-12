@@ -14,7 +14,7 @@ class WordFeedback extends Feedback
 {
     private string $duplicatePropertyName = 'duplicate';
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return [
             ...parent::requiredWiths(),
@@ -23,12 +23,12 @@ class WordFeedback extends Feedback
         ];
     }
 
-    public function hasTypo() : bool
+    public function hasTypo(): bool
     {
         return strlen($this->typo) > 0;
     }
 
-    public function hasDuplicate() : bool
+    public function hasDuplicate(): bool
     {
         return $this->duplicateId > 0;
     }
@@ -40,7 +40,7 @@ class WordFeedback extends Feedback
      * The reason for that behavior is not found, so this explicit
      * function declaration is a temporary (or a permanent) solution.
      */
-    public function duplicate() : ?Word
+    public function duplicate(): ?Word
     {
         return $this->getWithProperty(
             $this->duplicatePropertyName
