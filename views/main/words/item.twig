@@ -114,7 +114,7 @@
             {% endif %}
 
             {% if word.duplicate_by_me %}
-                <p class="mt-3">Вы отметили, что слово <strong>{{ word.word }}</strong> дублирует слово {{ lm.word(word.duplicate_by_me) }}.</p>
+                <p class="mt-3 br-word">Вы отметили, что слово <strong>{{ word.word }}</strong> дублирует слово {{ lm.word(word.duplicate_by_me) }}.</p>
             {% endif %}
 
             {% if auth.user %}
@@ -184,46 +184,43 @@
     </div>
 
     {% if is_moderator %}
+        {% if word.feedbacks|length > 0 %}
+            <div class="panel-secondary-heading">Отзывы</div>
+            <div class="panel panel-secondary">
+                <div class="panel-body table-responsive">
+                    <table id="feedbacks-table" class="display table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Не нравится</th>
+                                <th>Опечатка</th>
+                                <th>Дублирует</th>
+                                <th>16+</th>
+                                <th>Дата</th>
+                                <th>Автор</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for feedback in word.feedbacks.sort %}
+                                <tr>
+                                    <td>{{ feedback.id }}</td>
+                                    <td>{% if feedback.isDisliked %}<i class="fas fa-check"></i>{% endif %}</td>
+                                    <td>{% if feedback.hasTypo %}{{ feedback.typo }}{% endif %}</td>
+                                    <td>{% if feedback.hasDuplicate %}{{ lm.word(feedback.duplicate) }}{% endif %}</td>
+                                    <td>{% if feedback.isDisliked %}<i class="fas fa-check"></i>{% endif %}</td>
+                                    <td>{{ gm.moment_local(feedback.updated_at_iso) }}</td>
+                                    <td>{{ lm.user(feedback.creator) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
         <div class="panel-secondary-heading">Модераторская панель</div>
         <div class="panel panel-secondary">
             <div class="panel-body">
-                {% if word.feedbacks|length > 0 %}
-                    Feedbacks: {{ word.feedbacks.count }}
-                {% endif %}
-
-                {% if word.proposed_typos|length > 0 %}
-                    <p>Возможно, <strong>{{ word.word }}</strong> правильно писать как:</p>
-
-                    <ul class="vgap-2">
-                        {% for typo, typo_items in word.proposed_typos %}
-                            <li>
-                                {{ typo }}
-
-                                {% for typo_item in typo_items %}
-                                    {{ lm.user(typo_item.creator) }}
-                                {% endfor %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-                
-                {% if word.proposed_duplicates|length > 0 %}
-                    <p>Возможно, <strong>{{ word.word }}</strong> дублирует:</p>
-
-                    <ul class="vgap-2">
-                        {% for dup_id, dup_items in word.proposed_duplicates %}
-                            {% set duplicate = dup_items[0].duplicate %}
-                            <li>
-                                {{ lm.word(duplicate) }}
-
-                                {% for dup_item in dup_items %}
-                                    {{ lm.user(dup_item.creator) }}
-                                {% endfor %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                {% endif %}
-
                 <strong>Обновлено:</strong> {{ gm.moment_local(word.updated_at_iso) }}<br/>
                 <strong>...общее:</strong> {{ gm.moment_local(word.approved_updated_at_iso, 'никогда') }}<br/>
                 <strong>...не для детей:</strong> {{ gm.moment_local(word.mature_updated_at_iso, 'никогда') }}
