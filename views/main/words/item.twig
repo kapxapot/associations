@@ -28,16 +28,12 @@
 
                     {% if dw.is_valid %}
                         <span class="label label-success" title="Есть в словаре" data-toggle="tooltip"><i class="fas fa-check"></i> словарь</span>
-                    {#% else %}
-                        <span class="label label-danger" title="Нет в словаре" data-toggle="tooltip"><i class="fas fa-times"></i> словарь</span>
-                    #}{% endif %}
+                    {% endif %}
                 {% endif %}
 
                 {% if definition %}
                     <span class="label label-success" title="Есть определение" data-toggle="tooltip"><i class="fas fa-check"></i> определение</span>
-                {#% else %}
-                    <span class="label label-danger" title="Нет определения" data-toggle="tooltip"><i class="fas fa-times"></i> определение</span>
-                #}{% endif %}
+                {% endif %}
 
                 {% for pos in word.partsOfSpeech %}
                     {% include 'components/part_of_speech.twig' with { 'pos': pos } only %}
@@ -207,7 +203,7 @@
                                     <td>{% if feedback.isDisliked %}<i class="fas fa-check"></i>{% endif %}</td>
                                     <td>{% if feedback.hasTypo %}{{ feedback.typo }}{% endif %}</td>
                                     <td>{% if feedback.hasDuplicate %}{{ lm.word(feedback.duplicate) }}{% endif %}</td>
-                                    <td>{% if feedback.isDisliked %}<i class="fas fa-check"></i>{% endif %}</td>
+                                    <td>{% if feedback.isMature %}<i class="fas fa-check"></i>{% endif %}</td>
                                     <td>{{ gm.moment_local(feedback.updated_at_iso) }}</td>
                                     <td>{{ lm.user(feedback.creator) }}</td>
                                 </tr>

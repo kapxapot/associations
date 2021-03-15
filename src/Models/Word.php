@@ -253,9 +253,18 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     {
         $feedback = $this->feedbackByMe();
 
-        return ($feedback && strlen($feedback->typo) > 0)
+        return ($feedback && $this->isRealTypo($feedback->typo))
             ? $feedback->typo
             : null;
+    }
+
+    /**
+     * Checks if the typo is not empty and is different from the word.
+     */
+    public function isRealTypo(?string $typo): bool
+    {
+        return strlen($typo) > 0
+            && $this->word !== $typo;
     }
 
     /**

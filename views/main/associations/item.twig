@@ -69,6 +69,36 @@
     </div>
 
     {% if is_moderator %}
+        {% if association.feedbacks|length > 0 %}
+            <div class="panel-secondary-heading">Отзывы</div>
+            <div class="panel panel-secondary">
+                <div class="panel-body table-responsive">
+                    <table id="feedbacks-table" class="display table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Не нравится</th>
+                                <th>16+</th>
+                                <th>Дата</th>
+                                <th>Автор</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for feedback in association.feedbacks.sort %}
+                                <tr>
+                                    <td>{{ feedback.id }}</td>
+                                    <td>{% if feedback.isDisliked %}<i class="fas fa-check"></i>{% endif %}</td>
+                                    <td>{% if feedback.isMature %}<i class="fas fa-check"></i>{% endif %}</td>
+                                    <td>{{ gm.moment_local(feedback.updated_at_iso) }}</td>
+                                    <td>{{ lm.user(feedback.creator) }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endif %}
+
         <div class="panel-secondary-heading">Модераторская панель</div>
         <div class="panel panel-secondary">
             <div class="panel-body">

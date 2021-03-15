@@ -108,6 +108,8 @@ class WordFeedbackService
 
     private function getRules(array $data): array
     {
+        $word = $this->wordRepository->get($data['word_id'] ?? null);
+
         $result = [
             'word_id' => $this
                 ->validationRules
@@ -116,22 +118,22 @@ class WordFeedbackService
         ];
 
         if (($data['typo'] ?? null) !== null) {
-            $result['typo'] = $this->wordService->getRule();
-        }
-
-        if (($data['duplicate'] ?? null) !== null) {
-            $word = $this
-                ->wordRepository
-                ->get($data['word_id'] ?? null);
+            $typoRule = $this->wordService->getRule();
 
             if ($word) {
-                $result['duplicate'] =
-                    Validator::mainWordExists(
-                        $this->wordRepository,
-                        $word->language(),
-                        $word
-                    );
+                $typoRule = $typoRule->wordTypoNotEqualsWord($word);
             }
+
+            $result['typo'] = $typoRule;
+        }
+
+        if (($data['duplicate'] ?? null) !== null && $word) {
+            $result['duplicate'] =
+                Validator::mainWordExists(
+                    $this->wordRepository,
+                    $word->language(),
+                    $word
+                );
         }
 
         return $result;

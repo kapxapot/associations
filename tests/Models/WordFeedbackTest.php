@@ -44,7 +44,7 @@ final class WordFeedbackTest extends IntegrationTest
 
     private WordFeedbackService $wordFeedbackService;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -120,7 +120,7 @@ final class WordFeedbackTest extends IntegrationTest
         );
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         unset($this->wordFeedbackService);
 
@@ -133,8 +133,10 @@ final class WordFeedbackTest extends IntegrationTest
         parent::tearDown();
     }
 
-    /** @dataProvider toModelProvider */
-    public function testToModel(array $data, array $expected) : void
+    /**
+     * @dataProvider toModelProvider
+     */
+    public function testToModel(array $data, array $expected): void
     {
         $user = $this->userRepository->get(1);
 
@@ -160,7 +162,7 @@ final class WordFeedbackTest extends IntegrationTest
         );
     }
 
-    public function toModelProvider()
+    public function toModelProvider(): array
     {
         return [
             [
@@ -182,12 +184,27 @@ final class WordFeedbackTest extends IntegrationTest
         ];
     }
 
-    public function testInvalidData() : void
+    public function testInvalidDataFails(): void
     {
         $this->expectException(ValidationException::class);
 
         $user = $this->userRepository->get(1);
 
         $this->wordFeedbackService->toModel([], $user);
+    }
+
+    public function testTypoEqualsToWordFails(): void
+    {
+        $this->expectException(ValidationException::class);
+
+        $user = $this->userRepository->get(1);
+
+        $this->wordFeedbackService->toModel(
+            [
+                'word_id' => '1',
+                'typo' => 'стол',
+            ],
+            $user
+        );
     }
 }

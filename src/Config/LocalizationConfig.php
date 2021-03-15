@@ -51,6 +51,8 @@ class LocalizationConfig extends BaseConfig
 
                 'No words yet. :(' => 'Пока слов нет. :(',
                 'No associations yet. :(' => 'Пока ассоциаций нет. :(',
+
+                'Typo must differ from the word.' => 'Опечатка должна отличаться от слова.',
             ]
         );
     }
