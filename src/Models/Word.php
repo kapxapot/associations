@@ -13,6 +13,9 @@ use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Interfaces\PartOfSpeechableInterface;
 
 /**
+ * @property string|null $correctedWord
+ * @property integer $disabled
+ * @property string|null $tokenizedWord
  * @property string $word
  * @method AssociationCollection associations()
  * @method Definition|null definition()
@@ -324,5 +327,10 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         }
 
         return $poses->distinct();
+    }
+
+    public function isDisabled(): bool
+    {
+        return self::toBool($this->disabled);
     }
 }
