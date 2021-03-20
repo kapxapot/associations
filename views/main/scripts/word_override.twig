@@ -1,6 +1,7 @@
 {% import 'main/local_macros.twig' as lm %}
 
 {% set override = word.override %}
+{% set current_parts_of_speech = override.hasPosCorrection ? override.partsOfSpeech : word.partsOfSpeech %}
 
 {# approved, mature, word_correction, pos_correction, disabled #}
 
@@ -12,10 +13,24 @@ $scope.override = {
     with_mature: {{ override.hasMature ? 'true' : 'false' }},
     mature: {{ override.hasMature ? override.isMature : 'null' }},
     disabled: {{ override.isDisabled ? 'true' : 'false' }},
-    with_word_correction: {{ override.wordCorrection ? 'true' : 'false' }},
-    word_correction: {% if override.wordCorrection %}'{{ override.wordCorrection }}'{% else %}null{% endif %},
-    with_pos_correction: {{ override.posCorrection ? 'true' : 'false' }},
-    pos_correction: {% if override.posCorrection %}'{{ override.posCorrection }}'{% else %}null{% endif %}
+    with_word_correction: {{ override.hasWordCorrection ? 'true' : 'false' }},
+    word_correction: {% if override.hasWordCorrection %}'{{ override.wordCorrection }}'{% else %}null{% endif %},
+    with_pos_correction: {{ override.hasPosCorrection ? 'true' : 'false' }},
+    pos_correction: [
+        {% for pos in parts_of_speech %}
+            {% set pos_selected = false %}
+            {% for cur_pos in current_parts_of_speech %}
+                {% if cur_pos.name == pos.name %}
+                    {% set pos_selected = true %}
+                {% endif %}
+            {% endfor %}
+            {
+                name: '{{ pos.name }}',
+                label: '{{ translate(pos.shortName) }}',
+                selected: {{ pos_selected ? 'true' : 'false' }}
+            }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
 };
 
 $scope.overrideDialog = () => {
@@ -27,11 +42,11 @@ $('#overrideForm').submit(function(e) {
 
     let obj = $.extend(true, {}, $scope.override);
 
-    if (obj.with_approved !== true) {
+    if (obj.with_approved !== true || obj.approved === null) {
         delete obj.approved;
     }
 
-    if (obj.with_mature !== true) {
+    if (obj.with_mature !== true || obj.mature === null) {
         delete obj.mature;
     }
 
@@ -41,6 +56,10 @@ $('#overrideForm').submit(function(e) {
 
     if (obj.with_pos_correction !== true) {
         delete obj.pos_correction;
+    } else {
+        obj.pos_correction = obj.pos_correction
+            .filter(pos => pos.selected)
+            .map(pos => pos.name);
     }
 
     delete obj.with_approved;

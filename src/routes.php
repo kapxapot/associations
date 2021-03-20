@@ -14,6 +14,7 @@ use App\Controllers\TagController;
 use App\Controllers\TelegramBotController;
 use App\Controllers\TurnController;
 use App\Controllers\WordController;
+use App\Controllers\WordOverrideController;
 use Brightwood\Controllers\BrightwoodBotController;
 use Brightwood\Controllers\CardsTestController;
 use Brightwood\Controllers\EightsTestController;

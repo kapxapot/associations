@@ -2,8 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Services\AssociationFeedbackService;
-use App\Services\WordFeedbackService;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Psr\Container\ContainerInterface;
@@ -22,6 +20,7 @@ class WordOverrideController extends Controller
         ResponseInterface $response
     ) : ResponseInterface
     {
+        die('not implemented');
         $data = $request->getParsedBody();
 
         $wordData = $data['word'] ?? [];

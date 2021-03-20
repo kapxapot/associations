@@ -73,14 +73,12 @@
             </div>
 
             <div class="form-group ml-3 check-inside" ng-if="override.with_pos_correction">
-                {% for pos in parts_of_speech %}
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" ng-model="override.pos_correction">
-                            {{ translate(pos.shortName) }}
-                        </label>
-                    </div>
-                {% endfor %}
+                <span class="hgap-2" ng-repeat="pos in override.pos_correction">
+                    <label class="checkbox-inline">
+                        <input type="checkbox" ng-checked="pos.selected" ng-model="pos.selected">
+                        {{ '{{pos.label}}' }}
+                    </label>
+                </span>
             </div>
         </div>
     </div>
