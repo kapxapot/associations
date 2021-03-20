@@ -11,7 +11,7 @@ use Plasticode\Models\Interfaces\CreatedAtInterface;
 
 /**
  * @property integer|null $approved
- * @property integer|null $disabled
+ * @property integer $disabled
  * @property integer|null $mature
  * @property string|null $posCorrection Part of speech correction.
  * @property string|null $wordCorrection
@@ -85,15 +85,8 @@ class WordOverride extends DbModel implements CreatedAtInterface, PartOfSpeechab
         return strlen($this->posCorrection) > 0;
     }
 
-    public function isDisabled(): ?bool
+    public function isDisabled(): bool
     {
-        return $this->hasDisabled()
-            ? self::toBool($this->disabled)
-            : null;
-    }
-
-    public function hasDisabled(): bool
-    {
-        return $this->disabled !== null;
+        return self::toBool($this->disabled);
     }
 }
