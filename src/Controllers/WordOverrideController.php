@@ -10,19 +10,11 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
-class FeedbackController extends Controller
+class WordOverrideController extends Controller
 {
-    private AssociationFeedbackService $associationFeedbackService;
-    private WordFeedbackService $wordFeedbackService;
-
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
-
-        $this->associationFeedbackService =
-            $container->get(AssociationFeedbackService::class);
-
-        $this->wordFeedbackService = $container->get(WordFeedbackService::class);
     }
 
     public function __invoke(

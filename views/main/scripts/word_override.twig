@@ -1,0 +1,66 @@
+{% import 'main/local_macros.twig' as lm %}
+
+{% set override = word.override %}
+
+{# approved, mature, word_correction, pos_correction, disabled #}
+
+$scope.override = {
+    word_id: {{ word.id }},
+    word: '{{ word.word }}',
+    with_approved: {{ override.hasApproved ? 'true' : 'false' }},
+    approved: {{ override.hasApproved ? override.isApproved : 'null' }},
+    with_mature: {{ override.hasMature ? 'true' : 'false' }},
+    mature: {{ override.hasMature ? override.isMature : 'null' }},
+    disabled: {{ override.isDisabled ? 'true' : 'false' }},
+    with_word_correction: {{ override.wordCorrection ? 'true' : 'false' }},
+    word_correction: {% if override.wordCorrection %}'{{ override.wordCorrection }}'{% else %}null{% endif %},
+    with_pos_correction: {{ override.posCorrection ? 'true' : 'false' }},
+    pos_correction: {% if override.posCorrection %}'{{ override.posCorrection }}'{% else %}null{% endif %}
+};
+
+$scope.overrideDialog = () => {
+    showModal('override');
+};
+
+$('#overrideForm').submit(function(e) {
+    $scope.modalPrePost(e);
+
+    let obj = $.extend(true, {}, $scope.override);
+
+    if (obj.with_approved !== true) {
+        delete obj.approved;
+    }
+
+    if (obj.with_mature !== true) {
+        delete obj.mature;
+    }
+
+    if (obj.with_word_correction !== true) {
+        delete obj.word_correction;
+    }
+
+    if (obj.with_pos_correction !== true) {
+        delete obj.pos_correction;
+    }
+
+    delete obj.with_approved;
+    delete obj.with_mature;
+    delete obj.with_word_correction;
+    delete obj.with_pos_correction;
+
+    $scope.modalAjax({
+        url: '{{ path_for('actions.word.override') }}',
+        data: obj,
+        view: 'problems',
+        onSuccess: {{ on_success ?? '$scope.postSuccess' }},
+        noSuccessMessage: {{ on_success ? 'false' : 'true' }}
+    });
+});
+
+$scope.focusWordCorrection = () => {
+    if ($scope.override.with_word_correction) {
+        setTimeout(() => {
+            $('#overrideWordCorrection').focus();
+        }, 100);
+    }
+};

@@ -172,8 +172,13 @@ $app->group(
 
                 $this->post(
                     '/feedback',
-                    FeedbackController::class . ':save'
+                    FeedbackController::class
                 )->setName('actions.feedback');
+
+                $this->post(
+                    '/word/override',
+                    WordOverrideController::class
+                )->setName('actions.word.override');
             }
         )->add(
             new TokenAuthMiddleware(

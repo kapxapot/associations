@@ -5,7 +5,7 @@ namespace App\Models\DTO;
 class AliceRequest
 {
     private const TRASH_TOKENS = [
-        'алиса', 'блядь', 'алис', 'ты', 'я', '-', '='
+        'алиса', 'блядь', 'алис', 'ты', 'я', 'а', '-', '='
     ];
 
     public const WILDCARD = '*';

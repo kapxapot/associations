@@ -10,7 +10,10 @@ use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
 interface WordFeedbackRepositoryInterface extends ChangingRepositoryInterface
 {
     function get(?int $id): ?WordFeedback;
+
     function create(array $data): WordFeedback;
+
     function save(WordFeedback $feedback): WordFeedback;
+
     function getAllByWord(Word $word): WordFeedbackCollection;
 }

@@ -21,6 +21,7 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Repositories\LanguageRepository;
 use App\Repositories\NewsRepository;
@@ -29,12 +30,12 @@ use App\Repositories\TelegramUserRepository;
 use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
+use App\Repositories\WordOverrideRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
 use Plasticode\Auth\Access;
 use Plasticode\Auth\Interfaces\AuthInterface;
 use Plasticode\Core\Interfaces\CacheInterface;
-use Plasticode\Core\Interfaces\LinkerInterface;
 use Plasticode\Data\DbMetadata;
 use Plasticode\Mapping\Interfaces\MappingProviderInterface;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
@@ -49,7 +50,6 @@ final class RepositoryProviderTest extends AbstractProviderTest
             AuthInterface::class,
             CacheInterface::class,
             DbMetadata::class,
-            // LinkerInterface::class,
 
             CoreRepositories\TagRepositoryInterface::class,
         ];
@@ -135,6 +135,11 @@ final class RepositoryProviderTest extends AbstractProviderTest
         $this->check(
             WordFeedbackRepositoryInterface::class,
             WordFeedbackRepository::class
+        );
+
+        $this->check(
+            WordOverrideRepositoryInterface::class,
+            WordOverrideRepository::class
         );
 
         $this->check(

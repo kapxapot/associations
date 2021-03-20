@@ -149,3 +149,9 @@ a.assoc-arrow {
     height: 32px;
     vertical-align: middle;
 }
+
+/* modals */
+
+.checkbox + .check-inside {
+    margin-top: -5px;
+}

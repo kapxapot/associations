@@ -7,6 +7,7 @@ use App\Collections\MetaAssociationCollection;
 use App\Collections\PartOfSpeechCollection;
 use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
+use App\Collections\WordOverrideCollection;
 use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
@@ -20,11 +21,13 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
  * @method AssociationCollection associations()
  * @method Definition|null definition()
  * @method DictWordInterface|null dictWord()
+ * @method WordOverrideCollection overrides()
  * @method DefinitionAggregate|null parsedDefinition()
  * @method static withAssociations(AssociationCollection|callable $associations)
  * @method static withDefinition(Definition|callable|null $definition)
  * @method static withDictWord(DictWordInterface|callable|null $dictWord)
  * @method static withFeedbacks(WordFeedbackCollection|callable $feedbacks)
+ * @method static withOverrides(WordOverrideCollection|callable $overrides)
  * @method static withParsedDefinition(DefinitionAggregate|callable|null $parsedDefinition)
  */
 class Word extends LanguageElement implements PartOfSpeechableInterface
@@ -34,6 +37,10 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return [
             ...parent::requiredWiths(),
             'associations',
+            'definition',
+            'dictWord',
+            'overrides',
+            'parsedDefinition',
         ];
     }
 
@@ -327,6 +334,11 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         }
 
         return $poses->distinct();
+    }
+
+    public function override(): ?WordOverride
+    {
+        return $this->overrides()->latest();
     }
 
     public function isDisabled(): bool

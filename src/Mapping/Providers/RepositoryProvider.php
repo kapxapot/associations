@@ -17,6 +17,7 @@ use App\Hydrators\TurnHydrator;
 use App\Hydrators\UserHydrator;
 use App\Hydrators\WordFeedbackHydrator;
 use App\Hydrators\WordHydrator;
+use App\Hydrators\WordOverrideHydrator;
 use App\Hydrators\YandexDictWordHydrator;
 use App\Repositories\AliceUserRepository;
 use App\Repositories\AssociationFeedbackRepository;
@@ -36,6 +37,7 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Repositories\LanguageRepository;
 use App\Repositories\NewsRepository;
@@ -44,6 +46,7 @@ use App\Repositories\TelegramUserRepository;
 use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
+use App\Repositories\WordOverrideRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
 use App\Services\DictionaryService;
@@ -229,6 +232,17 @@ class RepositoryProvider extends MappingProvider
                     )
                 ),
 
+            WordOverrideRepositoryInterface::class =>
+                fn (ContainerInterface $c) => new WordOverrideRepository(
+                    $c->get(RepositoryContext::class),
+                    new ObjectProxy(
+                        fn () => new WordOverrideHydrator(
+                            $c->get(UserRepositoryInterface::class),
+                            $c->get(WordRepositoryInterface::class)
+                        )
+                    )
+                ),
+
             WordRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new WordRepository(
                     $c->get(RepositoryContext::class),
@@ -240,6 +254,7 @@ class RepositoryProvider extends MappingProvider
                             $c->get(TurnRepositoryInterface::class),
                             $c->get(UserRepositoryInterface::class),
                             $c->get(WordFeedbackRepositoryInterface::class),
+                            $c->get(WordOverrideRepositoryInterface::class),
                             $c->get(AuthInterface::class),
                             $c->get(LinkerInterface::class),
                             $c->get(DictionaryService::class),

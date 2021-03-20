@@ -9,6 +9,7 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Core\Serializer;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\PartOfSpeech;
 use App\Services\CasesService;
 use App\Services\LanguageService;
 use Plasticode\Controllers\Controller as BaseController;
@@ -82,6 +83,8 @@ class Controller extends BaseController
 
             $params['language'] = $language;
         }
+
+        $params['parts_of_speech'] = PartOfSpeech::known();
 
         return parent::buildParams(['params' => $params]);
     }
