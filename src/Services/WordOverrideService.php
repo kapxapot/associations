@@ -9,11 +9,9 @@ use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Convert;
-use Plasticode\Util\Date;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
-use Respect\Validation\Validator;
 
 class WordOverrideService
 {
@@ -51,7 +49,7 @@ class WordOverrideService
 
         $override = $this
             ->wordOverrideRepository
-            ->create($override->toArray());
+            ->save($override);
 
         $event = new WordOverrideCreatedEvent($override);
         $this->eventDispatcher->dispatch($event);
@@ -71,40 +69,37 @@ class WordOverrideService
         $wordId = $data['word_id'];
         $word = $this->wordRepository->get($wordId);
 
-        $model =
-            $word->feedbackBy($user)
-            ??
-            $this->wordFeedbackRepository->create(
-                [
-                    'word_id' => $word->getId(),
-                    'created_by' => $user->getId(),
-                ]
+        $model = $this->wordOverrideRepository->create([
+            'word_id' => $word->getId(),
+            'created_by' => $user->getId(),
+        ]);
+
+        /** @var bool|null $approved */
+        $approved = $data['approved'] ?? null;
+
+        if ($approved !== null) {
+            $model->approved = Convert::toBit($approved);
+        }
+
+        /** @var bool|null $mature */
+        $mature = $data['mature'] ?? null;
+
+        if ($mature !== null) {
+            $model->mature = Convert::toBit($mature);
+        }
+
+        $model->disabled = Convert::toBit($data['disabled'] ?? null);
+
+        $wordCorrection = Strings::normalize($data['word_correction'] ?? null);
+        $model->wordCorrection = (strlen($wordCorrection) > 0) ? $wordCorrection : null;
+
+        $posCorrection = $data['pos_correction'] ?? [];
+
+        if (!empty($posCorrection)) {
+            $model->posCorrection = implode(
+                WordOverride::POS_DELIMITER,
+                $posCorrection
             );
-
-        $model->dislike = Convert::toBit($data['dislike'] ?? null);
-
-        $typo = Strings::normalize($data['typo'] ?? null);
-        $model->typo = (strlen($typo) > 0) ? $typo : null;
-
-        $duplicate = Strings::normalize($data['duplicate'] ?? null);
-
-        $duplicateWord = $this
-            ->wordRepository
-            ->findInLanguage(
-                $word->language(),
-                $duplicate
-            );
-
-        $model->duplicateId = $duplicateWord
-            ? $duplicateWord->getId()
-            : null;
-
-        $model->withDuplicate($duplicateWord);
-
-        $model->mature = Convert::toBit($data['mature'] ?? null);
-
-        if ($model->isPersisted()) {
-            $model->updatedAt = Date::dbNow();
         }
 
         return $model;

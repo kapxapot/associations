@@ -54,6 +54,7 @@ class LocalizationConfig extends BaseConfig
 
                 'Typo must differ from the word.' => 'Опечатка должна отличаться от слова.',
                 'Word correction must differ from the word.' => 'Исправление должно отличаться от слова.',
+                'Such word already exists.' => 'Такое слово уже существует.',
             ]
         );
     }

@@ -184,7 +184,7 @@
             <div class="panel-secondary-heading">Отзывы</div>
             <div class="panel panel-secondary">
                 <div class="panel-body table-responsive">
-                    <table id="feedbacks-table" class="display table table-striped mb-0">
+                    <table id="feedbacks-table" class="table table-striped mb-0">
                         <thead>
                             <tr>
                                 <th>Id</th>
@@ -219,29 +219,37 @@
             <div class="panel-body">
                 <button ng-click="overrideDialog()" class="btn btn-default"><i class="fas fa-wrench mr-1"></i> Исправить</button>
                 {% if word.overrides|length > 0 %}
-                    <div class="table-responsive">
-                        <table id="overrides-table" class="display table table-striped mt-2 mb-0">
+                    <div class="table-responsive mt-2">
+                        <table id="overrides-table" class="table table-striped mb-0">
                             <thead>
                                 <tr>
                                     <th>Id</th>
-                                    <th>Не нравится</th>
-                                    <th>Опечатка</th>
-                                    <th>Дублирует</th>
+                                    <th>Общее</th>
                                     <th>16+</th>
+                                    <th>Откл.</th>
+                                    <th>Исправление</th>
+                                    <th>Части речи</th>
                                     <th>Дата</th>
                                     <th>Автор</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for feedback in word.feedbacks.sort %}
+                                {% for override in word.overrides.sort %}
                                     <tr>
-                                        <td>{{ feedback.id }}</td>
-                                        <td>{% if feedback.isDisliked %}<i class="fas fa-check"></i>{% endif %}</td>
-                                        <td>{% if feedback.hasTypo %}{{ feedback.typo }}{% endif %}</td>
-                                        <td>{% if feedback.hasDuplicate %}{{ lm.word(feedback.duplicate) }}{% endif %}</td>
-                                        <td>{% if feedback.isMature %}<i class="fas fa-check"></i>{% endif %}</td>
-                                        <td>{{ gm.moment_local(feedback.updated_at_iso) }}</td>
-                                        <td>{{ lm.user(feedback.creator) }}</td>
+                                        <td>{{ override.id }}</td>
+                                        <td>{% if override.hasApproved %}{{ override.approved ? 'общее' : 'личное' }}{% endif %}</td>
+                                        <td>{% if override.hasMature %}{{ override.mature ? '16+' : '0+' }}{% endif %}</td>
+                                        <td>{% if override.isDisabled %}<i class="fas fa-check"></i>{% endif %}</td>
+                                        <td>{% if override.hasWordCorrection %}{{ override.wordCorrection }}{% endif %}</td>
+                                        <td>
+                                            {% if override.hasPosCorrection %}
+                                                {% for pos in override.partsOfSpeech %}
+                                                    {{ translate(pos.shortName) }}{% if not loop.last %},{% endif %}
+                                                {% endfor %}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ gm.moment_local(override.created_at_iso) }}</td>
+                                        <td>{{ lm.user(override.creator) }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

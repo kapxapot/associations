@@ -9,9 +9,9 @@ $scope.override = {
     word_id: {{ word.id }},
     word: '{{ word.word }}',
     with_approved: {{ override.hasApproved ? 'true' : 'false' }},
-    approved: {{ override.hasApproved ? override.isApproved : 'null' }},
+    approved: {{ override.hasApproved ? (override.isApproved ? 'true' : 'false') : 'null' }},
     with_mature: {{ override.hasMature ? 'true' : 'false' }},
-    mature: {{ override.hasMature ? override.isMature : 'null' }},
+    mature: {{ override.hasMature ? (override.isMature ? 'true' : 'false') : 'null' }},
     disabled: {{ override.isDisabled ? 'true' : 'false' }},
     with_word_correction: {{ override.hasWordCorrection ? 'true' : 'false' }},
     word_correction: {% if override.hasWordCorrection %}'{{ override.wordCorrection }}'{% else %}null{% endif %},
@@ -70,7 +70,7 @@ $('#overrideForm').submit(function(e) {
     $scope.modalAjax({
         url: '{{ path_for('actions.word.override') }}',
         data: obj,
-        view: 'problems',
+        view: 'override',
         onSuccess: {{ on_success ?? '$scope.postSuccess' }},
         noSuccessMessage: {{ on_success ? 'false' : 'true' }}
     });

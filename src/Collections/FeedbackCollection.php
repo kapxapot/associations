@@ -5,6 +5,7 @@ namespace App\Collections;
 use App\Models\Feedback;
 use App\Models\User;
 use Plasticode\Collections\Generic\DbModelCollection;
+use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Util\Sort;
 
 class FeedbackCollection extends DbModelCollection
@@ -46,9 +47,8 @@ class FeedbackCollection extends DbModelCollection
      */
     public function sort(): self
     {
-        return $this->orderBy(
-            fn (Feedback $f) => $f->updatedAt,
-            Sort::DESC,
+        return $this->desc(
+            fn (UpdatedAtInterface $u) => $u->updatedAt,
             Sort::DATE
         );
     }

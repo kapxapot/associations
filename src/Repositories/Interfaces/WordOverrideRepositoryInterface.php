@@ -9,11 +9,13 @@ use Plasticode\Repositories\Interfaces\Generic\GetRepositoryInterface;
 
 interface WordOverrideRepositoryInterface extends GetRepositoryInterface
 {
-    function get(?int $id): ?WordOverride;
+    public function get(?int $id): ?WordOverride;
 
-    function create(array $data): WordOverride;
+    public function create(array $data): WordOverride;
 
-    function getLatestByWord(Word $word): ?WordOverride;
+    public function save(WordOverride $wordOverride): WordOverride;
 
-    function getAllByWord(Word $word): WordOverrideCollection;
+    public function getLatestByWord(Word $word): ?WordOverride;
+
+    public function getAllByWord(Word $word): WordOverrideCollection;
 }

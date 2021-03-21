@@ -34,13 +34,12 @@ class WordOverrideRepository extends IdiormRepository implements WordOverrideRep
 
     public function create(array $data): WordOverride
     {
-        $id = $this->idField();
-
-        if (array_key_exists($id, $data)) {
-            unset($data[$id]);
-        }
-
         return $this->createEntity($data);
+    }
+
+    public function save(WordOverride $wordOverride): WordOverride
+    {
+        return $this->saveEntity($wordOverride);
     }
 
     public function getLatestByWord(Word $word): ?WordOverride

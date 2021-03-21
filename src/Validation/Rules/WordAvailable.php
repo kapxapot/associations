@@ -24,7 +24,7 @@ class WordAvailable extends AbstractRule
     }
 
     /**
-     * @param mixed $input
+     * @param string $input
      */
     public function validate($input)
     {

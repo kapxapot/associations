@@ -18,6 +18,6 @@ class AbstractStringNotEqualsWord extends AbstractRule
 
     public function validate($input)
     {
-        return $this->wordToCompare->equalsWordStr($input);
+        return !$this->wordToCompare->equalsWordStr($input);
     }
 }
