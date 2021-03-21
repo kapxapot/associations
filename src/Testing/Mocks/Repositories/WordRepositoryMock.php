@@ -65,8 +65,14 @@ class WordRepositoryMock implements WordRepositoryInterface
             );
     }
 
-    public function findInLanguage(Language $language, ?string $wordStr) : ?Word
+    public function findInLanguage(
+        Language $language,
+        ?string $wordStr,
+        ?int $exceptId = null
+    ) : ?Word
     {
+        // todo: add correctedWord + exceptId management
+
         return $this
             ->getAllByLanguage($language)
             ->first(

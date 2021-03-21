@@ -51,11 +51,24 @@ class WordRepository extends LanguageElementRepository implements WordRepository
      * 
      * Normalized word string expected.
      */
-    public function findInLanguage(Language $language, ?string $wordStr): ?Word
+    public function findInLanguage(
+        Language $language,
+        ?string $wordStr,
+        ?int $exceptId = null
+    ): ?Word
     {
         return $this
             ->getByLanguageQuery($language)
-            ->where('word_bin', $wordStr)
+            ->whereAnyIs(
+                [
+                    ['word_bin' => $wordStr],
+                    ['corrected_word' => $wordStr],
+                ]
+            )
+            ->applyIf(
+                $exceptId > 0,
+                fn (Query $q) => $q->whereNotEqual($this->idField(), $exceptId)
+            )
             ->one();
     }
 

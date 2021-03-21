@@ -12,6 +12,7 @@ use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Interfaces\PartOfSpeechableInterface;
+use Plasticode\Util\Strings;
 
 /**
  * @property string|null $correctedWord
@@ -344,5 +345,16 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     public function isDisabled(): bool
     {
         return self::toBool($this->disabled);
+    }
+
+    public function equalsWordStr(?string $str): bool
+    {
+        $str = Strings::normalize($str);
+
+        if ($str === null) {
+            return false;
+        }
+
+        return $this->word === $str || $this->correctedWord === $str;
     }
 }

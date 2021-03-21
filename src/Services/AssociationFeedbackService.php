@@ -40,6 +40,20 @@ class AssociationFeedbackService
         $this->eventDispatcher = $eventDispatcher;
     }
 
+    public function save(array $data, User $user): AssociationFeedback
+    {
+        $feedback = $this->toModel($data, $user);
+
+        $feedback = $this
+            ->associationFeedbackRepository
+            ->save($feedback);
+
+        $event = new AssociationFeedbackCreatedEvent($feedback);
+        $this->eventDispatcher->dispatch($event);
+
+        return $feedback;
+    }
+
     public function toModel(array $data, User $user): AssociationFeedback
     {
         $this->validate($data);
@@ -93,19 +107,5 @@ class AssociationFeedbackService
                 ->get('posInt')
                 ->associationExists($this->associationRepository)
         ];
-    }
-
-    public function save(array $data, User $user): AssociationFeedback
-    {
-        $feedback = $this->toModel($data, $user);
-
-        $feedback = $this
-            ->associationFeedbackRepository
-            ->save($feedback);
-
-        $event = new AssociationFeedbackCreatedEvent($feedback);
-        $this->eventDispatcher->dispatch($event);
-
-        return $feedback;
     }
 }

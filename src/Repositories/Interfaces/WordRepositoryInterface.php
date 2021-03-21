@@ -17,7 +17,11 @@ interface WordRepositoryInterface extends LanguageElementRepositoryInterface
 
     function getAllByLanguage(Language $language): WordCollection;
 
-    function findInLanguage(Language $language, ?string $wordStr): ?Word;
+    function findInLanguage(
+        Language $language,
+        ?string $wordStr,
+        ?int $exceptId = null
+    ): ?Word;
 
     function searchAllNonMature(
         SearchParams $searchParams,

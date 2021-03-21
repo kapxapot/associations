@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Events\Feedback\WordFeedbackCreatedEvent;
+use App\Events\Override\WordOverrideCreatedEvent;
 use App\Models\User;
-use App\Models\WordFeedback;
-use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
+use App\Models\WordOverride;
+use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Convert;
@@ -15,9 +15,9 @@ use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
 use Respect\Validation\Validator;
 
-class WordFeedbackService
+class WordOverrideService
 {
-    private WordFeedbackRepositoryInterface $wordFeedbackRepository;
+    private WordOverrideRepositoryInterface $wordOverrideRepository;
     private WordRepositoryInterface $wordRepository;
 
     private ValidatorInterface $validator;
@@ -27,7 +27,7 @@ class WordFeedbackService
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
-        WordFeedbackRepositoryInterface $wordFeedbackRepository,
+        WordOverrideRepositoryInterface $wordOverrideRepository,
         WordRepositoryInterface $wordRepository,
         ValidatorInterface $validator,
         ValidationRules $validationRules,
@@ -35,7 +35,7 @@ class WordFeedbackService
         EventDispatcher $eventDispatcher
     )
     {
-        $this->wordFeedbackRepository = $wordFeedbackRepository;
+        $this->wordOverrideRepository = $wordOverrideRepository;
         $this->wordRepository = $wordRepository;
 
         $this->validator = $validator;
@@ -45,28 +45,28 @@ class WordFeedbackService
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function save(array $data, User $user): WordFeedback
+    public function save(array $data, User $user): WordOverride
     {
-        $feedback = $this->toModel($data, $user);
+        $override = $this->toModel($data, $user);
 
-        $feedback = $this
-            ->wordFeedbackRepository
-            ->save($feedback);
+        $override = $this
+            ->wordOverrideRepository
+            ->create($override->toArray());
 
-        $event = new WordFeedbackCreatedEvent($feedback);
+        $event = new WordOverrideCreatedEvent($override);
         $this->eventDispatcher->dispatch($event);
 
-        return $feedback;
+        return $override;
     }
 
-    public function toModel(array $data, User $user): WordFeedback
+    public function toModel(array $data, User $user): WordOverride
     {
         $this->validate($data);
 
         return $this->convertToModel($data, $user);
     }
 
-    private function convertToModel(array $data, User $user): WordFeedback
+    private function convertToModel(array $data, User $user): WordOverride
     {
         $wordId = $data['word_id'];
         $word = $this->wordRepository->get($wordId);
@@ -131,23 +131,20 @@ class WordFeedbackService
                 ->wordExists($this->wordRepository)
         ];
 
-        if (($data['typo'] ?? null) !== null) {
-            $typoRule = $this->wordService->getRule();
+        if (($data['word_correction'] ?? null) !== null) {
+            $wordCorrectionRule = $this->wordService->getRule();
 
             if ($word) {
-                $typoRule = $typoRule->wordTypoNotEqualsWord($word);
+                $wordCorrectionRule = $wordCorrectionRule
+                    ->wordCorrectionNotEqualsWord($word)
+                    ->wordAvailable(
+                        $this->wordRepository,
+                        $word->language(),
+                        $word->getId()
+                    );
             }
 
-            $result['typo'] = $typoRule;
-        }
-
-        if (($data['duplicate'] ?? null) !== null && $word) {
-            $result['duplicate'] =
-                Validator::mainWordExists(
-                    $this->wordRepository,
-                    $word->language(),
-                    $word
-                );
+            $result['word_correction'] = $wordCorrectionRule;
         }
 
         return $result;

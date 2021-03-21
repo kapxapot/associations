@@ -18,7 +18,7 @@ class ChangeWordOverrides extends AbstractMigration
         $table = $this->table('word_overrides');
 
         $table
-            ->addColumn('disabled', 'boolean', ['null' => true])
+            ->changeColumn('disabled', 'boolean', ['null' => true])
             ->save();
     }
 }

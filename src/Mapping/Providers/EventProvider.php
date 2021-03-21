@@ -9,6 +9,7 @@ use App\EventHandlers\DictWord\DictWordLinkedHandler;
 use App\EventHandlers\DictWord\DictWordUnlinkedHandler;
 use App\EventHandlers\Feedback\AssociationFeedbackCreatedHandler;
 use App\EventHandlers\Feedback\WordFeedbackCreatedHandler;
+use App\EventHandlers\Override\WordOverrideCreatedHandler;
 use App\EventHandlers\Turn\TurnCreatedHandler;
 use App\EventHandlers\Word\WordCreatedHandler;
 use App\EventHandlers\Word\WordMatureChangedHandler;
@@ -68,6 +69,10 @@ class EventProvider extends MappingProvider
             ),
 
             new WordOutOfDateHandler(
+                $container->get(WordRecountService::class)
+            ),
+
+            new WordOverrideCreatedHandler(
                 $container->get(WordRecountService::class)
             ),
 
