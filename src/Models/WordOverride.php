@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Collections\PartOfSpeechCollection;
 use App\Models\Traits\Created;
-use App\Semantics\Interfaces\PartOfSpeechableInterface;
 use App\Semantics\PartOfSpeech;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
@@ -19,7 +18,7 @@ use Plasticode\Models\Interfaces\CreatedAtInterface;
  * @method Word word()
  * @method static withWord(Word|callable $word)
  */
-class WordOverride extends DbModel implements CreatedAtInterface, PartOfSpeechableInterface
+class WordOverride extends DbModel implements CreatedAtInterface
 {
     use Created;
 
@@ -62,12 +61,10 @@ class WordOverride extends DbModel implements CreatedAtInterface, PartOfSpeechab
         return strlen($this->wordCorrection) > 0;
     }
 
-    public function partsOfSpeech(): PartOfSpeechCollection
+    public function partsOfSpeech(): ?PartOfSpeechCollection
     {
-        $collection = PartOfSpeechCollection::empty();
-
         if (!$this->hasPosCorrection()) {
-            return $collection;
+            return null;
         }
 
         $rawParts = explode(self::POS_DELIMITER, $this->posCorrection);
@@ -77,12 +74,12 @@ class WordOverride extends DbModel implements CreatedAtInterface, PartOfSpeechab
             $rawParts
         );
 
-        return $collection->add(...$parts);
+        return PartOfSpeechCollection::make($parts);
     }
 
     public function hasPosCorrection(): bool
     {
-        return strlen($this->posCorrection) > 0;
+        return $this->posCorrection !== null;
     }
 
     public function isDisabled(): bool

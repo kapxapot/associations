@@ -6,7 +6,7 @@
         {{ translate(pos ? pos.name : raw, lang) }}
     {% endif %}
 {% elseif pos %}
-    <span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}">{{ translate(short ? pos.shortName : pos.name, lang) }}</span>
+    <span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}">{% if is_override %}<i class="fas fa-lock"></i> {% endif %}{{ translate(short ? pos.shortName : pos.name, lang) }}</span>
 {% else %}
     <span class="label label-danger">{{ translate(raw, lang) }}</span>
 {% endif %}

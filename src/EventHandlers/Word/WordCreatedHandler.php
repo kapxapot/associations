@@ -25,9 +25,9 @@ class WordCreatedHandler
 
     public function __invoke(WordCreatedEvent $event) : void
     {
-        $word = $event->getWord();
+        // $word = $event->getWord();
 
-        $this->dictionaryService->loadByWord($word);
-        $this->definitionService->loadByWord($word);
+        // $this->dictionaryService->loadByWord($word);
+        // $this->definitionService->loadByWord($word);
     }
 }

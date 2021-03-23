@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Collections\PartOfSpeechCollection;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\PartOfSpeech;
 use Plasticode\Models\Generic\DbModel;
@@ -69,6 +70,13 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
     public function isValid(): bool
     {
         return $this->pos !== null;
+    }
+
+    public function partsOfSpeech(): PartOfSpeechCollection
+    {
+        return $this->partsOfSpeech() !== null
+            ? PartOfSpeechCollection::collect($this->partsOfSpeech())
+            : PartOfSpeechCollection::empty();
     }
 
     public function partOfSpeech(): ?PartOfSpeech

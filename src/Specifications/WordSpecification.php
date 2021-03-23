@@ -4,7 +4,6 @@ namespace App\Specifications;
 
 use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Word;
-use App\Semantics\PartOfSpeech;
 use App\Services\WordService;
 
 class WordSpecification
@@ -23,6 +22,12 @@ class WordSpecification
 
     public function isApproved(Word $word): bool
     {
+        $approvedOverride = $word->approvedOverride();
+
+        if ($approvedOverride !== null) {
+            return $approvedOverride;
+        }
+
         return $this->isApprovedByDictWord($word)
             || $this->isApprovedByDefinition($word)
             || $this->isApprovedByAssociations($word);
@@ -30,6 +35,12 @@ class WordSpecification
 
     public function isMature(Word $word): bool
     {
+        $matureOverride = $word->matureOverride();
+
+        if ($matureOverride !== null) {
+            return $matureOverride;
+        }
+
         $threshold = $this->config->wordMatureThreshold();
 
         $score = $word->matures()->count();
@@ -41,16 +52,28 @@ class WordSpecification
     {
         $dictWord = $word->dictWord();
 
-        return $dictWord !== null
-            && $dictWord->isGood();
+        if ($dictWord === null) {
+            return false;
+        }
+
+        $partsOfSpeech = $word->partsOfSpeechOverride()
+            ?? $dictWord->partsOfSpeech();
+
+        return $partsOfSpeech->isAnyGood();
     }
 
     private function isApprovedByDefinition(Word $word): bool
     {
         $parsedDefinition = $this->wordService->getParsedDefinition($word);
 
-        return $parsedDefinition !== null
-            && $parsedDefinition->partsOfSpeech()->isAnyGood();
+        if ($parsedDefinition === null) {
+            return false;
+        }
+
+        $partsOfSpeech = $word->partsOfSpeechOverride()
+            ?? $parsedDefinition->partsOfSpeech();
+
+        return $partsOfSpeech->isAnyGood();
     }
 
     private function isApprovedByAssociations(Word $word): bool

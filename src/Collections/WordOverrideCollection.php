@@ -4,8 +4,7 @@ namespace App\Collections;
 
 use App\Models\WordOverride;
 use Plasticode\Collections\Generic\DbModelCollection;
-use Plasticode\Models\Interfaces\CreatedAtInterface;
-use Plasticode\Util\Sort;
+use Plasticode\Models\Interfaces\DbModelInterface;
 
 class WordOverrideCollection extends DbModelCollection
 {
@@ -24,8 +23,7 @@ class WordOverrideCollection extends DbModelCollection
     public function sort(): self
     {
         return $this->desc(
-            fn (CreatedAtInterface $c) => $c->createdAt,
-            Sort::DATE
+            fn (DbModelInterface $m) => $m->getId()
         );
     }
 }

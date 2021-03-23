@@ -318,6 +318,10 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     public function partsOfSpeech(): PartOfSpeechCollection
     {
+        if ($this->hasPartsOfSpeechOverride()) {
+            return $this->partsOfSpeechOverride();
+        }
+
         $poses = PartOfSpeechCollection::empty();
 
         $dw = $this->dictWord();
@@ -340,6 +344,47 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     public function override(): ?WordOverride
     {
         return $this->overrides()->latest();
+    }
+
+    public function hasApprovedOverride(): bool
+    {
+        return $this->approvedOverride() !== null;
+    }
+
+    public function approvedOverride(): ?bool
+    {
+        return $this->hasOverride()
+            ? $this->override()->isApproved()
+            : null;
+    }
+
+    public function hasMatureOverride(): bool
+    {
+        return $this->matureOverride() !== null;
+    }
+
+    public function matureOverride(): ?bool
+    {
+        return $this->hasOverride()
+            ? $this->override()->isMature()
+            : null;
+    }
+
+    public function hasPartsOfSpeechOverride(): bool
+    {
+        return $this->partsOfSpeechOverride() !== null;
+    }
+
+    public function partsOfSpeechOverride(): ?PartOfSpeechCollection
+    {
+        return $this->hasOverride()
+            ? $this->override()->partsOfSpeech()
+            : null;
+    }
+
+    public function hasOverride(): bool
+    {
+        return $this->override() !== null;
     }
 
     public function isDisabled(): bool

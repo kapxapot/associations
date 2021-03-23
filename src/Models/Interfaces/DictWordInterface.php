@@ -4,10 +4,11 @@ namespace App\Models\Interfaces;
 
 use App\Models\Language;
 use App\Models\Word;
+use App\Semantics\Interfaces\PartOfSpeechableInterface;
 use App\Semantics\PartOfSpeech;
 use Plasticode\Models\Interfaces\DbModelInterface;
 
-interface DictWordInterface extends DbModelInterface
+interface DictWordInterface extends DbModelInterface, PartOfSpeechableInterface
 {
     function getLanguage(): Language;
 
