@@ -71,7 +71,7 @@ class WordRepositoryMock implements WordRepositoryInterface
         ?int $exceptId = null
     ) : ?Word
     {
-        // todo: add correctedWord + exceptId management
+        // todo: add originalWord + exceptId management
 
         return $this
             ->getAllByLanguage($language)

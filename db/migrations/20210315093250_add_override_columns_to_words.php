@@ -19,7 +19,7 @@ class AddOverrideColumnsToWords extends AbstractMigration
                 ]
             )
             ->addColumn(
-                'corrected_word',
+                'original_word',
                 'string',
                 [
                     'limit' => 250,

@@ -15,8 +15,8 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
 use Plasticode\Util\Strings;
 
 /**
- * @property string|null $correctedWord
  * @property integer $disabled
+ * @property string|null $originalWord
  * @property string|null $tokenizedWord
  * @property string $word
  * @method AssociationCollection associations()
@@ -400,6 +400,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             return false;
         }
 
-        return $this->word === $str || $this->correctedWord === $str;
+        return $this->word === $str || $this->originalWord === $str;
     }
 }

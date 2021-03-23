@@ -62,7 +62,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             ->whereAnyIs(
                 [
                     ['word_bin' => $wordStr],
-                    ['corrected_word' => $wordStr],
+                    ['original_word' => $wordStr],
                 ]
             )
             ->applyIf(
