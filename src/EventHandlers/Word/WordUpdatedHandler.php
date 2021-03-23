@@ -25,8 +25,12 @@ class WordUpdatedHandler
         if ($dictWord) {
             if ($dictWord->getWord() !== $word->word) {
                 $this->dictionaryService->unlink($dictWord);
+
+                $dictWord = null;
             }
-        } else {
+        }
+
+        if ($dictWord === null && $event->isSync()) {
             $this->dictionaryService->loadByWord($word);
         }
     }

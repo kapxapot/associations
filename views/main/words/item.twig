@@ -21,7 +21,7 @@
             <p>
                 <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
 
-                <span class="label {{ word.is_approved ? 'label-success' : 'label-primary' }}" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто его использовал' }}" data-toggle="tooltip">{% if word.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif word.is_approved %}<i class="fas fa-check"></i> {% endif %}{{ word.is_approved ? 'общее' : 'личное' }}</span>
+                <span class="label {{ word.is_approved ? 'label-success' : 'label-primary' }}" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто использовал слово' }}" data-toggle="tooltip">{% if word.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif word.is_approved %}<i class="fas fa-check"></i> {% endif %}{{ word.is_approved ? 'общее' : 'личное' }}</span>
 
                 {% if word.is_mature or word.hasMatureOverride %}
                     <span class="label {{ word.is_mature ? 'label-danger' : 'label-success' }}" title="{{ word.is_mature ? 'Не для детей' : 'Для всех' }}" data-toggle="tooltip">{% if word.hasMatureOverride %}<i class="fas fa-lock"></i> {% endif %}{{ word.is_mature ? '16+' : '0+' }}</span>

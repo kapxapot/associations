@@ -74,8 +74,8 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
 
     public function partsOfSpeech(): PartOfSpeechCollection
     {
-        return $this->partsOfSpeech() !== null
-            ? PartOfSpeechCollection::collect($this->partsOfSpeech())
+        return $this->partOfSpeech() !== null
+            ? PartOfSpeechCollection::collect($this->partOfSpeech())
             : PartOfSpeechCollection::empty();
     }
 

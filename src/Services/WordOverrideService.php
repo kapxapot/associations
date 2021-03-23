@@ -12,7 +12,6 @@ use Plasticode\Util\Convert;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
-use Webmozart\Assert\Assert;
 
 class WordOverrideService
 {
