@@ -16,9 +16,11 @@ use Plasticode\Util\Strings;
 
 /**
  * @property integer $disabled
+ * @property string|null $disabledUpdatedAt
  * @property string|null $originalWord
  * @property string|null $tokenizedWord
  * @property string $word
+ * @property string|null $wordUpdatedAt
  * @method AssociationCollection associations()
  * @method Definition|null definition()
  * @method DictWordInterface|null dictWord()
@@ -392,6 +394,18 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return self::toBool($this->disabled);
     }
 
+    public function hasDisabledOverride(): bool
+    {
+        return $this->disabledOverride() !== null;
+    }
+
+    public function disabledOverride(): ?bool
+    {
+        return $this->hasOverride()
+            ? $this->override()->isDisabled()
+            : null;
+    }
+
     public function equalsWordStr(?string $str): bool
     {
         $str = Strings::normalize($str);
@@ -401,5 +415,15 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         }
 
         return $this->word === $str || $this->originalWord === $str;
+    }
+
+    public function disabledUpdatedAtIso(): ?string
+    {
+        return self::toIso($this->disabledUpdatedAt);
+    }
+
+    public function wordUpdatedAtIso(): ?string
+    {
+        return self::toIso($this->wordUpdatedAt);
     }
 }

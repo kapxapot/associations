@@ -6,10 +6,7 @@ use App\Models\Definition;
 use Plasticode\Events\EntityEvent;
 use Plasticode\Events\Event;
 
-/**
- * This event is fired when the word definition is created or updated.
- */
-class DefinitionUpdatedEvent extends EntityEvent
+abstract class DefinitionEvent extends EntityEvent
 {
     protected Definition $definition;
 

@@ -4,17 +4,18 @@ namespace App\Mapping\Providers;
 
 use App\EventHandlers\Association\AssociationApprovedChangedHandler;
 use App\EventHandlers\Association\AssociationOutOfDateHandler;
-use App\EventHandlers\Definition\DefinitionUpdatedHandler;
+use App\EventHandlers\Definition\DefinitionLinkedHandler;
+use App\EventHandlers\Definition\DefinitionUnlinkedHandler;
 use App\EventHandlers\DictWord\DictWordLinkedHandler;
 use App\EventHandlers\DictWord\DictWordUnlinkedHandler;
 use App\EventHandlers\Feedback\AssociationFeedbackCreatedHandler;
 use App\EventHandlers\Feedback\WordFeedbackCreatedHandler;
 use App\EventHandlers\Override\WordOverrideCreatedHandler;
 use App\EventHandlers\Turn\TurnCreatedHandler;
+use App\EventHandlers\Word\WordCorrectedHandler;
 use App\EventHandlers\Word\WordCreatedHandler;
 use App\EventHandlers\Word\WordMatureChangedHandler;
 use App\EventHandlers\Word\WordOutOfDateHandler;
-use App\EventHandlers\Word\WordUpdatedHandler;
 use App\Services\AssociationRecountService;
 use App\Services\DefinitionService;
 use App\Services\DictionaryService;
@@ -39,7 +40,11 @@ class EventProvider extends MappingProvider
                 $container->get(AssociationRecountService::class)
             ),
 
-            new DefinitionUpdatedHandler(
+            new DefinitionLinkedHandler(
+                $container->get(WordRecountService::class)
+            ),
+
+            new DefinitionUnlinkedHandler(
                 $container->get(WordRecountService::class)
             ),
 
@@ -76,7 +81,8 @@ class EventProvider extends MappingProvider
                 $container->get(WordRecountService::class)
             ),
 
-            new WordUpdatedHandler(
+            new WordCorrectedHandler(
+                $container->get(DefinitionService::class),
                 $container->get(DictionaryService::class)
             ),
         ];

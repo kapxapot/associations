@@ -2,11 +2,10 @@
 
 namespace App\EventHandlers\Definition;
 
-use App\Events\Definition\DefinitionUpdatedEvent;
+use App\Events\Definition\DefinitionUnlinkedEvent;
 use App\Services\WordRecountService;
-use Webmozart\Assert\Assert;
 
-class DefinitionUpdatedHandler
+class DefinitionUnlinkedHandler
 {
     private WordRecountService $wordRecountService;
 
@@ -15,11 +14,9 @@ class DefinitionUpdatedHandler
         $this->wordRecountService = $wordRecountService;
     }
 
-    public function __invoke(DefinitionUpdatedEvent $event): void
+    public function __invoke(DefinitionUnlinkedEvent $event): void
     {
-        $word = $event->getDefinition()->word();
-
-        Assert::notNull($word);
+        $word = $event->getUnlinkedWord();
 
         $this->wordRecountService->recountApproved($word, $event);
     }

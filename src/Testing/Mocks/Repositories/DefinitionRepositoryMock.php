@@ -53,6 +53,15 @@ class DefinitionRepositoryMock implements DefinitionRepositoryInterface
         return $this->save($definition);
     }
 
+    public function delete(Definition $definition): bool
+    {
+        $this->definitions = $this->definitions->removeFirst(
+            fn (Definition $d) => $d->equals($definition)
+        );
+
+        return true;
+    }
+
     public function getByWord(Word $word): ?Definition
     {
         return $this

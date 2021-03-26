@@ -12,5 +12,7 @@ interface DefinitionRepositoryInterface extends GetRepositoryInterface
 
     function store(array $data): Definition;
 
+    function delete(Definition $definition): bool;
+
     function getByWord(Word $word): ?Definition;
 }

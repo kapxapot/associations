@@ -1,12 +1,12 @@
 <?php
 
-namespace App\EventHandlers\DictWord;
+namespace App\EventHandlers\Definition;
 
-use App\Events\DictWord\DictWordLinkedEvent;
+use App\Events\Definition\DefinitionLinkedEvent;
 use App\Services\WordRecountService;
 use Webmozart\Assert\Assert;
 
-class DictWordLinkedHandler
+class DefinitionLinkedHandler
 {
     private WordRecountService $wordRecountService;
 
@@ -15,9 +15,9 @@ class DictWordLinkedHandler
         $this->wordRecountService = $wordRecountService;
     }
 
-    public function __invoke(DictWordLinkedEvent $event): void
+    public function __invoke(DefinitionLinkedEvent $event): void
     {
-        $word = $event->getDictWord()->getLinkedWord();
+        $word = $event->getDefinition()->word();
 
         Assert::notNull($word);
 

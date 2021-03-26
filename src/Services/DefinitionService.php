@@ -2,16 +2,19 @@
 
 namespace App\Services;
 
-use App\Events\Definition\DefinitionUpdatedEvent;
+use App\Events\Definition\DefinitionLinkedEvent;
+use App\Events\Definition\DefinitionUnlinkedEvent;
 use App\External\Interfaces\DefinitionSourceInterface;
 use App\Models\Definition;
 use App\Models\Word;
 use App\Parsing\DefinitionParser;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use Plasticode\Events\EventDispatcher;
+use Plasticode\Util\Convert;
 
 /**
- * @emits DefinitionUpdatedEvent
+ * @emits DefinitionLinkedEvent
+ * @emits DefinitionUnlinkedEvent
  */
 class DefinitionService
 {
@@ -70,25 +73,47 @@ class DefinitionService
             return null;
         }
 
-        $definition = $this->definitionRepository->store(
-            [
-                'source' => $defData->source(),
-                'url' => $defData->url(),
-                'json_data' => $defData->jsonData(),
-                'word_id' => $word->getId(),
-            ]
-        );
+        $definition = $this->definitionRepository->store([
+            'source' => $defData->source(),
+            'url' => $defData->url(),
+            'json_data' => $defData->jsonData(),
+            'word_id' => $word->getId(),
+        ]);
 
         $parsedDefinition = $this->definitionParser->parse($definition);
 
-        $definition->valid = ($parsedDefinition !== null ? 1 : 0);
+        $definition->valid = Convert::toBit(
+            $parsedDefinition !== null
+        );
 
         $this->definitionRepository->save($definition);
 
         $this->eventDispatcher->dispatch(
-            new DefinitionUpdatedEvent($definition)
+            new DefinitionLinkedEvent($definition)
         );
 
         return $definition;
+    }
+
+    /**
+     * Unlinks word from definition (and *deletes* the definition)
+     * and emits {@see DefinitionUnlinkedEvent}.
+     */
+    public function unlink(Definition $definition): void
+    {
+        $word = $definition->word();
+
+        $this->definitionRepository->delete($definition);
+
+        $this->unlinkWord($definition, $word);
+    }
+
+    private function unlinkWord(Definition $definition, Word $word): void
+    {
+        $word = $word->withDefinition(null);
+
+        $this->eventDispatcher->dispatch(
+            new DefinitionUnlinkedEvent($definition, $word)
+        );
     }
 }

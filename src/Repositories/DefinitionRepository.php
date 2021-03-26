@@ -29,6 +29,11 @@ class DefinitionRepository extends IdiormRepository implements DefinitionReposit
         return $this->storeEntity($data);
     }
 
+    public function delete(Definition $definition): bool
+    {
+        return $this->deleteEntity($definition);
+    }
+
     public function getByWord(Word $word): ?Definition
     {
         return $this

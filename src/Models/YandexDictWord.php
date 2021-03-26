@@ -12,11 +12,11 @@ use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
 
 /**
+ * @property integer $languageId
+ * @property string|null $pos
+ * @property string|null $response
  * @property string $word
  * @property integer|null $wordId
- * @property integer $languageId
- * @property string|null $response
- * @property string|null $pos
  * @method Language language()
  * @method Word|null linkedWord()
  * @method static withLanguage(Language|callable $language)
@@ -40,6 +40,12 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
     public function getWord(): string
     {
         return $this->word;
+    }
+
+    public function matchesWord(Word $word): bool
+    {
+        return $word->languageId === $this->languageId
+            && $word->word === $this->word;
     }
 
     public function getLinkedWord(): ?Word

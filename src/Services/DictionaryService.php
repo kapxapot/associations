@@ -41,9 +41,9 @@ class DictionaryService
     }
 
     /**
-     * Returns external dictionary word by Word entity.
-     * 
-     * @param $allowRemoteLoad Set this to 'true' if the remote loading must
+     * Returns external dictionary word by {@see Word} entity.
+     *
+     * @param $allowRemoteLoad Set this to `true` if the remote loading must
      * be enabled. By default it's not performed.
      */
     public function getByWord(
@@ -72,28 +72,32 @@ class DictionaryService
 
             if ($dictWord) {
                 $dictWord = $this->dictWordRepository->save($dictWord);
-
-                if ($word) {
-                    $this->link($dictWord, $word);
-                }
             }
+        }
+
+        if (
+            $dictWord
+            && $word
+            && !$word->equals($dictWord->getLinkedWord())
+        ) {
+            $this->link($dictWord, $word);
         }
 
         return $dictWord;
     }
 
     /**
-     * Links dict word with word and emits {@see DictWordLinkedEvent}.
+     * Links dict word to word and emits {@see DictWordLinkedEvent}.
      * 
      * If dict word was already linked to another word, emits {@see DictWordUnlinkedEvent}
      * as well.
      */
     public function link(DictWordInterface $dictWord, Word $word): DictWordInterface
     {
-        $unlinkedWord = $dictWord->getLinkedWord();
+        $wordToUnlink = $dictWord->getLinkedWord();
 
         // nothing to do?
-        if ($word->equals($unlinkedWord)) {
+        if ($word->equals($wordToUnlink)) {
             return $dictWord;
         }
 
@@ -103,8 +107,8 @@ class DictionaryService
 
         $word = $word->withDictWord($dictWord);
 
-        if ($unlinkedWord) {
-            $this->unlinkWord($dictWord, $unlinkedWord);
+        if ($wordToUnlink) {
+            $this->unlinkWord($dictWord, $wordToUnlink);
         }
 
         $this->eventDispatcher->dispatch(
@@ -119,10 +123,10 @@ class DictionaryService
      */
     public function unlink(DictWordInterface $dictWord): DictWordInterface
     {
-        $unlinkedWord = $dictWord->getLinkedWord();
+        $wordToUnlink = $dictWord->getLinkedWord();
 
         // nothing to do?
-        if (is_null($unlinkedWord)) {
+        if (is_null($wordToUnlink)) {
             return $dictWord;
         }
 
@@ -130,7 +134,7 @@ class DictionaryService
 
         $dictWord = $this->dictWordRepository->save($dictWord);
 
-        $this->unlinkWord($dictWord, $unlinkedWord);
+        $this->unlinkWord($dictWord, $wordToUnlink);
 
         return $dictWord;
     }

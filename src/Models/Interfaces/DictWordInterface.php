@@ -18,6 +18,11 @@ interface DictWordInterface extends DbModelInterface, PartOfSpeechableInterface
     function getWord(): string;
 
     /**
+     * Checks if the dict word matches the word (language and word are equal).
+     */
+    function matchesWord(Word $word): bool;
+
+    /**
      * Returns linked {@see Word}.
      */
     function getLinkedWord(): ?Word;

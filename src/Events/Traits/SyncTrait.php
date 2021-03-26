@@ -2,6 +2,9 @@
 
 namespace App\Events\Traits;
 
+/**
+ * Implementation of {@see App\Events\Interfaces\SyncEventInterface}.
+ */
 trait SyncTrait
 {
     private bool $isSync = false;

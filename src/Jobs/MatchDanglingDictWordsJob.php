@@ -37,7 +37,7 @@ class MatchDanglingDictWordsJob implements ModelJobInterface
         $this->settingsProvider = $settingsProvider;
     }
 
-    public function run() : DictWordCollection
+    public function run(): DictWordCollection
     {
         $danglingTtl = $this
             ->settingsProvider

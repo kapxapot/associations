@@ -20,8 +20,19 @@ class WordSpecification
         $this->wordService = $wordService;
     }
 
+    public function isDisabled(Word $word): bool
+    {
+        return $word->hasOverride()
+            ? $word->override()->isDisabled()
+            : false;
+    }
+
     public function isApproved(Word $word): bool
     {
+        if ($this->isDisabled($word)) {
+            return false;
+        }
+
         $approvedOverride = $word->approvedOverride();
 
         if ($approvedOverride !== null) {
