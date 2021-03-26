@@ -29,6 +29,7 @@ class WordSpecification
 
     public function isApproved(Word $word): bool
     {
+        // shortcut
         if ($this->isDisabled($word)) {
             return false;
         }
@@ -57,6 +58,15 @@ class WordSpecification
         $score = $word->matures()->count();
 
         return $score >= $threshold;
+    }
+
+    public function correctedWord(Word $word): string
+    {
+        $override = $word->override();
+
+        return $override && $override->hasWordCorrection()
+            ? $override->wordCorrection
+            : $word->originalWord;
     }
 
     private function isApprovedByDictWord(Word $word): bool

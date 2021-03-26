@@ -25,8 +25,10 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 
     public function save(Word $word): Word
     {
+        $word['word_bin'] = $word->word;
+
         if (!$word->isPersisted()) {
-            $word['word_bin'] = $word->word;
+            $word['original_word'] = $word->word;
         }
 
         return $this->saveEntity($word);
@@ -35,6 +37,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     public function store(array $data): Word
     {
         $data['word_bin'] = $data['word'];
+        $data['original_word'] = $data['word'];
 
         return $this->storeEntity($data);
     }

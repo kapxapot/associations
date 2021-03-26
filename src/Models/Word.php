@@ -406,17 +406,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             : null;
     }
 
-    public function equalsWordStr(?string $str): bool
-    {
-        $str = Strings::normalize($str);
-
-        if ($str === null) {
-            return false;
-        }
-
-        return $this->word === $str || $this->originalWord === $str;
-    }
-
     public function disabledUpdatedAtIso(): ?string
     {
         return self::toIso($this->disabledUpdatedAt);

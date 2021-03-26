@@ -244,7 +244,7 @@
                                         <td>{% if override.hasApproved %}{{ override.approved ? 'общее' : 'личное' }}{% endif %}</td>
                                         <td>{% if override.hasMature %}{{ override.mature ? '16+' : '0+' }}{% endif %}</td>
                                         <td>{% if override.isDisabled %}<i class="fas fa-check"></i>{% endif %}</td>
-                                        <td>{% if override.hasWordCorrection %}{{ override.wordCorrection }}{% endif %}</td>
+                                        <td>{% if override.hasWordCorrection %}{{ word.original_word }} &#x2192; {{ override.wordCorrection }}{% endif %}</td>
                                         <td>
                                             {% if override.hasPosCorrection %}
                                                 {% for pos in override.partsOfSpeech %}

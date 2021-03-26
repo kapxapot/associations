@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\Word\WordApprovedChangedEvent;
+use App\Events\Word\WordCorrectedEvent;
 use App\Events\Word\WordDisabledChangedEvent;
 use App\Events\Word\WordMatureChangedEvent;
 use App\Models\Word;
@@ -40,6 +41,7 @@ class WordRecountService
         $word = $this->recountDisabled($word, $sourceEvent);
         $word = $this->recountApproved($word, $sourceEvent);
         $word = $this->recountMature($word, $sourceEvent);
+        $word = $this->recountCorrectedWord($word, $sourceEvent);
 
         return $word;
     }
@@ -128,6 +130,36 @@ class WordRecountService
         if ($changed) {
             $this->eventDispatcher->dispatch(
                 new WordMatureChangedEvent($word, $sourceEvent)
+            );
+        }
+
+        return $word;
+    }
+
+    public function recountCorrectedWord(Word $word, ?Event $sourceEvent = null): Word
+    {
+        $now = Date::dbNow();
+        $changed = false;
+
+        $correctedWord = $this->wordSpecification->correctedWord($word);
+
+        if ($correctedWord !== $word->word
+            || is_null($word->wordUpdatedAt)
+        ) {
+            $word->word = $correctedWord;
+            $word->wordBin = $correctedWord;
+            $word->wordUpdatedAt = $now;
+
+            $changed = true;
+        }
+
+        $word->updatedAt = $now;
+
+        $word = $this->wordService->update($word);
+
+        if ($changed) {
+            $this->eventDispatcher->dispatch(
+                new WordCorrectedEvent($word, $sourceEvent)
             );
         }
 
