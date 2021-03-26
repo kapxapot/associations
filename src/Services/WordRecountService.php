@@ -53,10 +53,7 @@ class WordRecountService
 
         $disabled = $this->wordSpecification->isDisabled($word);
 
-        if (
-            $word->isDisabled() !== $disabled
-            || is_null($word->disabledUpdatedAt)
-        ) {
+        if ($word->isDisabled() !== $disabled) {
             $word->disabled = self::toBit($disabled);
             $word->disabledUpdatedAt = $now;
 
@@ -83,10 +80,7 @@ class WordRecountService
 
         $approved = $this->wordSpecification->isApproved($word);
 
-        if (
-            $word->isApproved() !== $approved
-            || is_null($word->approvedUpdatedAt)
-        ) {
+        if ($word->isApproved() !== $approved) {
             $word->approved = self::toBit($approved);
             $word->approvedUpdatedAt = $now;
 
@@ -113,10 +107,7 @@ class WordRecountService
 
         $mature = $this->wordSpecification->isMature($word);
 
-        if (
-            $word->isMature() !== $mature
-            || is_null($word->matureUpdatedAt)
-        ) {
+        if ($word->isMature() !== $mature) {
             $word->mature = self::toBit($mature);
             $word->matureUpdatedAt = $now;
 
@@ -143,9 +134,7 @@ class WordRecountService
 
         $correctedWord = $this->wordSpecification->correctedWord($word);
 
-        if ($correctedWord !== $word->word
-            || is_null($word->wordUpdatedAt)
-        ) {
+        if ($correctedWord !== $word->word) {
             $word->word = $correctedWord;
             $word->wordBin = $correctedWord;
             $word->wordUpdatedAt = $now;
