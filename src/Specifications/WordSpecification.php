@@ -73,7 +73,7 @@ class WordSpecification
     {
         $dictWord = $word->dictWord();
 
-        if ($dictWord === null) {
+        if ($dictWord === null || !$dictWord->isValid()) {
             return false;
         }
 
@@ -85,11 +85,13 @@ class WordSpecification
 
     private function isApprovedByDefinition(Word $word): bool
     {
-        $parsedDefinition = $this->wordService->getParsedDefinition($word);
+        $definition = $word->definition();
 
-        if ($parsedDefinition === null) {
+        if ($definition === null || !$definition->isValid()) {
             return false;
         }
+
+        $parsedDefinition = $this->wordService->getParsedDefinition($word);
 
         $partsOfSpeech = $word->partsOfSpeechOverride()
             ?? $parsedDefinition->partsOfSpeech();
