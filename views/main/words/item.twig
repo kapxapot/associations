@@ -25,10 +25,10 @@
                     <span class="label label-default">{% if word.hasDisabledOverride %}<i class="fas fa-lock"></i> {% endif %}отключено</span>
                 {% else %}
                     <span class="label {{ word.is_approved ? 'label-success' : 'label-primary' }}" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто использовал слово' }}" data-toggle="tooltip">{% if word.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif word.is_approved %}<i class="fas fa-check"></i> {% endif %}{{ word.is_approved ? 'общее' : 'личное' }}</span>
+                {% endif %}
 
-                    {% if word.is_mature or word.hasMatureOverride %}
-                        <span class="label {{ word.is_mature ? 'label-danger' : 'label-success' }}" title="{{ word.is_mature ? 'Не для детей' : 'Для всех' }}" data-toggle="tooltip">{% if word.hasMatureOverride %}<i class="fas fa-lock"></i> {% endif %}{{ word.is_mature ? '16+' : '0+' }}</span>
-                    {% endif %}
+                {% if word.is_mature or word.hasMatureOverride %}
+                    <span class="label {{ word.is_mature ? 'label-danger' : 'label-success' }}" title="{{ word.is_mature ? 'Не для детей' : 'Для всех' }}" data-toggle="tooltip">{% if word.hasMatureOverride %}<i class="fas fa-lock"></i> {% endif %}{{ word.is_mature ? '16+' : '0+' }}</span>
                 {% endif %}
 
                 {% if word.dict_word %}
