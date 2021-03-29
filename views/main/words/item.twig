@@ -120,6 +120,10 @@
             {% if auth.user %}
                 <div class="mt-3">
                     <button ng-click="problemsDialog()" class="btn btn-default"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</button>
+
+                    {% if is_moderator %}
+                        <button ng-click="overrideDialog()" class="btn btn-default ml-2"><i class="fas fa-wrench mr-1"></i> Исправить</button>
+                    {% endif %}
                 </div>
             {% endif %}
         </div>
@@ -218,12 +222,11 @@
             </div>
         {% endif %}
 
-        <div class="panel-secondary-heading">Исправления</div>
-        <div class="panel panel-secondary">
-            <div class="panel-body">
-                <button ng-click="overrideDialog()" class="btn btn-default"><i class="fas fa-wrench mr-1"></i> Исправить</button>
-                {% if word.overrides|length > 0 %}
-                    <div class="table-responsive mt-2">
+        {% if word.overrides|length > 0 %}
+            <div class="panel-secondary-heading">Исправления</div>
+            <div class="panel panel-secondary">
+                <div class="panel-body">
+                    <div class="table-responsive">
                         <table id="overrides-table" class="table table-striped mb-0">
                             <thead>
                                 <tr>
@@ -259,9 +262,9 @@
                             </tbody>
                         </table>
                     </div>
-                {% endif %}
+                </div>
             </div>
-        </div>
+        {% endif %}
 
         <div class="panel-secondary-heading">Модераторская панель</div>
         <div class="panel panel-secondary">
