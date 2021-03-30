@@ -7,14 +7,14 @@
 
 $scope.override = {
     word_id: {{ word.id }},
-    word: '{{ word.word }}',
+    word: '{{ word.word|e('js') }}',
     with_approved: {{ override.hasApproved ? 'true' : 'false' }},
     approved: {{ override.hasApproved ? (override.isApproved ? 'true' : 'false') : 'null' }},
     with_mature: {{ override.hasMature ? 'true' : 'false' }},
     mature: {{ override.hasMature ? (override.isMature ? 'true' : 'false') : 'null' }},
     disabled: {{ override.isDisabled ? 'true' : 'false' }},
     with_word_correction: {{ override.hasWordCorrection ? 'true' : 'false' }},
-    word_correction: {% if override.hasWordCorrection %}'{{ override.wordCorrection }}'{% else %}null{% endif %},
+    word_correction: {% if override.hasWordCorrection %}'{{ override.wordCorrection|e('js') }}'{% else %}null{% endif %},
     with_pos_correction: {{ override.hasPosCorrection ? 'true' : 'false' }},
     pos_correction: [
         {% for pos in parts_of_speech %}
