@@ -5,7 +5,7 @@ namespace App\Models\DTO;
 class AliceRequest
 {
     private const TRASH_TOKENS = [
-        'алиса', 'блядь', 'алис', 'сама', 'ты', 'ой', 'я', 'а', '-', '='
+        'алиса', 'блядь', 'алис', 'сама', 'ты', 'ой', 'да', 'я', 'а', '-', '='
     ];
 
     public const WILDCARD = '*';
@@ -77,10 +77,6 @@ class AliceRequest
     private function parseTokens(?string $command): array
     {
         $tokens = explode(' ', $command);
-
-        if (count($tokens) <= 1) {
-            return $tokens;
-        }
 
         return $this->filterTokens($tokens);
     }
