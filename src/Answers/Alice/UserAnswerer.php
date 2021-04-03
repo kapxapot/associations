@@ -93,10 +93,6 @@ class UserAnswerer extends AbstractAnswerer
             return $this->rulesCommand();
         }
 
-        // if ($request->isAny('выйти', 'выходить', 'прекратить')) {
-        //     return $this->buildResponse()->withEndSession(true);
-        // }
-
         if ($this->isNativeAliceCommand($request)) {
             return $this->nativeAliceCommand($aliceUser);
         }
