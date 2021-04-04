@@ -187,6 +187,17 @@ class WordRepository extends LanguageElementRepository implements WordRepository
                 ->limit($limit)
         );
     }
+    // queries
+
+    /**
+     * Filters non-mature & enabled words.
+     */
+    protected function nonMatureQuery(?Language $language = null): Query
+    {
+        return parent::nonMatureQuery($language)->apply(
+            fn (Query $q) => $this->filterEnabled($q)
+        );
+    }
 
     // filters
 
@@ -196,5 +207,10 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             mb_strtolower($substr),
             '(word_bin like ?)'
         );
+    }
+
+    protected function filterEnabled(Query $query): Query
+    {
+        return $query->whereNotEqual('disabled', 1);
     }
 }

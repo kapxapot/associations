@@ -110,6 +110,9 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
             );
     }
 
+    /**
+     * Filters non-mature elements.
+     */
     protected function nonMatureQuery(?Language $language = null): Query
     {
         return $this

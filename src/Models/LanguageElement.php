@@ -86,7 +86,7 @@ abstract class LanguageElement extends DbModel implements CreatedAtInterface, Li
         // 3. mature elements are visible for mature users
         // 4. mature elements are visible for non-mature users only if they used them
 
-        return 
+        return
             !$this->isMature()
             || (
                 $user

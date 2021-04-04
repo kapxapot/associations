@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Interfaces\GenderedInterface;
 use App\Models\Traits\Gendered;
+use App\Policies\UserPolicy;
 use Plasticode\Models\User as UserBase;
 use Plasticode\Util\Date;
 
@@ -13,11 +14,13 @@ use Plasticode\Util\Date;
  * @method Game|null currentGame()
  * @method bool isMature()
  * @method Game|null lastGame()
+ * @method UserPolicy policy()
  * @method TelegramUser|null telegramUser()
  * @method static withAliceUser(AliceUser|callable|null $aliceUser)
  * @method static withCurrentGame(Game|callable|null $currentGame)
  * @method static withIsMature(bool|callable $mature)
  * @method static withLastGame(Game|callable|null $lastGame)
+ * @method static withPolicy(UserPolicy $policy)
  * @method static withTelegramUser(TelegramUser|callable|null $telegramUser)
  */
 class User extends UserBase implements GenderedInterface

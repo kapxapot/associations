@@ -423,6 +423,11 @@ words:
         '<a href="' + row.url + '">' + row.name + '</a>'
       attributes: [readonly]
 
+    disabled:
+      name: Откл.
+      type: bool
+      attributes: [readonly]
+
     mature:
       name: 16+
       type: bool

@@ -62,6 +62,9 @@ class UserHydrator extends BaseUserHydrator
             )
             ->withAliceUser(
                 fn () => $this->aliceUserRepository->getByUser($entity)
+            )
+            ->withPolicy(
+                fn () => $this->userService->getUserPolicy($entity)
             );
     }
 }

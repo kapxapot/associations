@@ -9,7 +9,6 @@ use App\Services\WordService;
 use Plasticode\Auth\Access;
 use Plasticode\Core\Request;
 use Plasticode\Core\Response;
-use Plasticode\Data\Rights;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Psr\Container\ContainerInterface;
@@ -23,8 +22,6 @@ class GameController extends Controller
 
     private WordService $wordService;
 
-    private Access $access;
-
     private NotFoundHandlerInterface $notFoundHandler;
 
     public function __construct(ContainerInterface $container)
@@ -35,8 +32,6 @@ class GameController extends Controller
         $this->languageRepository = $container->get(LanguageRepositoryInterface::class);
 
         $this->wordService = $container->get(WordService::class);
-
-        $this->access = $container->get(Access::class);
 
         $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
     }
@@ -61,7 +56,7 @@ class GameController extends Controller
             return ($this->notFoundHandler)($request, $response);
         }
 
-        $canSeeAllGames = $this->access->checkActionRights('games', Rights::READ, $user);
+        $canSeeAllGames = $user->policy()->canSeeAllGames();
         $isPlayer = $game->hasPlayer($user);
 
         if (!$canSeeAllGames && !$isPlayer) {

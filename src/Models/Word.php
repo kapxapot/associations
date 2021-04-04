@@ -47,6 +47,13 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         ];
     }
 
+    public function isVisibleFor(?User $user): bool
+    {
+        return $this->isDisabled()
+            ? $user && ($user->equals($this->creator()) || $user->policy()->canSeeAllWords())
+            : parent::isVisibleFor($user);
+    }
+
     public function feedbacks(): WordFeedbackCollection
     {
         return WordFeedbackCollection::from(
