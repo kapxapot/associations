@@ -84,5 +84,8 @@ rights:
   word_feedbacks:
     template: strict_read
 
+  word_overrides:
+    template: strict_read
+
   words:
     template: strict_read

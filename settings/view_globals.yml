@@ -53,6 +53,10 @@ admin_menu:
         - word_feedbacks
         - association_feedbacks
   - group:
+      title: Исправления
+      items:
+        - word_overrides
+  - group:
       title: Сайт
       items:
         - users

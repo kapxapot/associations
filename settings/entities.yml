@@ -501,3 +501,57 @@ word_feedbacks:
     created_by_name:
       name: Автор
       attributes: [readonly]
+
+word_overrides:
+  name_gen: исправления слова
+  name_accus: исправление слова
+  title: Исправления слов
+
+  columns:
+    id:
+      name: id
+      attributes: [readonly]
+
+    word:
+      name: Слово
+      template: >
+        '<a href="' + row.word.url + '">' + row.word.name + '</a>'
+      attributes: [readonly]
+
+    original_word:
+      name: Ориг. слово
+      template: >
+        row.word.original_word ? row.word.original_word : ''
+      attributes: [readonly]
+
+    approved:
+      name: Общее
+      type: bool
+      attributes: [readonly]
+
+    mature:
+      name: 16+
+      type: bool
+      attributes: [readonly]
+
+    disabled:
+      name: Откл.
+      type: bool
+      attributes: [readonly]
+
+    word_correction:
+      name: Коррект.
+      attributes: [readonly]
+
+    parts_of_speech:
+      name: Части речи
+      attributes: [readonly]
+
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [readonly]
+
+    created_by_name:
+      name: Автор
+      attributes: [readonly]

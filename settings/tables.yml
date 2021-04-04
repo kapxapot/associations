@@ -84,3 +84,10 @@ word_feedbacks:
   reverse: true
   has: [created_at, created_by, updated_at]
   generator: App\Generators\WordFeedbackGenerator
+
+word_overrides:
+  api: read
+  sort: created_at
+  reverse: true
+  has: [created_at, created_by]
+  generator: App\Generators\WordOverrideGenerator
