@@ -63,10 +63,10 @@ $scope.problems = {
 
         $scope.problems.word = {
             word_id: {{ word.id }},
-            word: '{{ word.word }}',
+            word: '{{ word.word|e('js') }}',
             dislike: {{ word_feedback.is_disliked ? 'true' : 'false' }},
             withTypo: {{ word_feedback.typo ? 'true' : 'false' }},
-            typo: {% if word_feedback.typo %}'{{ word_feedback.typo }}'{% else %}null{% endif %},
+            typo: {% if word_feedback.typo %}'{{ word_feedback.typo|e('js') }}'{% else %}null{% endif %},
             withDuplicate: {{ word_feedback.duplicate ? 'true' : 'false' }},
             duplicate: {% if word_feedback.duplicate %}'{{ word_feedback.duplicate.word }}'{% else %}null{% endif %},
             mature: {{ word_feedback.is_mature ? 'true' : 'false' }}
