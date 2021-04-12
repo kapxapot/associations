@@ -9,10 +9,8 @@ class AssociationFeedbackCollection extends FeedbackCollection
 {
     protected string $class = AssociationFeedback::class;
 
-    public function firstBy(User $user) : ?AssociationFeedback
+    public function firstBy(User $user): ?AssociationFeedback
     {
-        return $this->first(
-            fn (AssociationFeedback $f) => $f->isCreatedBy($user)
-        );
+        return parent::firstBy($user);
     }
 }

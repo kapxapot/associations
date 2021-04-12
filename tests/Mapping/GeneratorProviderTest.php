@@ -18,6 +18,7 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use Plasticode\Core\Interfaces as Core;
+use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Data\Interfaces\ApiInterface;
 use Plasticode\Middleware\Factories\AccessMiddlewareFactory;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
@@ -35,6 +36,7 @@ final class GeneratorProviderTest extends AbstractProviderTest
             ApiInterface::class,
             RouterInterface::class,
             SettingsProviderInterface::class,
+            TranslatorInterface::class,
             ValidatorInterface::class,
             Core\ViewInterface::class,
 

@@ -9,21 +9,19 @@ class WordFeedbackCollection extends FeedbackCollection
 {
     protected string $class = WordFeedback::class;
 
-    public function firstBy(User $user) : ?WordFeedback
+    public function firstBy(User $user): ?WordFeedback
     {
-        return $this->first(
-            fn (WordFeedback $f) => $f->isCreatedBy($user)
-        );
+        return parent::firstBy($user);
     }
 
-    public function typos() : self
+    public function typos(): self
     {
         return $this->where(
             fn (WordFeedback $f) => $f->hasTypo()
         );
     }
 
-    public function duplicates() : self
+    public function duplicates(): self
     {
         return $this->where(
             fn (WordFeedback $f) => $f->hasDuplicate()

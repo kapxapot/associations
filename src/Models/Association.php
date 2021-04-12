@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Collections\AssociationFeedbackCollection;
+use App\Collections\AssociationOverrideCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
 
@@ -13,6 +14,7 @@ use App\Collections\WordCollection;
  * @method Word secondWord()
  * @method static withFeedbacks(AssociationFeedbackCollection|callable $feedbacks)
  * @method static withFirstWord(Word|callable $firstWord)
+ * @method static withOverrides(AssociationOverrideCollection|callable $overrides)
  * @method static withSecondWord(Word|callable $secondWord)
  */
 class Association extends LanguageElement
@@ -20,7 +22,7 @@ class Association extends LanguageElement
     const DEFAULT_SIGN = '→';
     const APPROVED_SIGN = '⇉';
 
-    protected function requiredWiths() : array
+    protected function requiredWiths(): array
     {
         return [
             ...parent::requiredWiths(),
@@ -29,7 +31,7 @@ class Association extends LanguageElement
         ];
     }
 
-    public function words() : WordCollection
+    public function words(): WordCollection
     {
         return WordCollection::collect(
             $this->firstWord(),
@@ -37,7 +39,7 @@ class Association extends LanguageElement
         );
     }
 
-    public function hasWords(Word $first, Word $second) : bool
+    public function hasWords(Word $first, Word $second): bool
     {
         // the same word is NO
         if ($first->equals($second)) {
@@ -49,39 +51,51 @@ class Association extends LanguageElement
         return $ids->contains($first->getId()) && $ids->contains($second->getId());
     }
 
-    public function feedbacks() : AssociationFeedbackCollection
+    public function feedbacks(): AssociationFeedbackCollection
     {
         return AssociationFeedbackCollection::from(
             parent::feedbacks()
         );
     }
 
-    public function dislikes() : AssociationFeedbackCollection
+    public function overrides(): AssociationOverrideCollection
+    {
+        return AssociationOverrideCollection::from(
+            parent::overrides()
+        );
+    }
+
+    public function dislikes(): AssociationFeedbackCollection
     {
         return $this->feedbacks()->dislikes();
     }
 
-    public function matures() : AssociationFeedbackCollection
+    public function matures(): AssociationFeedbackCollection
     {
         return $this->feedbacks()->matures();
     }
 
-    public function feedbackBy(User $user) : ?AssociationFeedback
+    public function feedbackBy(User $user): ?AssociationFeedback
     {
         return $this->feedbacks()->firstBy($user);
     }
 
-    public function feedbackByMe() : ?AssociationFeedback
+    public function feedbackByMe(): ?AssociationFeedback
     {
         return $this->me()
             ? $this->feedbackBy($this->me())
             : null;
     }
 
+    public function override(): ?AssociationOverride
+    {
+        return $this->overrides()->latest();
+    }
+
     /**
      * Returns one of the association's words different from the provided one.
      */
-    public function otherWord(Word $word) : Word
+    public function otherWord(Word $word): Word
     {
         return $this->firstWord()->equals($word)
             ? $this->secondWord()
@@ -91,7 +105,7 @@ class Association extends LanguageElement
     /**
      * Users that used this association.
      */
-    public function users() : UserCollection
+    public function users(): UserCollection
     {
         return $this->turns()->users();
     }
@@ -99,7 +113,7 @@ class Association extends LanguageElement
     /**
      * Users + creator (in case when turns are deleted/lost).
      */
-    public function extendedUsers() : UserCollection
+    public function extendedUsers(): UserCollection
     {
         return $this
             ->users()
@@ -107,7 +121,7 @@ class Association extends LanguageElement
             ->distinct();
     }
 
-    public function hasMatureWords() : bool
+    public function hasMatureWords(): bool
     {
         return $this
             ->words()
@@ -116,14 +130,14 @@ class Association extends LanguageElement
             );
     }
 
-    public function sign() : string
+    public function sign(): string
     {
         return $this->isApproved()
             ? self::APPROVED_SIGN
             : self::DEFAULT_SIGN;
     }
 
-    public function fullName() : string
+    public function fullName(): string
     {
         return
             $this->firstWord()->word . ' ' .

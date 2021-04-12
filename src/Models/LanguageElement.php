@@ -3,10 +3,11 @@
 namespace App\Models;
 
 use App\Collections\FeedbackCollection;
+use App\Collections\OverrideCollection;
 use App\Collections\TurnCollection;
 use App\Models\Traits\Created;
 use Plasticode\Models\Generic\DbModel;
-use Plasticode\Models\Interfaces\CreatedAtInterface;
+use Plasticode\Models\Interfaces\CreatedInterface;
 use Plasticode\Models\Interfaces\LinkableInterface;
 use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Models\Traits\Linkable;
@@ -15,6 +16,8 @@ use Plasticode\Models\Traits\UpdatedAt;
 /**
  * @property integer $approved
  * @property string|null $approvedUpdatedAt
+ * @property integer $disabled
+ * @property string|null $disabledUpdatedAt
  * @property integer $languageId
  * @property integer $mature
  * @property string|null $matureUpdatedAt
@@ -25,19 +28,21 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @method static withMe(User|callable|null $me)
  * @method static withTurns(TurnCollection|callable $turns)
  */
-abstract class LanguageElement extends DbModel implements CreatedAtInterface, LinkableInterface, UpdatedAtInterface
+abstract class LanguageElement extends DbModel implements CreatedInterface, LinkableInterface, UpdatedAtInterface
 {
     use Created;
     use Linkable;
     use UpdatedAt;
 
     protected string $feedbacksPropertyName = 'feedbacks';
+    protected string $overridesPropertyName = 'overrides';
 
     protected function requiredWiths(): array
     {
         return [
             $this->creatorPropertyName,
             $this->feedbacksPropertyName,
+            $this->overridesPropertyName,
             $this->urlPropertyName,
             'language',
             'me',
@@ -49,6 +54,13 @@ abstract class LanguageElement extends DbModel implements CreatedAtInterface, Li
     {
         return $this->getWithProperty(
             $this->feedbacksPropertyName
+        );
+    }
+
+    public function overrides(): OverrideCollection
+    {
+        return $this->getWithProperty(
+            $this->overridesPropertyName
         );
     }
 
@@ -150,5 +162,58 @@ abstract class LanguageElement extends DbModel implements CreatedAtInterface, Li
     public function matureUpdatedAtIso(): ?string
     {
         return self::toIso($this->matureUpdatedAt);
+    }
+
+    public function isDisabled(): bool
+    {
+        return self::toBool($this->disabled);
+    }
+
+    public function disabledUpdatedAtIso(): ?string
+    {
+        return self::toIso($this->disabledUpdatedAt);
+    }
+
+    abstract public function override(): ?Override;
+
+    public function hasOverride(): bool
+    {
+        return $this->override() !== null;
+    }
+
+    public function hasApprovedOverride(): bool
+    {
+        return $this->approvedOverride() !== null;
+    }
+
+    public function approvedOverride(): ?bool
+    {
+        return $this->hasOverride()
+            ? $this->override()->isApproved()
+            : null;
+    }
+
+    public function hasMatureOverride(): bool
+    {
+        return $this->matureOverride() !== null;
+    }
+
+    public function matureOverride(): ?bool
+    {
+        return $this->hasOverride()
+            ? $this->override()->isMature()
+            : null;
+    }
+
+    public function hasDisabledOverride(): bool
+    {
+        return $this->disabledOverride() !== null;
+    }
+
+    public function disabledOverride(): ?bool
+    {
+        return $this->hasOverride()
+            ? $this->override()->isDisabled()
+            : null;
     }
 }

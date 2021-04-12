@@ -8,7 +8,7 @@ use App\Collections\WordCollection;
 use App\Models\Traits\Created;
 use Plasticode\Collections\Generic\Collection;
 use Plasticode\Models\Generic\DbModel;
-use Plasticode\Models\Interfaces\CreatedAtInterface;
+use Plasticode\Models\Interfaces\CreatedInterface;
 use Plasticode\Util\Date;
 
 /**
@@ -24,7 +24,7 @@ use Plasticode\Util\Date;
  * @method static withUrl(string|callable $url)
  * @method static withUser(User|callable $user)
  */
-class Game extends DbModel implements CreatedAtInterface
+class Game extends DbModel implements CreatedInterface
 {
     use Created;
 

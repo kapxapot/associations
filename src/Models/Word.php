@@ -12,11 +12,8 @@ use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Interfaces\PartOfSpeechableInterface;
-use Plasticode\Util\Strings;
 
 /**
- * @property integer $disabled
- * @property string|null $disabledUpdatedAt
  * @property string|null $originalWord
  * @property string|null $tokenizedWord
  * @property string $word
@@ -24,7 +21,6 @@ use Plasticode\Util\Strings;
  * @method AssociationCollection associations()
  * @method Definition|null definition()
  * @method DictWordInterface|null dictWord()
- * @method WordOverrideCollection overrides()
  * @method DefinitionAggregate|null parsedDefinition()
  * @method static withAssociations(AssociationCollection|callable $associations)
  * @method static withDefinition(Definition|callable|null $definition)
@@ -42,7 +38,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             'associations',
             'definition',
             'dictWord',
-            'overrides',
             'parsedDefinition',
         ];
     }
@@ -58,6 +53,13 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     {
         return WordFeedbackCollection::from(
             parent::feedbacks()
+        );
+    }
+
+    public function overrides(): WordOverrideCollection
+    {
+        return WordOverrideCollection::from(
+            parent::overrides()
         );
     }
 
@@ -355,30 +357,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this->overrides()->latest();
     }
 
-    public function hasApprovedOverride(): bool
-    {
-        return $this->approvedOverride() !== null;
-    }
-
-    public function approvedOverride(): ?bool
-    {
-        return $this->hasOverride()
-            ? $this->override()->isApproved()
-            : null;
-    }
-
-    public function hasMatureOverride(): bool
-    {
-        return $this->matureOverride() !== null;
-    }
-
-    public function matureOverride(): ?bool
-    {
-        return $this->hasOverride()
-            ? $this->override()->isMature()
-            : null;
-    }
-
     public function hasPartsOfSpeechOverride(): bool
     {
         return $this->partsOfSpeechOverride() !== null;
@@ -389,33 +367,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this->hasOverride()
             ? $this->override()->partsOfSpeech()
             : null;
-    }
-
-    public function hasOverride(): bool
-    {
-        return $this->override() !== null;
-    }
-
-    public function isDisabled(): bool
-    {
-        return self::toBool($this->disabled);
-    }
-
-    public function hasDisabledOverride(): bool
-    {
-        return $this->disabledOverride() !== null;
-    }
-
-    public function disabledOverride(): ?bool
-    {
-        return $this->hasOverride()
-            ? $this->override()->isDisabled()
-            : null;
-    }
-
-    public function disabledUpdatedAtIso(): ?string
-    {
-        return self::toIso($this->disabledUpdatedAt);
     }
 
     public function wordUpdatedAtIso(): ?string
