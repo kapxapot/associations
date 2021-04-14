@@ -6,6 +6,7 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Answers\Answerer;
 use Brightwood\Config\SerializationConfig;
 use Brightwood\External\TelegramTransport;
+use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Mapping\Providers\GeneralProvider;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
@@ -50,6 +51,10 @@ final class GeneralProviderTest extends AbstractProviderTest
     {
         $this->check(Answerer::class);
         $this->check(StoryParser::class);
+
+        // hydrators
+
+        $this->check(StoryStatusHydrator::class);
 
         // repositories
 

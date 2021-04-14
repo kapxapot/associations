@@ -2,7 +2,6 @@
 
 namespace Brightwood\Mapping\Providers;
 
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
@@ -28,9 +27,7 @@ class GeneralProvider extends MappingProvider
                 fn (ContainerInterface $c) => new StoryStatusRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new StoryStatusHydrator(
-                            $c->get(TelegramUserRepositoryInterface::class)
-                        )
+                        fn () => $c->get(StoryStatusHydrator::class)
                     )
                 ),
 
