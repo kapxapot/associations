@@ -2,6 +2,24 @@
 
 namespace App\Tests\Mapping;
 
+use App\Auth\Interfaces\AuthInterface;
+use App\Core\Interfaces\LinkerInterface;
+use App\Hydrators\AliceUserHydrator;
+use App\Hydrators\AssociationFeedbackHydrator;
+use App\Hydrators\AssociationHydrator;
+use App\Hydrators\AssociationOverrideHydrator;
+use App\Hydrators\DefinitionHydrator;
+use App\Hydrators\GameHydrator;
+use App\Hydrators\LanguageHydrator;
+use App\Hydrators\NewsHydrator;
+use App\Hydrators\PageHydrator;
+use App\Hydrators\TelegramUserHydrator;
+use App\Hydrators\TurnHydrator;
+use App\Hydrators\UserHydrator;
+use App\Hydrators\WordFeedbackHydrator;
+use App\Hydrators\WordHydrator;
+use App\Hydrators\WordOverrideHydrator;
+use App\Hydrators\YandexDictWordHydrator;
 use App\Mapping\Providers\RepositoryProvider;
 use App\Repositories\AliceUserRepository;
 use App\Repositories\AssociationFeedbackRepository;
@@ -35,11 +53,16 @@ use App\Repositories\WordFeedbackRepository;
 use App\Repositories\WordOverrideRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
+use App\Services\DictionaryService;
+use App\Services\UserService;
+use App\Services\WordService;
 use Plasticode\Auth\Access;
-use Plasticode\Auth\Interfaces\AuthInterface;
-use Plasticode\Core\Interfaces\CacheInterface;
+use Plasticode\Auth\Interfaces as AuthCore;
+use Plasticode\Core\Interfaces as Core;
 use Plasticode\Data\DbMetadata;
 use Plasticode\Mapping\Interfaces\MappingProviderInterface;
+use Plasticode\Parsing\Interfaces\ParserInterface;
+use Plasticode\Parsing\Parsers\CutParser;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
 use Plasticode\Testing\AbstractProviderTest;
 
@@ -49,11 +72,22 @@ final class RepositoryProviderTest extends AbstractProviderTest
     {
         return [
             Access::class,
+            AuthCore\AuthInterface::class,
             AuthInterface::class,
-            CacheInterface::class,
+            Core\CacheInterface::class,
             DbMetadata::class,
+            Core\LinkerInterface::class,
+            LinkerInterface::class,
 
+            CoreRepositories\RoleRepositoryInterface::class,
             CoreRepositories\TagRepositoryInterface::class,
+
+            CutParser::class,
+            ParserInterface::class,
+
+            DictionaryService::class,
+            UserService::class,
+            WordService::class,
         ];
     }
 
@@ -64,6 +98,23 @@ final class RepositoryProviderTest extends AbstractProviderTest
 
     public function testWiring(): void
     {
+        $this->check(AliceUserHydrator::class);
+        $this->check(AssociationFeedbackHydrator::class);
+        $this->check(AssociationHydrator::class);
+        $this->check(AssociationOverrideHydrator::class);
+        $this->check(DefinitionHydrator::class);
+        $this->check(GameHydrator::class);
+        $this->check(LanguageHydrator::class);
+        $this->check(NewsHydrator::class);
+        $this->check(PageHydrator::class);
+        $this->check(TelegramUserHydrator::class);
+        $this->check(TurnHydrator::class);
+        $this->check(UserHydrator::class);
+        $this->check(WordFeedbackHydrator::class);
+        $this->check(WordHydrator::class);
+        $this->check(WordOverrideHydrator::class);
+        $this->check(YandexDictWordHydrator::class);
+
         $this->check(
             AliceUserRepositoryInterface::class,
             AliceUserRepository::class
