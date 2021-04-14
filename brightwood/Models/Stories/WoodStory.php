@@ -2,7 +2,6 @@
 
 namespace Brightwood\Models\Stories;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\Data\WoodData;
 use Brightwood\Models\Links\RedirectLink;
 use Brightwood\Models\Nodes\ActionNode;
@@ -269,7 +268,7 @@ class WoodStory extends Story
             new SkipNode(
                 self::EATEN_IN_SLEEP,
                 [
-                    'Пока вы спали, пришли 🐺 <b>волки</b> и напали на вас.'
+                    'Пока вы спали, пришли 🐺 <b>волки</b> и загрызли вас.'
                 ],
                 self::GENERIC_DEATH
             )
@@ -396,7 +395,7 @@ class WoodStory extends Story
             (new SkipNode(
                 self::KICK_SUCCESS,
                 [
-                    '🐻 <b>медведь</b> схватил ваш 👟 <b>кроссовок</b> и скрылся в подлеске.',
+                    '🐻 <b>медведь</b> схватил вашу 👟 <b>кроссовку</b> и скрылся в подлеске.',
                     'Спустя несколько минут вы спустились и быстро убежали.'
                 ],
                 self::AIMLESS_WANDER

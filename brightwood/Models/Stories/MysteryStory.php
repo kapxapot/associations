@@ -2,7 +2,6 @@
 
 namespace Brightwood\Models\Stories;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\Data\MysteryData;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
