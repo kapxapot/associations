@@ -6,6 +6,7 @@ use App\Auth\Interfaces\AuthInterface;
 use App\Core\Interfaces\LinkerInterface;
 use App\Models\Association;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -16,6 +17,7 @@ use Plasticode\Models\Generic\DbModel;
 class AssociationHydrator extends Hydrator
 {
     private AssociationFeedbackRepositoryInterface $associationFeedbackRepository;
+    private AssociationOverrideRepositoryInterface $associationOverrideRepository;
     private LanguageRepositoryInterface $languageRepository;
     private TurnRepositoryInterface $turnRepository;
     private UserRepositoryInterface $userRepository;
@@ -26,6 +28,7 @@ class AssociationHydrator extends Hydrator
 
     public function __construct(
         AssociationFeedbackRepositoryInterface $associationFeedbackRepository,
+        AssociationOverrideRepositoryInterface $associationOverrideRepository,
         LanguageRepositoryInterface $languageRepository,
         TurnRepositoryInterface $turnRepository,
         UserRepositoryInterface $userRepository,
@@ -35,6 +38,7 @@ class AssociationHydrator extends Hydrator
     )
     {
         $this->associationFeedbackRepository = $associationFeedbackRepository;
+        $this->associationOverrideRepository = $associationOverrideRepository;
         $this->languageRepository = $languageRepository;
         $this->turnRepository = $turnRepository;
         $this->userRepository = $userRepository;
@@ -73,6 +77,9 @@ class AssociationHydrator extends Hydrator
             )
             ->withMe(
                 fn () => $this->auth->getUser()
+            )
+            ->withOverrides(
+                fn () => $this->associationOverrideRepository->getAllByAssociation($entity)
             )
             ->withCreator(
                 fn () => $this->userRepository->get($entity->createdBy)

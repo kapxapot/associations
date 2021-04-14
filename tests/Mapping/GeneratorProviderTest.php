@@ -3,6 +3,7 @@
 namespace App\Tests\Mapping;
 
 use App\Generators\AssociationFeedbackGenerator;
+use App\Generators\AssociationOverrideGenerator;
 use App\Generators\GameGenerator;
 use App\Generators\LanguageGenerator;
 use App\Generators\NewsGenerator;
@@ -11,6 +12,7 @@ use App\Generators\UserGenerator;
 use App\Generators\WordFeedbackGenerator;
 use App\Generators\WordOverrideGenerator;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use App\Repositories\Interfaces\PageRepositoryInterface;
@@ -41,6 +43,7 @@ final class GeneratorProviderTest extends AbstractProviderTest
             Core\ViewInterface::class,
 
             AssociationFeedbackRepositoryInterface::class,
+            AssociationOverrideRepositoryInterface::class,
             GameRepositoryInterface::class,
             NewsRepositoryInterface::class,
             PageRepositoryInterface::class,
@@ -55,6 +58,7 @@ final class GeneratorProviderTest extends AbstractProviderTest
     public function testWiring(): void
     {
         $this->check(AssociationFeedbackGenerator::class);
+        $this->check(AssociationOverrideGenerator::class);
         $this->check(GameGenerator::class);
         $this->check(LanguageGenerator::class);
         $this->check(NewsGenerator::class);

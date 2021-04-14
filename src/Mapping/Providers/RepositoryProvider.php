@@ -7,6 +7,7 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Hydrators\AliceUserHydrator;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
+use App\Hydrators\AssociationOverrideHydrator;
 use App\Hydrators\DefinitionHydrator;
 use App\Hydrators\GameHydrator;
 use App\Hydrators\LanguageHydrator;
@@ -21,11 +22,13 @@ use App\Hydrators\WordOverrideHydrator;
 use App\Hydrators\YandexDictWordHydrator;
 use App\Repositories\AliceUserRepository;
 use App\Repositories\AssociationFeedbackRepository;
+use App\Repositories\AssociationOverrideRepository;
 use App\Repositories\AssociationRepository;
 use App\Repositories\DefinitionRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\Interfaces\AliceUserRepositoryInterface;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
@@ -88,12 +91,24 @@ class RepositoryProvider extends MappingProvider
                     )
                 ),
 
+            AssociationOverrideRepositoryInterface::class =>
+                fn (ContainerInterface $c) => new AssociationOverrideRepository(
+                    $c->get(RepositoryContext::class),
+                    new ObjectProxy(
+                        fn () => new AssociationOverrideHydrator(
+                            $c->get(AssociationRepositoryInterface::class),
+                            $c->get(UserRepositoryInterface::class)
+                        )
+                    )
+                ),
+
             AssociationRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new AssociationRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
                         fn () => new AssociationHydrator(
                             $c->get(AssociationFeedbackRepositoryInterface::class),
+                            $c->get(AssociationOverrideRepositoryInterface::class),
                             $c->get(LanguageRepositoryInterface::class),
                             $c->get(TurnRepositoryInterface::class),
                             $c->get(UserRepositoryInterface::class),

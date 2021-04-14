@@ -5,11 +5,13 @@ namespace App\Tests\Mapping;
 use App\Mapping\Providers\RepositoryProvider;
 use App\Repositories\AliceUserRepository;
 use App\Repositories\AssociationFeedbackRepository;
+use App\Repositories\AssociationOverrideRepository;
 use App\Repositories\AssociationRepository;
 use App\Repositories\DefinitionRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\Interfaces\AliceUserRepositoryInterface;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
@@ -70,6 +72,11 @@ final class RepositoryProviderTest extends AbstractProviderTest
         $this->check(
             AssociationFeedbackRepositoryInterface::class,
             AssociationFeedbackRepository::class
+        );
+
+        $this->check(
+            AssociationOverrideRepositoryInterface::class,
+            AssociationOverrideRepository::class
         );
 
         $this->check(
