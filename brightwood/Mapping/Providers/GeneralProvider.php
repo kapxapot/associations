@@ -10,7 +10,6 @@ use Brightwood\Repositories\StoryStatusRepository;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\RootDeserializer;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
-use Plasticode\ObjectProxy;
 use Plasticode\Repositories\Idiorm\Core\RepositoryContext;
 use Psr\Container\ContainerInterface;
 
@@ -26,9 +25,7 @@ class GeneralProvider extends MappingProvider
             StoryStatusRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new StoryStatusRepository(
                     $c->get(RepositoryContext::class),
-                    new ObjectProxy(
-                        fn () => $c->get(StoryStatusHydrator::class)
-                    )
+                    $this->proxy($c, StoryStatusHydrator::class)
                 ),
 
             // cards
