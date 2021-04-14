@@ -1,0 +1,44 @@
+{% import 'main/local_macros.twig' as lm %}
+
+{% set override = association.override %}
+
+{# approved, mature, disabled #}
+
+$scope.override = {
+    association_id: {{ association.id }},
+    association: '{{ association.fullName|e('js') }}',
+    with_approved: {{ override.hasApproved ? 'true' : 'false' }},
+    approved: {{ override.hasApproved ? (override.isApproved ? 'true' : 'false') : 'null' }},
+    with_mature: {{ override.hasMature ? 'true' : 'false' }},
+    mature: {{ override.hasMature ? (override.isMature ? 'true' : 'false') : 'null' }},
+    disabled: {{ override.isDisabled ? 'true' : 'false' }}
+};
+
+$scope.overrideDialog = () => {
+    showModal('override');
+};
+
+$('#overrideForm').submit(function(e) {
+    $scope.modalPrePost(e);
+
+    let obj = $.extend(true, {}, $scope.override);
+
+    if (obj.with_approved !== true || obj.approved === null) {
+        delete obj.approved;
+    }
+
+    if (obj.with_mature !== true || obj.mature === null) {
+        delete obj.mature;
+    }
+
+    delete obj.with_approved;
+    delete obj.with_mature;
+
+    $scope.modalAjax({
+        url: '{{ path_for('actions.association.override') }}',
+        data: obj,
+        view: 'override',
+        onSuccess: {{ on_success ?? '$scope.postSuccess' }},
+        noSuccessMessage: {{ on_success ? 'false' : 'true' }}
+    });
+});

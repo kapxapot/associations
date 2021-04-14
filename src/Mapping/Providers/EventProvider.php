@@ -10,6 +10,7 @@ use App\EventHandlers\DictWord\DictWordLinkedHandler;
 use App\EventHandlers\DictWord\DictWordUnlinkedHandler;
 use App\EventHandlers\Feedback\AssociationFeedbackCreatedHandler;
 use App\EventHandlers\Feedback\WordFeedbackCreatedHandler;
+use App\EventHandlers\Override\AssociationOverrideCreatedHandler;
 use App\EventHandlers\Override\WordOverrideCreatedHandler;
 use App\EventHandlers\Turn\TurnCreatedHandler;
 use App\EventHandlers\Word\WordCorrectedHandler;
@@ -33,6 +34,10 @@ class EventProvider extends MappingProvider
             ),
 
             new AssociationFeedbackCreatedHandler(
+                $container->get(AssociationRecountService::class)
+            ),
+
+            new AssociationOverrideCreatedHandler(
                 $container->get(AssociationRecountService::class)
             ),
 

@@ -51,6 +51,9 @@ rights:
   association_feedbacks:
     template: strict_read
 
+  association_overrides:
+    template: strict_read
+
   associations:
     template: strict_read
 

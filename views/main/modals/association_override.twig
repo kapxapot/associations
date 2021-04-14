@@ -1,0 +1,56 @@
+{% extends 'modals/narrow.twig' %}
+
+{% import 'main/local_macros.twig' as lm %}
+
+{% set modal_name = 'override' %}
+{% set modal_title = 'Исправление ассоциации' %}
+{% set modal_save_label = 'Отправить' %}
+
+{% set modal_body_style = 'pb-1' %}
+
+{% block modal_body %}
+    <div class="row mh-0 br-word">
+        <div class="col-xs-12">
+            <div>Ассоциация <strong>{{'{{override.association}}'}}</strong>:</div>
+
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="override.with_approved">
+                    Общая?
+                </label>
+            </div>
+
+            <div class="form-group ml-3 check-inside" ng-if="override.with_approved">
+                <label class="radio-inline">
+                    <input type="radio" ng-model="override.approved" value="1"> Общая
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" ng-model="override.approved" value="0"> Личная
+                </label>
+            </div>
+
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="override.with_mature">
+                    Не для детей?
+                </label>
+            </div>
+
+            <div class="form-group ml-3 check-inside" ng-if="override.with_mature">
+                <label class="radio-inline">
+                    <input type="radio" ng-model="override.mature" value="1"> Для взрослых
+                </label>
+                <label class="radio-inline">
+                    <input type="radio" ng-model="override.mature" value="0"> Для всех
+                </label>
+            </div>
+
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" ng-model="override.disabled">
+                    Отключить
+                </label>
+            </div>
+        </div>
+    </div>
+{% endblock %}

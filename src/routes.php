@@ -2,6 +2,7 @@
 
 use App\Controllers\AliceBotController;
 use App\Controllers\AssociationController;
+use App\Controllers\AssociationOverrideController;
 use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
 use App\Controllers\IndexController;
@@ -175,6 +176,11 @@ $app->group(
                     '/feedback',
                     FeedbackController::class
                 )->setName('actions.feedback');
+
+                $this->post(
+                    '/association/override',
+                    AssociationOverrideController::class
+                )->setName('actions.association.override');
 
                 $this->post(
                     '/word/override',

@@ -72,6 +72,46 @@ association_feedbacks:
       name: Автор
       attributes: [readonly]
 
+association_overrides:
+  name_gen: исправления ассоциаций
+  name_accus: исправление ассоциации
+  title: Исправления ассоциаций
+
+  columns:
+    id:
+      name: id
+      attributes: [readonly]
+
+    word:
+      name: Ассоциация
+      template: >
+        '<a href="' + row.association.url + '">' + row.association.name + '</a>'
+      attributes: [readonly]
+
+    approved:
+      name: Общая
+      type: bool
+      attributes: [readonly]
+
+    mature:
+      name: 16+
+      type: bool
+      attributes: [readonly]
+
+    disabled:
+      name: Откл.
+      type: bool
+      attributes: [readonly]
+
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [readonly]
+
+    created_by_name:
+      name: Автор
+      attributes: [readonly]
+
 games:
   name_gen: игры
   name_accus: игру

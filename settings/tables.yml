@@ -12,6 +12,13 @@ association_feedbacks:
   has: [created_at, created_by, updated_at]
   generator: App\Generators\AssociationFeedbackGenerator
 
+association_overrides:
+  api: read
+  sort: created_at
+  reverse: true
+  has: [created_at, created_by]
+  generator: App\Generators\AssociationOverrideGenerator
+
 games:
   api: read
   sort: created_at
