@@ -2,8 +2,6 @@
 
 namespace App\Mapping\Providers;
 
-use App\Auth\Interfaces\AuthInterface;
-use App\Core\Interfaces\LinkerInterface;
 use App\Hydrators\AliceUserHydrator;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
@@ -52,15 +50,8 @@ use App\Repositories\WordFeedbackRepository;
 use App\Repositories\WordOverrideRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
-use App\Services\DictionaryService;
-use App\Services\UserService;
-use App\Services\WordService;
-use Plasticode\Core\Interfaces as Core;
-use Plasticode\External\Gravatar;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
 use Plasticode\ObjectProxy;
-use Plasticode\Parsing\Interfaces\ParserInterface;
-use Plasticode\Parsing\Parsers\CutParser;
 use Plasticode\Repositories\Idiorm\Core\RepositoryContext;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
 use Psr\Container\ContainerInterface;
@@ -74,9 +65,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new AliceUserRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new AliceUserHydrator(
-                            $c->get(UserRepositoryInterface::class)
-                        )
+                        fn () => $c->get(AliceUserHydrator::class)
                     )
                 ),
 
@@ -84,10 +73,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new AssociationFeedbackRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new AssociationFeedbackHydrator(
-                            $c->get(AssociationRepositoryInterface::class),
-                            $c->get(UserRepositoryInterface::class)
-                        )
+                        fn () => $c->get(AssociationFeedbackHydrator::class)
                     )
                 ),
 
@@ -95,10 +81,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new AssociationOverrideRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new AssociationOverrideHydrator(
-                            $c->get(AssociationRepositoryInterface::class),
-                            $c->get(UserRepositoryInterface::class)
-                        )
+                        fn () => $c->get(AssociationOverrideHydrator::class)
                     )
                 ),
 
@@ -106,16 +89,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new AssociationRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new AssociationHydrator(
-                            $c->get(AssociationFeedbackRepositoryInterface::class),
-                            $c->get(AssociationOverrideRepositoryInterface::class),
-                            $c->get(LanguageRepositoryInterface::class),
-                            $c->get(TurnRepositoryInterface::class),
-                            $c->get(UserRepositoryInterface::class),
-                            $c->get(WordRepositoryInterface::class),
-                            $c->get(AuthInterface::class),
-                            $c->get(LinkerInterface::class)
-                        )
+                        fn () => $c->get(AssociationHydrator::class)
                     )
                 ),
 
@@ -123,9 +97,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new DefinitionRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new DefinitionHydrator(
-                            $c->get(WordRepositoryInterface::class)
-                        )
+                        fn () => $c->get(DefinitionHydrator::class)
                     )
                 ),
 
@@ -133,10 +105,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new YandexDictWordRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new YandexDictWordHydrator(
-                            $c->get(LanguageRepositoryInterface::class),
-                            $c->get(WordRepositoryInterface::class)
-                        )
+                        fn () => $c->get(YandexDictWordHydrator::class)
                     )
                 ),
 
@@ -144,12 +113,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new GameRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new GameHydrator(
-                            $c->get(LanguageRepositoryInterface::class),
-                            $c->get(TurnRepositoryInterface::class),
-                            $c->get(UserRepositoryInterface::class),
-                            $c->get(LinkerInterface::class)
-                        )
+                        fn () => $c->get(GameHydrator::class)
                     )
                 ),
 
@@ -157,9 +121,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new LanguageRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new LanguageHydrator(
-                            $c->get(UserRepositoryInterface::class)
-                        )
+                        fn () => $c->get(LanguageHydrator::class)
                     )
                 ),
 
@@ -168,12 +130,7 @@ class RepositoryProvider extends MappingProvider
                     $c->get(RepositoryContext::class),
                     $c->get(CoreRepositories\TagRepositoryInterface::class),
                     new ObjectProxy(
-                        fn () => new NewsHydrator(
-                            $c->get(CoreRepositories\UserRepositoryInterface::class),
-                            $c->get(CutParser::class),
-                            $c->get(Core\LinkerInterface::class),
-                            $c->get(ParserInterface::class)
-                        )
+                        fn () => $c->get(NewsHydrator::class)
                     )
                 ),
 
@@ -182,13 +139,7 @@ class RepositoryProvider extends MappingProvider
                     $c->get(RepositoryContext::class),
                     $c->get(CoreRepositories\TagRepositoryInterface::class),
                     new ObjectProxy(
-                        fn () => new PageHydrator(
-                            $c->get(PageRepositoryInterface::class),
-                            $c->get(UserRepositoryInterface::class),
-                            $c->get(CutParser::class),
-                            $c->get(Core\LinkerInterface::class),
-                            $c->get(ParserInterface::class)
-                        )
+                        fn () => $c->get(PageHydrator::class)
                     )
                 ),
 
@@ -198,9 +149,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new TelegramUserRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new TelegramUserHydrator(
-                            $c->get(UserRepositoryInterface::class)
-                        )
+                        fn () => $c->get(TelegramUserHydrator::class)
                     )
                 ),
 
@@ -208,13 +157,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new TurnRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new TurnHydrator(
-                            $c->get(AssociationRepositoryInterface::class),
-                            $c->get(GameRepositoryInterface::class),
-                            $c->get(TurnRepositoryInterface::class),
-                            $c->get(UserRepositoryInterface::class),
-                            $c->get(WordRepositoryInterface::class)
-                        )
+                        fn () => $c->get(TurnHydrator::class)
                     )
                 ),
 
@@ -222,15 +165,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new UserRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new UserHydrator(
-                            $c->get(AliceUserRepositoryInterface::class),
-                            $c->get(GameRepositoryInterface::class),
-                            $c->get(CoreRepositories\RoleRepositoryInterface::class),
-                            $c->get(TelegramUserRepositoryInterface::class),
-                            $c->get(LinkerInterface::class),
-                            $c->get(Gravatar::class),
-                            $c->get(UserService::class)
-                        )
+                        fn () => $c->get(UserHydrator::class)
                     )
                 ),
 
@@ -240,10 +175,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new WordFeedbackRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new WordFeedbackHydrator(
-                            $c->get(UserRepositoryInterface::class),
-                            $c->get(WordRepositoryInterface::class)
-                        )
+                        fn () => $c->get(WordFeedbackHydrator::class)
                     )
                 ),
 
@@ -251,10 +183,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new WordOverrideRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new WordOverrideHydrator(
-                            $c->get(UserRepositoryInterface::class),
-                            $c->get(WordRepositoryInterface::class)
-                        )
+                        fn () => $c->get(WordOverrideHydrator::class)
                     )
                 ),
 
@@ -262,19 +191,7 @@ class RepositoryProvider extends MappingProvider
                 fn (ContainerInterface $c) => new WordRepository(
                     $c->get(RepositoryContext::class),
                     new ObjectProxy(
-                        fn () => new WordHydrator(
-                            $c->get(AssociationRepositoryInterface::class),
-                            $c->get(DefinitionRepositoryInterface::class),
-                            $c->get(LanguageRepositoryInterface::class),
-                            $c->get(TurnRepositoryInterface::class),
-                            $c->get(UserRepositoryInterface::class),
-                            $c->get(WordFeedbackRepositoryInterface::class),
-                            $c->get(WordOverrideRepositoryInterface::class),
-                            $c->get(AuthInterface::class),
-                            $c->get(LinkerInterface::class),
-                            $c->get(DictionaryService::class),
-                            $c->get(WordService::class)
-                        )
+                        fn () => $c->get(WordHydrator::class)
                     )
                 ),
         ];
