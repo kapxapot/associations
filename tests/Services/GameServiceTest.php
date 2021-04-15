@@ -7,6 +7,7 @@ use App\Hydrators\GameHydrator;
 use App\Hydrators\TurnHydrator;
 use App\Models\Word;
 use App\Parsing\DefinitionParser;
+use App\Policies\UserPolicy;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
@@ -148,6 +149,8 @@ class GameServiceTest extends TestCase
         // the meat
         $language = $this->languageRepository->get(1);
         $user = $this->userRepository->get(1);
+
+        $user->withPolicy(new UserPolicy());
 
         // save game count to compare later
         $gameCountFunc = fn () => $this->gameRepository->getCountByLanguage($language);

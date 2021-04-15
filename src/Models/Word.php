@@ -44,8 +44,8 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     public function isVisibleFor(?User $user): bool
     {
-        return $this->isDisabled()
-            ? $user && ($user->equals($this->creator()) || $user->policy()->canSeeAllWords())
+        return ($user && $user->policy()->canSeeAllWords())
+            ? true
             : parent::isVisibleFor($user);
     }
 
@@ -115,7 +115,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
-     * Returns approved associations visible for _the current user_.
+     * Returns approved associations visible for *the current user*.
      */
     public function approvedVisibleAssociations(): AssociationCollection
     {
@@ -125,7 +125,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
-     * Returns approved associations invisible for _the current user_.
+     * Returns approved associations invisible for *the current user*.
      */
     public function approvedInvisibleAssociations(): AssociationCollection
     {
@@ -135,7 +135,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
-     * Returns not approved associations visible for _the current user_.
+     * Returns not approved associations visible for *the current user*.
      */
     public function notApprovedVisibleAssociations(): AssociationCollection
     {
@@ -145,12 +145,32 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
-     * Returns not approved associations invisible for _the current user_.
+     * Returns not approved associations invisible for *the current user*.
      */
     public function notApprovedInvisibleAssociations(): AssociationCollection
     {
         return $this
             ->notApprovedAssociations()
+            ->invisibleFor($this->me());
+    }
+
+    /**
+     * Returns disabled associations visible for *the current user*.
+     */
+    public function disabledVisibleAssociations(): AssociationCollection
+    {
+        return $this
+            ->disabledAssociations()
+            ->visibleFor($this->me());
+    }
+
+    /**
+     * Returns disabled associations invisible for *the current user*.
+     */
+    public function disabledInvisibleAssociations(): AssociationCollection
+    {
+        return $this
+            ->disabledAssociations()
             ->invisibleFor($this->me());
     }
 
@@ -169,6 +189,16 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this
             ->associations()
             ->notApproved()
+            ->ascStr(
+                fn (Association $a) => $a->otherWord($this)->word
+            );
+    }
+
+    public function disabledAssociations(): AssociationCollection
+    {
+        return $this
+            ->associations()
+            ->disabled()
             ->ascStr(
                 fn (Association $a) => $a->otherWord($this)->word
             );

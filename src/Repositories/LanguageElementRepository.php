@@ -156,4 +156,9 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     {
         return $this->filterMature($query, false);
     }
+
+    protected function filterEnabled(Query $query): Query
+    {
+        return $query->whereNotEqual('disabled', 1);
+    }
 }

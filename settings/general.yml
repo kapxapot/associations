@@ -47,7 +47,7 @@ associations:
   mature_threshold: 2
   coeffs:
     usage: 1
-    dislike: 1
+    dislike: 0
   # sidebar limit
   last_added_limit: 10
 
@@ -65,7 +65,7 @@ words:
   mature_threshold: 2
   coeffs:
     approved_association: 1
-    dislike: 1
+    dislike: 0
   # sidebar limit
   last_added_limit: 10
 

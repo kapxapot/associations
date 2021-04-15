@@ -49,4 +49,11 @@ class WordOverride extends Override
     {
         return $this->posCorrection !== null;
     }
+
+    public function isNotEmpty(): bool
+    {
+        return parent::isNotEmpty()
+            || $this->hasWordCorrection()
+            || $this->hasPosCorrection();
+    }
 }

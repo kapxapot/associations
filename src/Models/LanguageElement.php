@@ -80,23 +80,27 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     /**
      * Is visible for everyone.
-     * 
-     * Equivalent to "non mature".
+     *
+     * Equivalent to "not disabled" & "non mature".
      */
     public function isVisible(): bool
     {
         return $this->isVisibleFor(null);
     }
 
-    /**
-     * Maturity check.
-     */
     public function isVisibleFor(?User $user): bool
     {
-        // 1. non-mature elements are visible for everyone
-        // 2. mature elements are invisible for non-authed users ($user == null)
-        // 3. mature elements are visible for mature users
-        // 4. mature elements are visible for non-mature users only if they used them
+        // 1. for enabled:
+        // 1.1. non-mature elements are visible for everyone
+        // 1.2. mature elements are invisible for non-authed users ($user == null)
+        // 1.3. mature elements are visible for mature users
+        // 1.4. mature elements are visible for non-mature users only if they used them
+        // 2. for disabled:
+        // 2.1. visible only for those who used them
+
+        if ($this->isDisabled()) {
+            return $user !== null && $this->isUsedBy($user);
+        }
 
         return
             !$this->isMature()
@@ -181,6 +185,15 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         return $this->override() !== null;
     }
 
+    /**
+     * Returns true if the element has an override AND
+     * that override has some actual changes (is not empty).
+     */
+    public function hasActualOverride(): bool
+    {
+        return $this->hasOverride() && $this->override()->isNotEmpty();
+    }
+
     public function hasApprovedOverride(): bool
     {
         return $this->approvedOverride() !== null;
@@ -207,7 +220,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function hasDisabledOverride(): bool
     {
-        return $this->disabledOverride() !== null;
+        return $this->disabledOverride() === true;
     }
 
     public function disabledOverride(): ?bool

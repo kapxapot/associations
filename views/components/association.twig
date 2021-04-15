@@ -2,7 +2,8 @@
     {% set sign %}{% include 'components/association_sign.twig' %}{% endset %}
 
     {% if association %}
-        {% set no_link = no_link or not association.is_visible_for_me %}
+        {% set is_visible = association.is_visible_for_me %}
+        {% set no_link = no_link or not is_visible %}
 
         {% if by_word and association.first_word.id != by_word.id %}
             {% set first = association.second_word %}

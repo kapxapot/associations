@@ -208,9 +208,4 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             '(word_bin like ?)'
         );
     }
-
-    protected function filterEnabled(Query $query): Query
-    {
-        return $query->whereNotEqual('disabled', 1);
-    }
 }

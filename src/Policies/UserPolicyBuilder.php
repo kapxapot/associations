@@ -28,7 +28,7 @@ class UserPolicyBuilder
             ->withCanSeeAllWords(
                 $this->access->checkActionRights('words', Rights::READ, $user)
             )
-            ->withCanSeeAllWords(
+            ->withCanSeeAllAssociations(
                 $this->access->checkActionRights('associations', Rights::READ, $user)
             );
     }

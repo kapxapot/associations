@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\Association\AssociationApprovedChangedEvent;
+use App\Events\Association\AssociationDisabledChangedEvent;
 use App\Events\Association\AssociationMatureChangedEvent;
 use App\Models\Association;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
@@ -14,6 +15,7 @@ use Plasticode\Util\Date;
 
 /**
  * @emits AssociationApprovedChangedEvent
+ * @emits AssociationDisabledChangedEvent
  * @emits AssociationMatureChangedEvent
  */
 class AssociationRecountService
@@ -35,77 +37,102 @@ class AssociationRecountService
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function recountAll(Association $assoc, ?Event $sourceEvent = null) : Association
+    public function recountAll(Association $assoc, ?Event $sourceEvent = null): Association
     {
+        $assoc = $this->recountDisabled($assoc, $sourceEvent);
         $assoc = $this->recountApproved($assoc, $sourceEvent);
         $assoc = $this->recountMature($assoc, $sourceEvent);
 
         return $assoc;
     }
 
-    public function recountApproved(
-        Association $assoc,
+    public function recountDisabled(
+        Association $association,
         ?Event $sourceEvent = null
-    ) : Association
+    ): Association
     {
         $now = Date::dbNow();
         $changed = false;
 
-        $approved = $this->associationSpecification->isApproved($assoc);
+        $disabled = $this->associationSpecification->isDisabled($association);
 
-        if (
-            $assoc->isApproved() !== $approved
-            || is_null($assoc->approvedUpdatedAt)
-        ) {
-            $assoc->approved = self::toBit($approved);
-            $assoc->approvedUpdatedAt = $now;
+        if ($association->isDisabled() !== $disabled) {
+            $association->disabled = self::toBit($disabled);
+            $association->disabledUpdatedAt = $now;
 
             $changed = true;
         }
 
-        $assoc->updatedAt = $now;
+        $association->updatedAt = $now;
 
-        $assoc = $this->associationRepository->save($assoc);
+        $association = $this->associationRepository->save($association);
 
         if ($changed) {
             $this->eventDispatcher->dispatch(
-                new AssociationApprovedChangedEvent($assoc, $sourceEvent)
+                new AssociationDisabledChangedEvent($association, $sourceEvent)
             );
         }
 
-        return $assoc;
+        return $association;
+    }
+
+    public function recountApproved(
+        Association $association,
+        ?Event $sourceEvent = null
+    ): Association
+    {
+        $now = Date::dbNow();
+        $changed = false;
+
+        $approved = $this->associationSpecification->isApproved($association);
+
+        if ($association->isApproved() !== $approved) {
+            $association->approved = self::toBit($approved);
+            $association->approvedUpdatedAt = $now;
+
+            $changed = true;
+        }
+
+        $association->updatedAt = $now;
+
+        $association = $this->associationRepository->save($association);
+
+        if ($changed) {
+            $this->eventDispatcher->dispatch(
+                new AssociationApprovedChangedEvent($association, $sourceEvent)
+            );
+        }
+
+        return $association;
     }
 
     public function recountMature(
-        Association $assoc,
+        Association $association,
         ?Event $sourceEvent = null
-    ) : Association
+    ): Association
     {
         $now = Date::dbNow();
         $changed = false;
 
-        $mature = $this->associationSpecification->isMature($assoc);
+        $mature = $this->associationSpecification->isMature($association);
 
-        if (
-            $assoc->isMature() !== $mature
-            || is_null($assoc->matureUpdateAt)
-        ) {
-            $assoc->mature = self::toBit($mature);
-            $assoc->matureUpdatedAt = $now;
+        if ($association->isMature() !== $mature) {
+            $association->mature = self::toBit($mature);
+            $association->matureUpdatedAt = $now;
 
             $changed = true;
         }
 
-        $assoc->updatedAt = $now;
+        $association->updatedAt = $now;
 
-        $assoc = $this->associationRepository->save($assoc);
+        $association = $this->associationRepository->save($association);
 
         if ($changed) {
             $this->eventDispatcher->dispatch(
-                new AssociationMatureChangedEvent($assoc, $sourceEvent)
+                new AssociationMatureChangedEvent($association, $sourceEvent)
             );
         }
 
-        return $assoc;
+        return $association;
     }
 }

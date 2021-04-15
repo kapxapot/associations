@@ -16,10 +16,14 @@
             <p>
                 <span class="label label-default" title="Язык: {{ association.language.name }}" data-toggle="tooltip">{{ association.language.name|lower }}</span>
 
-                <span class="label {{ association.is_approved ? 'label-success' : 'label-primary' }}" title="{{ association.is_approved ? 'Доступна всем игрокам' : 'Доступна только тем, кто ее использовал' }}" data-toggle="tooltip">{{ association.is_approved ? 'общая' : 'личная' }}</span>
+                {% if association.is_disabled %}
+                    <span class="label label-default">{% if association.hasDisabledOverride %}<i class="fas fa-lock"></i> {% endif %}отключена</span>
+                {% else %}
+                    <span class="label {{ association.is_approved ? 'label-success' : 'label-primary' }}" title="{{ association.is_approved ? 'Доступна всем игрокам' : 'Доступна только тем, кто ее использовал' }}" data-toggle="tooltip">{% if association.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif association.is_approved %}<i class="fas fa-check"></i> {% endif %}{{ association.is_approved ? 'общая' : 'личная' }}</span>
+                {% endif %}
 
-                {% if association.is_mature %}
-                    <span class="label label-danger" title="Не для детей" data-toggle="tooltip">16+</span>
+                {% if association.is_mature or association.hasMatureOverride %}
+                    <span class="label {{ association.is_mature ? 'label-danger' : 'label-success' }}" title="{{ association.is_mature ? 'Не для детей' : 'Для всех' }}" data-toggle="tooltip">{% if association.hasMatureOverride %}<i class="fas fa-lock"></i> {% endif %}{{ association.is_mature ? '16+' : '0+' }}</span>
                 {% endif %}
 
                 {% if turns_by_user|length > 0 %}
@@ -32,9 +36,9 @@
             </p>
 
             <p class="font-xl br-word lh-1 mb-3">
-                {% include "components/word.twig" with { 'word': association.first_word } only %}
+                {% include "components/word.twig" with { 'word': association.first_word, 'show_lock': true } only %}
                 {% include 'components/association_sign.twig' with { 'association': association } only %}
-                {% include "components/word.twig" with { 'word': association.second_word } only %}
+                {% include "components/word.twig" with { 'word': association.second_word, 'show_lock': true } only %}
             </p>
 
             <p>{{ lm.genderize(association.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>

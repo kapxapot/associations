@@ -7,6 +7,7 @@ use App\Events\Word\WordCorrectedEvent;
 use App\Events\Word\WordDisabledChangedEvent;
 use App\Events\Word\WordMatureChangedEvent;
 use App\Models\Word;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Specifications\WordSpecification;
 use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
@@ -15,24 +16,26 @@ use Plasticode\Util\Date;
 
 /**
  * @emits WordApprovedChangedEvent
+ * @emits WordCorrectedEvent
+ * @emits WordDisabledChangedEvent
  * @emits WordMatureChangedEvent
  */
 class WordRecountService
 {
     use ToBit;
 
+    private WordRepositoryInterface $wordRepository;
     private WordSpecification $wordSpecification;
-    private WordService $wordService;
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
+        WordRepositoryInterface $wordRepository,
         WordSpecification $wordSpecification,
-        WordService $wordService,
         EventDispatcher $eventDispatcher
     )
     {
+        $this->wordRepository = $wordRepository;
         $this->wordSpecification = $wordSpecification;
-        $this->wordService = $wordService;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -62,7 +65,7 @@ class WordRecountService
 
         $word->updatedAt = $now;
 
-        $word = $this->wordService->update($word);
+        $word = $this->wordRepository->save($word);
 
         if ($changed) {
             $this->eventDispatcher->dispatch(
@@ -89,7 +92,7 @@ class WordRecountService
 
         $word->updatedAt = $now;
 
-        $word = $this->wordService->update($word);
+        $word = $this->wordRepository->save($word);
 
         if ($changed) {
             $this->eventDispatcher->dispatch(
@@ -116,7 +119,7 @@ class WordRecountService
 
         $word->updatedAt = $now;
 
-        $word = $this->wordService->update($word);
+        $word = $this->wordRepository->save($word);
 
         if ($changed) {
             $this->eventDispatcher->dispatch(
@@ -144,7 +147,7 @@ class WordRecountService
 
         $word->updatedAt = $now;
 
-        $word = $this->wordService->update($word);
+        $word = $this->wordRepository->save($word);
 
         if ($changed) {
             $this->eventDispatcher->dispatch(

@@ -29,12 +29,7 @@ class WordSpecification
 
     public function isApproved(Word $word): bool
     {
-        // shortcut
-        if ($this->isDisabled($word)) {
-            return false;
-        }
-
-        $approvedOverride = $word->approvedOverride();
+        $approvedOverride = $this->approvedOverride($word);
 
         if ($approvedOverride !== null) {
             return $approvedOverride;
@@ -45,28 +40,14 @@ class WordSpecification
             || $this->isApprovedByAssociations($word);
     }
 
-    public function isMature(Word $word): bool
+    public function approvedOverride(Word $word): ?bool
     {
-        $matureOverride = $word->matureOverride();
-
-        if ($matureOverride !== null) {
-            return $matureOverride;
+        // shortcut
+        if ($this->isDisabled($word)) {
+            return false;
         }
 
-        $threshold = $this->config->wordMatureThreshold();
-
-        $score = $word->matures()->count();
-
-        return $score >= $threshold;
-    }
-
-    public function correctedWord(Word $word): string
-    {
-        $override = $word->override();
-
-        return $override && $override->hasWordCorrection()
-            ? $override->wordCorrection
-            : $word->originalWord;
+        return $word->approvedOverride();
     }
 
     private function isApprovedByDictWord(Word $word): bool
@@ -111,5 +92,34 @@ class WordSpecification
         $score = $approvedAssocs * $assocCoeff - $dislikes * $dislikeCoeff;
 
         return $score >= $threshold;
+    }
+
+    public function isMature(Word $word): bool
+    {
+        $matureOverride = $word->matureOverride();
+
+        if ($matureOverride !== null) {
+            return $matureOverride;
+        }
+
+        return $this->isMatureByFeedbacks($word);
+    }
+
+    private function isMatureByFeedbacks(Word $word): bool
+    {
+        $threshold = $this->config->wordMatureThreshold();
+
+        $score = $word->matures()->count();
+
+        return $score >= $threshold;
+    }
+
+    public function correctedWord(Word $word): string
+    {
+        $override = $word->override();
+
+        return $override && $override->hasWordCorrection()
+            ? $override->wordCorrection
+            : $word->originalWord;
     }
 }

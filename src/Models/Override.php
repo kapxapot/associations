@@ -50,4 +50,11 @@ abstract class Override extends DbModel implements CreatedInterface
     {
         return self::toBool($this->disabled);
     }
+
+    public function isNotEmpty(): bool
+    {
+        return $this->hasApproved()
+            || $this->hasMature()
+            || $this->isDisabled();
+    }
 }

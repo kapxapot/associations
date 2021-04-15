@@ -113,6 +113,26 @@
                 {% endif %}
             {% endif %}
 
+            {% if is_moderator and word.disabled_associations.any %}
+                <p class="b mt-3">Отключенные ассоциации ({{ word.disabled_associations.count }}):</p>
+
+                <ul class="vgap-2 br-word">
+                    {% for assoc in word.disabled_associations %}
+                        <li>
+                            {% if word.origin_association and word.origin_association.id == assoc.id %}
+                                <i class="fas fa-lightbulb dendro-color" title="Источник" data-toggle="tooltip"></i>
+                            {% endif %}
+
+                            {{ lm.association(assoc, word) }}
+
+                            {% for user in assoc.extended_users %}
+                                {{ lm.user(user) }}
+                            {% endfor %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             {% if word.duplicate_by_me %}
                 <p class="mt-3 br-word">Вы отметили, что слово <strong>{{ word.word }}</strong> дублирует слово {{ lm.word(word.duplicate_by_me) }}.</p>
             {% endif %}

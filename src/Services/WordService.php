@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Collections\WordCollection;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Events\Word\WordCreatedEvent;
-use App\Events\Word\WordUpdatedEvent;
 use App\Models\DTO\Search\SearchParams;
 use App\Models\DTO\Search\WordSearchResult;
 use App\Models\Language;
@@ -28,7 +27,6 @@ use Webmozart\Assert\Assert;
 
 /**
  * @emits WordCreatedEvent
- * @emits WordUpdatedEvent
  */
 class WordService
 {
@@ -142,17 +140,6 @@ class WordService
         return $word;
     }
 
-    public function update(Word $word): Word
-    {
-        $word = $this->wordRepository->save($word);
-
-        $this->eventDispatcher->dispatch(
-            new WordUpdatedEvent($word)
-        );
-
-        return $word;
-    }
-
     /**
      * Returns validation rules chain for word.
      */
@@ -212,6 +199,15 @@ class WordService
     public function notApprovedInvisibleAssociationsStr(Word $word): ?string
     {
         $count = $word->notApprovedInvisibleAssociations()->count();
+
+        return $this
+            ->casesService
+            ->invisibleAssociationCountStr($count);
+    }
+
+    public function disabledInvisibleAssociationsStr(Word $word): ?string
+    {
+        $count = $word->disabledInvisibleAssociations()->count();
 
         return $this
             ->casesService

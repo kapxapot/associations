@@ -13,8 +13,10 @@ use App\EventHandlers\Feedback\WordFeedbackCreatedHandler;
 use App\EventHandlers\Override\AssociationOverrideCreatedHandler;
 use App\EventHandlers\Override\WordOverrideCreatedHandler;
 use App\EventHandlers\Turn\TurnCreatedHandler;
+use App\EventHandlers\Word\WordApprovedChangedHandler;
 use App\EventHandlers\Word\WordCorrectedHandler;
 use App\EventHandlers\Word\WordCreatedHandler;
+use App\EventHandlers\Word\WordDisabledChangedHandler;
 use App\EventHandlers\Word\WordMatureChangedHandler;
 use App\EventHandlers\Word\WordOutOfDateHandler;
 use App\Services\AssociationRecountService;
@@ -65,9 +67,17 @@ class EventProvider extends MappingProvider
                 $container->get(AssociationRecountService::class)
             ),
 
+            new WordApprovedChangedHandler(
+                $container->get(AssociationRecountService::class)
+            ),
+
             new WordCreatedHandler(
                 $container->get(DefinitionService::class),
                 $container->get(DictionaryService::class)
+            ),
+
+            new WordDisabledChangedHandler(
+                $container->get(AssociationRecountService::class)
             ),
 
             new WordFeedbackCreatedHandler(

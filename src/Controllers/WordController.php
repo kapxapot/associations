@@ -86,6 +86,10 @@ class WordController extends Controller
             ->wordService
             ->notApprovedInvisibleAssociationsStr($word);
 
+        $disabledStr = $this
+            ->wordService
+            ->disabledInvisibleAssociationsStr($word);
+
         $parsedDefinition = $this->wordService->getParsedDefinition($word);
 
         $params = $this->buildParams(
@@ -94,6 +98,7 @@ class WordController extends Controller
                     'word' => $word,
                     'approved_invisible_associations_str' => $approvedStr,
                     'not_approved_invisible_associations_str' => $notApprovedStr,
+                    'disabled_invisible_associations_str' => $disabledStr,
                     'definition' => $parsedDefinition,
                     'disqus_id' => 'word' . $word->getId(),
                     'debug' => $debug,

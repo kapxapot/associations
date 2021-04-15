@@ -26,7 +26,17 @@ class LanguageElementCollection extends DbModelCollection
     public function notApproved(): self
     {
         return $this->where(
-            fn (LanguageElement $el) => !$el->isApproved()
+            fn (LanguageElement $el) => !$el->isApproved() && !$el->isDisabled()
+        );
+    }
+
+    /**
+     * @return static
+     */
+    public function disabled(): self
+    {
+        return $this->where(
+            fn (LanguageElement $el) => $el->isDisabled()
         );
     }
 

@@ -31,6 +31,13 @@ class Association extends LanguageElement
         ];
     }
 
+    public function isVisibleFor(?User $user): bool
+    {
+        return ($user && $user->policy()->canSeeAllAssociations())
+            ? true
+            : parent::isVisibleFor($user);
+    }
+
     public function words(): WordCollection
     {
         return WordCollection::collect(
