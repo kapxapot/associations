@@ -2,24 +2,34 @@
 
 namespace App\Services;
 
+use App\Events\Association\AssociationCreatedEvent;
 use App\Models\Association;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
 use Webmozart\Assert\Assert;
 
+/**
+ * @emits AssociationCreatedEvent
+ */
 class AssociationService
 {
     private AssociationRepositoryInterface $associationRepository;
 
+    private EventDispatcher $eventDispatcher;
+
     public function __construct(
-        AssociationRepositoryInterface $associationRepository
+        AssociationRepositoryInterface $associationRepository,
+        EventDispatcher $eventDispatcher
     )
     {
         $this->associationRepository = $associationRepository;
+
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     public function getOrCreate(
@@ -68,7 +78,7 @@ class AssociationService
 
         [$first, $second] = $this->orderPair($first, $second);
 
-        return $this
+        $association = $this
             ->associationRepository
             ->store(
                 [
@@ -78,6 +88,12 @@ class AssociationService
                     'language_id' => $language ? $language->getId() : null
                 ]
             );
+
+        $this->eventDispatcher->dispatch(
+            new AssociationCreatedEvent($association)
+        );
+
+        return $association;
     }
 
     public function checkPair(

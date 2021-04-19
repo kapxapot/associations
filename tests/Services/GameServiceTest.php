@@ -128,7 +128,8 @@ class GameServiceTest extends TestCase
         );
 
         $associationService = new AssociationService(
-            $this->associationRepository
+            $this->associationRepository,
+            $eventDispatcher
         );
 
         $turnService = new TurnService(

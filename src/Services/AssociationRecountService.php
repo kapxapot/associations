@@ -37,11 +37,14 @@ class AssociationRecountService
         $this->eventDispatcher = $eventDispatcher;
     }
 
-    public function recountAll(Association $assoc, ?Event $sourceEvent = null): Association
+    public function recountAll(
+        Association $association,
+        ?Event $sourceEvent = null
+    ): Association
     {
-        $assoc = $this->recountDisabled($assoc, $sourceEvent);
-        $assoc = $this->recountApproved($assoc, $sourceEvent);
-        $assoc = $this->recountMature($assoc, $sourceEvent);
+        $assoc = $this->recountDisabled($association, $sourceEvent);
+        $assoc = $this->recountApproved($association, $sourceEvent);
+        $assoc = $this->recountMature($association, $sourceEvent);
 
         return $assoc;
     }

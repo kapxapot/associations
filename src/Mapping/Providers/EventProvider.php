@@ -3,6 +3,7 @@
 namespace App\Mapping\Providers;
 
 use App\EventHandlers\Association\AssociationApprovedChangedHandler;
+use App\EventHandlers\Association\AssociationCreatedHandler;
 use App\EventHandlers\Association\AssociationOutOfDateHandler;
 use App\EventHandlers\Definition\DefinitionLinkedHandler;
 use App\EventHandlers\Definition\DefinitionUnlinkedHandler;
@@ -33,6 +34,10 @@ class EventProvider extends MappingProvider
         return [
             new AssociationApprovedChangedHandler(
                 $container->get(WordRecountService::class)
+            ),
+
+            new AssociationCreatedHandler(
+                $container->get(AssociationRecountService::class)
             ),
 
             new AssociationFeedbackCreatedHandler(

@@ -36,9 +36,9 @@
             </p>
 
             <p class="font-xl br-word lh-1 mb-3">
-                {% include "components/word.twig" with { 'word': association.first_word, 'show_lock': true } only %}
+                {% include "components/word.twig" with { 'word': association.first_word, 'show_lock': is_moderator } only %}
                 {% include 'components/association_sign.twig' with { 'association': association } only %}
-                {% include "components/word.twig" with { 'word': association.second_word, 'show_lock': true } only %}
+                {% include "components/word.twig" with { 'word': association.second_word, 'show_lock': is_moderator } only %}
             </p>
 
             <p>{{ lm.genderize(association.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
