@@ -7,9 +7,13 @@ use Plasticode\Util\Arrays;
 
 class Sentence
 {
+    const PERIOD = '.';
+    const COMMA_DELIMITER = ', ';
+    const AND_DELIMITER = ' и ';
+
     /**
      * Joins parts into a sentence such as "a, b, c".
-     *
+     * 
      * @param array|ArrayableInterface $array
      */
     public static function join(
@@ -18,14 +22,14 @@ class Sentence
     ) : string
     {
         return implode(
-            $commaDelimiter ?? ', ',
+            $commaDelimiter ?? self::COMMA_DELIMITER,
             Arrays::adopt($array)
         );
     }
 
     /**
      * Joins homogeneous parts into a sentence such as "a, b и c".
-     *
+     * 
      * @param array|ArrayableInterface $array
      */
     public static function homogeneousJoin(
@@ -36,8 +40,8 @@ class Sentence
     {
         $chunks = Arrays::adopt($array);
 
-        $commaDelimiter ??= ', ';
-        $andDelimiter ??= ' и ';
+        $commaDelimiter ??= self::COMMA_DELIMITER;
+        $andDelimiter ??= self::AND_DELIMITER;
 
         // a
         // a и b
@@ -71,6 +75,6 @@ class Sentence
      */
     public static function tailPeriod(string $str): string
     {
-        return trim($str, ".") . '.';
+        return trim($str, self::PERIOD) . self::PERIOD;
     }
 }

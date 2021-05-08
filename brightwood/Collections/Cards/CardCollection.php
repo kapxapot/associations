@@ -4,6 +4,7 @@ namespace Brightwood\Collections\Cards;
 
 use App\Semantics\Sentence;
 use Brightwood\Models\Cards\Card;
+use Plasticode\Collections\Generic\EquatableCollection;
 
 class CardCollection extends EquatableCollection
 {

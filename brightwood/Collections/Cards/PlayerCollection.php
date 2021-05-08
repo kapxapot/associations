@@ -4,19 +4,20 @@ namespace Brightwood\Collections\Cards;
 
 use App\Semantics\Sentence;
 use Brightwood\Models\Cards\Players\Player;
+use Plasticode\Collections\Generic\EquatableCollection;
 
 class PlayerCollection extends EquatableCollection
 {
     protected string $class = Player::class;
 
-    public function inspector() : ?Player
+    public function inspector(): ?Player
     {
         return $this->first(
             fn (Player $p) => $p->isInspector()
         );
     }
 
-    public function handsString() : string
+    public function handsString(): string
     {
         return Sentence::join(
             $this->map(
@@ -25,12 +26,12 @@ class PlayerCollection extends EquatableCollection
         );
     }
 
-    public function toSentence() : string
+    public function toSentence(): string
     {
         return Sentence::homogeneousJoin($this);
     }
 
-    public function find(?string $id) : ?Player
+    public function find(?string $id): ?Player
     {
         return $this->first(
             fn (Player $p) => $p->id() == $id

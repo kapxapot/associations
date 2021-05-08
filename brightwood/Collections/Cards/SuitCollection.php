@@ -3,6 +3,7 @@
 namespace Brightwood\Collections\Cards;
 
 use Brightwood\Models\Cards\Suit;
+use Plasticode\Collections\Generic\EquatableCollection;
 use Webmozart\Assert\Assert;
 
 class SuitCollection extends EquatableCollection
