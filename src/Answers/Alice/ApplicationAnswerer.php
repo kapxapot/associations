@@ -6,7 +6,7 @@ use App\Models\DTO\AliceRequest;
 use App\Models\DTO\AliceResponse;
 use App\Models\DTO\MetaTurn;
 use App\Models\Word;
-use App\Semantics\Sentence;
+use Plasticode\Semantics\Sentence;
 
 class ApplicationAnswerer extends AbstractAnswerer
 {

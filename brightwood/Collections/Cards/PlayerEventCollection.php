@@ -2,8 +2,8 @@
 
 namespace Brightwood\Collections\Cards;
 
-use App\Semantics\Sentence;
 use Brightwood\Models\Cards\Events\Generic\PlayerEvent;
+use Plasticode\Semantics\Sentence;
 
 class PlayerEventCollection extends CardEventCollection
 {

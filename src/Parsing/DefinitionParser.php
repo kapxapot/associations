@@ -8,7 +8,7 @@ use App\Models\Language;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Definition\DefinitionEntry;
 use App\Semantics\PartOfSpeech;
-use App\Semantics\Sentence;
+use Plasticode\Semantics\Sentence;
 
 class DefinitionParser
 {

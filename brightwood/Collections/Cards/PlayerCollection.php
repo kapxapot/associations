@@ -2,9 +2,9 @@
 
 namespace Brightwood\Collections\Cards;
 
-use App\Semantics\Sentence;
 use Brightwood\Models\Cards\Players\Player;
 use Plasticode\Collections\Generic\EquatableCollection;
+use Plasticode\Semantics\Sentence;
 
 class PlayerCollection extends EquatableCollection
 {
