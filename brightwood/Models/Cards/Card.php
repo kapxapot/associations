@@ -2,10 +2,10 @@
 
 namespace Brightwood\Models\Cards;
 
-use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 use Brightwood\Models\Cards\Restrictions\Interfaces\RestrictionInterface;
 use InvalidArgumentException;
 use JsonSerializable;
+use Plasticode\Models\Interfaces\EquatableInterface;
 use Webmozart\Assert\Assert;
 
 abstract class Card implements EquatableInterface, JsonSerializable

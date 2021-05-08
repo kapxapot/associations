@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Cards;
 
-use Brightwood\Models\Cards\Interfaces\EquatableInterface;
+use Plasticode\Models\Interfaces\EquatableInterface;
 
 class SuitedCard extends Card
 {
@@ -18,12 +18,12 @@ class SuitedCard extends Card
         $this->rank = $rank;
     }
 
-    public function suit() : Suit
+    public function suit(): Suit
     {
         return $this->suit;
     }
 
-    public function rank() : Rank
+    public function rank(): Rank
     {
         return $this->rank;
     }
@@ -31,7 +31,7 @@ class SuitedCard extends Card
     /**
      * @param string|null $lang 'ru' and 'en' are supported. null = 'en'.
      */
-    public function name(?string $lang = null) : string
+    public function name(?string $lang = null): string
     {
         $lang ??= 'en';
 
@@ -47,7 +47,7 @@ class SuitedCard extends Card
     /**
      * @param string|null $lang 'ru' and 'en' are supported. null = 'en'.
      */
-    public function fullName(?string $lang = null) : string
+    public function fullName(?string $lang = null): string
     {
         $lang ??= 'en';
 
@@ -60,7 +60,7 @@ class SuitedCard extends Card
         }
     }
 
-    public function equals(?EquatableInterface $obj) : bool
+    public function equals(?EquatableInterface $obj): bool
     {
         return
             $obj
@@ -74,7 +74,7 @@ class SuitedCard extends Card
      * 
      * ♥8
      */
-    public static function tryParse(?string $str) : ?self
+    public static function tryParse(?string $str): ?self
     {
         if (mb_strlen($str) < 2) {
             return null;
@@ -93,31 +93,31 @@ class SuitedCard extends Card
         return new self($suit, $rank);
     }
 
-    public function isSuited() : bool
+    public function isSuited(): bool
     {
         return true;
     }
 
-    public function isSameSuit(self $card) : bool
+    public function isSameSuit(self $card): bool
     {
         return $this->isSuit(
             $card->suit()
         );
     }
 
-    public function isSameRank(self $card) : bool
+    public function isSameRank(self $card): bool
     {
         return $this->isRank(
             $card->rank()
         );
     }
 
-    public function isSuit(Suit $suit) : bool
+    public function isSuit(Suit $suit): bool
     {
         return $this->suit->equals($suit);
     }
 
-    public function isRank(Rank $rank) : bool
+    public function isRank(Rank $rank): bool
     {
         return $this->rank->equals($rank);
     }

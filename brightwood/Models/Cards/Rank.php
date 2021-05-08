@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\RankCollection;
-use Brightwood\Models\Cards\Interfaces\EquatableInterface;
+use Plasticode\Models\Interfaces\EquatableInterface;
 
 class Rank implements EquatableInterface
 {
@@ -55,12 +55,12 @@ class Rank implements EquatableInterface
         $this->valueRu = $valueRu ?? $value;
     }
 
-    public function id() : int
+    public function id(): int
     {
         return $this->id;
     }
 
-    public function withCode(string $code) : self
+    public function withCode(string $code): self
     {
         $this->code = $code;
 
@@ -75,17 +75,17 @@ class Rank implements EquatableInterface
         return $this->value;
     }
 
-    public function code() : string
+    public function code(): string
     {
         return $this->code;
     }
 
-    public function name() : string
+    public function name(): string
     {
         return $this->name;
     }
 
-    public function nameRu() : string
+    public function nameRu(): string
     {
         return $this->nameRu;
     }
@@ -101,12 +101,12 @@ class Rank implements EquatableInterface
     /**
      * @param self|null $obj
      */
-    public function equals(?EquatableInterface $obj) : bool
+    public function equals(?EquatableInterface $obj): bool
     {
         return $obj && ($this->id() == $obj->id());
     }
 
-    public static function all() : RankCollection
+    public static function all(): RankCollection
     {
         self::$ranks ??= RankCollection::collect(
             new self(self::ACE, 'A', 'ace', 'туз', 'Т'),
@@ -127,67 +127,67 @@ class Rank implements EquatableInterface
         return self::$ranks;
     }
 
-    public static function ace() : self
+    public static function ace(): self
     {
         return self::all()->get(self::ACE);
     }
 
-    public static function two() : self
+    public static function two(): self
     {
         return self::all()->get(self::TWO);
     }
 
-    public static function three() : self
+    public static function three(): self
     {
         return self::all()->get(self::THREE);
     }
 
-    public static function four() : self
+    public static function four(): self
     {
         return self::all()->get(self::FOUR);
     }
 
-    public static function five() : self
+    public static function five(): self
     {
         return self::all()->get(self::FIVE);
     }
 
-    public static function six() : self
+    public static function six(): self
     {
         return self::all()->get(self::SIX);
     }
 
-    public static function seven() : self
+    public static function seven(): self
     {
         return self::all()->get(self::SEVEN);
     }
 
-    public static function eight() : self
+    public static function eight(): self
     {
         return self::all()->get(self::EIGHT);
     }
 
-    public static function nine() : self
+    public static function nine(): self
     {
         return self::all()->get(self::NINE);
     }
 
-    public static function ten() : self
+    public static function ten(): self
     {
         return self::all()->get(self::TEN);
     }
 
-    public static function jack() : self
+    public static function jack(): self
     {
         return self::all()->get(self::JACK);
     }
 
-    public static function queen() : self
+    public static function queen(): self
     {
         return self::all()->get(self::QUEEN);
     }
 
-    public static function king() : self
+    public static function king(): self
     {
         return self::all()->get(self::KING);
     }
@@ -195,7 +195,7 @@ class Rank implements EquatableInterface
     /**
      * Tries to parse rank. If not successful, returns null.
      */
-    public static function tryParse(?string $str) : ?self
+    public static function tryParse(?string $str): ?self
     {
         return self::all()->first(
             fn (self $r) => $r->code === $str || (string)$r->value === $str
@@ -207,7 +207,7 @@ class Rank implements EquatableInterface
         return $this->toString();
     }
 
-    public function toString() : string
+    public function toString(): string
     {
         return $this->value;
     }

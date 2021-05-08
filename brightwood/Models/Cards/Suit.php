@@ -3,9 +3,9 @@
 namespace Brightwood\Models\Cards;
 
 use Brightwood\Collections\Cards\SuitCollection;
-use Brightwood\Models\Cards\Interfaces\EquatableInterface;
 use InvalidArgumentException;
 use JsonSerializable;
+use Plasticode\Models\Interfaces\EquatableInterface;
 use Webmozart\Assert\Assert;
 
 class Suit implements EquatableInterface, JsonSerializable
@@ -73,9 +73,6 @@ class Suit implements EquatableInterface, JsonSerializable
         return $this->symbol . ' ' . $this->nameRu;
     }
 
-    /**
-     * @param self|null $obj
-     */
     public function equals(?EquatableInterface $obj): bool
     {
         return $obj && ($this->id() == $obj->id());
