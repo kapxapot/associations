@@ -169,6 +169,7 @@ abstract class AbstractAnswerer
         return $request->hasAny(
             'включи',
             'включить',
+            'выйди',
             'выйти',
             'выключай',
             'выключайся',
@@ -199,6 +200,8 @@ abstract class AbstractAnswerer
             'прекращай',
             'прекращаем',
             'скажи',
+            'устал',
+            'устала',
             'хватит'
         ) || $request->hasAnySet(
             ['стоп', 'игра'],
