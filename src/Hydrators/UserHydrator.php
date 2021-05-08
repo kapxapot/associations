@@ -6,12 +6,12 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Models\User;
 use App\Repositories\Interfaces\AliceUserRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\UserService;
 use Plasticode\External\Gravatar;
 use Plasticode\Hydrators\UserHydrator as BaseUserHydrator;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Repositories\Interfaces\RoleRepositoryInterface;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
 
 class UserHydrator extends BaseUserHydrator
 {

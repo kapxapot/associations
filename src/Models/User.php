@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Models\Interfaces\GenderedInterface;
-use App\Models\Traits\Gendered;
 use App\Policies\UserPolicy;
+use Plasticode\Models\Interfaces\GenderedInterface;
+use Plasticode\Models\Traits\Gendered;
 use Plasticode\Models\User as UserBase;
 use Plasticode\Util\Date;
 

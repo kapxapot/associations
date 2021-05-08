@@ -2,14 +2,14 @@
 
 namespace Brightwood\Tests;
 
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
-use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
-use App\Testing\Seeders\TelegramUserSeeder;
 use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Testing\Factories\RootDeserializerFactory;
 use PHPUnit\Framework\TestCase;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
+use Plasticode\Testing\Seeders\TelegramUserSeeder;
 
 abstract class SerializationTestCase extends TestCase
 {

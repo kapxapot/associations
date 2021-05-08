@@ -2,12 +2,13 @@
 
 namespace Brightwood\Models\Nodes;
 
-use App\Models\TelegramUser;
 use Brightwood\Collections\ActionLinkCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
+use InvalidArgumentException;
+use Plasticode\Models\TelegramUser;
 use Webmozart\Assert\Assert;
 
 class ActionNode extends LinkedNode
@@ -46,7 +47,7 @@ class ActionNode extends LinkedNode
         TelegramUser $tgUser,
         StoryData $data,
         ?string $text = null
-    ) : StoryMessageSequence
+    ): StoryMessageSequence
     {
         $data = $this->mutate($data);
         $actions = $this->links->satisfying($data)->actions();
@@ -59,9 +60,9 @@ class ActionNode extends LinkedNode
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function checkIntegrity() : void
+    public function checkIntegrity(): void
     {
         parent::checkIntegrity();
 

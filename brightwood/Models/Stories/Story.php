@@ -2,7 +2,6 @@
 
 namespace Brightwood\Models\Stories;
 
-use App\Models\TelegramUser;
 use Brightwood\Collections\StoryNodeCollection;
 use Brightwood\Models\Command;
 use Brightwood\Models\Data\StoryData;
@@ -12,7 +11,9 @@ use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\StoryNode;
+use InvalidArgumentException;
 use Plasticode\Exceptions\InvalidConfigurationException;
+use Plasticode\Models\TelegramUser;
 use Webmozart\Assert\Assert;
 
 abstract class Story implements CommandProviderInterface
@@ -45,47 +46,47 @@ abstract class Story implements CommandProviderInterface
         $this->checkIntegrity();
     }
 
-    public function id() : int
+    public function id(): int
     {
         return $this->id;
     }
 
-    public function name() : string
+    public function name(): string
     {
         return $this->name;
     }
 
-    public function isPublished() : bool
+    public function isPublished(): bool
     {
         return $this->published;
     }
 
-    public function nodes() : StoryNodeCollection
+    public function nodes(): StoryNodeCollection
     {
         return $this->nodes;
     }
 
-    public function startNode() : ?StoryNode
+    public function startNode(): ?StoryNode
     {
         return $this->startNode;
     }
 
-    abstract public function makeData(?array $data = null) : StoryData;
+    abstract public function makeData(?array $data = null): StoryData;
 
     /**
      * Override this.
      */
-    public function executeCommand(string $command) : StoryMessageSequence
+    public function executeCommand(string $command): StoryMessageSequence
     {
         return StoryMessageSequence::empty();
     }
 
-    abstract protected function build() : void;
+    abstract protected function build(): void;
 
     /**
      * @return $this
      */
-    public function setStartNode(StoryNode $node) : self
+    public function setStartNode(StoryNode $node): self
     {
         Assert::null(
             $this->startNode,
@@ -101,7 +102,7 @@ abstract class Story implements CommandProviderInterface
     /**
      * @return $this
      */
-    public function setMessagePrefix(string $msg) : self
+    public function setMessagePrefix(string $msg): self
     {
         $this->messagePrefix = $msg;
 
@@ -111,7 +112,7 @@ abstract class Story implements CommandProviderInterface
     /**
      * @return $this
      */
-    public function addNode(StoryNode $node) : self
+    public function addNode(StoryNode $node): self
     {
         $this->nodes = $this->nodes->add(
             $node->withStory($this)
@@ -120,7 +121,7 @@ abstract class Story implements CommandProviderInterface
         return $this;
     }
 
-    public function getNode(?int $id) : ?StoryNode
+    public function getNode(?int $id): ?StoryNode
     {
         if (is_null($id)) {
             return null;
@@ -134,7 +135,7 @@ abstract class Story implements CommandProviderInterface
     /**
      * Renders the start node with a fresh data.
      */
-    public function start(TelegramUser $tgUser) : StoryMessageSequence
+    public function start(TelegramUser $tgUser): StoryMessageSequence
     {
         $node = $this->startNode();
         $data = $this->makeData();
@@ -150,7 +151,7 @@ abstract class Story implements CommandProviderInterface
         StoryNode $node,
         StoryData $data,
         ?string $text = null
-    ) : StoryMessageSequence
+    ): StoryMessageSequence
     {
         $sequence = $node
             ->getMessages($tgUser, $data, $text)
@@ -163,7 +164,7 @@ abstract class Story implements CommandProviderInterface
      * Checks if the node is a finish node (= no actions)
      * and marks the sequence as finalized in that case.
      */
-    public function checkForFinish(StoryMessageSequence $sequence) : StoryMessageSequence
+    public function checkForFinish(StoryMessageSequence $sequence): StoryMessageSequence
     {
         $resultNode = $this->getNode($sequence->nodeId());
 
@@ -185,7 +186,7 @@ abstract class Story implements CommandProviderInterface
         StoryNode $node,
         StoryData $data,
         string $text
-    ) : ?StoryMessageSequence
+    ): ?StoryMessageSequence
     {
         if ($node->isFinish($data)) {
             return (self::RESTART_COMMAND === $text)
@@ -222,9 +223,9 @@ abstract class Story implements CommandProviderInterface
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function checkIntegrity() : void
+    public function checkIntegrity(): void
     {
         Assert::notNull($this->startNode);
         Assert::notEmpty($this->nodes);

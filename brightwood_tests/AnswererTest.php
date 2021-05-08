@@ -2,10 +2,7 @@
 
 namespace Brightwood\Tests;
 
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
-use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use Brightwood\Answers\Answerer;
-use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
@@ -14,6 +11,8 @@ use Brightwood\Testing\Factories\LoggerFactory;
 use Brightwood\Testing\Factories\RootDeserializerFactory;
 use Brightwood\Testing\Mocks\Repositories\StoryStatusRepositoryMock;
 use PHPUnit\Framework\TestCase;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use Plasticode\Util\Cases;
 use Psr\Log\LoggerInterface;
 

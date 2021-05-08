@@ -37,7 +37,6 @@ use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use App\Repositories\Interfaces\PageRepositoryInterface;
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
@@ -46,7 +45,6 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Repositories\LanguageRepository;
 use App\Repositories\NewsRepository;
 use App\Repositories\PageRepository;
-use App\Repositories\TelegramUserRepository;
 use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
@@ -64,6 +62,8 @@ use Plasticode\Mapping\Interfaces\MappingProviderInterface;
 use Plasticode\Parsing\Interfaces\ParserInterface;
 use Plasticode\Parsing\Parsers\CutParser;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use Plasticode\Repositories\TelegramUserRepository;
 use Plasticode\Testing\AbstractProviderTest;
 
 final class RepositoryProviderTest extends AbstractProviderTest

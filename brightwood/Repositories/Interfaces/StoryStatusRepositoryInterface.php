@@ -2,13 +2,16 @@
 
 namespace Brightwood\Repositories\Interfaces;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\StoryStatus;
+use Plasticode\Models\TelegramUser;
 
 interface StoryStatusRepositoryInterface
 {
-    function get(?int $id) : ?StoryStatus;
-    function getByTelegramUser(TelegramUser $telegramUser) : ?StoryStatus;
-    function save(StoryStatus $storyStatus) : StoryStatus;
-    function store(array $data) : StoryStatus;
+    public function get(?int $id): ?StoryStatus;
+
+    public function getByTelegramUser(TelegramUser $telegramUser): ?StoryStatus;
+
+    public function save(StoryStatus $storyStatus): StoryStatus;
+
+    public function store(array $data): StoryStatus;
 }

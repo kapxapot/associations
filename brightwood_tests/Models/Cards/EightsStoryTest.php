@@ -2,19 +2,19 @@
 
 namespace Brightwood\Tests\Models\Cards;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Testing\Factories\RootDeserializerFactory;
 use PHPUnit\Framework\TestCase;
+use Plasticode\Models\TelegramUser;
 
 final class EightsStoryTest extends TestCase
 {
     private RootDeserializerInterface $rootDeserializer;
     private EightsStory $story;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -22,7 +22,7 @@ final class EightsStoryTest extends TestCase
         $this->story = new EightsStory(3, $this->rootDeserializer);
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         unset($this->story);
         unset($this->rootDeserializer);
@@ -30,14 +30,14 @@ final class EightsStoryTest extends TestCase
         parent::tearDown();
     }
 
-    public function testStart() : void
+    public function testStart(): void
     {
         $sequence = $this->story->start(new TelegramUser());
 
         $this->assertNotNull($sequence);
     }
 
-    public function testMakeData() : void
+    public function testMakeData(): void
     {
         $data = $this->story->makeData(
             [
@@ -52,7 +52,7 @@ final class EightsStoryTest extends TestCase
         $this->assertInstanceOf(EightsData::class, $data);
     }
 
-    public function testMakeDataFull() : void
+    public function testMakeDataFull(): void
     {
         $jsonStr = file_get_contents('brightwood_tests/Files/eights_data_1.json');
 

@@ -2,7 +2,6 @@
 
 namespace Brightwood\Testing\Models;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\SimpleRedirectNode;

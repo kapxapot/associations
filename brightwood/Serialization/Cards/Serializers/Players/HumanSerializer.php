@@ -2,9 +2,9 @@
 
 namespace Brightwood\Serialization\Cards\Serializers\Players;
 
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Webmozart\Assert\Assert;
 
 class HumanSerializer extends PlayerSerializer
@@ -25,7 +25,7 @@ class HumanSerializer extends PlayerSerializer
         RootDeserializerInterface $rootDeserializer,
         object $obj,
         array $data
-    ) : Human
+    ): Human
     {
         /** @var Human */
         $obj = parent::deserialize($rootDeserializer, $obj, $data);

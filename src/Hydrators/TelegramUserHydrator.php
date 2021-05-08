@@ -2,10 +2,10 @@
 
 namespace App\Hydrators;
 
-use App\Models\TelegramUser;
-use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Hydrators\Generic\Hydrator;
 use Plasticode\Models\Generic\DbModel;
+use Plasticode\Models\TelegramUser;
+use Plasticode\Repositories\Interfaces\UserRepositoryInterface;
 
 class TelegramUserHydrator extends Hydrator
 {

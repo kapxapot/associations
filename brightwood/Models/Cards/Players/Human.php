@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Cards\Players;
 
-use App\Models\TelegramUser;
+use Plasticode\Models\TelegramUser;
 use Plasticode\Util\Cases;
 use Webmozart\Assert\Assert;
 

@@ -2,10 +2,10 @@
 
 namespace Brightwood\Tests;
 
-use App\Models\TelegramUser;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Testing\Models\TestData;
 use PHPUnit\Framework\TestCase;
+use Plasticode\Models\TelegramUser;
 use Plasticode\Util\Cases;
 
 final class StoryParserTest extends TestCase
@@ -16,7 +16,7 @@ final class StoryParserTest extends TestCase
     private TelegramUser $male;
     private TelegramUser $female;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -24,20 +24,16 @@ final class StoryParserTest extends TestCase
 
         $this->default = new TelegramUser();
 
-        $this->male = new TelegramUser(
-            [
-                'gender_id' => Cases::MAS
-            ]
-        );
+        $this->male = new TelegramUser([
+            'gender_id' => Cases::MAS
+        ]);
 
-        $this->female = new TelegramUser(
-            [
-                'gender_id' => Cases::FEM
-            ]
-        );
+        $this->female = new TelegramUser([
+            'gender_id' => Cases::FEM
+        ]);
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         unset($this->female);
         unset($this->male);
@@ -48,7 +44,7 @@ final class StoryParserTest extends TestCase
         parent::tearDown();
     }
 
-    public function testPlainText() : void
+    public function testPlainText(): void
     {
         $text = 'just text';
 
@@ -58,7 +54,7 @@ final class StoryParserTest extends TestCase
         );
     }
 
-    public function testGenderedText() : void
+    public function testGenderedText(): void
     {
         $text = 'hello, {male|female} friend';
 
@@ -73,7 +69,7 @@ final class StoryParserTest extends TestCase
         );
     }
 
-    public function testValidVar() : void
+    public function testValidVar(): void
     {
         $text = 'День: {day}';
 
@@ -85,7 +81,7 @@ final class StoryParserTest extends TestCase
         );
     }
 
-    public function testInvalidVar() : void
+    public function testInvalidVar(): void
     {
         $text = 'Здоровье: {hp}';
 

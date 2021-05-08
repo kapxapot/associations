@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\Interfaces\GenderedInterface;
-use App\Models\Interfaces\NamedInterface;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
+use Plasticode\Models\Interfaces\GenderedInterface;
+use Plasticode\Models\Interfaces\NamedInterface;
 use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
+use Plasticode\Models\Traits\Gendered;
 use Plasticode\Models\Traits\UpdatedAt;
 
 /**
@@ -24,6 +25,7 @@ use Plasticode\Models\Traits\UpdatedAt;
 class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterface, NamedInterface, UpdatedAtInterface
 {
     use CreatedAt;
+    use Gendered;
     use UpdatedAt;
 
     protected function requiredWiths(): array
@@ -67,12 +69,7 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
             : $this->username;
     }
 
-    // GenderedInterface
-
-    public function hasGender(): bool
-    {
-        return $this->genderId !== null;
-    }
+    // GenderedInterface (partially implemented in Gendered trait)
 
     public function gender(): ?int
     {

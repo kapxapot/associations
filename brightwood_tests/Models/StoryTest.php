@@ -2,14 +2,14 @@
 
 namespace Brightwood\Tests\Models;
 
-use App\Models\TelegramUser;
 use Brightwood\Testing\Models\TestData;
 use Brightwood\Testing\Models\TestStory;
 use PHPUnit\Framework\TestCase;
+use Plasticode\Models\TelegramUser;
 
 final class StoryTest extends TestCase
 {
-    public function testStart() : void
+    public function testStart(): void
     {
         $story = new TestStory(1);
         $sequence = $story->start(new TelegramUser());
@@ -17,7 +17,7 @@ final class StoryTest extends TestCase
         $this->assertNotNull($sequence);
     }
 
-    public function testRenderNode() : void
+    public function testRenderNode(): void
     {
         $tgUser = new TelegramUser();
         $story = new TestStory(1);
@@ -29,7 +29,7 @@ final class StoryTest extends TestCase
         $this->assertNotNull($sequence->data());
     }
 
-    public function testGo() : void
+    public function testGo(): void
     {
         $story = new TestStory(1);
         $node = $story->getNode(6);
@@ -48,7 +48,7 @@ final class StoryTest extends TestCase
         $this->assertNotNull($sequence->data());
     }
 
-    public function testDefaultMakeData() : void
+    public function testDefaultMakeData(): void
     {
         $story = new TestStory(1);
         $data = $story->makeData();
@@ -57,7 +57,7 @@ final class StoryTest extends TestCase
         $this->assertEquals(1, $data->day);
     }
 
-    public function testPredefinedMakeData() : void
+    public function testPredefinedMakeData(): void
     {
         $story = new TestStory(1);
         $data = $story->makeData(['day' => 2]);
@@ -66,7 +66,7 @@ final class StoryTest extends TestCase
         $this->assertEquals(2, $data->day);
     }
 
-    public function testFinishNode() : void
+    public function testFinishNode(): void
     {
         $tgUser = new TelegramUser();
         $story = new TestStory(1);
@@ -84,7 +84,7 @@ final class StoryTest extends TestCase
         );
     }
 
-    public function testEmptyFinishNode() : void
+    public function testEmptyFinishNode(): void
     {
         $tgUser = new TelegramUser();
         $story = new TestStory(1);

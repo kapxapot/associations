@@ -2,7 +2,6 @@
 
 namespace Brightwood\Models\Data;
 
-use App\Models\TelegramUser;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Games\EightsGame;
 use Brightwood\Models\Cards\Players\Bot;
@@ -11,6 +10,7 @@ use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Serialization\Interfaces\SerializableInterface;
 use Brightwood\Serialization\UniformSerializer;
+use Plasticode\Models\TelegramUser;
 use Plasticode\Util\Cases;
 use Webmozart\Assert\Assert;
 

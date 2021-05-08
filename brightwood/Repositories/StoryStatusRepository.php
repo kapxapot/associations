@@ -2,9 +2,9 @@
 
 namespace Brightwood\Repositories;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
+use Plasticode\Models\TelegramUser;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Util\Date;
 

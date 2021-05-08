@@ -2,7 +2,6 @@
 
 namespace Brightwood\Tests\Mapping;
 
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Answers\Answerer;
 use Brightwood\Config\SerializationConfig;
 use Brightwood\External\TelegramTransport;
@@ -22,6 +21,7 @@ use Plasticode\Auth\Interfaces as AuthCore;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Data\DbMetadata;
 use Plasticode\Mapping\Interfaces\MappingProviderInterface;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Testing\AbstractProviderTest;
 use Psr\Log\LoggerInterface;

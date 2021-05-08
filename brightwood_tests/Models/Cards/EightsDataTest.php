@@ -2,7 +2,6 @@
 
 namespace Brightwood\Tests\Models\Cards;
 
-use App\Models\TelegramUser;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Actions\Eights\SixGiftAction;
@@ -23,11 +22,12 @@ use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Tests\SerializationTestCase;
+use Plasticode\Models\TelegramUser;
 use Plasticode\Util\Cases;
 
 final class EightsDataTest extends SerializationTestCase
 {
-    public function testSerialize() : void
+    public function testSerialize(): void
     {
         $player1 = (new Bot())
             ->withId('929e1b1d93a09b7d5aba')
@@ -144,8 +144,6 @@ final class EightsDataTest extends SerializationTestCase
 
         $jsonStr = json_encode($data);
 
-        //var_dump($jsonStr);
-
         $this->assertIsString($jsonStr);
 
         $expectedJsonStr = file_get_contents('brightwood_tests/Files/eights_data.json');
@@ -153,7 +151,7 @@ final class EightsDataTest extends SerializationTestCase
         $this->assertEquals($expectedJsonStr, $jsonStr . PHP_EOL);
     }
 
-    public function testDeserialize() : void
+    public function testDeserialize(): void
     {
         $jsonStr = file_get_contents('brightwood_tests/Files/eights_data.json');
 

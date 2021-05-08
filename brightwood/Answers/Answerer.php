@@ -2,8 +2,6 @@
 
 namespace Brightwood\Answers;
 
-use App\Models\TelegramUser;
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\StoryMessageSequence;
@@ -12,6 +10,8 @@ use Brightwood\Models\Stories\Story;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
+use Plasticode\Models\TelegramUser;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Plasticode\Util\Cases;
 use Plasticode\Util\Strings;
 use Psr\Log\LoggerInterface;

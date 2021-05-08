@@ -2,9 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\TelegramUser;
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use Plasticode\Models\TelegramUser;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Webmozart\Assert\Assert;
 
 class TelegramUserService
@@ -30,14 +30,12 @@ class TelegramUserService
         $tgUser = $this->telegramUserRepository->getByTelegramId($tgUserId);
 
         if ($tgUser === null) {
-            $tgUser = $this->telegramUserRepository->store(
-                [
-                    'telegram_id' => $tgUserId,
-                    'username' => $data['username'] ?? null,
-                    'first_name' => $data['first_name'] ?? null,
-                    'last_name' => $data['last_name'] ?? null,
-                ]
-            );
+            $tgUser = $this->telegramUserRepository->store([
+                'telegram_id' => $tgUserId,
+                'username' => $data['username'] ?? null,
+                'first_name' => $data['first_name'] ?? null,
+                'last_name' => $data['last_name'] ?? null,
+            ]);
         }
 
         Assert::notNull($tgUser);
@@ -54,13 +52,11 @@ class TelegramUserService
             return $tgUser;
         }
 
-        $user = $this->userRepository->store(
-            [
-                'login' => '',
-                'password' => '',
-                'age' => 0,
-            ]
-        );
+        $user = $this->userRepository->store([
+            'login' => '',
+            'password' => '',
+            'age' => 0,
+        ]);
 
         Assert::notNull($user);
 

@@ -2,9 +2,9 @@
 
 namespace Brightwood\Models\Nodes;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessageSequence;
+use Plasticode\Models\TelegramUser;
 
 class FunctionNode extends StoryNode
 {
@@ -21,7 +21,7 @@ class FunctionNode extends StoryNode
         $this->function = $function;
     }
 
-    public function isFinish(?StoryData $data) : bool
+    public function isFinish(?StoryData $data): bool
     {
         // todo: allow to redefine this
         return false;
@@ -31,7 +31,7 @@ class FunctionNode extends StoryNode
         TelegramUser $tgUser,
         StoryData $data,
         ?string $text = null
-    ) : StoryMessageSequence
+    ): StoryMessageSequence
     {
         /** @var StoryMessageSequence */
         $sequence = ($this->function)($tgUser, $data, $text);

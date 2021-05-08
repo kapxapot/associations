@@ -2,8 +2,6 @@
 
 namespace Brightwood\Controllers;
 
-use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
-use App\Testing\Seeders\TelegramUserSeeder;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Games\EightsGame;
@@ -13,6 +11,8 @@ use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Parsing\StoryParser;
 use Plasticode\Core\Response;
+use Plasticode\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
+use Plasticode\Testing\Seeders\TelegramUserSeeder;
 use Plasticode\Util\Cases;
 use Plasticode\Util\Text;
 use Psr\Http\Message\ResponseInterface;

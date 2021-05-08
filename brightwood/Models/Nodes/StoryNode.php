@@ -2,11 +2,11 @@
 
 namespace Brightwood\Models\Nodes;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\Story;
 use InvalidArgumentException;
+use Plasticode\Models\TelegramUser;
 use Webmozart\Assert\Assert;
 
 abstract class StoryNode
@@ -14,9 +14,7 @@ abstract class StoryNode
     protected ?Story $story = null;
     protected int $id;
 
-    public function __construct(
-        int $id
-    )
+    public function __construct(int $id)
     {
         $this->id = $id;
     }

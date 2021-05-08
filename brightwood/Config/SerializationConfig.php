@@ -2,7 +2,6 @@
 
 namespace Brightwood\Config;
 
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\Cards\Actions\Eights\EightGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\JackGiftAction;
 use Brightwood\Models\Cards\Actions\Eights\SevenGiftAction;
@@ -29,6 +28,7 @@ use Brightwood\Serialization\Cards\Serializers\Players\BotSerializer;
 use Brightwood\Serialization\Cards\Serializers\Players\HumanSerializer;
 use Brightwood\Serialization\Cards\Serializers\Restrictions\SuitRestrictionSerializer;
 use Brightwood\Serialization\Cards\SerializerSource;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Plasticode\Util\Cases;
 
 class SerializationConfig extends SerializerSource

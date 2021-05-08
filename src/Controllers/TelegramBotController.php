@@ -4,7 +4,6 @@ namespace App\Controllers;
 
 use App\Exceptions\DuplicateWordException;
 use App\Models\Association;
-use App\Models\TelegramUser;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Validation\AgeValidation;
@@ -19,6 +18,7 @@ use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\ValidationException;
+use Plasticode\Models\TelegramUser;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Text;
 use Plasticode\Validation\Interfaces\ValidatorInterface;

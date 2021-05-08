@@ -2,7 +2,6 @@
 
 namespace Brightwood\Models\Stories;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Games\EightsGame;
@@ -16,6 +15,8 @@ use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\SkipNode;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
+use InvalidArgumentException;
+use Plasticode\Models\TelegramUser;
 use Plasticode\Util\Text;
 use Webmozart\Assert\Assert;
 
@@ -48,12 +49,12 @@ class EightsStory extends Story
         $this->rootDeserializer = $rootDeserializer;
     }
 
-    public function makeData(?array $data = null) : EightsData
+    public function makeData(?array $data = null): EightsData
     {
         if ($data !== null) {
             try {
                 return $this->rootDeserializer->deserialize($data);
-            } catch (\InvalidArgumentException $ex) {
+            } catch (InvalidArgumentException $ex) {
                 // just ignore it
                 // this is needed for parsing the data without the type
             }
@@ -62,7 +63,7 @@ class EightsStory extends Story
         return new EightsData($data);
     }
 
-    public function executeCommand(string $command) : StoryMessageSequence
+    public function executeCommand(string $command): StoryMessageSequence
     {
         switch ($command) {
             case self::RULES_COMMAND:
@@ -101,7 +102,7 @@ class EightsStory extends Story
         return parent::executeCommand($command);
     }
 
-    protected function build() : void
+    protected function build(): void
     {
         $this->setStartNode(
             new SkipNode(
@@ -322,7 +323,7 @@ class EightsStory extends Story
         );
     }
 
-    private function getAndCheckPlayer(EightsGame $game, TelegramUser $tgUser) : Human
+    private function getAndCheckPlayer(EightsGame $game, TelegramUser $tgUser): Human
     {
         /** @var Human */
         $player = $game->currentPlayer();

@@ -2,7 +2,6 @@
 
 namespace Brightwood\Tests\Models;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\Links\ActionLink;
 use Brightwood\Testing\Models\TestData;
 use Brightwood\Testing\Models\TestStory;
@@ -10,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ActionLinkTest extends TestCase
 {
-    public function testEmptyMutatePreservesData() : void
+    public function testEmptyMutatePreservesData(): void
     {
         $story = new TestStory(1);
         $data = $story->makeData();
@@ -25,7 +24,7 @@ final class ActionLinkTest extends TestCase
         $this->assertEquals($data->toArray(), $resultData->toArray());
     }
 
-    public function testMutateMutatesData() : void
+    public function testMutateMutatesData(): void
     {
         $story = new TestStory(1);
         $data = $story->makeData();

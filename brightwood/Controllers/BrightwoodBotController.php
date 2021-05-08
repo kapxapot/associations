@@ -2,7 +2,6 @@
 
 namespace Brightwood\Controllers;
 
-use App\Models\TelegramUser;
 use App\Services\TelegramUserService;
 use Brightwood\Answers\Answerer;
 use Brightwood\External\TelegramTransport;
@@ -12,6 +11,7 @@ use Brightwood\Models\Stories\Story;
 use Brightwood\Parsing\StoryParser;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;
+use Plasticode\Models\TelegramUser;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Debug;
 use Plasticode\Util\Text;

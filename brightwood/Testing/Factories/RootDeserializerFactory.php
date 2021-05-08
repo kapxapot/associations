@@ -2,15 +2,15 @@
 
 namespace Brightwood\Testing\Factories;
 
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
-use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
-use App\Testing\Seeders\TelegramUserSeeder;
 use Brightwood\Config\SerializationConfig;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\RootDeserializer;
 use Brightwood\Serialization\Cards\Serializers\CardSerializer;
 use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
+use Plasticode\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
+use Plasticode\Testing\Seeders\TelegramUserSeeder;
 use Plasticode\Util\Cases;
 
 class RootDeserializerFactory

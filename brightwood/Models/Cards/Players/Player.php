@@ -2,9 +2,6 @@
 
 namespace Brightwood\Models\Cards\Players;
 
-use App\Models\Interfaces\GenderedInterface;
-use App\Models\Interfaces\NamedInterface;
-use App\Models\Traits\Gendered;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Sets\Hand;
@@ -13,6 +10,9 @@ use Brightwood\Serialization\Interfaces\SerializableInterface;
 use Brightwood\Serialization\UniformSerializer;
 use Plasticode\Collections\Generic\Collection;
 use Plasticode\Core\Security;
+use Plasticode\Models\Interfaces\GenderedInterface;
+use Plasticode\Models\Interfaces\NamedInterface;
+use Plasticode\Models\Traits\Gendered;
 
 abstract class Player implements EquatableInterface, GenderedInterface, NamedInterface, SerializableInterface
 {
