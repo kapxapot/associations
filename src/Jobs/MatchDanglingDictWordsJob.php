@@ -55,9 +55,12 @@ class MatchDanglingDictWordsJob implements ModelJobInterface
                     $language = $dictWord->getLanguage();
                     $wordStr = $dictWord->getWord();
 
-                    $word = $this->wordRepository->findInLanguage($language, $wordStr);
+                    // !attention!
+                    // here we must find the word strictly by it's current word string,
+                    // not by the original word string
+                    $word = $this->wordRepository->findInLanguageStrict($language, $wordStr);
 
-                    if (is_null($word)) {
+                    if ($word === null) {
                         return null;
                     }
 

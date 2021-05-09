@@ -50,23 +50,42 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     }
 
     /**
-     * Finds the word by string in the specified language.
+     * Finds the word by string in the specified language strictly by `word_bin` field.
      * 
      * Normalized word string expected.
      */
-    public function findInLanguage(
+    public function findInLanguageStrict(
         Language $language,
         ?string $wordStr,
         ?int $exceptId = null
     ): ?Word
     {
+        return $this->findInLanguage($language, $wordStr, $exceptId, true);
+    }
+
+    /**
+     * Finds the word by string in the specified language.
+     * 
+     * - Searches by `word_bin` and `original_word` fields by default.
+     * - In strict mode (`$strict === true`) searches strictly by `word_bin`.
+     * - Normalized word string expected.
+     */
+    public function findInLanguage(
+        Language $language,
+        ?string $wordStr,
+        ?int $exceptId = null,
+        bool $strict = false
+    ): ?Word
+    {
         return $this
             ->getByLanguageQuery($language)
-            ->whereAnyIs(
-                [
+            ->applyIfElse(
+                $strict,
+                fn (Query $q) => $q->where('word_bin', $wordStr),
+                fn (Query $q) => $q->whereAnyIs([
                     ['word_bin' => $wordStr],
                     ['original_word' => $wordStr],
-                ]
+                ])
             )
             ->applyIf(
                 $exceptId > 0,
