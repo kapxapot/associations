@@ -10,6 +10,7 @@ use App\Models\Game;
 use App\Models\Turn;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Tokenizer;
 use App\Services\AssociationFeedbackService;
 use App\Services\GameService;
 use App\Services\LanguageService;
@@ -33,6 +34,8 @@ class UserAnswerer extends AbstractAnswerer
     private TurnService $turnService;
     private WordFeedbackService $wordFeedbackService;
 
+    private Tokenizer $tokenizer;
+
     public function __construct(
         WordRepositoryInterface $wordRepository,
         AssociationFeedbackService $associationFeedbackService,
@@ -51,6 +54,8 @@ class UserAnswerer extends AbstractAnswerer
         $this->wordFeedbackService = $wordFeedbackService;
 
         $this->logger = $logger;
+
+        $this->tokenizer = new Tokenizer();
     }
 
     public function getResponse(AliceRequest $request, AliceUser $aliceUser): AliceResponse
@@ -363,6 +368,12 @@ class UserAnswerer extends AbstractAnswerer
         $user = $aliceUser->user();
         $game = $this->getGame($aliceUser);
 
+        $prevWord = $game->lastTurnWord();
+
+        if ($prevWord !== null) {
+            $question = $this->purgeWord($question, $prevWord->word);
+        }
+
         $question = $this->deduplicate($question);
 
         try {
@@ -409,11 +420,31 @@ class UserAnswerer extends AbstractAnswerer
     }
 
     /**
-     * Converts 'word word' to 'word' for approved words.
+     * Removes the previous word from the question if it is contained there.
+     */
+    private function purgeWord(string $question, string $prevWord): string
+    {
+        $tokens = $this->tokenizer->tokenize($question);
+        $prevWordTokens = $this->tokenizer->tokenize($prevWord);
+
+        $filteredTokens = array_filter(
+            $tokens,
+            fn (string $token) => !in_array($token, $prevWordTokens)
+        );
+
+        if (empty($filteredTokens)) {
+            return $question;
+        }
+
+        return $this->tokenizer->join($filteredTokens);
+    }
+
+    /**
+     * Converts 'word word' to 'word' for known words.
      */
     private function deduplicate(string $question): string
     {
-        $tokens = explode(' ', $question);
+        $tokens = $this->tokenizer->tokenize($question);
 
         $originalCount = count($tokens);
 
@@ -429,7 +460,7 @@ class UserAnswerer extends AbstractAnswerer
 
         $originalWord = $this->findWord($question);
 
-        if ($originalWord !== null && $originalWord->isApproved()) {
+        if ($originalWord !== null) {
             return $question;
         }
 
@@ -437,11 +468,9 @@ class UserAnswerer extends AbstractAnswerer
 
         $deduplicatedWord = $this->findWord($deduplicatedCandidate);
 
-        if ($deduplicatedWord !== null && $deduplicatedWord->isApproved()) {
-            return $deduplicatedWord->word;
-        }
-
-        return $question;
+        return $deduplicatedWord !== null
+            ? $deduplicatedWord->word
+            : $question;
     }
 
     private function newGameFor(AliceUser $aliceUser): string

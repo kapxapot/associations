@@ -2,6 +2,8 @@
 
 namespace App\Models\DTO;
 
+use App\Semantics\Tokenizer;
+
 class AliceRequest
 {
     private const TRASH_TOKENS = [
@@ -9,6 +11,8 @@ class AliceRequest
     ];
 
     public const WILDCARD = '*';
+
+    private Tokenizer $tokenizer;
 
     private ?string $originalCommand;
     private ?string $originalUtterance;
@@ -34,6 +38,8 @@ class AliceRequest
 
     public function __construct(array $data)
     {
+        $this->tokenizer = new Tokenizer();
+
         $this->originalCommand = $data['request']['command'] ?? null;
         $this->originalUtterance = $data['request']['original_utterance'] ?? null;
         $this->originalTokens = $data['request']['nlu']['tokens'] ?? [];
@@ -76,7 +82,7 @@ class AliceRequest
      */
     private function parseTokens(?string $command): array
     {
-        $tokens = explode(' ', $command);
+        $tokens = $this->tokenizer->tokenize($command);
 
         return $this->filterTokens($tokens);
     }
@@ -102,7 +108,7 @@ class AliceRequest
      */
     private function rebuildFrom(array $tokens): string
     {
-        return implode(' ', $tokens);
+        return $this->tokenizer->join($tokens);
     }
 
     public function isNewSession(): bool
@@ -237,7 +243,7 @@ class AliceRequest
      */
     private function matchesTokens(string $pattern, array $tokens): ?array
     {
-        $patternTokens = explode(' ', $pattern);
+        $patternTokens = $this->tokenizer->tokenize($pattern);
 
         if (count($tokens) !== count($patternTokens)) {
             return null;
