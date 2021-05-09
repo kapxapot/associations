@@ -56,6 +56,16 @@ class PartOfSpeech
      */
     public const INTERJECTION = 'interjection';
 
+    /**
+     * Причастие (рус. яз.)
+     */
+    public const PARTICIPLE = 'participle';
+
+    /**
+     * Деепричастие (рус. яз.)
+     */
+    public const ADVERBIAL_PARTICIPLE = 'adverbial participle';
+
     public const GOOD = 1;
     public const BAD = 2;
     public const UGLY = 3;
@@ -112,6 +122,8 @@ class PartOfSpeech
             new self(self::NUMERAL, 'num.', self::BAD),
             new self(self::VERB, 'v.', self::UGLY),
             new self(self::ADVERB, 'adv.', self::UGLY),
+            new self(self::PARTICIPLE, 'part.', self::UGLY),
+            new self(self::ADVERBIAL_PARTICIPLE, 'adv. part.', self::UGLY),
             new self(self::PREPOSITION, 'prep.', self::UGLY),
             new self(self::CONJUNCTION, 'conj.', self::UGLY),
             new self(self::PREDICATIVE, 'pred.', self::UGLY),
