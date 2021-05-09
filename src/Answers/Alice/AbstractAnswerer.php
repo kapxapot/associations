@@ -262,6 +262,7 @@ abstract class AbstractAnswerer
     protected function isSkipCommand(AliceRequest $request): bool
     {
         return $request->hasAny(
+            'было',
             'дальше',
             'другую',
             'заново',
@@ -283,6 +284,7 @@ abstract class AbstractAnswerer
             'следующая',
             'следующее',
             'следующий',
+            'следующую',
             'сначала'
         ) || $request->hasAnySet(
             ['нет', 'слов'],
