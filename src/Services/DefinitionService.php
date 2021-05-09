@@ -57,7 +57,7 @@ class DefinitionService
     {
         $definition = $this->definitionRepository->getByWord($word);
 
-        if ($definition !== null && !$allowRemoteLoad) {
+        if ($definition !== null || !$allowRemoteLoad) {
             return $definition;
         }
 

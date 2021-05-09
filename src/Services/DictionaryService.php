@@ -33,7 +33,7 @@ class DictionaryService
 
     /**
      * Returns (and loads it from remote dictionary) external dictionary word
-     * by {@see Word} entity.
+     * by {@see Word}.
      */
     public function loadByWord(Word $word): ?DictWordInterface
     {
@@ -41,7 +41,7 @@ class DictionaryService
     }
 
     /**
-     * Returns external dictionary word by {@see Word} entity.
+     * Returns external dictionary word by {@see Word}.
      *
      * @param $allowRemoteLoad Set this to `true` if the remote loading must
      * be enabled. By default it's not performed.
@@ -51,35 +51,24 @@ class DictionaryService
         bool $allowRemoteLoad = false
     ): ?DictWordInterface
     {
-        // searching by word
-        $dictWord = $word
-            ? $this->dictWordRepository->getByWord($word)
-            : null;
-
         $language = $word->language();
         $wordStr = $word->word;
 
-        // searching by language & wordStr
-        $dictWord ??= ($language && strlen($wordStr) > 0)
-            ? $this->dictWordRepository->getByWordStr($language, $wordStr)
-            : null;
+        $dictWord = $this->dictWordRepository->getByWord($word)
+            ?? $this->dictWordRepository->getByWordStr($language, $wordStr);
 
-        if (is_null($dictWord) && $allowRemoteLoad) {
+        if ($dictWord === null && $allowRemoteLoad) {
             // no word found, loading from dictionary
             $dictWord = $this
                 ->externalDictService
                 ->loadFromDictionary($language, $wordStr);
 
-            if ($dictWord) {
+            if ($dictWord !== null) {
                 $dictWord = $this->dictWordRepository->save($dictWord);
             }
         }
 
-        if (
-            $dictWord
-            && $word
-            && !$word->equals($dictWord->getLinkedWord())
-        ) {
+        if ($dictWord !== null && !$word->equals($dictWord->getLinkedWord())) {
             $this->link($dictWord, $word);
         }
 
@@ -102,12 +91,11 @@ class DictionaryService
         }
 
         $dictWord = $dictWord->linkWord($word);
-
         $dictWord = $this->dictWordRepository->save($dictWord);
 
         $word = $word->withDictWord($dictWord);
 
-        if ($wordToUnlink) {
+        if ($wordToUnlink !== null) {
             $this->unlinkWord($dictWord, $wordToUnlink);
         }
 
