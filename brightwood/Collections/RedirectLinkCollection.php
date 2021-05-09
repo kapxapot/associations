@@ -3,7 +3,6 @@
 namespace Brightwood\Collections;
 
 use Brightwood\Models\Links\RedirectLink;
-use Plasticode\Collections\Generic\NumericCollection;
 
 class RedirectLinkCollection extends StoryLinkCollection
 {
