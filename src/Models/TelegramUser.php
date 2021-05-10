@@ -13,7 +13,7 @@ use Plasticode\Models\Traits\UpdatedAt;
 /**
  * @property integer|null $genderId
  * @property integer $id
- * @property int|null $userId
+ * @property integer|null $userId
  * @property integer $telegramId
  * @property string|null $username
  * @property string|null $firstName

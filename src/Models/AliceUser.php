@@ -11,7 +11,7 @@ use Plasticode\Models\Traits\UpdatedAt;
 
 /**
  * @property integer $id
- * @property int|null $userId
+ * @property integer|null $userId
  * @property string $aliceId
  * @method User|null user()
  * @method static withUser(User|callable|null $user)

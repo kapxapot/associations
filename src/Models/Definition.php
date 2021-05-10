@@ -9,11 +9,11 @@ use Plasticode\Models\Traits\CreatedAt;
 use Plasticode\Models\Traits\UpdatedAt;
 
 /**
- * @property int $valid
+ * @property integer $valid
  * @property string|null $jsonData
  * @property string $source
  * @property string $url
- * @property int $wordId
+ * @property integer $wordId
  * @method Word word()
  * @method static withWord(Word|callable $word)
  */

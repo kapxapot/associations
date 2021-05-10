@@ -19,7 +19,9 @@ class Language extends DbModel implements CreatedInterface
 
     protected function requiredWiths(): array
     {
-        return ['creator'];
+        return [
+            $this->creatorPropertyName,
+        ];
     }
 
     public function serialize(): array

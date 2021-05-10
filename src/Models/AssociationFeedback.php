@@ -11,6 +11,9 @@ class AssociationFeedback extends Feedback
 {
     protected function requiredWiths() : array
     {
-        return [...parent::requiredWiths(), 'association'];
+        return [
+            ...parent::requiredWiths(),
+            'association',
+        ];
     }
 }

@@ -8,8 +8,8 @@ use App\Collections\UserCollection;
 use App\Collections\WordCollection;
 
 /**
- * @property int $firstWordId
- * @property int $secondWordId
+ * @property integer $firstWordId
+ * @property integer $secondWordId
  * @method Word firstWord()
  * @method Word secondWord()
  * @method static withFeedbacks(AssociationFeedbackCollection|callable $feedbacks)

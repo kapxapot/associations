@@ -39,6 +39,13 @@ class LocalizationConfig extends BaseConfig
                 'pred.' => 'част.',
                 'interj.' => 'межд.',
 
+                'Plural form' => 'Множественное число',
+                'Typo' => 'Опечатка',
+                'Alternative form' => 'Альтернативная форма',
+                'Grammatical form' => 'Грамматическая форма',
+                'Diminutive form' => 'Уменьшительно-ласкательное',
+                'Gender form' => 'Родовая форма',
+
                 'Language not found.' => 'Язык не найден.',
                 'New game started.' => 'Начата новая игра.',
                 'Association not found.' => 'Ассоциация не найдена.',
