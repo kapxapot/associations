@@ -12,6 +12,7 @@ use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
+use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Services\DictionaryService;
 use App\Services\WordService;
 use Plasticode\Hydrators\Generic\Hydrator;
@@ -26,6 +27,7 @@ class WordHydrator extends Hydrator
     private UserRepositoryInterface $userRepository;
     private WordFeedbackRepositoryInterface $wordFeedbackRepository;
     private WordOverrideRepositoryInterface $wordOverrideRepository;
+    private WordRelationRepositoryInterface $wordRelationRepository;
 
     private AuthInterface $auth;
     private LinkerInterface $linker;
@@ -41,6 +43,7 @@ class WordHydrator extends Hydrator
         UserRepositoryInterface $userRepository,
         WordFeedbackRepositoryInterface $wordFeedbackRepository,
         WordOverrideRepositoryInterface $wordOverrideRepository,
+        WordRelationRepositoryInterface $wordRelationRepository,
         AuthInterface $auth,
         LinkerInterface $linker,
         DictionaryService $dictionaryService,
@@ -54,6 +57,7 @@ class WordHydrator extends Hydrator
         $this->userRepository = $userRepository;
         $this->wordFeedbackRepository = $wordFeedbackRepository;
         $this->wordOverrideRepository = $wordOverrideRepository;
+        $this->wordRelationRepository = $wordRelationRepository;
 
         $this->auth = $auth;
         $this->linker = $linker;
@@ -97,6 +101,9 @@ class WordHydrator extends Hydrator
             )
             ->withOverrides(
                 fn () => $this->wordOverrideRepository->getAllByWord($entity)
+            )
+            ->withRelations(
+                fn () => $this->wordRelationRepository->getAllByWord($entity)
             )
             ->withCreator(
                 fn () => $this->userRepository->get($entity->createdBy)

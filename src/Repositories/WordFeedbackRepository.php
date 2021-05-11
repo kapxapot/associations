@@ -6,10 +6,13 @@ use App\Collections\WordFeedbackCollection;
 use App\Models\Word;
 use App\Models\WordFeedback;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
+use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
 class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRepositoryInterface
 {
+    use WithWordRepository;
+
     protected function entityClass(): string
     {
         return WordFeedback::class;
@@ -33,9 +36,7 @@ class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRep
     public function getAllByWord(Word $word): WordFeedbackCollection
     {
         return WordFeedbackCollection::from(
-            $this
-                ->query()
-                ->where('word_id', $word->getId())
+            $this->byWordQuery($word)
         );
     }
 }

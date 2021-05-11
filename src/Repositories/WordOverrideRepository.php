@@ -6,7 +6,7 @@ use App\Collections\WordOverrideCollection;
 use App\Models\Word;
 use App\Models\WordOverride;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
-use Plasticode\Data\Query;
+use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
 use Plasticode\Util\SortStep;
@@ -14,6 +14,7 @@ use Plasticode\Util\SortStep;
 class WordOverrideRepository extends IdiormRepository implements WordOverrideRepositoryInterface
 {
     use CreatedRepository;
+    use WithWordRepository;
 
     protected function getSortOrder(): array
     {
@@ -52,14 +53,5 @@ class WordOverrideRepository extends IdiormRepository implements WordOverrideRep
         return WordOverrideCollection::from(
             $this->byWordQuery($word)
         );
-    }
-
-    // queries
-
-    protected function byWordQuery(Word $word): Query
-    {
-        return $this
-            ->query()
-            ->where('word_id', $word->getId());
     }
 }

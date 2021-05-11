@@ -5,10 +5,13 @@ namespace App\Repositories;
 use App\Models\Definition;
 use App\Models\Word;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
+use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
 class DefinitionRepository extends IdiormRepository implements DefinitionRepositoryInterface
 {
+    use WithWordRepository;
+
     protected function entityClass(): string
     {
         return Definition::class;
@@ -36,9 +39,6 @@ class DefinitionRepository extends IdiormRepository implements DefinitionReposit
 
     public function getByWord(Word $word): ?Definition
     {
-        return $this
-            ->query()
-            ->where('word_id', $word->getId())
-            ->one();
+        return $this->byWordQuery($word)->one();
     }
 }

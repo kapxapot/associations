@@ -8,6 +8,7 @@ use App\Collections\PartOfSpeechCollection;
 use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
 use App\Collections\WordOverrideCollection;
+use App\Collections\WordRelationCollection;
 use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
@@ -22,12 +23,14 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
  * @method Definition|null definition()
  * @method DictWordInterface|null dictWord()
  * @method DefinitionAggregate|null parsedDefinition()
+ * @method WordRelationCollection relations()
  * @method static withAssociations(AssociationCollection|callable $associations)
  * @method static withDefinition(Definition|callable|null $definition)
  * @method static withDictWord(DictWordInterface|callable|null $dictWord)
  * @method static withFeedbacks(WordFeedbackCollection|callable $feedbacks)
  * @method static withOverrides(WordOverrideCollection|callable $overrides)
  * @method static withParsedDefinition(DefinitionAggregate|callable|null $parsedDefinition)
+ * @method static withRelations(WordRelationCollection|callable $relations)
  */
 class Word extends LanguageElement implements PartOfSpeechableInterface
 {

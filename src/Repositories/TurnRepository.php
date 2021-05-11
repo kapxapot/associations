@@ -12,12 +12,14 @@ use App\Models\Word;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Traits\ByUserRepository;
 use App\Repositories\Traits\WithLanguageRepository;
+use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
 class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
 {
     use ByUserRepository;
     use WithLanguageRepository;
+    use WithWordRepository;
 
     protected string $sortField = 'id';
     protected bool $sortReverse = true;
@@ -77,9 +79,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
     public function getAllByWord(Word $word): TurnCollection
     {
         return TurnCollection::from(
-            $this
-                ->query()
-                ->where('word_id', $word->getId())
+            $this->byWordQuery($word)
         );
     }
 }

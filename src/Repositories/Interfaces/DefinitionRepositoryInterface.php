@@ -8,11 +8,13 @@ use Plasticode\Repositories\Interfaces\Generic\GetRepositoryInterface;
 
 interface DefinitionRepositoryInterface extends GetRepositoryInterface
 {
-    function save(Definition $definition): Definition;
+    public function get(?int $id): ?Definition;
 
-    function store(array $data): Definition;
+    public function save(Definition $definition): Definition;
 
-    function delete(Definition $definition): bool;
+    public function store(array $data): Definition;
 
-    function getByWord(Word $word): ?Definition;
+    public function delete(Definition $definition): bool;
+
+    public function getByWord(Word $word): ?Definition;
 }

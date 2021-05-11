@@ -9,12 +9,14 @@ use App\Models\Word;
 use App\Models\YandexDictWord;
 use App\Repositories\Interfaces\YandexDictWordRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
+use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Webmozart\Assert\Assert;
 
 class YandexDictWordRepository extends IdiormRepository implements YandexDictWordRepositoryInterface
 {
     use WithLanguageRepository;
+    use WithWordRepository;
 
     protected function entityClass(): string
     {
@@ -55,7 +57,7 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
         return DictWordCollection::from(
             $this
                 ->query()
-                ->whereNull('word_id')
+                ->whereNull($this->wordIdField)
                 ->whereRaw(
                     '(updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))'
                 )
@@ -66,10 +68,7 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
 
     public function getByWord(Word $word): ?YandexDictWord
     {
-        return $this
-            ->query()
-            ->where('word_id', $word->getId())
-            ->one();
+        return $this->byWordQuery($word)->one();
     }
 
     public function getByWordStr(
