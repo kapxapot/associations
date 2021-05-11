@@ -19,6 +19,7 @@ use App\Hydrators\UserHydrator;
 use App\Hydrators\WordFeedbackHydrator;
 use App\Hydrators\WordHydrator;
 use App\Hydrators\WordOverrideHydrator;
+use App\Hydrators\WordRelationHydrator;
 use App\Hydrators\YandexDictWordHydrator;
 use App\Mapping\Providers\RepositoryProvider;
 use App\Repositories\AliceUserRepository;
@@ -42,6 +43,8 @@ use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
+use App\Repositories\Interfaces\WordRelationRepositoryInterface;
+use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Repositories\LanguageRepository;
 use App\Repositories\NewsRepository;
@@ -51,6 +54,8 @@ use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
 use App\Repositories\WordOverrideRepository;
+use App\Repositories\WordRelationRepository;
+use App\Repositories\WordRelationTypeRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
 use App\Services\DictionaryService;
@@ -113,6 +118,7 @@ final class RepositoryProviderTest extends AbstractProviderTest
         $this->check(WordFeedbackHydrator::class);
         $this->check(WordHydrator::class);
         $this->check(WordOverrideHydrator::class);
+        $this->check(WordRelationHydrator::class);
         $this->check(YandexDictWordHydrator::class);
 
         $this->check(
@@ -198,6 +204,16 @@ final class RepositoryProviderTest extends AbstractProviderTest
         $this->check(
             WordOverrideRepositoryInterface::class,
             WordOverrideRepository::class
+        );
+
+        $this->check(
+            WordRelationRepositoryInterface::class,
+            WordRelationRepository::class
+        );
+
+        $this->check(
+            WordRelationTypeRepositoryInterface::class,
+            WordRelationTypeRepository::class
         );
 
         $this->check(

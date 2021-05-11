@@ -17,6 +17,7 @@ use App\Hydrators\UserHydrator;
 use App\Hydrators\WordFeedbackHydrator;
 use App\Hydrators\WordHydrator;
 use App\Hydrators\WordOverrideHydrator;
+use App\Hydrators\WordRelationHydrator;
 use App\Hydrators\YandexDictWordHydrator;
 use App\Repositories\AliceUserRepository;
 use App\Repositories\AssociationFeedbackRepository;
@@ -39,6 +40,8 @@ use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
+use App\Repositories\Interfaces\WordRelationRepositoryInterface;
+use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Repositories\LanguageRepository;
 use App\Repositories\NewsRepository;
@@ -48,6 +51,8 @@ use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
 use App\Repositories\WordFeedbackRepository;
 use App\Repositories\WordOverrideRepository;
+use App\Repositories\WordRelationRepository;
+use App\Repositories\WordRelationTypeRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
@@ -155,6 +160,14 @@ class RepositoryProvider extends MappingProvider
                     $c->get(RepositoryContext::class),
                     $this->proxy($c, WordOverrideHydrator::class)
                 ),
+
+            WordRelationRepositoryInterface::class =>
+                fn (ContainerInterface $c) => new WordRelationRepository(
+                    $c->get(RepositoryContext::class),
+                    $this->proxy($c, WordRelationHydrator::class)
+                ),
+
+            WordRelationTypeRepositoryInterface::class => WordRelationTypeRepository::class,
 
             WordRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new WordRepository(
