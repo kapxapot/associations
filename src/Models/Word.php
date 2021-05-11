@@ -42,6 +42,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             'definition',
             'dictWord',
             'parsedDefinition',
+            'relations'
         ];
     }
 
