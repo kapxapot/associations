@@ -1,0 +1,69 @@
+{% extends 'modal.twig' %}
+
+{% import 'macros.twig' as gm %}
+{% import 'main/local_macros.twig' as lm %}
+
+{% set modal_name = 'relations' %}
+{% set modal_title = 'Связи' %}
+{% set submittable = false %}
+
+{% block modal_body %}
+    <div class="mb-2" ng-if="relationData.relations.length > 0">
+        <div class="panel-body--nopad table-responsive">
+            <table id="relations-table" class="table table-striped">
+                <thead>
+                    <tr>
+                        {#<th>Id</th>#}
+                        <th>Тип</th>
+                        <th>Слово</th>
+                        <th><i class="fas fa-fist-raised" title="Сильная" data-toggle="tooltip"></i></th>
+                        {#<th>Дата</th>
+                        <th>Автор</th>#}
+                        <th>Действия</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for relation in word.relations %}
+                        {% set modelBase = 'relationData.relations[' ~ (loop.index - 1) ~ ']' %}
+                        <tr>
+                            {#<td>{{ relation.id }}</td>#}
+                            <td class="vcenter">{{ relation.type.tag }}</td>
+                            <td><input type="text" id="relation{{ relation.id }}MainWord" class="form-control" ng-model="{{ modelBase }}.main_word" maxlength="{{ word_max_length }}" required /></td>
+                            <td class="vcenter"><input type="checkbox" id="relation{{ relation.id }}Primary" ng-model="{{ modelBase }}.primary"></td>
+                            {#<td>{{ gm.moment_local(relation.updated_at_iso) }}</td>
+                            <td>{{ lm.user(relation.updater) }}</td>#}
+                            <td class="vcenter">
+                                <button type="submit" class="btn btn-success modal-button modal-button--compact" ng-disabled="!{{ modelBase }}.state.dirty || {{ modelBase }}.state.saving || {{ modelBase }}.state.deleting"><i class="fas fa-spinner fa-lg fa-spin modal-button-spinner" ng-show="{{ modelBase }}.state.saving"></i><span ng-hide="{{ modelBase }}.state.saving"><i class="fas fa-check"></i></span></button>
+
+                                <button class="btn btn-danger modal-button modal-button--compact ml-1" ng-disabled="{{ modelBase }}.state.saving || {{ modelBase }}.state.deleting"><i class="fas fa-spinner fa-lg fa-spin modal-button-spinner" ng-show="{{ modelBase }}.state.deleting"></i><span ng-hide="{{ modelBase }}.state.deleting"><i class="fas fa-trash"></i></span></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="mb-2" ng-if="relationData.relations.length == 0">
+        {% set handSign = '<i class="far fa-hand-point-down dendro-color"></i>' %}
+        <p>У слова <strong>{{'{{relationData.word}}'}}</strong> пока нет связей.</p>
+        <p>{{ handSign|raw }} Добавьте новую {{ handSign|raw }}</p>
+    </div>
+
+    <form id="newRelationForm" name="forms.newRelationForm" method="post">
+        <div class="form-group required">
+            <label for="newRelationType">Тип связи</label>
+            <select class="form-control" ng-model="newRelation.type_id" id="newRelationType" ng-options="value.id as value.name for (key, value) in relationTypes"></select>
+        </div>
+
+        <div class="form-group required">
+            <label for="newRelationMainWord">Главное слово</label>
+            <input type="text" id="newRelationMainWord" class="form-control" ng-model="newRelation.main_word" maxlength="{{ word_max_length }}" required />
+        </div>
+
+        <div class="checkbox">
+            <label><input type="checkbox" id="newRelationPrimary" ng-model="newRelation.primary">Сильная связь</label>
+        </div>
+
+        <button type="submit" class="btn btn-success modal-button" ng-disabled="newRelationSaving"><i class="fas fa-spinner fa-lg fa-spin modal-button-spinner" ng-show="newRelationSaving"></i><span ng-hide="newRelationSaving"><i class="fas fa-plus mr-1"></i> Добавить</span></button>
+    </form>
+{% endblock %}

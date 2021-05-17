@@ -16,6 +16,7 @@ use App\Controllers\TelegramBotController;
 use App\Controllers\TurnController;
 use App\Controllers\WordController;
 use App\Controllers\WordOverrideController;
+use App\Controllers\WordRelationController;
 use Brightwood\Controllers\BrightwoodBotController;
 use Brightwood\Controllers\CardsTestController;
 use Brightwood\Controllers\EightsTestController;
@@ -186,6 +187,11 @@ $app->group(
                     '/word/override',
                     WordOverrideController::class
                 )->setName('actions.word.override');
+
+                $this->post(
+                    '/word/relation',
+                    WordRelationController::class
+                )->setName('actions.word.relation');
             }
         )->add(
             new TokenAuthMiddleware(

@@ -23,6 +23,11 @@ templates:
     editor: [api_read]
     author: [api_read]
 
+  api_read:
+    admin: [api_read]
+    editor: [api_read]
+    author: [api_read]
+
   strict_read:
     admin: [read]
     editor: [read]
@@ -89,6 +94,12 @@ rights:
 
   word_overrides:
     template: strict_read
+
+  word_relations:
+    template: strict_read
+
+  word_relation_types:
+    template: api_read
 
   words:
     template: strict_read

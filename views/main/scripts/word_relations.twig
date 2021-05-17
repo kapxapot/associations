@@ -1,0 +1,84 @@
+{% import 'main/local_macros.twig' as lm %}
+
+$scope.relationTypes = [
+    {% for type in word_relation_types %}
+        {
+            id: {{ type.id }},
+            name: "[{{ type.tag }}] {{ translate(type.name) }}",
+            state: {
+                dirty: false,
+                saving: false,
+                deleting: false
+            }
+        }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];
+
+$scope.relationData = {
+    word_id: {{ word.id }},
+    word: '{{ word.word|e('js') }}',
+    relations: [
+        {% for relation in word.relations %}
+            {
+                id: {{ relation.id }},
+                type_id: {{ relation.typeId }},
+                main_word_id: {{ relation.mainWordId }},
+                main_word: "{{ relation.mainWord.word }}",
+                primary: {{ relation.isPrimary ? 'true' : 'false' }}
+            }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ]
+};
+
+$scope.newRelation = null;
+
+$scope.resetNewRelation = () => {
+    $scope.newRelation = {
+        type_id: 1,
+        word_id: {{ word.id }},
+        main_word: null,
+        primary: false
+    };
+};
+
+$scope.resetNewRelation();
+
+$scope.relationsDialog = () => {
+    showModal('relations');
+};
+
+$scope.newRelationSaving = false;
+$scope.newRelationAlertError = null;
+
+$('#newRelationForm').submit(function(e) {
+    if (e != null) {
+        e.preventDefault();
+    }
+
+    $scope.newRelationAlertError = null;
+    $scope.alertSuccess = null;
+
+    hideModalAlerts();
+
+    $scope.newRelationSaving = true;
+
+    $scope.ajax({
+        url: '{{ path_for('actions.word.relation') }}',
+        data: $scope.newRelation,
+        setError: (msg) => {
+            $scope.newRelationAlertError = msg;
+        },
+        showError: () => {
+            // probably, this must be more specific
+            showAlert('.modal .alert-danger');
+        },
+        setSaving: (val) => {
+            $scope.newRelationSaving = val;
+        },
+        onSuccess: (data, context) => {
+            // reload relations
+
+            $scope.resetNewRelation();
+        }
+    });
+});

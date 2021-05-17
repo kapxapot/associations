@@ -11,6 +11,7 @@ use App\Generators\PageGenerator;
 use App\Generators\UserGenerator;
 use App\Generators\WordFeedbackGenerator;
 use App\Generators\WordOverrideGenerator;
+use App\Generators\WordRelationTypeGenerator;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
@@ -19,6 +20,7 @@ use App\Repositories\Interfaces\PageRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
+use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Data\Interfaces\ApiInterface;
@@ -52,6 +54,7 @@ final class GeneratorProviderTest extends AbstractProviderTest
             UserRepositoryInterface::class,
             WordFeedbackRepositoryInterface::class,
             WordOverrideRepositoryInterface::class,
+            WordRelationTypeRepositoryInterface::class,
         ];
     }
 
@@ -66,5 +69,6 @@ final class GeneratorProviderTest extends AbstractProviderTest
         $this->check(UserGenerator::class);
         $this->check(WordFeedbackGenerator::class);
         $this->check(WordOverrideGenerator::class);
+        $this->check(WordRelationTypeGenerator::class);
     }
 }

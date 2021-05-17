@@ -98,3 +98,8 @@ word_overrides:
   reverse: true
   has: [created_at, created_by]
   generator: App\Generators\WordOverrideGenerator
+
+word_relation_types:
+  api: read
+  sort: name
+  generator: App\Generators\WordRelationTypeGenerator

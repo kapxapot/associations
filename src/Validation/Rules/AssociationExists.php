@@ -2,24 +2,8 @@
 
 namespace App\Validation\Rules;
 
-use App\Repositories\Interfaces\AssociationRepositoryInterface;
-use Respect\Validation\Rules\AbstractRule;
+use Plasticode\Validation\Rules\EntityExists;
 
-class AssociationExists extends AbstractRule
+class AssociationExists extends EntityExists
 {
-    private AssociationRepositoryInterface $associationRepository;
-
-    public function __construct(
-        AssociationRepositoryInterface $associationRepository
-    )
-    {
-        $this->associationRepository = $associationRepository;
-    }
-
-    public function validate($input)
-    {
-        $association = $this->associationRepository->get($input);
-
-        return $association !== null;
-    }
 }

@@ -34,6 +34,7 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
+use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\AliceUserService;
 use App\Services\AnniversaryService;
@@ -53,6 +54,7 @@ use App\Services\TurnService;
 use App\Services\UserService;
 use App\Services\WordFeedbackService;
 use App\Services\WordRecountService;
+use App\Services\WordRelationService;
 use App\Services\WordService;
 use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
@@ -107,6 +109,7 @@ final class GeneralProviderTest extends AbstractProviderTest
             TurnRepositoryInterface::class,
             UserRepositoryInterface::class,
             WordFeedbackRepositoryInterface::class,
+            WordRelationRepositoryInterface::class,
             WordRepositoryInterface::class,
         ];
     }
@@ -185,6 +188,7 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(UserService::class);
         $this->check(WordFeedbackService::class);
         $this->check(WordRecountService::class);
+        $this->check(WordRelationService::class);
         $this->check(WordService::class);
 
         // parsing

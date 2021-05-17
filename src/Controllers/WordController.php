@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\DTO\Search\SearchParams;
+use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
 use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
@@ -12,6 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class WordController extends Controller
 {
+    private WordRelationTypeRepositoryInterface $wordRelationTypeRepository;
     private WordService $wordService;
 
     private NotFoundHandlerInterface $notFoundHandler;
@@ -19,6 +21,10 @@ class WordController extends Controller
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
+
+        $this->wordRelationTypeRepository = $container->get(
+            WordRelationTypeRepositoryInterface::class
+        );
 
         $this->wordService = $container->get(WordService::class);
 
@@ -100,6 +106,7 @@ class WordController extends Controller
                     'not_approved_invisible_associations_str' => $notApprovedStr,
                     'disabled_invisible_associations_str' => $disabledStr,
                     'definition' => $parsedDefinition,
+                    'word_relation_types' => $this->wordRelationTypeRepository->getAll(),
                     'disqus_id' => 'word' . $word->getId(),
                     'debug' => $debug,
                 ],
