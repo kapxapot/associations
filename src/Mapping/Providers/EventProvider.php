@@ -20,6 +20,7 @@ use App\EventHandlers\Word\WordCreatedHandler;
 use App\EventHandlers\Word\WordDisabledChangedHandler;
 use App\EventHandlers\Word\WordMatureChangedHandler;
 use App\EventHandlers\Word\WordOutOfDateHandler;
+use App\EventHandlers\Word\WordRelationsChangedHandler;
 use App\Services\AssociationRecountService;
 use App\Services\DefinitionService;
 use App\Services\DictionaryService;
@@ -76,6 +77,11 @@ class EventProvider extends MappingProvider
                 $container->get(AssociationRecountService::class)
             ),
 
+            new WordCorrectedHandler(
+                $container->get(DefinitionService::class),
+                $container->get(DictionaryService::class)
+            ),
+
             new WordCreatedHandler(
                 $container->get(DefinitionService::class),
                 $container->get(DictionaryService::class)
@@ -101,9 +107,8 @@ class EventProvider extends MappingProvider
                 $container->get(WordRecountService::class)
             ),
 
-            new WordCorrectedHandler(
-                $container->get(DefinitionService::class),
-                $container->get(DictionaryService::class)
+            new WordRelationsChangedHandler(
+                $container->get(WordRecountService::class)
             ),
         ];
     }

@@ -7,6 +7,8 @@ use App\Events\Word\WordCorrectedEvent;
 use App\Events\Word\WordDisabledChangedEvent;
 use App\Events\Word\WordMatureChangedEvent;
 use App\Models\Word;
+use App\Models\WordRelation;
+use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Specifications\WordSpecification;
 use Plasticode\Events\Event;
@@ -25,16 +27,21 @@ class WordRecountService
     use ToBit;
 
     private WordRepositoryInterface $wordRepository;
+    private WordRelationRepositoryInterface $wordRelationRepository;
+
     private WordSpecification $wordSpecification;
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
+        WordRelationRepositoryInterface $wordRelationRepository,
         WordSpecification $wordSpecification,
         EventDispatcher $eventDispatcher
     )
     {
         $this->wordRepository = $wordRepository;
+        $this->wordRelationRepository = $wordRelationRepository;
+
         $this->wordSpecification = $wordSpecification;
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -156,5 +163,54 @@ class WordRecountService
         }
 
         return $word;
+    }
+
+    /**
+     * This function does two things:
+     * 
+     * - Ensures that the word has no more than one primary relation.
+     * - Syncs the word's `mainId` with the primary relation.
+     */
+    public function recountRelations(Word $word, ?Event $sourceEvent = null): Word
+    {
+        $primary = $this->enforcePrimaryRelation($word);
+
+        // update the word's `mainId`
+        $mainId = $primary ? $primary->mainWordId : null;
+
+        if ($word->mainId != $mainId) {
+            $word->mainId = $mainId;
+
+            $this->wordRepository->save($word);
+        }
+
+        return $word;
+    }
+
+    /**
+     * - Determine primary relation (and return it).
+     * - Purge old primary relations if there are any.
+     */
+    private function enforcePrimaryRelation(Word $word): ?WordRelation
+    {
+        $relations = $word
+            ->relations()
+            ->primary()
+            ->descByUpdate();
+
+        /** @var WordRelation|null */
+        $primary = $relations->first();
+
+        if ($relations->count() > 1) {
+            $relations->except($primary)->apply(
+                function (WordRelation $wr) {
+                    $wr->primary = false;
+
+                    $this->wordRelationRepository->save($wr);
+                }
+            );
+        }
+
+        return $primary;
     }
 }

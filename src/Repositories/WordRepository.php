@@ -28,7 +28,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         $word['word_bin'] = $word->word;
 
         if (!$word->isPersisted()) {
-            $word['original_word'] = $word->word;
+            $word->originalWord = $word->word;
         }
 
         return $this->saveEntity($word);

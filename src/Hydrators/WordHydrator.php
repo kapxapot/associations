@@ -13,6 +13,7 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
+use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\DictionaryService;
 use App\Services\WordService;
 use Plasticode\Hydrators\Generic\Hydrator;
@@ -25,6 +26,7 @@ class WordHydrator extends Hydrator
     private LanguageRepositoryInterface $languageRepository;
     private TurnRepositoryInterface $turnRepository;
     private UserRepositoryInterface $userRepository;
+    private WordRepositoryInterface $wordRepository;
     private WordFeedbackRepositoryInterface $wordFeedbackRepository;
     private WordOverrideRepositoryInterface $wordOverrideRepository;
     private WordRelationRepositoryInterface $wordRelationRepository;
@@ -41,6 +43,7 @@ class WordHydrator extends Hydrator
         LanguageRepositoryInterface $languageRepository,
         TurnRepositoryInterface $turnRepository,
         UserRepositoryInterface $userRepository,
+        WordRepositoryInterface $wordRepository,
         WordFeedbackRepositoryInterface $wordFeedbackRepository,
         WordOverrideRepositoryInterface $wordOverrideRepository,
         WordRelationRepositoryInterface $wordRelationRepository,
@@ -55,6 +58,7 @@ class WordHydrator extends Hydrator
         $this->languageRepository = $languageRepository;
         $this->turnRepository = $turnRepository;
         $this->userRepository = $userRepository;
+        $this->wordRepository = $wordRepository;
         $this->wordFeedbackRepository = $wordFeedbackRepository;
         $this->wordOverrideRepository = $wordOverrideRepository;
         $this->wordRelationRepository = $wordRelationRepository;
@@ -98,6 +102,9 @@ class WordHydrator extends Hydrator
             )
             ->withDictWord(
                 fn () => $this->dictionaryService->getByWord($entity)
+            )
+            ->withMain(
+                fn () => $this->wordRepository->get($entity->mainId)
             )
             ->withOverrides(
                 fn () => $this->wordOverrideRepository->getAllByWord($entity)

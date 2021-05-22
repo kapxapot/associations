@@ -15,6 +15,7 @@ use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Interfaces\PartOfSpeechableInterface;
 
 /**
+ * @property integer|null $mainId
  * @property string|null $originalWord
  * @property string|null $tokenizedWord
  * @property string $word
@@ -22,12 +23,14 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
  * @method AssociationCollection associations()
  * @method Definition|null definition()
  * @method DictWordInterface|null dictWord()
+ * @method Word|null main()
  * @method DefinitionAggregate|null parsedDefinition()
  * @method WordRelationCollection relations()
  * @method static withAssociations(AssociationCollection|callable $associations)
  * @method static withDefinition(Definition|callable|null $definition)
  * @method static withDictWord(DictWordInterface|callable|null $dictWord)
  * @method static withFeedbacks(WordFeedbackCollection|callable $feedbacks)
+ * @method static withMain(Word|callable|null $main)
  * @method static withOverrides(WordOverrideCollection|callable $overrides)
  * @method static withParsedDefinition(DefinitionAggregate|callable|null $parsedDefinition)
  * @method static withRelations(WordRelationCollection|callable $relations)
@@ -41,6 +44,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             'associations',
             'definition',
             'dictWord',
+            'main',
             'parsedDefinition',
             'relations'
         ];

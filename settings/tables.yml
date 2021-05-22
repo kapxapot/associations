@@ -99,6 +99,12 @@ word_overrides:
   has: [created_at, created_by]
   generator: App\Generators\WordOverrideGenerator
 
+word_relations:
+  api: full
+  sort: created_at
+  has: [created_at, created_by, updated_at, updated_by]
+  generator: App\Generators\WordRelationGenerator
+
 word_relation_types:
   api: read
   sort: name

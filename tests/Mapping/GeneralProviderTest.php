@@ -54,7 +54,6 @@ use App\Services\TurnService;
 use App\Services\UserService;
 use App\Services\WordFeedbackService;
 use App\Services\WordRecountService;
-use App\Services\WordRelationService;
 use App\Services\WordService;
 use App\Specifications\AssociationSpecification;
 use App\Specifications\WordSpecification;
@@ -188,7 +187,6 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(UserService::class);
         $this->check(WordFeedbackService::class);
         $this->check(WordRecountService::class);
-        $this->check(WordRelationService::class);
         $this->check(WordService::class);
 
         // parsing

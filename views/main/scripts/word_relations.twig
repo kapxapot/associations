@@ -4,9 +4,9 @@ $scope.relationTypes = [
     {% for type in word_relation_types %}
         {
             id: {{ type.id }},
-            name: "[{{ type.tag }}] {{ translate(type.name) }}",
+            name: "{#[{{ type.tag }}] #}{{ translate(type.name) }}",
             state: {
-                dirty: false,
+                editing: false,
                 saving: false,
                 deleting: false
             }
@@ -22,6 +22,7 @@ $scope.relationData = {
             {
                 id: {{ relation.id }},
                 type_id: {{ relation.typeId }},
+                type: "{#[{{ relation.type.tag }}] #}{{ translate(relation.type.name) }}",
                 main_word_id: {{ relation.mainWordId }},
                 main_word: "{{ relation.mainWord.word }}",
                 primary: {{ relation.isPrimary ? 'true' : 'false' }}
@@ -48,37 +49,42 @@ $scope.relationsDialog = () => {
 };
 
 $scope.newRelationSaving = false;
-$scope.newRelationAlertError = null;
 
 $('#newRelationForm').submit(function(e) {
-    if (e != null) {
-        e.preventDefault();
-    }
-
-    $scope.newRelationAlertError = null;
-    $scope.alertSuccess = null;
-
-    hideModalAlerts();
+    $scope.modalPrePost();
 
     $scope.newRelationSaving = true;
+    $scope.modalSaving = true;
 
-    $scope.ajax({
-        url: '{{ path_for('actions.word.relation') }}',
+    const data = $scope.newRelation;
+
+    $scope.modalAjax({
+        url: '{{ api }}word_relations',
         data: $scope.newRelation,
-        setError: (msg) => {
-            $scope.newRelationAlertError = msg;
-        },
-        showError: () => {
-            // probably, this must be more specific
-            showAlert('.modal .alert-danger');
-        },
         setSaving: (val) => {
             $scope.newRelationSaving = val;
+            $scope.modalSaving = val;
         },
         onSuccess: (data, context) => {
-            // reload relations
-
             $scope.resetNewRelation();
+            $scope.reloadRelations();
         }
     });
 });
+
+$scope.deleteRelation = (index) => {
+    if (confirm('Действительно удалить связь?')) {
+        const relation = $scope.relationData.relations[index];
+
+        $scope.ajax({
+            method: 'delete',
+            url: '{{ api }}word_relations/' + relation.id,
+            onSuccess: $scope.reloadRelations,
+            message: 'Связь успешно удалена.'
+        });
+    }
+};
+
+$scope.reloadRelations = () => {
+
+};
