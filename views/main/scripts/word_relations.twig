@@ -17,7 +17,7 @@ $scope.relationData = {
             {
                 id: {{ relation.id }},
                 type_id: {{ relation.typeId }},
-                type: "{{ translate(relation.type.name) }}",
+                localized_type: "{{ translate(relation.type.name) }}",
                 main_word_id: {{ relation.mainWordId }},
                 main_word: "{{ relation.mainWord.word }}",
                 primary: {{ relation.isPrimary ? 'true' : 'false' }},
@@ -111,7 +111,10 @@ $scope.saveRelation = (index) => {
             relation.state.saving = val;
             $scope.modalSaving = val;
         },
-        onSuccess: $scope.reloadRelations
+        onSuccess: (data, context) => {
+            $scope.relationData.state.editing = false;
+            $scope.reloadRelations();
+        }
     });
 };
 
@@ -139,7 +142,30 @@ $scope.deleteRelation = (index) => {
 $scope.reloadRelations = () => {
     $scope.modalLoading = true;
 
-    reloadWindow();
+    const wordId = $scope.relationData.word_id;
 
-    $scope.modalLoading = false;
+    $http.get('{{ api }}words/' + wordId + '/relations')
+        .then(function(response) {
+            const data = response.data;
+
+            $scope.relationData.relations = data.map((datum) => {
+                datum.type_id = parseInt(datum.type_id);
+                datum.primary = (datum.primary == 1);
+                datum.state = {
+                    editing: false,
+                    saving: false,
+                    deleting: false
+                };
+
+                return datum;
+            });
+
+            $scope.modalLoading = false;
+        }, function(response) {
+            $scope.modalAlertError = '{{ translate('Failed to load word relations.') }}';
+
+            showModalAlertError();
+
+            $scope.modalLoading = false;
+        });
 };

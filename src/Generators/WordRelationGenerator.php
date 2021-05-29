@@ -7,6 +7,7 @@ use App\Models\WordRelation;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Generators\Core\GeneratorContext;
 use Plasticode\Generators\Generic\ChangingEntityGenerator;
@@ -23,6 +24,7 @@ class WordRelationGenerator extends ChangingEntityGenerator
     private WordRelationRepositoryInterface $wordRelationRepository;
     private WordRelationTypeRepositoryInterface $wordRelationTypeRepository;
 
+    private TranslatorInterface $translator;
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
@@ -30,6 +32,7 @@ class WordRelationGenerator extends ChangingEntityGenerator
         WordRepositoryInterface $wordRepository,
         WordRelationRepositoryInterface $wordRelationRepository,
         WordRelationTypeRepositoryInterface $wordRelationTypeRepository,
+        TranslatorInterface $translator,
         EventDispatcher $eventDispatcher
     )
     {
@@ -39,6 +42,7 @@ class WordRelationGenerator extends ChangingEntityGenerator
         $this->wordRelationRepository = $wordRelationRepository;
         $this->wordRelationTypeRepository = $wordRelationTypeRepository;
 
+        $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
     }
 
@@ -78,6 +82,36 @@ class WordRelationGenerator extends ChangingEntityGenerator
         }
 
         return $rules;
+    }
+
+    public function getOptions(): array
+    {
+        $options = parent::getOptions();
+
+        $options['uri'] = 'words/{id:\d+}/relations';
+        $options['filter'] = 'word_id';
+
+        return $options;
+    }
+
+    public function afterLoad(array $item): array
+    {
+        $item = parent::afterLoad($item);
+
+        $id = $item[$this->idField()];
+
+        $relation = $this->getRepository()->get($id);
+
+        if ($relation !== null) {
+            $typeName = $relation->type()->name;
+
+            $item['type'] = $typeName;
+            $item['localized_type'] = $this->translator->translate($typeName);
+            $item['word'] = $relation->word()->word;
+            $item['main_word'] = $relation->mainWord()->word;
+        }
+
+        return $item;
     }
 
     public function beforeSave(array $data, $id = null): array

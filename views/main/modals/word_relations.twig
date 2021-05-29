@@ -34,9 +34,9 @@
                         </td>
 
                         <td class="vcenter flex" ng-show="r.state.editing">
-                            <button type="submit" ng-click="saveRelation(rKey)" class="btn btn-success modal-button--compact" ng-disabled="r.state.saving"><i class="fas fa-spinner fa-spin modal-button-spinner" ng-show="r.state.saving"></i><span ng-hide="r.state.saving"><i class="fas fa-check"></i></span></button>
+                            <button type="submit" ng-click="saveRelation(rKey)" class="btn btn-success modal-button--compact" ng-disabled="{{ full_check }} || r.state.saving"><i class="fas fa-spinner fa-spin modal-button-spinner" ng-show="r.state.saving"></i><span ng-hide="r.state.saving"><i class="fas fa-check"></i></span></button>
 
-                            <button class="btn btn-default modal-button--compact ml-1" ng-disabled="r.state.saving" ng-click="cancelEditRelation(rKey)"><i class="fas fa-times"></i></button>
+                            <button class="btn btn-default modal-button--compact ml-1" ng-disabled="{{ full_check }} || r.state.saving" ng-click="cancelEditRelation(rKey)"><i class="fas fa-times"></i></button>
                         </td>
                     </form>
 
@@ -45,7 +45,7 @@
                     </td>
 
                     <td class="vcenter" ng-hide="r.state.editing">
-                        {{ '{{r.type}}' }}
+                        {{ '{{r.localized_type}}' }}
                     </td>
 
                     <td class="vcenter br-word" ng-hide="r.state.editing">
@@ -53,10 +53,10 @@
                     </td>
 
                     <td class="vcenter flex" ng-hide="r.state.editing">
-                        <button class="btn btn-warning modal-button--compact" ng-disabled="modalSaving || relationData.state.editing" ng-click="editRelation(rKey)"><i class="fas fa-pencil-alt"></i></button>
+                        <button class="btn btn-warning modal-button--compact" ng-disabled="{{ full_check }} || relationData.state.editing" ng-click="editRelation(rKey)"><i class="fas fa-pencil-alt"></i></button>
 
                         {% if can('word_relations', 'delete') %}
-                            <button class="btn btn-danger modal-button--compact ml-1" ng-disabled="modalSaving || relationData.state.editing" ng-click="deleteRelation(rKey)"><i class="fas fa-spinner fa-spin modal-button-spinner" ng-show="r.state.deleting"></i><span ng-hide="r.state.deleting"><i class="fas fa-trash"></i></span></button>
+                            <button class="btn btn-danger modal-button--compact ml-1" ng-disabled="{{ full_check }} || relationData.state.editing" ng-click="deleteRelation(rKey)"><i class="fas fa-spinner fa-spin modal-button-spinner" ng-show="r.state.deleting"></i><span ng-hide="r.state.deleting"><i class="fas fa-trash"></i></span></button>
                         {% endif %}
                     </td>
                 </tr>
@@ -75,16 +75,11 @@
                         </td>
 
                         <td class="vcenter">
-                            <button type="submit" class="btn btn-success modal-button modal-button--compact" ng-disabled="modalSaving || relationData.state.editing"><i class="fas fa-spinner fa-spin modal-button-spinner" ng-show="newRelationSaving"></i><span ng-hide="newRelationSaving"><i class="fas fa-plus"></i></span></button>
+                            <button type="submit" class="btn btn-success modal-button modal-button--compact" ng-disabled="{{ full_check }} || relationData.state.editing"><i class="fas fa-spinner fa-spin modal-button-spinner" ng-show="newRelationSaving"></i><span ng-hide="newRelationSaving"><i class="fas fa-plus"></i></span></button>
                         </td>
                     </form>
                 </tr>
             </tbody>
         </table>
     </div>
-    {#<div class="mb-2" ng-if="relationData.relations.length == 0">
-        {% set handSign = '<i class="far fa-hand-point-down dendro-color"></i>' %}
-        <p>У слова <strong>{{'{{relationData.word}}'}}</strong> пока нет связей.</p>
-        <p>{{ handSign|raw }} Добавьте новую {{ handSign|raw }}</p>
-    </div>#}
 {% endblock %}

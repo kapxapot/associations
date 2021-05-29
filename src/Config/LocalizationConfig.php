@@ -69,6 +69,7 @@ class LocalizationConfig extends BaseConfig
 
                 'Are you sure you want to delete the relation?' => 'Действительно удалить связь?',
                 'Relation deleted successfully.' => 'Связь успешно удалена.',
+                'Failed to load word relations.' => 'Не удалось загрузить связи слова.',
             ]
         );
     }
