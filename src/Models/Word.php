@@ -407,6 +407,11 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             : null;
     }
 
+    public function primaryRelation(): ?WordRelation
+    {
+        return $this->relations()->primary();
+    }
+
     public function wordUpdatedAtIso(): ?string
     {
         return self::toIso($this->wordUpdatedAt);

@@ -204,7 +204,7 @@ class WordRecountService
         $relations = $this
             ->wordRelationRepository
             ->getAllByWord($word)
-            ->primary()
+            ->filterPrimary()
             ->descByUpdate();
 
         /** @var WordRelation|null */

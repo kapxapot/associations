@@ -11,11 +11,19 @@ class WordRelationCollection extends DbModelCollection
     protected string $class = WordRelation::class;
 
     /**
+     * Returns 1st primary relation.
+     */
+    public function primary(): ?WordRelation
+    {
+        return $this->filterPrimary()->first();
+    }
+
+    /**
      * Filters primary relations.
      *
      * @return static
      */
-    public function primary(): self
+    public function filterPrimary(): self
     {
         return $this->where(
             fn (WordRelation $wr) => $wr->isPrimary()

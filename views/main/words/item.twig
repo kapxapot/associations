@@ -21,6 +21,10 @@
             <p>
                 <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
 
+                {% if word.primaryRelation %}
+                    <span class="label label-primary" title="{{ translate(word.primaryRelation.type.name) }} слова {{ word.primaryRelation.mainWord.word }}" data-toggle="tooltip"><i class="fas fa-fist-raised"></i> {{ word.primaryRelation.mainWord.word }}</span>
+                {% endif %}
+
                 {% if word.is_disabled %}
                     <span class="label label-default">{% if word.hasDisabledOverride %}<i class="fas fa-lock"></i> {% endif %}отключено</span>
                 {% else %}
@@ -156,7 +160,7 @@
         <div class="panel-body">
             {% if definition %}
                 {% for def_entry in definition.entries %}
-                    <p><strong>{{ word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}{% if def_entry.partOfSpeech %} <i class="gray-9 ml-1">{% include 'components/part_of_speech.twig' with { 'pos': def_entry.partOfSpeech, 'bare': true, 'short': true, 'lang': definition.language.code } only %}</i>{% endif %}</p>
+                    <p class="br-word"><strong>{{ word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}{% if def_entry.partOfSpeech %} <i class="gray-9 ml-1">{% include 'components/part_of_speech.twig' with { 'pos': def_entry.partOfSpeech, 'bare': true, 'short': true, 'lang': definition.language.code } only %}</i>{% endif %}</p>
 
                     {% if def_entry.definitions|length == 1 %}
                         <p>{{ def_entry.definitions[0] }}</p>
@@ -168,6 +172,13 @@
                         </ol>
                     {% endif %}
                 {% endfor %}
+            {% elseif word.relations|length > 0 %}
+                <p class="br-word"><strong>{{ word.word|upper }}</strong></p>
+                <ul class="mb-0">
+                    {% for relation in word.relations %}
+                        <li>{% if relation.isPrimary %}<i class="fas fa-fist-raised action-color" title="Сильная связь" data-toggle="tooltip"></i> {% endif %}<em>{{ translate(relation.type.name) }}</em> слова {{ lm.word(relation.mainWord) }}.</li>
+                    {% endfor %}
+                </ul>
             {% else %}
                 <p class="i">Определение отсутствует.</p>
             {% endif %}
@@ -184,7 +195,7 @@
 
             {% if word.origin_chain.any %}
                 <p>Цепочка ассоциаций, которая привела к добавлению:</p>
-                <p>
+                <p class="br-word">
                     {% for meta_assoc in word.origin_chain %}
                         {% if loop.first %}
                             {{ lm.word(meta_assoc.toWord) }}
