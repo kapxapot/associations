@@ -22,7 +22,7 @@
                 <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
 
                 {% if word.primaryRelation %}
-                    <span class="label label-primary" title="{{ translate(word.primaryRelation.type.name) }} слова {{ word.primaryRelation.mainWord.word }}" data-toggle="tooltip"><i class="fas fa-fist-raised"></i> {{ word.primaryRelation.mainWord.word }}</span>
+                    <span class="label label-primary" title="{{ translate(word.primaryRelation.type.name) }} слова {{ word.primaryRelation.mainWord.word|upper }}" data-toggle="tooltip"><i class="fas fa-link"></i> {{ word.primaryRelation.mainWord.word }}</span>
                 {% endif %}
 
                 {% if word.is_disabled %}
