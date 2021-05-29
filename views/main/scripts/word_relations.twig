@@ -4,12 +4,7 @@ $scope.relationTypes = [
     {% for type in word_relation_types %}
         {
             id: {{ type.id }},
-            name: "{#[{{ type.tag }}] #}{{ translate(type.name) }}",
-            state: {
-                editing: false,
-                saving: false,
-                deleting: false
-            }
+            name: "{#[{{ type.tag }}] #}{{ translate(type.name) }}"
         }{% if not loop.last %},{% endif %}
     {% endfor %}
 ];
@@ -22,13 +17,22 @@ $scope.relationData = {
             {
                 id: {{ relation.id }},
                 type_id: {{ relation.typeId }},
-                type: "{#[{{ relation.type.tag }}] #}{{ translate(relation.type.name) }}",
+                type: "{{ translate(relation.type.name) }}",
                 main_word_id: {{ relation.mainWordId }},
                 main_word: "{{ relation.mainWord.word }}",
-                primary: {{ relation.isPrimary ? 'true' : 'false' }}
+                primary: {{ relation.isPrimary ? 'true' : 'false' }},
+                updated_at: "{{ relation.updatedAt }}",
+                state: {
+                    editing: false,
+                    saving: false,
+                    deleting: false
+                }
             }{% if not loop.last %},{% endif %}
         {% endfor %}
-    ]
+    ],
+    state: {
+        editing: false
+    }
 };
 
 $scope.newRelation = null;
@@ -50,11 +54,10 @@ $scope.relationsDialog = () => {
 
 $scope.newRelationSaving = false;
 
-$('#newRelationForm').submit(function(e) {
+$scope.saveNewRelation = () => {
     $scope.modalPrePost();
 
     $scope.newRelationSaving = true;
-    $scope.modalSaving = true;
 
     const data = $scope.newRelation;
 
@@ -70,21 +73,73 @@ $('#newRelationForm').submit(function(e) {
             $scope.reloadRelations();
         }
     });
-});
+};
+
+$scope.editRelation = (index) => {
+    $scope.relationData.state.editing = true;
+    $scope.relationData.relations[index].state.editing = true;
+
+    hideModalAlerts();
+};
+
+$scope.cancelEditRelation = (index) => {
+    $scope.relationData.state.editing = false;
+    $scope.relationData.relations[index].state.editing = false;
+};
+
+$scope.saveRelation = (index) => {
+    $scope.modalPrePost();
+
+    const relation = $scope.relationData.relations[index];
+
+    relation.state.saving = true;
+
+    let data = {
+        id: relation.id,
+        word_id: $scope.relationData.word_id,
+        type_id: relation.type_id,
+        main_word: relation.main_word,
+        primary: relation.primary,
+        updated_at: relation.updated_at
+    };
+
+    $scope.modalAjax({
+        method: 'put',
+        url: '{{ api }}word_relations/' + relation.id,
+        data: data,
+        setSaving: (val) => {
+            relation.state.saving = val;
+            $scope.modalSaving = val;
+        },
+        onSuccess: $scope.reloadRelations
+    });
+};
 
 $scope.deleteRelation = (index) => {
-    if (confirm('Действительно удалить связь?')) {
+    if (confirm('{{ translate('Are you sure you want to delete the relation?') }}')) {
+        $scope.modalPrePost();
+
         const relation = $scope.relationData.relations[index];
 
-        $scope.ajax({
+        relation.state.deleting = true;
+
+        $scope.modalAjax({
             method: 'delete',
             url: '{{ api }}word_relations/' + relation.id,
+            setSaving: (val) => {
+                relation.state.deleting = val;
+                $scope.modalSaving = val;
+            },
             onSuccess: $scope.reloadRelations,
-            message: 'Связь успешно удалена.'
+            message: '{{ translate('Relation deleted successfully.') }}'
         });
     }
 };
 
 $scope.reloadRelations = () => {
+    $scope.modalLoading = true;
 
+    reloadWindow();
+
+    $scope.modalLoading = false;
 };

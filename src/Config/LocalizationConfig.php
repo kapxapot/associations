@@ -66,6 +66,9 @@ class LocalizationConfig extends BaseConfig
                 'Typo must differ from the word.' => 'Опечатка должна отличаться от слова.',
                 'Word correction must differ from the word.' => 'Исправление должно отличаться от слова.',
                 'Such word already exists.' => 'Такое слово уже существует.',
+
+                'Are you sure you want to delete the relation?' => 'Действительно удалить связь?',
+                'Relation deleted successfully.' => 'Связь успешно удалена.',
             ]
         );
     }

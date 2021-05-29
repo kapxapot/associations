@@ -15,5 +15,8 @@ interface WordRelationRepositoryInterface extends ChangingRepositoryInterface
 
     public function save(WordRelation $wordRelation): WordRelation;
 
-    public function getAllByWord(Word $word): WordRelationCollection;
+    public function getAllByWord(
+        Word $word,
+        bool $ignoreCache = false
+    ): WordRelationCollection;
 }

@@ -14,7 +14,9 @@ use App\Specifications\WordSpecification;
 use Plasticode\Events\Event;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Traits\Convert\ToBit;
+use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Date;
+use Psr\Log\LoggerInterface;
 
 /**
  * @emits WordApprovedChangedEvent
@@ -24,6 +26,7 @@ use Plasticode\Util\Date;
  */
 class WordRecountService
 {
+    use LoggerAwareTrait;
     use ToBit;
 
     private WordRepositoryInterface $wordRepository;
@@ -36,7 +39,8 @@ class WordRecountService
         WordRepositoryInterface $wordRepository,
         WordRelationRepositoryInterface $wordRelationRepository,
         WordSpecification $wordSpecification,
-        EventDispatcher $eventDispatcher
+        EventDispatcher $eventDispatcher,
+        LoggerInterface $logger
     )
     {
         $this->wordRepository = $wordRepository;
@@ -44,6 +48,8 @@ class WordRecountService
 
         $this->wordSpecification = $wordSpecification;
         $this->eventDispatcher = $eventDispatcher;
+
+        $this->logger = $logger;
     }
 
     public function recountAll(Word $word, ?Event $sourceEvent = null): Word
@@ -180,6 +186,7 @@ class WordRecountService
 
         if ($word->mainId != $mainId) {
             $word->mainId = $mainId;
+            $word->updatedAt = Date::dbNow();
 
             $this->wordRepository->save($word);
         }
@@ -193,8 +200,10 @@ class WordRecountService
      */
     private function enforcePrimaryRelation(Word $word): ?WordRelation
     {
-        $relations = $word
-            ->relations()
+        // need to reload relations, because they can be cached for `$word`
+        $relations = $this
+            ->wordRelationRepository
+            ->getAllByWord($word)
             ->primary()
             ->descByUpdate();
 
@@ -205,6 +214,7 @@ class WordRecountService
             $relations->except($primary)->apply(
                 function (WordRelation $wr) {
                     $wr->primary = false;
+                    $wr->updatedAt = Date::dbNow();
 
                     $this->wordRelationRepository->save($wr);
                 }

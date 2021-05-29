@@ -8,7 +8,7 @@
 {% set submittable = false %}
 
 {% block modal_body %}
-    <div class="panel-body--nopad table-responsive">
+    <div class="panel-body--nopad">
         <table id="relations-table" class="table mb-1">
             <thead>
                 <tr>
@@ -19,59 +19,63 @@
                 </tr>
             </thead>
             <tbody>
-                {% for relation in word.relations %}
-                    {% set modelBase = 'relationData.relations[' ~ (loop.index - 1) ~ ']' %}
-                    {% set inlineForm = false %}
-                    <tr>
-                        <td class="vcenter">
-                            {% if inlineForm %}
-                                <input type="checkbox" id="relation{{ relation.id }}Primary" ng-model="{{ modelBase }}.primary">
-                            {% else %}
-                                <span ng-if="{{ modelBase }}.primary"><i class="fas fa-check"></i></span>
-                            {% endif %}
+                <tr ng-repeat="(rKey, r) in relationData.relations">
+                    <form ng-submit="saveRelation(rKey)" ng-attr-id="relationEditForm{{ '{{rKey}}' }}" name="relationEditForm{{ '{{rKey}}' }}">
+                        <td class="vcenter" ng-show="r.state.editing">
+                            <input type="checkbox" ng-model="r.primary">
                         </td>
 
-                        <td class="vcenter">
-                            {% if inlineForm %}
-                                <select class="form-control" ng-model="{{ modelBase }}.type_id" id="relation{{ relation.id }}Type" ng-options="value.id as value.name for (key, value) in relationTypes"></select>
-                            {% else %}
-                                {{ '{{' ~ modelBase ~ '.type}}' }}
-                            {% endif %}
+                        <td class="vcenter" ng-show="r.state.editing">
+                            <select class="form-control" ng-model="r.type_id" ng-options="value.id as value.name for (key, value) in relationTypes"></select>
                         </td>
 
-                        <td class="vcenter">
-                            {% if inlineForm %}
-                                <input type="text" id="relation{{ relation.id }}MainWord" class="form-control" ng-model="{{ modelBase }}.main_word" maxlength="{{ word_max_length }}" required />
-                            {% else %}
-                                <span class="ellipsis w-200">{{ '{{' ~ modelBase ~ '.main_word}}' }}</span>
-                            {% endif %}
+                        <td class="vcenter" ng-show="r.state.editing">
+                            <input type="text" class="form-control" ng-model="r.main_word" required />
                         </td>
 
-                        <td class="vcenter flex">
-                            <button type="submit" class="btn btn-warning modal-button--compact" ng-disabled="modalSaving"><i class="fas fa-spinner fa-lg fa-spin modal-button-spinner" ng-show="{{ modelBase }}.state.saving"></i><span ng-hide="{{ modelBase }}.state.saving"><i class="fas fa-pencil-alt"></i></span></button>
+                        <td class="vcenter flex" ng-show="r.state.editing">
+                            <button type="submit" ng-click="saveRelation(rKey)" class="btn btn-success modal-button--compact" ng-disabled="r.state.saving"><i class="fas fa-spinner fa-spin modal-button-spinner" ng-show="r.state.saving"></i><span ng-hide="r.state.saving"><i class="fas fa-check"></i></span></button>
 
-                            {% if can('word_relations', 'delete') %}
-                                <button class="btn btn-danger modal-button--compact ml-1" ng-disabled="modalSaving" ng-click="deleteRelation({{ loop.index - 1 }})"><i class="fas fa-spinner fa-lg fa-spin modal-button-spinner" ng-show="{{ modelBase }}.state.deleting"></i><span ng-hide="{{ modelBase }}.state.deleting"><i class="fas fa-trash"></i></span></button>
-                            {% endif %}
+                            <button class="btn btn-default modal-button--compact ml-1" ng-disabled="r.state.saving" ng-click="cancelEditRelation(rKey)"><i class="fas fa-times"></i></button>
                         </td>
-                    </tr>
-                {% endfor %}
+                    </form>
+
+                    <td class="vcenter" ng-hide="r.state.editing">
+                        <span ng-if="r.primary"><i class="fas fa-check"></i></span>
+                    </td>
+
+                    <td class="vcenter" ng-hide="r.state.editing">
+                        {{ '{{r.type}}' }}
+                    </td>
+
+                    <td class="vcenter br-word" ng-hide="r.state.editing">
+                        {{ '{{r.main_word}}' }}
+                    </td>
+
+                    <td class="vcenter flex" ng-hide="r.state.editing">
+                        <button class="btn btn-warning modal-button--compact" ng-disabled="modalSaving || relationData.state.editing" ng-click="editRelation(rKey)"><i class="fas fa-pencil-alt"></i></button>
+
+                        {% if can('word_relations', 'delete') %}
+                            <button class="btn btn-danger modal-button--compact ml-1" ng-disabled="modalSaving || relationData.state.editing" ng-click="deleteRelation(rKey)"><i class="fas fa-spinner fa-spin modal-button-spinner" ng-show="r.state.deleting"></i><span ng-hide="r.state.deleting"><i class="fas fa-trash"></i></span></button>
+                        {% endif %}
+                    </td>
+                </tr>
                 <tr>
-                    <form id="newRelationForm" method="post">
+                    <form ng-submit="saveNewRelation()">
                         <td class="center vcenter">
-                            <input type="checkbox" id="newRelationPrimary" ng-model="newRelation.primary">
+                            <input type="checkbox" ng-disabled="relationData.state.editing" ng-model="newRelation.primary">
                         </td>
 
                         <td>
-                            <select class="form-control" ng-model="newRelation.type_id" id="newRelationType" ng-options="value.id as value.name for (key, value) in relationTypes"></select>
+                            <select class="form-control" ng-disabled="relationData.state.editing" ng-model="newRelation.type_id" ng-options="value.id as value.name for (key, value) in relationTypes"></select>
                         </td>
 
                         <td>
-                            <input type="text" id="newRelationMainWord" class="form-control" ng-model="newRelation.main_word" maxlength="{{ word_max_length }}" required />
+                            <input type="text" class="form-control" ng-disabled="relationData.state.editing" ng-model="newRelation.main_word" required />
                         </td>
 
                         <td class="vcenter">
-                            <button type="submit" class="btn btn-success modal-button modal-button--compact" ng-disabled="modalSaving"><i class="fas fa-spinner fa-lg fa-spin modal-button-spinner" ng-show="newRelationSaving"></i><span ng-hide="newRelationSaving"><i class="fas fa-plus"></i></span></button>
+                            <button type="submit" class="btn btn-success modal-button modal-button--compact" ng-disabled="modalSaving || relationData.state.editing"><i class="fas fa-spinner fa-spin modal-button-spinner" ng-show="newRelationSaving"></i><span ng-hide="newRelationSaving"><i class="fas fa-plus"></i></span></button>
                         </td>
                     </form>
                 </tr>
