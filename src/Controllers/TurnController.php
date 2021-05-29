@@ -47,7 +47,7 @@ class TurnController extends Controller
         $gameId = $data['game_id'] ?? null;
         $game = $this->gameRepository->get($gameId);
 
-        if (is_null($game)) {
+        if ($game === null) {
             throw new NotFoundException('Game not found.');
         }
 
@@ -63,7 +63,7 @@ class TurnController extends Controller
         $prevTurnId = $data['prev_turn_id'] ?? null;
         $prevTurn = $this->turnRepository->get($prevTurnId);
 
-        if ($prevTurn && !$this->gameService->validateLastTurn($game, $prevTurn)) {
+        if (!$this->gameService->validateLastTurn($game, $prevTurn)) {
             throw new BadRequestException(
                 'Game turn is not correct. Please, reload the page.'
             );
@@ -89,7 +89,7 @@ class TurnController extends Controller
             'answer' => $this->serializer->serializeTurn($answer)
         ];
 
-        if (is_null($answer)) {
+        if ($answer === null) {
             $newGame = $this->gameService->createGameFor($user);
 
             $result['new'] = $this->serializer->serializeTurn(
@@ -111,7 +111,7 @@ class TurnController extends Controller
 
         $game = $user->currentGame();
 
-        if ($game) {
+        if ($game !== null) {
             $this->turnService->finishGame($game);
         }
 

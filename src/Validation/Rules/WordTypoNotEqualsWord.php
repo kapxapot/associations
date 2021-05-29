@@ -3,23 +3,31 @@
 namespace App\Validation\Rules;
 
 use App\Models\Word;
-use Plasticode\Util\Strings;
+use App\Services\LanguageService;
 use Respect\Validation\Rules\AbstractRule;
 
 class WordTypoNotEqualsWord extends AbstractRule
 {
+    private LanguageService $languageService;
+
     private Word $wordToCompare;
 
     public function __construct(
+        LanguageService $languageService,
         Word $wordToCompare
     )
     {
+        $this->languageService = $languageService;
+
         $this->wordToCompare = $wordToCompare;
     }
 
     public function validate($input)
     {
-        $normalized = Strings::normalize($input);
+        $normalized = $this->languageService->normalizeWord(
+            $this->wordToCompare->language(),
+            $input
+        );
 
         return $this->wordToCompare->word !== $normalized;
     }

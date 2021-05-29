@@ -10,7 +10,6 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Convert;
 use Plasticode\Util\Date;
-use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
 use Respect\Validation\Validator;
@@ -20,27 +19,32 @@ class WordFeedbackService
     private WordFeedbackRepositoryInterface $wordFeedbackRepository;
     private WordRepositoryInterface $wordRepository;
 
+    private LanguageService $languageService;
+    private WordService $wordService;
+
     private ValidatorInterface $validator;
     private ValidationRules $validationRules;
-    private WordService $wordService;
 
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
         WordFeedbackRepositoryInterface $wordFeedbackRepository,
         WordRepositoryInterface $wordRepository,
+        LanguageService $languageService,
+        WordService $wordService,
         ValidatorInterface $validator,
         ValidationRules $validationRules,
-        WordService $wordService,
         EventDispatcher $eventDispatcher
     )
     {
         $this->wordFeedbackRepository = $wordFeedbackRepository;
         $this->wordRepository = $wordRepository;
 
+        $this->languageService = $languageService;
+        $this->wordService = $wordService;
+
         $this->validator = $validator;
         $this->validationRules = $validationRules;
-        $this->wordService = $wordService;
 
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -70,6 +74,10 @@ class WordFeedbackService
     {
         $wordId = $data['word_id'];
         $word = $this->wordRepository->get($wordId);
+        $language = $word->language();
+
+        $normalize = fn (?string $w) =>
+            $this->languageService->normalizeWord($language, $w);
 
         $model =
             $word->feedbackBy($user)
@@ -83,10 +91,10 @@ class WordFeedbackService
 
         $model->dislike = Convert::toBit($data['dislike'] ?? null);
 
-        $typo = Strings::normalize($data['typo'] ?? null);
+        $typo = $normalize($data['typo'] ?? null);
         $model->typo = (strlen($typo) > 0) ? $typo : null;
 
-        $duplicate = Strings::normalize($data['duplicate'] ?? null);
+        $duplicate = $normalize($data['duplicate'] ?? null);
 
         $duplicateWord = $this
             ->wordRepository
@@ -135,7 +143,10 @@ class WordFeedbackService
             $typoRule = $this->wordService->getRule();
 
             if ($word) {
-                $typoRule = $typoRule->wordTypoNotEqualsWord($word);
+                $typoRule = $typoRule->wordTypoNotEqualsWord(
+                    $this->languageService,
+                    $word
+                );
             }
 
             $result['typo'] = $typoRule;
@@ -145,6 +156,7 @@ class WordFeedbackService
             $result['duplicate'] =
                 Validator::mainWordExists(
                     $this->wordRepository,
+                    $this->languageService,
                     $word->language(),
                     $word
                 );

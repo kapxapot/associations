@@ -9,7 +9,6 @@ use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Util\Convert;
-use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
 
@@ -18,27 +17,32 @@ class WordOverrideService
     private WordOverrideRepositoryInterface $wordOverrideRepository;
     private WordRepositoryInterface $wordRepository;
 
+    private LanguageService $languageService;
+    private WordService $wordService;
+
     private ValidatorInterface $validator;
     private ValidationRules $validationRules;
-    private WordService $wordService;
 
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
         WordOverrideRepositoryInterface $wordOverrideRepository,
         WordRepositoryInterface $wordRepository,
+        LanguageService $languageService,
+        WordService $wordService,
         ValidatorInterface $validator,
         ValidationRules $validationRules,
-        WordService $wordService,
         EventDispatcher $eventDispatcher
     )
     {
         $this->wordOverrideRepository = $wordOverrideRepository;
         $this->wordRepository = $wordRepository;
 
+        $this->languageService = $languageService;
+        $this->wordService = $wordService;
+
         $this->validator = $validator;
         $this->validationRules = $validationRules;
-        $this->wordService = $wordService;
 
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -90,7 +94,11 @@ class WordOverrideService
 
         $model->disabled = Convert::toBit($data['disabled'] ?? null);
 
-        $wordCorrection = Strings::normalize($data['word_correction'] ?? null);
+        $wordCorrection = $this->languageService->normalizeWord(
+            $word->language(),
+            $data['word_correction'] ?? null
+        );
+
         $model->wordCorrection = (strlen($wordCorrection) > 0) ? $wordCorrection : null;
 
         $posCorrection = $data['pos_correction'] ?? [];
@@ -131,7 +139,10 @@ class WordOverrideService
 
             if ($word) {
                 $wordCorrectionRule = $wordCorrectionRule
-                    ->wordCorrectionNotEqualsWord($word)
+                    ->wordCorrectionNotEqualsWord(
+                        $this->languageService,
+                        $word
+                    )
                     ->wordAvailable(
                         $this->wordRepository,
                         $word->language(),

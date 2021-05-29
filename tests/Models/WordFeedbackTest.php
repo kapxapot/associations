@@ -14,6 +14,7 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\CasesService;
+use App\Services\LanguageService;
 use App\Services\WordFeedbackService;
 use App\Services\WordService;
 use App\Testing\Factories\LanguageRepositoryFactory;
@@ -90,10 +91,10 @@ final class WordFeedbackTest extends IntegrationTest
             )
         );
 
+        $settingsProvider = new SettingsProvider($this->settings);
+
         $validator = new Validator();
-        $validationRules = new ValidationRules(
-            new SettingsProvider($this->settings)
-        );
+        $validationRules = new ValidationRules($settingsProvider);
 
         $eventDispatcher = new EventDispatcher();
 
@@ -110,12 +111,20 @@ final class WordFeedbackTest extends IntegrationTest
             new DefinitionParser()
         );
 
+        $languageService = new LanguageService(
+            $languageRepository,
+            $this->wordRepository,
+            $settingsProvider,
+            $wordService
+        );
+
         $this->wordFeedbackService = new WordFeedbackService(
             $this->wordFeedbackRepository,
             $this->wordRepository,
+            $languageService,
+            $wordService,
             $validator,
             $validationRules,
-            $wordService,
             $eventDispatcher
         );
     }

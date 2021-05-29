@@ -85,15 +85,15 @@ class GameService
 
     /**
      * Returns true, if the provided turn is the last turn of the game
-     * OR turn is null and game contains no turns.
+     * OR turn is `null` and game contains no turns.
      */
-    public function validateLastTurn(Game $game, Turn $turn): bool
+    public function validateLastTurn(Game $game, ?Turn $turn): bool
     {
         $lastTurn = $game->lastTurn();
 
-        return
-            ($lastTurn && $lastTurn->equals($turn))
-            || (is_null($lastTurn) && is_null($turn));
+        return $lastTurn !== null
+            ? $lastTurn->equals($turn)
+            : $turn === null;
     }
 
     /**
@@ -112,10 +112,10 @@ class GameService
         $this->wordService->validateWord($wordStr);
         $this->turnService->validatePlayerTurn($game, $wordStr);
 
-        // get word
+        // get or CREATE word
         $word = $this->wordService->getOrCreate($language, $wordStr, $user);
 
-        // new turn
+        // new turn (+ AI's potential answer)
         $turns = $this->turnService->newPlayerTurn($game, $word, $user);
 
         Assert::minCount($turns, 1);

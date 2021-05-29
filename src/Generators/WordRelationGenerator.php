@@ -7,12 +7,12 @@ use App\Models\WordRelation;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\LanguageService;
 use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Generators\Core\GeneratorContext;
 use Plasticode\Generators\Generic\ChangingEntityGenerator;
 use Plasticode\Util\Convert;
-use Plasticode\Util\Strings;
 use Respect\Validation\Validator;
 
 /**
@@ -24,6 +24,8 @@ class WordRelationGenerator extends ChangingEntityGenerator
     private WordRelationRepositoryInterface $wordRelationRepository;
     private WordRelationTypeRepositoryInterface $wordRelationTypeRepository;
 
+    private LanguageService $languageService;
+
     private TranslatorInterface $translator;
     private EventDispatcher $eventDispatcher;
 
@@ -32,6 +34,7 @@ class WordRelationGenerator extends ChangingEntityGenerator
         WordRepositoryInterface $wordRepository,
         WordRelationRepositoryInterface $wordRelationRepository,
         WordRelationTypeRepositoryInterface $wordRelationTypeRepository,
+        LanguageService $languageService,
         TranslatorInterface $translator,
         EventDispatcher $eventDispatcher
     )
@@ -41,6 +44,8 @@ class WordRelationGenerator extends ChangingEntityGenerator
         $this->wordRepository = $wordRepository;
         $this->wordRelationRepository = $wordRelationRepository;
         $this->wordRelationTypeRepository = $wordRelationTypeRepository;
+
+        $this->languageService = $languageService;
 
         $this->translator = $translator;
         $this->eventDispatcher = $eventDispatcher;
@@ -76,6 +81,7 @@ class WordRelationGenerator extends ChangingEntityGenerator
             $rules['main_word'] =
                 Validator::mainWordExists(
                     $this->wordRepository,
+                    $this->languageService,
                     $word->language(),
                     $word
                 );
@@ -119,10 +125,11 @@ class WordRelationGenerator extends ChangingEntityGenerator
         $wordId = $data['word_id'];
 
         $word = $this->wordRepository->get($wordId);
+        $language = $word->language();
 
         $mainWord = $this->wordRepository->findInLanguage(
-            $word->language(),
-            Strings::normalize($data['main_word'])
+            $language,
+            $this->languageService->normalizeWord($language, $data['main_word'])
         );
 
         $data['main_word_id'] = $mainWord->getId();
