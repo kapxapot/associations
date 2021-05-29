@@ -207,7 +207,7 @@ class TurnService
             ->findInLanguage($language, $wordStr);
 
         // unknown yet word
-        if (is_null($word)) {
+        if ($word === null) {
             return;
         }
 
