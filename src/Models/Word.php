@@ -412,6 +412,19 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this->relations()->primary();
     }
 
+    /**
+     * Returns the word's canonical form.
+     * 
+     * - If the word doesn't have a main word, returns itself.
+     * - Otherwise, returns the root main word (main()->main()->...->main()).
+     */
+    public function canonical(): self
+    {
+        return $this->main() !== null
+            ? $this->main()->canonical()
+            : $this;
+    }
+
     public function wordUpdatedAtIso(): ?string
     {
         return self::toIso($this->wordUpdatedAt);

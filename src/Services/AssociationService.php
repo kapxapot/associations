@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Collections\WordCollection;
 use App\Events\Association\AssociationCreatedEvent;
 use App\Models\Association;
 use App\Models\Language;
@@ -37,7 +38,7 @@ class AssociationService
         Word $second,
         User $user = null,
         Language $language = null
-    ) : Association
+    ): Association
     {
         $association =
             $this->getByPair($first, $second, $language)
@@ -66,7 +67,7 @@ class AssociationService
         Word $second,
         User $user,
         Language $language = null
-    ) : Association
+    ): Association
     {
         $association = $this->getByPair($first, $second, $language);
 
@@ -100,7 +101,7 @@ class AssociationService
         Word $first,
         Word $second,
         Language $language = null
-    ) : void
+    ): void
     {
         Assert::allNotNull(
             [$first, $second],
@@ -126,18 +127,16 @@ class AssociationService
         );
     }
 
-    public function orderPair(Word $first, Word $second) : array
+    public function orderPair(Word $first, Word $second): WordCollection
     {
-        return $first->getId() < $second->getId()
-            ? [$first, $second]
-            : [$second, $first];
+        return WordCollection::collect($first, $second)->order();
     }
 
     private function getByPair(
         Word $first,
         Word $second,
         Language $language = null
-    ) : ?Association
+    ): ?Association
     {
         $this->checkPair($first, $second, $language);
 
