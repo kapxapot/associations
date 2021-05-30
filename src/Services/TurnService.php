@@ -5,6 +5,9 @@ namespace App\Services;
 use App\Collections\TurnCollection;
 use App\Events\Turn\TurnCreatedEvent;
 use App\Exceptions\DuplicateWordException;
+use App\Exceptions\RecentRelatedWordException;
+use App\Exceptions\StronglyRelatedWordException;
+use App\Exceptions\TurnException;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\User;
@@ -12,6 +15,7 @@ use App\Models\Word;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use Exception;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Date;
@@ -196,7 +200,7 @@ class TurnService
      * 
      * Normalized word string expected.
      * 
-     * @throws DuplicateWordException
+     * @throws TurnException
      */
     public function validatePlayerTurn(Game $game, string $wordStr): void
     {
@@ -211,9 +215,7 @@ class TurnService
             return;
         }
 
-        if ($game->containsWord($word)) {
-            throw new DuplicateWordException($word->word);
-        };
+        $this->throwIfCantBePlayed($game, $word);
     }
 
     public function findAnswer(Turn $turn): ?Word
@@ -225,8 +227,44 @@ class TurnService
             ->word()
             ->associatedWordsFor($user)
             ->where(
-                fn (Word $w) => !$game->containsWord($w)
+                fn (Word $w) => $this->canBePlayed($game, $w)
             )
             ->random();
+    }
+
+    private function canBePlayed(Game $game, Word $word): bool
+    {
+        try {
+            $this->throwIfCantBePlayed($game, $word);
+        } catch (Exception $ex) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @throws TurnException
+     */
+    private function throwIfCantBePlayed(Game $game, Word $word): void
+    {
+        // check for the same word
+        if ($game->containsWord($word)) {
+            throw new DuplicateWordException($word->word);
+        }
+
+        // check for a strongly related word
+        $stronglyRelatedWord = $game->getStronglyRelatedWordFor($word);
+
+        if ($stronglyRelatedWord !== null) {
+            throw new StronglyRelatedWordException($stronglyRelatedWord->word);
+        }
+
+        // check for a recent related word
+        $recentRelatedWord = $game->getRecentRelatedWordFor($word);
+
+        if ($recentRelatedWord !== null) {
+            throw new RecentRelatedWordException($recentRelatedWord->word);
+        }
     }
 }

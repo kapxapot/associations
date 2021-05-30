@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Exceptions\TurnException;
 use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
@@ -74,6 +75,10 @@ class TurnController extends Controller
 
         try {
             $turns = $this->gameService->makeTurn($user, $game, $wordStr);
+        } catch (TurnException $tEx) {
+            throw new BadRequestException(
+                $tEx->getTranslatedMessage($this->translator)
+            );
         } catch (InvalidResultException $ex) {
             throw new BadRequestException($ex->getMessage());
         }

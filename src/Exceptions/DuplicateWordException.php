@@ -2,16 +2,10 @@
 
 namespace App\Exceptions;
 
-use Plasticode\Exceptions\InvalidResultException;
-
-class DuplicateWordException extends InvalidResultException
+class DuplicateWordException extends TurnException
 {
-    public string $word;
-
-    public function __construct(string $word)
+    protected function getMessageTemplate(): string
     {
-        parent::__construct('Word is already used in this game.');
-
-        $this->word = $word;
+        return 'Word "%s" is already used in the game.';
     }
 }

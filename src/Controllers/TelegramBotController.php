@@ -2,7 +2,7 @@
 
 namespace App\Controllers;
 
-use App\Exceptions\DuplicateWordException;
+use App\Exceptions\TurnException;
 use App\Models\Association;
 use App\Models\TelegramUser;
 use App\Models\Turn;
@@ -343,11 +343,9 @@ class TelegramBotController
             return [
                 '❌ ' . $vEx->firstError()
             ];
-        } catch (DuplicateWordException $dwEx) {
-            $word = mb_strtoupper($dwEx->word);
-
+        } catch (TurnException $tEx) {
             return [
-                '❌ Слово <b>' . $word . '</b> уже использовано в игре.'
+                '❌ ' . $tEx->getTranslatedMessage($this->translator)
             ];
         }
 

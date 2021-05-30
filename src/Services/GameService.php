@@ -3,7 +3,7 @@
 namespace App\Services;
 
 use App\Collections\TurnCollection;
-use App\Exceptions\DuplicateWordException;
+use App\Exceptions\TurnException;
 use App\Models\Game;
 use App\Models\Language;
 use App\Models\Turn;
@@ -101,7 +101,7 @@ class GameService
      * The result is the user's turn and AI's turn (if the AI has something to say).
      * 
      * @throws ValidationException
-     * @throws DuplicateWordException
+     * @throws TurnException
      */
     public function makeTurn(User $user, Game $game, ?string $wordStr): TurnCollection
     {

@@ -72,7 +72,7 @@ abstract class AbstractAnswerer
     protected function renderWord(?Word $word): string
     {
         return $word !== null
-            ? $this->renderWordStr($word->word)
+            ? $word->word
             : 'У меня нет слов';
     }
 
@@ -341,11 +341,6 @@ abstract class AbstractAnswerer
         $wordStr = $this->languageService->normalizeWord($language, $wordStr);
 
         return $this->wordRepository->findInLanguage($language, $wordStr);
-    }
-
-    protected function renderWordStr(string $word): string
-    {
-        return mb_strtoupper($word);
     }
 
     /**

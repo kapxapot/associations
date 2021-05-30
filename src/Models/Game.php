@@ -130,6 +130,16 @@ class Game extends DbModel implements CreatedInterface
             ->any('id', $word->getId());
     }
 
+    public function getStronglyRelatedWordFor(Word $word): ?Word
+    {
+        return null;
+    }
+
+    public function getRecentRelatedWordFor(Word $word): ?Word
+    {
+        return null;
+    }
+
     public function displayName(): string
     {
         return 'Игра #' . $this->getId();

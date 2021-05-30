@@ -2,7 +2,7 @@
 
 namespace App\Answers\Alice;
 
-use App\Exceptions\DuplicateWordException;
+use App\Exceptions\TurnException;
 use App\Models\AliceUser;
 use App\Models\DTO\AliceRequest;
 use App\Models\DTO\AliceResponse;
@@ -16,6 +16,7 @@ use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
 use App\Services\WordFeedbackService;
+use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Semantics\Sentence;
 use Plasticode\Traits\LoggerAwareTrait;
@@ -34,6 +35,8 @@ class UserAnswerer extends AbstractAnswerer
     private TurnService $turnService;
     private WordFeedbackService $wordFeedbackService;
 
+    private TranslatorInterface $translator;
+
     private Tokenizer $tokenizer;
 
     public function __construct(
@@ -43,6 +46,7 @@ class UserAnswerer extends AbstractAnswerer
         LanguageService $languageService,
         TurnService $turnService,
         WordFeedbackService $wordFeedbackService,
+        TranslatorInterface $translator,
         LoggerInterface $logger
     )
     {
@@ -52,6 +56,8 @@ class UserAnswerer extends AbstractAnswerer
         $this->gameService = $gameService;
         $this->turnService = $turnService;
         $this->wordFeedbackService = $wordFeedbackService;
+
+        $this->translator = $translator;
 
         $this->logger = $logger;
 
@@ -291,7 +297,7 @@ class UserAnswerer extends AbstractAnswerer
             ? Strings::upperCaseFirst($wordStr)
                 . ' - это '
                 . Strings::lowerCaseFirst($parsedDefinition->firstDefinition())
-            : 'Я не знаю, что такое ' . $this->renderWordStr($wordStr);
+            : 'Я не знаю, что такое "' . $wordStr . '"';
     }
 
     private function tooManyWords(AliceUser $aliceUser): AliceResponse
@@ -382,11 +388,9 @@ class UserAnswerer extends AbstractAnswerer
             return $this->buildResponse(
                 $vEx->firstError()
             );
-        } catch (DuplicateWordException $dwEx) {
-            $word = $this->renderWordStr($dwEx->word);
-
+        } catch (TurnException $tEx) {
             return $this->buildResponse(
-                'Слово ' . $word . ' уже использовано в игре.'
+                $tEx->getTranslatedMessage($this->translator)
             );
         }
 

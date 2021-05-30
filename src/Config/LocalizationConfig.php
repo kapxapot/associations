@@ -70,6 +70,10 @@ class LocalizationConfig extends BaseConfig
                 'Are you sure you want to delete the relation?' => 'Действительно удалить связь?',
                 'Relation deleted successfully.' => 'Связь успешно удалена.',
                 'Failed to load word relations.' => 'Не удалось загрузить связи слова.',
+
+                'Word "%s" is already used in the game.' => 'Слово "%s" уже использовано в игре.',
+                'Related word "%s" is already used in the game.' => 'Связанное слово "%s" уже использовано в игре.',
+                'Related word "%s" is recently used in the game.' => 'Связанное слово "%s" недавно использовано в игре.',
             ]
         );
     }
