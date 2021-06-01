@@ -23,7 +23,8 @@ class AssociationSpecification
     public function isDisabled(Association $association): bool
     {
         return $this->isDisabledByWords($association)
-            || $this->isDisabledByOverride($association);
+            || $this->isDisabledByOverride($association)
+            || $this->isDisabledByRelations($association);
     }
 
     private function isDisabledByWords(Association $association): bool
@@ -38,6 +39,13 @@ class AssociationSpecification
         return $association->hasOverride()
             ? $association->override()->isDisabled()
             : false;
+    }
+
+    private function isDisabledByRelations(Association $association): bool
+    {
+        return $association->firstWord()->isRelatedTo(
+            $association->secondWord()
+        );
     }
 
     public function isApproved(Association $association): bool

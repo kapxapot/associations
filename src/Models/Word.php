@@ -438,6 +438,11 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             : $this;
     }
 
+    public function isRelatedTo(Word $word): bool
+    {
+        return $this->relatedWords()->contains($word);
+    }
+
     public function relatedWords(): WordCollection
     {
         $out = $this->relations()->map(

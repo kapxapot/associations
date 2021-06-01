@@ -152,7 +152,7 @@ class Game extends DbModel implements CreatedInterface
             ->recentTurns()
             ->words()
             ->first(
-                fn (Word $w) => $word->relatedWords()->contains($w)
+                fn (Word $w) => $word->isRelatedTo($w)
             );
     }
 
