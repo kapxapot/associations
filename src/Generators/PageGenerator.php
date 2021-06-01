@@ -35,7 +35,7 @@ class PageGenerator extends TaggableEntityGenerator
         return Page::class;
     }
 
-    protected function getRepository(): PageRepositoryInterface
+    public function getRepository(): PageRepositoryInterface
     {
         return $this->pageRepository;
     }

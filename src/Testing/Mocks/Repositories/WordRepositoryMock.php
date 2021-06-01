@@ -2,16 +2,16 @@
 
 namespace App\Testing\Mocks\Repositories;
 
-use App\Collections\LanguageElementCollection;
 use App\Collections\WordCollection;
 use App\Models\DTO\Search\SearchParams;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
-class WordRepositoryMock implements WordRepositoryInterface
+class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterface
 {
     private WordCollection $words;
 

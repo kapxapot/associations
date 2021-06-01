@@ -26,7 +26,7 @@ class WordFeedbackGenerator extends ChangingEntityGenerator
         return WordFeedback::class;
     }
 
-    protected function getRepository(): WordFeedbackRepositoryInterface
+    public function getRepository(): WordFeedbackRepositoryInterface
     {
         return $this->wordFeedbackRepository;
     }

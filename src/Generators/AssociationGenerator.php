@@ -26,7 +26,7 @@ class AssociationGenerator extends ChangingEntityGenerator
         return Association::class;
     }
 
-    protected function getRepository(): AssociationRepositoryInterface
+    public function getRepository(): AssociationRepositoryInterface
     {
         return $this->associationRepository;
     }

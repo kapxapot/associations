@@ -112,6 +112,9 @@ class WordHydrator extends Hydrator
             ->withRelations(
                 fn () => $this->wordRelationRepository->getAllByWord($entity)
             )
+            ->withCounterRelations(
+                fn () => $this->wordRelationRepository->getAllByMainWord($entity)
+            )
             ->withCreator(
                 fn () => $this->userRepository->get($entity->createdBy)
             );

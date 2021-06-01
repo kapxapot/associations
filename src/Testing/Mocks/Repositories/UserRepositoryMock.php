@@ -6,9 +6,10 @@ use App\Collections\UserCollection;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Models\User as BaseUser;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
-class UserRepositoryMock implements UserRepositoryInterface
+class UserRepositoryMock extends RepositoryMock implements UserRepositoryInterface
 {
     private UserCollection $users;
 

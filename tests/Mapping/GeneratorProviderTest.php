@@ -15,6 +15,7 @@ use App\Generators\WordRelationTypeGenerator;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
+use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use App\Repositories\Interfaces\PageRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -47,6 +48,7 @@ final class GeneratorProviderTest extends AbstractProviderTest
             AssociationFeedbackRepositoryInterface::class,
             AssociationOverrideRepositoryInterface::class,
             GameRepositoryInterface::class,
+            LanguageRepositoryInterface::class,
             NewsRepositoryInterface::class,
             PageRepositoryInterface::class,
             CoreRepositories\TagRepositoryInterface::class,

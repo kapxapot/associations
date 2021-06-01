@@ -8,8 +8,9 @@ use App\Models\AssociationFeedback;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use Plasticode\Hydrators\Interfaces\HydratorInterface;
 use Plasticode\ObjectProxy;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
-class AssociationFeedbackRepositoryMock implements AssociationFeedbackRepositoryInterface
+class AssociationFeedbackRepositoryMock extends RepositoryMock implements AssociationFeedbackRepositoryInterface
 {
     /** @var HydratorInterface|ObjectProxy */
     private $hydrator;

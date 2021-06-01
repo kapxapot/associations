@@ -9,8 +9,9 @@ use App\Models\Word;
 use App\Models\YandexDictWord;
 use App\Repositories\Interfaces\DictWordRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
-class DictWordRepositoryMock implements DictWordRepositoryInterface
+class DictWordRepositoryMock extends RepositoryMock implements DictWordRepositoryInterface
 {
     private DictWordCollection $dictWords;
 

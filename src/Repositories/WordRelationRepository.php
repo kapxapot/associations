@@ -43,13 +43,17 @@ class WordRelationRepository extends IdiormRepository implements WordRelationRep
         return $this->saveEntity($wordRelation);
     }
 
-    public function getAllByWord(
-        Word $word,
-        bool $ignoreCache = false
-    ): WordRelationCollection
+    public function getAllByWord(Word $word): WordRelationCollection
     {
         return WordRelationCollection::from(
-            $this->byWordQuery($word)->all(true)
+            $this->byWordQuery($word)
+        );
+    }
+
+    public function getAllByMainWord(Word $mainWord): WordRelationCollection
+    {
+        return WordRelationCollection::from(
+            $this->query()->where('main_word_id', $mainWord->getId())
         );
     }
 }

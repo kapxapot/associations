@@ -28,6 +28,8 @@ class Game extends DbModel implements CreatedInterface
 {
     use Created;
 
+    private const RECENT = 2;
+
     protected function requiredWiths(): array
     {
         return ['language', 'turns', 'url', 'user'];
@@ -44,6 +46,11 @@ class Game extends DbModel implements CreatedInterface
         return $this->lastTurn()
             ? $this->lastTurn()->prev()
             : null;
+    }
+
+    private function recentTurns(): TurnCollection
+    {
+        return $this->turns()->take(self::RECENT);
     }
 
     public function words(): WordCollection
@@ -132,12 +139,21 @@ class Game extends DbModel implements CreatedInterface
 
     public function getStronglyRelatedWordFor(Word $word): ?Word
     {
-        return null;
+        return $this
+            ->words()
+            ->first(
+                fn (Word $w) => $w->canonicalEquals($word)
+            );
     }
 
     public function getRecentRelatedWordFor(Word $word): ?Word
     {
-        return null;
+        return $this
+            ->recentTurns()
+            ->words()
+            ->first(
+                fn (Word $w) => $word->relatedWords()->contains($w)
+            );
     }
 
     public function displayName(): string

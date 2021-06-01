@@ -21,12 +21,14 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
  * @property string $word
  * @property string|null $wordUpdatedAt
  * @method AssociationCollection associations()
+ * @method WordRelationCollection counterRelations()
  * @method Definition|null definition()
  * @method DictWordInterface|null dictWord()
  * @method Word|null main()
  * @method DefinitionAggregate|null parsedDefinition()
  * @method WordRelationCollection relations()
  * @method static withAssociations(AssociationCollection|callable $associations)
+ * @method static withCounterRelations(WordRelationCollection|callable $counterRelations)
  * @method static withDefinition(Definition|callable|null $definition)
  * @method static withDictWord(DictWordInterface|callable|null $dictWord)
  * @method static withFeedbacks(WordFeedbackCollection|callable $feedbacks)
@@ -42,6 +44,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return [
             ...parent::requiredWiths(),
             'associations',
+            'counterRelations',
             'definition',
             'dictWord',
             'main',
@@ -413,6 +416,16 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
+     * Checks if the words have the same canonical word.
+     */
+    public function canonicalEquals(Word $word): bool
+    {
+        return $this->canonical()->equals(
+            $word->canonical()
+        );
+    }
+
+    /**
      * Returns the word's canonical form.
      * 
      * - If the word doesn't have a main word, returns itself.
@@ -423,6 +436,19 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this->main() !== null
             ? $this->main()->canonical()
             : $this;
+    }
+
+    public function relatedWords(): WordCollection
+    {
+        $out = $this->relations()->map(
+            fn (WordRelation $wr) => $wr->mainWord()
+        );
+
+        $in = $this->counterRelations()->map(
+            fn (WordRelation $wr) => $wr->word()
+        );
+
+        return WordCollection::merge($out, $in);
     }
 
     public function wordUpdatedAtIso(): ?string

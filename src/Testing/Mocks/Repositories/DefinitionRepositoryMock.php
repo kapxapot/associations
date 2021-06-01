@@ -7,8 +7,9 @@ use App\Models\Definition;
 use App\Models\Word;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
-class DefinitionRepositoryMock implements DefinitionRepositoryInterface
+class DefinitionRepositoryMock extends RepositoryMock implements DefinitionRepositoryInterface
 {
     private DefinitionCollection $definitions;
 

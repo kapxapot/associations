@@ -26,7 +26,7 @@ class AssociationFeedbackGenerator extends ChangingEntityGenerator
         return AssociationFeedback::class;
     }
 
-    protected function getRepository(): AssociationFeedbackRepositoryInterface
+    public function getRepository(): AssociationFeedbackRepositoryInterface
     {
         return $this->associationFeedbackRepository;
     }

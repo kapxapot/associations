@@ -8,8 +8,9 @@ use App\Models\WordFeedback;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use Plasticode\Hydrators\Interfaces\HydratorInterface;
 use Plasticode\ObjectProxy;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
-class WordFeedbackRepositoryMock implements WordFeedbackRepositoryInterface
+class WordFeedbackRepositoryMock extends RepositoryMock implements WordFeedbackRepositoryInterface
 {
     /** @var HydratorInterface|ObjectProxy */
     private $hydrator;

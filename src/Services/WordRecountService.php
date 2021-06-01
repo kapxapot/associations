@@ -184,6 +184,8 @@ class WordRecountService
         // update the word's `mainId`
         $mainId = $primary ? $primary->mainWordId : null;
 
+        $this->log('primary: ' . $primary . ', mainId: ' . $mainId . ', word.mainId: ' . $word->mainId);
+
         if ($word->mainId != $mainId) {
             $word->mainId = $mainId;
             $word->updatedAt = Date::dbNow();

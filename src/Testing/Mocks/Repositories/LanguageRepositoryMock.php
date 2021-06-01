@@ -5,9 +5,10 @@ namespace App\Testing\Mocks\Repositories;
 use App\Models\Language;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use Plasticode\Collections\Generic\DbModelCollection;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
-class LanguageRepositoryMock implements LanguageRepositoryInterface
+class LanguageRepositoryMock extends RepositoryMock implements LanguageRepositoryInterface
 {
     private DbModelCollection $languages;
 

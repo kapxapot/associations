@@ -32,6 +32,11 @@ class WordRelationTypeGenerator extends EntityGenerator
         return WordRelationType::class;
     }
 
+    public function getRepository(): WordRelationTypeRepositoryInterface
+    {
+        return $this->wordRelationTypeRepository;
+    }
+
     public function afterLoad(array $item): array
     {
         $item = parent::afterLoad($item);

@@ -28,7 +28,7 @@ class UserGenerator extends BaseUserGenerator
         return User::class;
     }
 
-    protected function getRepository(): UserRepositoryInterface
+    public function getRepository(): UserRepositoryInterface
     {
         return parent::getRepository();
     }

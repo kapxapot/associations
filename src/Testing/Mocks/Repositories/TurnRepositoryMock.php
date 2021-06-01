@@ -10,8 +10,9 @@ use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
-class TurnRepositoryMock implements TurnRepositoryInterface
+class TurnRepositoryMock extends RepositoryMock implements TurnRepositoryInterface
 {
     /** @var HydratorInterface|ObjectProxy */
     private $hydrator;

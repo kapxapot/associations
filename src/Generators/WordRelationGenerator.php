@@ -56,7 +56,7 @@ class WordRelationGenerator extends ChangingEntityGenerator
         return WordRelation::class;
     }
 
-    protected function getRepository(): WordRelationRepositoryInterface
+    public function getRepository(): WordRelationRepositoryInterface
     {
         return $this->wordRelationRepository;
     }

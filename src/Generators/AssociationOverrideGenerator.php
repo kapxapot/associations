@@ -26,7 +26,7 @@ class AssociationOverrideGenerator extends EntityGenerator
         return AssociationOverride::class;
     }
 
-    protected function getRepository(): AssociationOverrideRepositoryInterface
+    public function getRepository(): AssociationOverrideRepositoryInterface
     {
         return $this->associationOverrideRepository;
     }

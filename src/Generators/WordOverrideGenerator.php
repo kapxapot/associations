@@ -31,7 +31,7 @@ class WordOverrideGenerator extends EntityGenerator
         return WordOverride::class;
     }
 
-    protected function getRepository(): WordOverrideRepositoryInterface
+    public function getRepository(): WordOverrideRepositoryInterface
     {
         return $this->wordOverrideRepository;
     }

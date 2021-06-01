@@ -34,7 +34,7 @@ class NewsGenerator extends TaggableEntityGenerator
         return News::class;
     }
 
-    protected function getRepository(): NewsRepositoryInterface
+    public function getRepository(): NewsRepositoryInterface
     {
         return $this->newsRepository;
     }

@@ -26,7 +26,7 @@ class WordGenerator extends ChangingEntityGenerator
         return Word::class;
     }
 
-    protected function getRepository(): WordRepositoryInterface
+    public function getRepository(): WordRepositoryInterface
     {
         return $this->wordRepository;
     }

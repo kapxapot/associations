@@ -6,9 +6,10 @@ use App\Collections\TelegramUserCollection;
 use App\Models\TelegramUser;
 use App\Models\User;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
-class TelegramUserRepositoryMock implements TelegramUserRepositoryInterface
+class TelegramUserRepositoryMock extends RepositoryMock implements TelegramUserRepositoryInterface
 {
     private TelegramUserCollection $users;
 

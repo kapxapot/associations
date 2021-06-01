@@ -26,6 +26,11 @@ class GameGenerator extends EntityGenerator
         return Game::class;
     }
 
+    public function getRepository(): GameRepositoryInterface
+    {
+        return $this->gameRepository;
+    }
+
     public function afterLoad(array $item): array
     {
         $item = parent::afterLoad($item);

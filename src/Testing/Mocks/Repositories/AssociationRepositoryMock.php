@@ -9,8 +9,9 @@ use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
-class AssociationRepositoryMock implements AssociationRepositoryInterface
+class AssociationRepositoryMock extends RepositoryMock implements AssociationRepositoryInterface
 {
     private AssociationCollection $associations;
 

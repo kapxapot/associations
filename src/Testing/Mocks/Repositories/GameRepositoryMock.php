@@ -9,9 +9,10 @@ use App\Models\User;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use Plasticode\Hydrators\Interfaces\HydratorInterface;
 use Plasticode\ObjectProxy;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Util\Sort;
 
-class GameRepositoryMock implements GameRepositoryInterface
+class GameRepositoryMock extends RepositoryMock implements GameRepositoryInterface
 {
     /** @var HydratorInterface|ObjectProxy */
     private $hydrator;
