@@ -21,10 +21,7 @@ use App\EventHandlers\Word\WordDisabledChangedHandler;
 use App\EventHandlers\Word\WordMatureChangedHandler;
 use App\EventHandlers\Word\WordOutOfDateHandler;
 use App\EventHandlers\Word\WordRelationsChangedHandler;
-use App\Services\AssociationRecountService;
-use App\Services\DefinitionService;
-use App\Services\DictionaryService;
-use App\Services\WordRecountService;
+use Plasticode\Collections\Generic\StringCollection;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
 use Psr\Container\ContainerInterface;
 
@@ -32,85 +29,32 @@ class EventProvider extends MappingProvider
 {
     public function getEventHandlers(ContainerInterface $container): array
     {
-        return [
-            new AssociationApprovedChangedHandler(
-                $container->get(WordRecountService::class)
-            ),
+        $classes = StringCollection::collect(
+            AssociationApprovedChangedHandler::class,
+            AssociationCreatedHandler::class,
+            AssociationFeedbackCreatedHandler::class,
+            AssociationOverrideCreatedHandler::class,
+            AssociationOutOfDateHandler::class,
+            DefinitionLinkedHandler::class,
+            DefinitionUnlinkedHandler::class,
+            DictWordLinkedHandler::class,
+            DictWordUnlinkedHandler::class,
+            TurnCreatedHandler::class,
+            WordApprovedChangedHandler::class,
+            WordCorrectedHandler::class,
+            WordCreatedHandler::class,
+            WordDisabledChangedHandler::class,
+            WordFeedbackCreatedHandler::class,
+            WordMatureChangedHandler::class,
+            WordOutOfDateHandler::class,
+            WordOverrideCreatedHandler::class,
+            WordRelationsChangedHandler::class,
+        );
 
-            new AssociationCreatedHandler(
-                $container->get(AssociationRecountService::class)
-            ),
+        $handlers = $classes->map(
+            fn (string $c) => $container->get($c)
+        );
 
-            new AssociationFeedbackCreatedHandler(
-                $container->get(AssociationRecountService::class)
-            ),
-
-            new AssociationOverrideCreatedHandler(
-                $container->get(AssociationRecountService::class)
-            ),
-
-            new AssociationOutOfDateHandler(
-                $container->get(AssociationRecountService::class)
-            ),
-
-            new DefinitionLinkedHandler(
-                $container->get(WordRecountService::class)
-            ),
-
-            new DefinitionUnlinkedHandler(
-                $container->get(WordRecountService::class)
-            ),
-
-            new DictWordLinkedHandler(
-                $container->get(WordRecountService::class)
-            ),
-
-            new DictWordUnlinkedHandler(
-                $container->get(WordRecountService::class)
-            ),
-
-            new TurnCreatedHandler(
-                $container->get(AssociationRecountService::class)
-            ),
-
-            new WordApprovedChangedHandler(
-                $container->get(AssociationRecountService::class)
-            ),
-
-            new WordCorrectedHandler(
-                $container->get(DefinitionService::class),
-                $container->get(DictionaryService::class)
-            ),
-
-            new WordCreatedHandler(
-                $container->get(DefinitionService::class),
-                $container->get(DictionaryService::class)
-            ),
-
-            new WordDisabledChangedHandler(
-                $container->get(AssociationRecountService::class)
-            ),
-
-            new WordFeedbackCreatedHandler(
-                $container->get(WordRecountService::class)
-            ),
-
-            new WordMatureChangedHandler(
-                $container->get(AssociationRecountService::class)
-            ),
-
-            new WordOutOfDateHandler(
-                $container->get(WordRecountService::class)
-            ),
-
-            new WordOverrideCreatedHandler(
-                $container->get(WordRecountService::class)
-            ),
-
-            new WordRelationsChangedHandler(
-                $container->get(AssociationRecountService::class),
-                $container->get(WordRecountService::class)
-            ),
-        ];
+        return $handlers->toArray();
     }
 }
