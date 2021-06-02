@@ -433,9 +433,14 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      */
     public function canonical(): self
     {
-        return $this->main() !== null
+        return $this->hasMain()
             ? $this->main()->canonical()
             : $this;
+    }
+
+    public function hasMain(): bool
+    {
+        return $this->main() !== null;
     }
 
     public function isRelatedTo(Word $word): bool
