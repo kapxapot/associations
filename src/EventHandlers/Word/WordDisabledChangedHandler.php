@@ -28,7 +28,7 @@ class WordDisabledChangedHandler
             ->associations()
             ->apply(
                 fn (Association $a) =>
-                $this->associationRecountService->recountAll($a, $event)
+                    $this->associationRecountService->recountAll($a, $event)
             );
     }
 }
