@@ -33,6 +33,11 @@ class WordRelation extends DbModel implements CreatedInterface, UpdatedAtInterfa
         ];
     }
 
+    public function isDisabling(): bool
+    {
+        return $this->type()->isDisabling() && $this->isPrimary();
+    }
+
     public function isPrimary(): bool
     {
         return self::toBool($this->primary);

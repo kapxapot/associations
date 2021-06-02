@@ -4,6 +4,7 @@ namespace App\Specifications;
 
 use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Word;
+use App\Models\WordRelation;
 use App\Services\WordService;
 
 class WordSpecification
@@ -22,9 +23,24 @@ class WordSpecification
 
     public function isDisabled(Word $word): bool
     {
+        return $this->isDisabledByOverride($word)
+            || $this->isDisabledByRelations($word);
+    }
+
+    private function isDisabledByOverride(Word $word): bool
+    {
         return $word->hasOverride()
             ? $word->override()->isDisabled()
             : false;
+    }
+
+    private function isDisabledByRelations(Word $word): bool
+    {
+        return $word
+            ->relations()
+            ->anyFirst(
+                fn (WordRelation $wr) => $wr->isDisabling()
+            );
     }
 
     public function isApproved(Word $word): bool
@@ -42,7 +58,8 @@ class WordSpecification
 
     public function approvedOverride(Word $word): ?bool
     {
-        // shortcut
+        // disabled word works as an override as well
+        // it has priority over manual override
         if ($this->isDisabled($word)) {
             return false;
         }

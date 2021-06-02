@@ -54,6 +54,7 @@ class WordRecountService
 
     public function recountAll(Word $word, ?Event $sourceEvent = null): Word
     {
+        $word = $this->recountRelations($word, $sourceEvent);
         $word = $this->recountDisabled($word, $sourceEvent);
         $word = $this->recountApproved($word, $sourceEvent);
         $word = $this->recountMature($word, $sourceEvent);
@@ -183,8 +184,6 @@ class WordRecountService
 
         // update the word's `mainId`
         $mainId = $primary ? $primary->mainWordId : null;
-
-        $this->log('primary: ' . $primary . ', mainId: ' . $mainId . ', word.mainId: ' . $word->mainId);
 
         if ($word->mainId != $mainId) {
             $word->mainId = $mainId;

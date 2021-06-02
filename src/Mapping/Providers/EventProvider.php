@@ -108,6 +108,7 @@ class EventProvider extends MappingProvider
             ),
 
             new WordRelationsChangedHandler(
+                $container->get(AssociationRecountService::class),
                 $container->get(WordRecountService::class)
             ),
         ];
