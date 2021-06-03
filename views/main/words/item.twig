@@ -25,6 +25,10 @@
                     <span class="label label-primary" title="{{ translate(word.primaryRelation.type.name) }} слова {{ word.primaryRelation.mainWord.word|upper }}" data-toggle="tooltip"><i class="fas fa-link"></i> {{ word.primaryRelation.mainWord.word }}</span>
                 {% endif %}
 
+                {% for relation in word.relations if not relation.isPrimary %}
+                    <span class="label label-default" title="{{ translate(relation.type.name) }} слова {{ relation.mainWord.word|upper }}" data-toggle="tooltip"><i class="fas fa-link"></i> {{ relation.mainWord.word }}</span>
+                {% endfor %}
+
                 {% if word.is_disabled %}
                     <span class="label label-default">{% if word.hasDisabledOverride %}<i class="fas fa-lock"></i> {% endif %}отключено</span>
                 {% else %}
