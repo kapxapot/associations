@@ -262,43 +262,41 @@
         {% if word.overrides|length > 0 %}
             <div class="panel-secondary-heading">Исправления</div>
             <div class="panel panel-secondary">
-                <div class="panel-body">
-                    <div class="table-responsive">
-                        <table id="overrides-table" class="table table-striped mb-0">
-                            <thead>
+                <div class="panel-body table-responsive">
+                    <table id="overrides-table" class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Id</th>
+                                <th>Общее</th>
+                                <th>16+</th>
+                                <th>Откл.</th>
+                                <th>Исправление</th>
+                                <th>Части речи</th>
+                                <th>Дата</th>
+                                <th>Автор</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for override in word.overrides.sort %}
                                 <tr>
-                                    <th>Id</th>
-                                    <th>Общее</th>
-                                    <th>16+</th>
-                                    <th>Откл.</th>
-                                    <th>Исправление</th>
-                                    <th>Части речи</th>
-                                    <th>Дата</th>
-                                    <th>Автор</th>
+                                    <td>{{ override.id }}</td>
+                                    <td>{% if override.hasApproved %}{{ override.approved ? 'общее' : 'личное' }}{% endif %}</td>
+                                    <td>{% if override.hasMature %}{{ override.mature ? '16+' : '0+' }}{% endif %}</td>
+                                    <td>{% if override.isDisabled %}<i class="fas fa-check"></i>{% endif %}</td>
+                                    <td>{% if override.hasWordCorrection %}{{ word.original_word }} &#x2192; {{ override.wordCorrection }}{% endif %}</td>
+                                    <td>
+                                        {% if override.hasPosCorrection %}
+                                            {% for pos in override.partsOfSpeech %}
+                                                {{ translate(pos.shortName) }}{% if not loop.last %},{% endif %}
+                                            {% endfor %}
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ gm.moment_local(override.created_at_iso) }}</td>
+                                    <td>{{ lm.user(override.creator) }}</td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                {% for override in word.overrides.sort %}
-                                    <tr>
-                                        <td>{{ override.id }}</td>
-                                        <td>{% if override.hasApproved %}{{ override.approved ? 'общее' : 'личное' }}{% endif %}</td>
-                                        <td>{% if override.hasMature %}{{ override.mature ? '16+' : '0+' }}{% endif %}</td>
-                                        <td>{% if override.isDisabled %}<i class="fas fa-check"></i>{% endif %}</td>
-                                        <td>{% if override.hasWordCorrection %}{{ word.original_word }} &#x2192; {{ override.wordCorrection }}{% endif %}</td>
-                                        <td>
-                                            {% if override.hasPosCorrection %}
-                                                {% for pos in override.partsOfSpeech %}
-                                                    {{ translate(pos.shortName) }}{% if not loop.last %},{% endif %}
-                                                {% endfor %}
-                                            {% endif %}
-                                        </td>
-                                        <td>{{ gm.moment_local(override.created_at_iso) }}</td>
-                                        <td>{{ lm.user(override.creator) }}</td>
-                                    </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </div>
         {% endif %}
