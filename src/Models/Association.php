@@ -48,12 +48,7 @@ class Association extends LanguageElement
 
     public function canonicalWords(): WordCollection
     {
-        return
-            WordCollection::collect(
-                $this->firstWord()->canonical(),
-                $this->secondWord()->canonical()
-            )
-            ->order();
+        return $this->words()->canonical()->order();
     }
 
     public function hasWords(Word $first, Word $second): bool

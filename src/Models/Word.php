@@ -443,11 +443,27 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this->main() !== null;
     }
 
+    /**
+     * Checks if `$word` is one of related words.
+     */
     public function isRelatedTo(Word $word): bool
     {
         return $this->relatedWords()->contains($word);
     }
 
+    /**
+     * Checks if `$word` is one of canonical related words.
+     */
+    public function isCanonicallyRelatedTo(Word $word): bool
+    {
+        return $this->relatedCanonicalWords()->contains(
+            $word->canonical()
+        );
+    }
+
+    /**
+     * Concats related and counter-related words (distinct).
+     */
     public function relatedWords(): WordCollection
     {
         $out = $this->relations()->map(
@@ -458,7 +474,15 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             fn (WordRelation $wr) => $wr->word()
         );
 
-        return WordCollection::merge($out, $in);
+        return WordCollection::merge($out, $in)->distinct();
+    }
+
+    /**
+     * Returns canonical words for related words (distinct).
+     */
+    public function relatedCanonicalWords(): WordCollection
+    {
+        return $this->relatedWords()->canonical()->distinct();
     }
 
     public function wordUpdatedAtIso(): ?string

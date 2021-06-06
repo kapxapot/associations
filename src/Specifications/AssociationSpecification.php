@@ -43,7 +43,7 @@ class AssociationSpecification
 
     private function isDisabledByRelations(Association $association): bool
     {
-        return $association->firstWord()->isRelatedTo(
+        return $association->firstWord()->isCanonicallyRelatedTo(
             $association->secondWord()
         );
     }

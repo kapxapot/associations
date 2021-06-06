@@ -17,4 +17,16 @@ class WordCollection extends LanguageElementCollection
             fn (Word $w) => $w->getId()
         );
     }
+
+    /**
+     * Returns `canonical()` words for collection's words.
+     */
+    public function canonical(): self
+    {
+        return self::from(
+            $this->map(
+                fn (Word $w) => $w->canonical()
+            )
+        );
+    }
 }
