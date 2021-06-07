@@ -390,6 +390,10 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             );
         }
 
+        if ($poses->isEmpty() && $this->hasMain()) {
+            $poses = $this->main()->partsOfSpeech();
+        }
+
         return $poses->distinct();
     }
 
