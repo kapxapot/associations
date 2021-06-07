@@ -35,6 +35,7 @@ $scope.relationData = {
     }
 };
 
+$scope.relationsChanged = false;
 $scope.newRelation = null;
 
 $scope.resetNewRelation = () => {
@@ -71,6 +72,8 @@ $scope.saveNewRelation = () => {
         onSuccess: (data, context) => {
             $scope.resetNewRelation();
             $scope.reloadRelations();
+
+            $scope.relationsChanged = true;
         }
     });
 };
@@ -114,6 +117,8 @@ $scope.saveRelation = (index) => {
         onSuccess: (data, context) => {
             $scope.relationData.state.editing = false;
             $scope.reloadRelations();
+
+            $scope.relationsChanged = true;
         }
     });
 };
@@ -133,7 +138,11 @@ $scope.deleteRelation = (index) => {
                 relation.state.deleting = val;
                 $scope.modalSaving = val;
             },
-            onSuccess: $scope.reloadRelations,
+            onSuccess: (data, context) => {
+                $scope.reloadRelations();
+
+                $scope.relationsChanged = true;
+            },
             message: '{{ translate('Relation deleted successfully.') }}'
         });
     }
@@ -169,3 +178,9 @@ $scope.reloadRelations = () => {
             $scope.modalLoading = false;
         });
 };
+
+$('#relationsView').on('hidden.bs.modal', () => {
+    if ($scope.relationsChanged) {
+        reloadWindow();
+    }
+});
