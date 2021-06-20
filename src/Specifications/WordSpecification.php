@@ -119,7 +119,8 @@ class WordSpecification
             return $matureOverride;
         }
 
-        return $this->isMatureByFeedbacks($word);
+        return $this->isMatureByFeedbacks($word)
+            || $this->isMatureByMainWord($word);
     }
 
     private function isMatureByFeedbacks(Word $word): bool
@@ -129,6 +130,13 @@ class WordSpecification
         $score = $word->matures()->count();
 
         return $score >= $threshold;
+    }
+
+    private function isMatureByMainWord(Word $word): bool
+    {
+        return $word->hasMain()
+            ? $word->main()->isMature()
+            : false;
     }
 
     public function correctedWord(Word $word): string

@@ -63,4 +63,9 @@ interface WordRepositoryInterface extends LanguageElementRepositoryInterface
      * Returns words without definitions.
      */
     public function getAllUndefined(int $limit = 0): WordCollection;
+
+    /**
+     * Returns all words having the provided word as `main`.
+     */
+    public function getAllByMain(Word $word): WordCollection;
 }

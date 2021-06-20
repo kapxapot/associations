@@ -206,6 +206,14 @@ class WordRepository extends LanguageElementRepository implements WordRepository
                 ->limit($limit)
         );
     }
+
+    public function getAllByMain(Word $word): WordCollection
+    {
+        return WordCollection::from(
+            $this->query()->where('main_id', $word->getId())
+        );
+    }
+
     // queries
 
     /**

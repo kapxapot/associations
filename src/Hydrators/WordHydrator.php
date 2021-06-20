@@ -106,6 +106,9 @@ class WordHydrator extends Hydrator
             ->withMain(
                 fn () => $this->wordRepository->get($entity->mainId)
             )
+            ->withDependents(
+                fn () => $this->wordRepository->getAllByMain($entity)
+            )
             ->withOverrides(
                 fn () => $this->wordOverrideRepository->getAllByWord($entity)
             )

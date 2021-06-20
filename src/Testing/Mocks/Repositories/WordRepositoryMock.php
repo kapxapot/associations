@@ -153,6 +153,13 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
         );
     }
 
+    public function getAllByMain(Word $word): WordCollection
+    {
+        return $this->words->where(
+            fn (Word $w) => $w->equals($word)
+        );
+    }
+
     public function getCountByLanguage(Language $language): int
     {
         return $this->getAllByLanguage($language)->count();
