@@ -80,13 +80,22 @@ $scope.saveNewRelation = () => {
 
 $scope.editRelation = (index) => {
     $scope.relationData.state.editing = true;
-    $scope.relationData.relations[index].state.editing = true;
+
+    const relation = $scope.relationData.relations[index];
+
+    // backup relation
+    $scope.relationData.backup = $.extend(true, {}, relation);
+
+    relation.state.editing = true;
 
     hideModalAlerts();
 };
 
 $scope.cancelEditRelation = (index) => {
     $scope.relationData.state.editing = false;
+
+    // restore relation
+    $scope.relationData.relations[index] = $.extend(true, {}, $scope.relationData.backup);
     $scope.relationData.relations[index].state.editing = false;
 };
 
