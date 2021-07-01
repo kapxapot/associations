@@ -49,7 +49,7 @@
                     </td>
 
                     <td class="vcenter br-word" ng-hide="r.state.editing">
-                        {{ '{{r.main_word}}' }}
+                        <a ng-href="{{ path_for('main.words') }}/{{ '{{r.main_word_id}}' }}" ng-bind="r.main_word"></a>
                     </td>
 
                     <td class="vcenter flex" ng-hide="r.state.editing">

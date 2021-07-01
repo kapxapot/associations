@@ -49,7 +49,7 @@ class CardEventAccumulator
     {
         return $this
             ->events
-            ->anyFirst(
+            ->any(
                 fn ($e) => $e instanceof SkipEvent
             );
     }

@@ -23,12 +23,11 @@ class TurnCollection extends DbModelCollection
      */
     public function users(): UserCollection
     {
-        return UserCollection::from(
+        return UserCollection::fromDistinct(
             $this->cleanMap(
                 fn (Turn $t) => $t->user()
             )
-        )
-        ->distinct();
+        );
     }
 
     public function hasAiTurn(): bool
@@ -43,13 +42,11 @@ class TurnCollection extends DbModelCollection
      */
     public function words(): WordCollection
     {
-        return
-            WordCollection::from(
-                $this->map(
-                    fn (Turn $t) => $t->word()
-                )
+        return WordCollection::fromDistinct(
+            $this->map(
+                fn (Turn $t) => $t->word()
             )
-            ->distinct();
+        );
     }
 
     /**

@@ -253,14 +253,14 @@ class TurnService
             throw new DuplicateWordException($word->word);
         }
 
-        // check for a strongly related word
-        $stronglyRelatedWord = $game->getStronglyRelatedWordFor($word);
+        // check for a canonical equal word
+        $stronglyRelatedWord = $game->getCanonicalEqualWordFor($word);
 
         if ($stronglyRelatedWord !== null) {
             throw new StronglyRelatedWordException($stronglyRelatedWord->word);
         }
 
-        // check for a recent related word
+        // check for a recent related/remotely related word
         $recentRelatedWord = $game->getRecentRelatedWordFor($word);
 
         if ($recentRelatedWord !== null) {

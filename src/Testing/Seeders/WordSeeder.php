@@ -49,12 +49,12 @@ class WordSeeder implements ArraySeederInterface
         ];
 
         return array_map(
-            fn (Word $w) =>
-            $w->withLanguage(
-                $this->languageRepository->get($w->languageId)
-            )->withFeedbacks(
-                WordFeedbackCollection::empty()
-            ),
+            fn (Word $w) => $w
+                ->withLanguage(
+                    $this->languageRepository->get($w->languageId)
+                )->withFeedbacks(
+                    WordFeedbackCollection::empty()
+                ),
             $words
         );
     }

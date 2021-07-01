@@ -137,7 +137,7 @@ class Game extends DbModel implements CreatedInterface
             ->any('id', $word->getId());
     }
 
-    public function getStronglyRelatedWordFor(Word $word): ?Word
+    public function getCanonicalEqualWordFor(Word $word): ?Word
     {
         return $this
             ->words()
@@ -152,7 +152,7 @@ class Game extends DbModel implements CreatedInterface
             ->recentTurns()
             ->words()
             ->first(
-                fn (Word $w) => $word->isRelatedTo($w)
+                fn (Word $w) => $word->isRelatedTo($w) || $word->isRemotelyRelatedTo($w)
             );
     }
 

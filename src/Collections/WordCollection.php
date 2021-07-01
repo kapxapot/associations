@@ -19,11 +19,11 @@ class WordCollection extends LanguageElementCollection
     }
 
     /**
-     * Returns `canonical()` words for collection's words.
+     * Returns distinct `canonical()` words for collection's words.
      */
     public function canonical(): self
     {
-        return self::from(
+        return self::fromDistinct(
             $this->map(
                 fn (Word $w) => $w->canonical()
             )

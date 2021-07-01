@@ -450,19 +450,35 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
-     * Checks if `$word` is one of related words.
+     * Checks if `$word` is one of directly related words (both ways).
      */
     public function isRelatedTo(Word $word): bool
     {
-        return $this->relatedWords()->contains($word);
+        return $this->allRelatedWords()->contains($word);
     }
 
     /**
-     * Checks if `$word` is one of canonical related words.
+     * Checks if the words are related to one another by any third word.
+     * 
+     * A relates to B, C relates to B => A remotely relates to C.
+     */
+    public function isRemotelyRelatedTo(Word $word): bool
+    {
+        return $this
+            ->relatedCanonicalWords()
+            ->intersect($word->relatedCanonicalWords())
+            ->any();
+    }
+
+    /**
+     * Checks if `$word`'s canonical word is one of the canonical related words.
+     * 
+     * Gets canonical words for all related words and looks for `$word`'s
+     * canonical word in them.
      */
     public function isCanonicallyRelatedTo(Word $word): bool
     {
-        return $this->relatedCanonicalWords()->contains(
+        return $this->allRelatedCanonicalWords()->contains(
             $word->canonical()
         );
     }
@@ -470,25 +486,58 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Concats related and counter-related words (distinct).
      */
-    public function relatedWords(): WordCollection
+    public function allRelatedWords(): WordCollection
     {
-        $out = $this->relations()->map(
-            fn (WordRelation $wr) => $wr->mainWord()
-        );
-
-        $in = $this->counterRelations()->map(
-            fn (WordRelation $wr) => $wr->word()
-        );
+        $out = $this->relatedWords();
+        $in = $this->counterRelatedWords();
 
         return WordCollection::merge($out, $in)->distinct();
     }
 
     /**
-     * Returns canonical words for related words (distinct).
+     * Returns distinct words that the current word is related to.
+     * 
+     * this -> A
+     * this -> B
+     */
+    public function relatedWords(): WordCollection
+    {
+        $words = $this->relations()->map(
+            fn (WordRelation $wr) => $wr->mainWord()
+        );
+
+        return WordCollection::fromDistinct($words);
+    }
+
+    /**
+     * Returns distinct words that are related to the current word.
+     * 
+     * A -> this
+     * B -> this
+     */
+    public function counterRelatedWords(): WordCollection
+    {
+        $words = $this->counterRelations()->map(
+            fn (WordRelation $wr) => $wr->word()
+        );
+
+        return WordCollection::fromDistinct($words);
+    }
+
+    /**
+     * Returns distinct canonical words for related words.
      */
     public function relatedCanonicalWords(): WordCollection
     {
-        return $this->relatedWords()->canonical()->distinct();
+        return $this->relatedWords()->canonical();
+    }
+
+    /**
+     * Returns distinct canonical words for duplex related words.
+     */
+    public function allRelatedCanonicalWords(): WordCollection
+    {
+        return $this->allRelatedWords()->canonical();
     }
 
     public function wordUpdatedAtIso(): ?string

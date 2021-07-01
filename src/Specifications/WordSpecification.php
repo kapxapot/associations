@@ -38,7 +38,7 @@ class WordSpecification
     {
         return $word
             ->relations()
-            ->anyFirst(
+            ->any(
                 fn (WordRelation $wr) => $wr->isDisabling()
             );
     }

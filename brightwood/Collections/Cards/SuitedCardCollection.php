@@ -13,12 +13,10 @@ class SuitedCardCollection extends CardCollection
      */
     public function suits() : SuitCollection
     {
-        return
-            SuitCollection::from(
-                $this->map(
-                    fn (SuitedCard $c) => $c->suit()
-                )
+        return SuitCollection::fromDistinct(
+            $this->map(
+                fn (SuitedCard $c) => $c->suit()
             )
-            ->distinct();
+        );
     }
 }

@@ -16,10 +16,12 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
     private WordCollection $words;
 
     public function __construct(
-        ArraySeederInterface $seeder
+        ?ArraySeederInterface $seeder = null
     )
     {
-        $this->words = WordCollection::make($seeder->seed());
+        $this->words = WordCollection::make(
+            $seeder ? $seeder->seed() : []
+        );
     }
 
     public function get(?int $id) : ?Word
@@ -104,7 +106,10 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             : $public;
     }
 
-    public function getNonMatureCount(?Language $language = null, ?string $substr = null): int
+    public function getNonMatureCount(
+        ?Language $language = null,
+        ?string $substr = null
+    ): int
     {
         // todo: add filtering by substr
         return $this->getAllNonMature($language)->count();

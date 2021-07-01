@@ -8,6 +8,7 @@ use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Interfaces\SequencableInterface;
 use Plasticode\Collections\Generic\Collection;
+use Plasticode\Collections\Generic\StringCollection;
 
 class StoryMessageSequence implements SequencableInterface
 {
@@ -253,10 +254,9 @@ class StoryMessageSequence implements SequencableInterface
     {
         return $this->messages->any(
             fn (MessageInterface $m) =>
-                Collection::make($m->lines())
-                    ->anyFirst(
-                        fn ($s) => strlen($s) > 0
-                    )
+                Collection::make($m->lines())->anyFirst(
+                    fn ($s) => strlen($s) > 0
+                )
         );
     }
 
