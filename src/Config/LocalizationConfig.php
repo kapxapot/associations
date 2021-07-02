@@ -45,6 +45,10 @@ class LocalizationConfig extends BaseConfig
                 'Grammatical form' => 'Грамматическая форма',
                 'Diminutive form' => 'Уменьшительно-ласкательное',
                 'Gender form' => 'Родовая форма',
+                'Homophone' => 'Омофон',
+                'Phonetic typo' => 'Фонетическая опечатка',
+                'Translation' => 'Перевод',
+                'Localization' => 'Локализация',
 
                 'Language not found.' => 'Язык не найден.',
                 'New game started.' => 'Начата новая игра.',
