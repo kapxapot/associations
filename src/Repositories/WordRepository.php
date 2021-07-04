@@ -99,29 +99,18 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         ?Language $language = null
     ): WordCollection
     {
-        $query = $this
-            ->nonMatureQuery($language)
-            ->applyIf(
-                $searchParams->hasFilter(),
-                fn (Query $q) => $this->filterBySubstr($q, $searchParams->filter())
-            )
-            ->applyIf(
-                $searchParams->hasSort(),
-                fn (Query $q) => $q->withSort($searchParams->sort())
-            )
-            ->applyIf(
-                $searchParams->hasOffset(),
-                fn (Query $q) => $q->offset($searchParams->offset())
-            )
-            ->applyIf(
-                $searchParams->hasLimit(),
-                fn (Query $q) => $q->limit($searchParams->limit())
-            );
+        $query = $searchParams->applyToQuery(
+            $this->nonMatureQuery($language),
+            fn (Query $q, string $filter) => $this->filterBySubstr($q, $filter)
+        );
 
         return WordCollection::from($query);
     }
 
-    public function getNonMatureCount(?Language $language = null, ?string $substr = null): int
+    public function getNonMatureCount(
+        ?Language $language = null,
+        ?string $substr = null
+    ): int
     {
         return $this
             ->nonMatureQuery($language)

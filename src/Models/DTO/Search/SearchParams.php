@@ -2,6 +2,7 @@
 
 namespace App\Models\DTO\Search;
 
+use Plasticode\Data\Query;
 use Plasticode\Util\SortStep;
 use Psr\Http\Message\ServerRequestInterface;
 
@@ -98,5 +99,31 @@ class SearchParams
         }
 
         return new self($offset, $limit, $filter, $sort);
+    }
+
+    public function applyToQuery(
+        Query $query,
+        ?callable $filterApplicator = null
+    ): Query
+    {
+        $searchParams = $this;
+
+        return $query
+            ->applyIf(
+                $searchParams->hasFilter() && $filterApplicator !== null,
+                fn (Query $q) => $filterApplicator($q, $searchParams->filter())
+            )
+            ->applyIf(
+                $searchParams->hasSort(),
+                fn (Query $q) => $q->withSort($searchParams->sort())
+            )
+            ->applyIf(
+                $searchParams->hasOffset(),
+                fn (Query $q) => $q->offset($searchParams->offset())
+            )
+            ->applyIf(
+                $searchParams->hasLimit(),
+                fn (Query $q) => $q->limit($searchParams->limit())
+            );
     }
 }
