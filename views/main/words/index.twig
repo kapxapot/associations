@@ -30,7 +30,7 @@
 
 {% block more_js %}
     <script>
-        var spinnerShown = false;
+        let spinnerShown = false;
 
         $('#words-table').DataTable({
             dom: "<'row'<'col-sm-12'f>><'row'<'col-sm-12'tr>><'row'<'col-sm-6'i><'col-sm-6'l>><'row'<'col-sm-12'p>>", //'ftrilp',
@@ -42,15 +42,17 @@
             ajax: {
                 url: '{{ api }}public/words',
                 beforeSend: function() {
-                    if (!spinnerShown) {
-                        $('#words-table > tbody').html(
-                            '<tr class="even">' +
-                            '<td valign="top" colspan="5" class="dataTables_empty"><i class="fas fa-yin-yang fa-spin fa-2x"></i></td>' +
-                            '</tr>'
-                        );
-
-                        spinnerShown = true;
+                    if (spinnerShown) {
+                        return;
                     }
+
+                    $('#words-table > tbody').html(
+                        '<tr class="even">' +
+                        '<td valign="top" colspan="5" class="dataTables_empty"><i class="fas fa-yin-yang fa-spin fa-2x"></i></td>' +
+                        '</tr>'
+                    );
+
+                    spinnerShown = true;
                 }
             },
             order: [[4, 'desc']],
