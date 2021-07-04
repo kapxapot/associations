@@ -3,9 +3,9 @@
 namespace App\Repositories\Interfaces;
 
 use App\Collections\WordCollection;
-use App\Models\DTO\Search\SearchParams;
 use App\Models\Language;
 use App\Models\Word;
+use App\Search\SearchParams;
 
 interface WordRepositoryInterface extends LanguageElementRepositoryInterface
 {

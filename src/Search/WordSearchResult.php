@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Models\DTO\Search;
+namespace App\Search;
 
 use App\Collections\WordCollection;
 use App\Models\Word;

@@ -3,14 +3,17 @@
 namespace App\Repositories;
 
 use App\Collections\WordCollection;
-use App\Models\DTO\Search\SearchParams;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Repositories\Traits\SearchRepository;
+use App\Search\SearchParams;
 use Plasticode\Data\Query;
 
 class WordRepository extends LanguageElementRepository implements WordRepositoryInterface
 {
+    use SearchRepository;
+
     protected string $sortField = 'word';
 
     protected function entityClass(): string
@@ -99,24 +102,25 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         ?Language $language = null
     ): WordCollection
     {
-        $query = $searchParams->applyToQuery(
-            $this->nonMatureQuery($language),
-            fn (Query $q, string $filter) => $this->filterBySubstr($q, $filter)
-        );
+        $query = $this
+            ->nonMatureQuery($language)
+            ->apply(
+                fn (Query $q) => $this->applySearchParams($q, $searchParams)
+            );
 
         return WordCollection::from($query);
     }
 
     public function getNonMatureCount(
         ?Language $language = null,
-        ?string $substr = null
+        ?string $filter = null
     ): int
     {
         return $this
             ->nonMatureQuery($language)
             ->applyIf(
-                strlen($substr) > 0,
-                fn (Query $q) => $this->filterBySubstr($q, $substr)
+                strlen($filter) > 0,
+                fn (Query $q) => $this->applyFilter($q, $filter)
             )
             ->count();
     }
@@ -203,6 +207,16 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         );
     }
 
+    // SearchRepository
+
+    public function applyFilter(Query $query, string $filter): Query
+    {
+        return $query->search(
+            mb_strtolower($filter),
+            '(word_bin like ?)'
+        );
+    }
+
     // queries
 
     /**
@@ -212,16 +226,6 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     {
         return parent::nonMatureQuery($language)->apply(
             fn (Query $q) => $this->filterEnabled($q)
-        );
-    }
-
-    // filters
-
-    protected function filterBySubstr(Query $query, string $substr): Query
-    {
-        return $query->search(
-            mb_strtolower($substr),
-            '(word_bin like ?)'
         );
     }
 }

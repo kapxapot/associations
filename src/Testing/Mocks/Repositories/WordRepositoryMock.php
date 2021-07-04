@@ -3,11 +3,11 @@
 namespace App\Testing\Mocks\Repositories;
 
 use App\Collections\WordCollection;
-use App\Models\DTO\Search\SearchParams;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Search\SearchParams;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 

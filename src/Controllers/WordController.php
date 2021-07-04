@@ -2,8 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Models\DTO\Search\SearchParams;
 use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
+use App\Search\SearchParams;
 use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
