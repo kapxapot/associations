@@ -26,12 +26,12 @@ class NewsRepository extends NewsSourceRepository implements NewsRepositoryInter
 
     // SearchableRepositoryInterface
 
-    public function search(string $searchQuery): NewsCollection
+    public function search(string $query): NewsCollection
     {
         return NewsCollection::from(
             $this
                 ->publishedQuery()
-                ->search($searchQuery, '(title like ?)')
+                ->search($query, '(title like ?)')
                 ->orderByAsc('title')
         );
     }

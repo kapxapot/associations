@@ -8,7 +8,9 @@ use Plasticode\Repositories\Interfaces\Generic\SearchableNewsSourceRepositoryInt
 
 interface NewsRepositoryInterface extends SearchableNewsSourceRepositoryInterface
 {
-    function get(?int $id): ?News;
-    function getProtected(?int $id): ?News;
-    function search(string $searchQuery): NewsCollection;
+    public function get(?int $id): ?News;
+
+    public function getProtected(?int $id): ?News;
+
+    public function search(string $query): NewsCollection;
 }

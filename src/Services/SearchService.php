@@ -33,7 +33,7 @@ class SearchService
         $this->linker = $linker;
     }
 
-    public function search($query): ArrayCollection
+    public function search(string $query): ArrayCollection
     {
         $news = $this
             ->newsRepository

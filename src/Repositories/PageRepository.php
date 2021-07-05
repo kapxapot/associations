@@ -79,12 +79,12 @@ class PageRepository extends NewsSourceRepository implements PageRepositoryInter
 
     // SearchableRepositoryInterface
 
-    public function search(string $searchQuery): PageCollection
+    public function search(string $query): PageCollection
     {
         return PageCollection::from(
             $this
                 ->publishedQuery()
-                ->search($searchQuery, '(slug like ? or title like ?)', 2)
+                ->search($query, '(slug like ? or title like ?)', 2)
                 ->all()
                 ->orderByStr('title')
         );

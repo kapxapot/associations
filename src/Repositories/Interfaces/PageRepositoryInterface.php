@@ -10,15 +10,18 @@ use Plasticode\Repositories\Interfaces\PageRepositoryInterface as BasePageReposi
 
 interface PageRepositoryInterface extends BasePageRepositoryInterface, SearchableNewsSourceRepositoryInterface, ParentedRepositoryInterface
 {
-    function get(?int $id): ?Page;
-    function getProtected(?int $id): ?Page;
-    function getBySlug(?string $slug): ?Page;
-    function getChildren(Page $parent): PageCollection;
+    public function get(?int $id): ?Page;
+
+    public function getProtected(?int $id): ?Page;
+
+    public function getBySlug(?string $slug): ?Page;
+
+    public function getChildren(Page $parent): PageCollection;
 
     /**
      * Returns all published orphans.
      */
-    function getAllPublishedOrphans(): PageCollection;
+    public function getAllPublishedOrphans(): PageCollection;
 
-    function search(string $searchQuery): PageCollection;
+    public function search(string $query): PageCollection;
 }

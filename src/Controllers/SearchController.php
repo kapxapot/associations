@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Services\SearchService;
+use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Core\Response;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -27,7 +28,9 @@ class SearchController extends Controller
     {
         $query = $args['query'];
 
-        $result = $this->searchService->search($query);
+        $result = (strlen($query) > 0)
+            ? $this->searchService->search($query)
+            : ArrayCollection::empty();
 
         return Response::json($response, $result);
     }

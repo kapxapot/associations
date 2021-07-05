@@ -7,7 +7,8 @@ use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Search\SearchParams;
+use App\Search\WordSearchResult;
+use Plasticode\Search\SearchParams;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
@@ -186,5 +187,15 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             ->where(
                 fn (Word $w) => !$w->isMature()
             );
+    }
+
+    public function getSearchResult(SearchParams $searchParams): WordSearchResult
+    {
+        // placeholder
+        return new WordSearchResult(
+            $this->words,
+            $this->words->count(),
+            $this->words->count()
+        );
     }
 }

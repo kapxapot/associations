@@ -67,7 +67,7 @@
                     name: 'word',
                     data: 'word',
                     render: function (data, type, row) {
-                        if (type === 'display' || type === 'filter') {
+                        if (type === 'display') {
                             return '<a class="ellipsis w-200" href="' + row.url + '">' + data + '</a>';
                         }
 
@@ -91,11 +91,11 @@
                     data: 'created_at',
                     searchable: false,
                     render: function (data, type, row) {
-                        if (type === 'display' || type === 'filter') {
-                            return moment(data).format('DD.MM.Y HH:mm');
-                        }
+                        const format = (type === 'display' || type === 'filter')
+                            ? 'DD.MM.Y HH:mm'
+                            : 'X';
 
-                        return moment(data).format('X');
+                        return moment(data).format(format);
                     }
                 }
             ]

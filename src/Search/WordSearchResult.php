@@ -6,6 +6,7 @@ use App\Collections\WordCollection;
 use App\Models\Word;
 use JsonSerializable;
 use Plasticode\Interfaces\ArrayableInterface;
+use Plasticode\Search\SearchResult;
 
 class WordSearchResult extends SearchResult implements ArrayableInterface, JsonSerializable
 {

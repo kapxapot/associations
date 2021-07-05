@@ -281,9 +281,17 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     public function serialize(): array
     {
+        $dw = $this->dictWord();
+        $def = $this->definition();
+
         return [
             'id' => $this->getId(),
             'word' => $this->word,
+            'disabled' => $this->disabled,
+            'mature' => $this->mature,
+            'approved' => $this->approved,
+            'has_dict_word' => $dw && $dw->isValid(),
+            'has_definition' => $def && $def->isValid(),
             'url' => $this->url(),
             'language' => $this->language()->serialize(),
             'creator' => $this->creator()->serialize(),

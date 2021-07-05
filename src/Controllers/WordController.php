@@ -3,10 +3,10 @@
 namespace App\Controllers;
 
 use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
-use App\Search\SearchParams;
 use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
+use Plasticode\Search\SearchParams;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

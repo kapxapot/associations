@@ -455,13 +455,14 @@ words:
 
     language:
       name: Язык
-      attributes: [readonly]
+      template: row.language.name
+      attributes: [readonly, no_sort]
 
     word:
       name: Слово
       template: >
-        '<a href="' + row.url + '">' + row.name + '</a>'
-      attributes: [readonly]
+        '<a class="ellipsis w-200" href="' + row.url + '">' + row.word + '</a>'
+      attributes: [readonly, searchable]
 
     disabled:
       name: Откл.
@@ -493,9 +494,10 @@ words:
       type: date
       attributes: [readonly]
 
-    created_by_name:
+    creator:
       name: Автор
-      attributes: [readonly]
+      template: row.creator.name
+      attributes: [readonly, no_sort]
 
 word_feedbacks:
   name_gen: отзыва о слове

@@ -5,9 +5,11 @@ namespace App\Repositories\Interfaces;
 use App\Collections\WordCollection;
 use App\Models\Language;
 use App\Models\Word;
-use App\Search\SearchParams;
+use App\Search\WordSearchResult;
+use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
+use Plasticode\Search\SearchParams;
 
-interface WordRepositoryInterface extends LanguageElementRepositoryInterface
+interface WordRepositoryInterface extends FilteringRepositoryInterface, LanguageElementRepositoryInterface
 {
     public function get(?int $id): ?Word;
 
@@ -68,4 +70,8 @@ interface WordRepositoryInterface extends LanguageElementRepositoryInterface
      * Returns all words having the provided word as `main`.
      */
     public function getAllByMain(Word $word): WordCollection;
+
+    // FilteringRepositoryInterface
+
+    public function getSearchResult(SearchParams $searchParams): WordSearchResult;
 }
