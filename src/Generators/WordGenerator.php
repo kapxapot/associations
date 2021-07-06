@@ -30,27 +30,4 @@ class WordGenerator extends ChangingEntityGenerator
     {
         return $this->wordRepository;
     }
-
-    public function afterLoad(array $item): array
-    {
-        $item = parent::afterLoad($item);
-
-        $id = $item[$this->idField()];
-
-        $word = $this->wordRepository->get($id);
-
-        if ($word) {
-            $item['name'] = $word->word;
-            $item['url'] = $word->url();
-            $item['language'] = $word->language()->name;
-
-            $dw = $word->dictWord();
-            $item['has_dict_word'] = $dw && $dw->isValid();
-
-            $def = $word->definition();
-            $item['has_definition'] = $def && $def->isValid();
-        }
-
-        return $item;
-    }
 }

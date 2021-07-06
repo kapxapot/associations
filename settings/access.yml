@@ -31,7 +31,6 @@ templates:
   strict_read:
     admin: [read]
     editor: [read]
-    author: [read_own]
 
   editor_strict:
     admin: [full]
@@ -63,7 +62,7 @@ rights:
     template: strict_read
 
   games:
-    template: public_immutable
+    template: strict_read
 
   languages:
     template: admin_strict
@@ -84,7 +83,7 @@ rights:
     template: admin_api
 
   turns:
-    template: public_immutable
+    template: strict_read
 
   users:
     template: admin_strict

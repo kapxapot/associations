@@ -7,9 +7,13 @@ use App\Models\Association;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use Plasticode\Data\Query;
+use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 
 class AssociationRepository extends LanguageElementRepository implements AssociationRepositoryInterface
 {
+    use SearchRepository;
+
     protected function entityClass(): string
     {
         return Association::class;
@@ -83,5 +87,36 @@ class AssociationRepository extends LanguageElementRepository implements Associa
         return AssociationCollection::from(
             parent::getLastAddedByLanguage($language, $limit)
         );
+    }
+
+    // SearchRepository
+
+    public function applyFilter(Query $query, string $filter): Query
+    {
+        return $query
+            ->select($this->getTable() . '.*')
+            ->join(
+                'words',
+                [
+                    $this->getTable() . '.first_word_id',
+                    '=',
+                    'first_word.id'
+                ],
+                'first_word'
+            )
+            ->join(
+                'words',
+                [
+                    $this->getTable() . '.second_word_id',
+                    '=',
+                    'second_word.id'
+                ],
+                'second_word'
+            )
+            ->search(
+                mb_strtolower($filter),
+                '(first_word.word_bin like ? or second_word.word_bin like ?)',
+                2
+            );
     }
 }

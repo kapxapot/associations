@@ -11,7 +11,6 @@ use App\Models\Word;
 use App\Parsing\DefinitionParser;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Search\WordSearchResult;
 use App\Semantics\Definition\DefinitionAggregate;
 use Exception;
 use Plasticode\Events\EventDispatcher;
@@ -19,6 +18,7 @@ use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Search\SearchParams;
+use Plasticode\Search\SearchResult;
 use Plasticode\Util\Strings;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
@@ -235,7 +235,7 @@ class WordService
     public function searchAllNonMature(
         SearchParams $searchParams,
         ?Language $language = null
-    ): WordSearchResult
+    ): SearchResult
     {
         $data = $this
             ->wordRepository
@@ -247,7 +247,7 @@ class WordService
             ? $this->wordRepository->getNonMatureCount($language, $searchParams->filter())
             : $totalCount;
 
-        return new WordSearchResult($data, $totalCount, $filteredCount);
+        return new SearchResult($data, $totalCount, $filteredCount);
     }
 
     /**

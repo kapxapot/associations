@@ -6,8 +6,9 @@ use App\Collections\AssociationCollection;
 use App\Models\Association;
 use App\Models\Language;
 use App\Models\Word;
+use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 
-interface AssociationRepositoryInterface extends LanguageElementRepositoryInterface
+interface AssociationRepositoryInterface extends FilteringRepositoryInterface, LanguageElementRepositoryInterface
 {
     function get(?int $id): ?Association;
 

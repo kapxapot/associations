@@ -9,6 +9,8 @@ use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use Plasticode\Search\SearchParams;
+use Plasticode\Search\SearchResult;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
 class AssociationRepositoryMock extends RepositoryMock implements AssociationRepositoryInterface
@@ -142,5 +144,15 @@ class AssociationRepositoryMock extends RepositoryMock implements AssociationRep
             ->where(
                 fn (Association $a) => $a->isApproved()
             );
+    }
+
+    public function getSearchResult(SearchParams $searchParams): SearchResult
+    {
+        // placeholder
+        return new SearchResult(
+            $this->associations,
+            $this->associations->count(),
+            $this->associations->count()
+        );
     }
 }

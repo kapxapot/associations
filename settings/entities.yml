@@ -10,12 +10,26 @@ associations:
 
     language:
       name: Язык
+      template: row.language.name
+      attributes: [readonly, no_sort]
+
+    first_word_id:
+      name: Сл1
+      attributes: [readonly]
+
+    second_word_id:
+      name: Сл2
       attributes: [readonly]
 
     association:
       name: Ассоциация
       template: >
         '<a href="' + row.url + '">' + row.name + '</a>'
+      attributes: [readonly, no_sort]
+
+    disabled:
+      name: Откл.
+      type: bool
       attributes: [readonly]
 
     mature:
@@ -33,9 +47,10 @@ associations:
       type: date
       attributes: [readonly]
 
-    created_by_name:
+    creator:
       name: Автор
-      attributes: [readonly]
+      template: row.creator.name
+      attributes: [readonly, no_sort]
 
 association_feedbacks:
   name_gen: отзыва об ассоциации

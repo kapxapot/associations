@@ -142,11 +142,21 @@ class Association extends LanguageElement
             );
     }
 
-    public function sign(): string
+    public function serialize(): array
     {
-        return $this->isApproved()
-            ? self::APPROVED_SIGN
-            : self::DEFAULT_SIGN;
+        return [
+            'id' => $this->getId(),
+            'first_word_id' => $this->firstWordId,
+            'second_word_id' => $this->secondWordId,
+            'name' => $this->fullName(),
+            'disabled' => $this->disabled,
+            'mature' => $this->mature,
+            'approved' => $this->approved,
+            'url' => $this->url(),
+            'language' => $this->language()->serialize(),
+            'creator' => $this->creator()->serialize(),
+            'created_at' => $this->createdAtIso(),
+        ];
     }
 
     public function fullName(): string
@@ -155,5 +165,12 @@ class Association extends LanguageElement
             $this->firstWord()->word . ' ' .
             $this->sign() . ' ' .
             $this->secondWord()->word;
+    }
+
+    public function sign(): string
+    {
+        return $this->isApproved()
+            ? self::APPROVED_SIGN
+            : self::DEFAULT_SIGN;
     }
 }

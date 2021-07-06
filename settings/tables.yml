@@ -1,5 +1,6 @@
 associations:
   api: read
+  server_side: true
   sort: created_at
   reverse: true
   has: [created_at, created_by, updated_at]

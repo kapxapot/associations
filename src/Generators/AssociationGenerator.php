@@ -30,21 +30,4 @@ class AssociationGenerator extends ChangingEntityGenerator
     {
         return $this->associationRepository;
     }
-
-    public function afterLoad(array $item): array
-    {
-        $item = parent::afterLoad($item);
-
-        $id = $item[$this->idField()];
-
-        $association = $this->associationRepository->get($id);
-
-        if ($association) {
-            $item['name'] = $association->fullName();
-            $item['url'] = $association->url();
-            $item['language'] = $association->language()->name;
-        }
-
-        return $item;
-    }
 }

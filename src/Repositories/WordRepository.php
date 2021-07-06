@@ -6,7 +6,6 @@ use App\Collections\WordCollection;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Search\WordSearchResult;
 use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Search\SearchParams;
@@ -206,38 +205,6 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         return WordCollection::from(
             $this->query()->where('main_id', $word->getId())
         );
-    }
-
-    // FilteringRepositoryInterface
-
-    public function getSearchResult(SearchParams $searchParams): WordSearchResult
-    {
-        return new WordSearchResult(
-            $this->getAllFiltered($searchParams),
-            $this->getCount(),
-            $this->getFilteredCount($searchParams)
-        );
-    }
-
-    protected function getAllFiltered(SearchParams $searchParams): WordCollection
-    {
-        $searchQuery = $this->applySearchParams(
-            $this->baseQuery(),
-            $searchParams
-        );
-
-        return WordCollection::from($searchQuery);
-    }
-
-    protected function getFilteredCount(SearchParams $searchParams): int
-    {
-        return $this
-            ->baseQuery()
-            ->applyIf(
-                $searchParams->hasFilter(),
-                fn (Query $q) => $this->applyFilter($q, $searchParams->filter())
-            )
-            ->count();
     }
 
     // SearchRepository

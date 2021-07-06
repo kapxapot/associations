@@ -2,7 +2,9 @@
 
 namespace Brightwood\Serialization\Interfaces;
 
-interface SerializableInterface extends \JsonSerializable
+use JsonSerializable;
+
+interface SerializableInterface extends JsonSerializable
 {
     /**
      * @param array[] $data

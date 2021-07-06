@@ -7,8 +7,8 @@ use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Search\WordSearchResult;
 use Plasticode\Search\SearchParams;
+use Plasticode\Search\SearchResult;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
@@ -189,10 +189,10 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             );
     }
 
-    public function getSearchResult(SearchParams $searchParams): WordSearchResult
+    public function getSearchResult(SearchParams $searchParams): SearchResult
     {
         // placeholder
-        return new WordSearchResult(
+        return new SearchResult(
             $this->words,
             $this->words->count(),
             $this->words->count()
