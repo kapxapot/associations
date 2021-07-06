@@ -13,14 +13,6 @@ associations:
       template: row.language.name
       attributes: [readonly, no_sort]
 
-    first_word_id:
-      name: Сл1
-      attributes: [readonly]
-
-    second_word_id:
-      name: Сл2
-      attributes: [readonly]
-
     association:
       name: Ассоциация
       template: >
