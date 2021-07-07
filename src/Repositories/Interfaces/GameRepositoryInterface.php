@@ -6,14 +6,20 @@ use App\Collections\GameCollection;
 use App\Models\Game;
 use App\Models\Language;
 use App\Models\User;
+use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 use Plasticode\Repositories\Interfaces\Generic\GetRepositoryInterface;
 
-interface GameRepositoryInterface extends GetRepositoryInterface, WithLanguageRepositoryInterface
+interface GameRepositoryInterface extends FilteringRepositoryInterface, GetRepositoryInterface, WithLanguageRepositoryInterface
 {
-    function get(?int $id): ?Game;
-    function getAllByLanguage(Language $language): GameCollection;
-    function save(Game $game): Game;
-    function store(array $data): Game;
-    function getCurrentByUser(User $user): ?Game;
-    function getLastByUser(User $user): ?Game;
+    public function get(?int $id): ?Game;
+
+    public function getAllByLanguage(Language $language): GameCollection;
+
+    public function save(Game $game): Game;
+
+    public function store(array $data): Game;
+
+    public function getCurrentByUser(User $user): ?Game;
+
+    public function getLastByUser(User $user): ?Game;
 }

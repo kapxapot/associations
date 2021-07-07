@@ -11,10 +11,12 @@ use App\Repositories\Traits\ByUserRepository;
 use App\Repositories\Traits\WithLanguageRepository;
 use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
+use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 
 class GameRepository extends IdiormRepository implements GameRepositoryInterface
 {
     use ByUserRepository;
+    use SearchRepository;
     use WithLanguageRepository;
 
     protected function entityClass(): string
@@ -59,6 +61,17 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
             ->getAllByUserQuery($user)
             ->orderByDesc('id')
             ->one();
+    }
+
+    // SearchRepository
+
+    public function applyFilter(Query $query, string $filter): Query
+    {
+        return $query
+            ->applyIf(
+                is_numeric($filter),
+                fn (Query $q) => $q->where('user_id', $filter)
+            );
     }
 
     // queries

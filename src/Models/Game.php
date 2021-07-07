@@ -35,6 +35,12 @@ class Game extends DbModel implements CreatedInterface
         return ['language', 'turns', 'url', 'user'];
     }
 
+    public function firstTurn(): ?Turn
+    {
+        // turns are sorted backwards, so last
+        return $this->turns()->last();
+    }
+
     public function lastTurn(): ?Turn
     {
         // turns are sorted backwards, so first
@@ -156,13 +162,33 @@ class Game extends DbModel implements CreatedInterface
             );
     }
 
+    public function serialize(): array
+    {
+        $firstTurn = $this->firstTurn();
+        $lastTurn = $this->lastTurn();
+
+        return [
+            'id' => $this->getId(),
+            'url' => $this->url(),
+            'language' => $this->language()->serialize(),
+            'first_word' => $firstTurn ? $firstTurn->word()->serialize() : null,
+            'last_word' => $lastTurn ? $lastTurn->word()->serialize() : null,
+            'turn_count' => $this->turns()->count(),
+            'user' => $this->user()->serialize(),
+            'created_at' => $this->createdAtIso(),
+            'finished_at' => $this->finishedAtIso(),
+        ];
+    }
+
     public function displayName(): string
     {
         return 'Игра #' . $this->getId();
     }
 
-    public function finishedAtIso(): string
+    public function finishedAtIso(): ?string
     {
-        return Date::iso($this->finishedAt);
+        return $this->finishedAt !== null
+            ? Date::iso($this->finishedAt)
+            : null;
     }
 }

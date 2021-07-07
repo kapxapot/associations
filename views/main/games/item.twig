@@ -25,7 +25,7 @@
 
             <p>
                 <strong>Даты:</strong>
-                {{ gm.moment_short_range(game.created_at_iso, game.finished_at_iso, 'D MMMM Y, H:mm') }}
+                {{ gm.moment_short_range(game.created_at_iso, game.finished_at_iso, 'D MMMM Y, H:mm', 'D MMMM Y, H:mm') }}
             </p>
 
             <p><strong>Ходов:</strong> {{ game.turns.count }}</p>

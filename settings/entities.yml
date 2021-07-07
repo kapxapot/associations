@@ -131,17 +131,20 @@ games:
 
     language:
       name: Язык
-      attributes: [readonly]
+      template: row.language.name
+      attributes: [readonly, no_sort]
 
     game:
       name: Игра
       template: >
-        '<a href="' + row.url + '">' + row.id + '</a>'
-      attributes: [readonly]
+        '<a href="' + row.url + '">' + (row.first_word ? (row.first_word.word + (row.last_word && row.last_word.id != row.first_word.id ? ' ... ' + row.last_word.word : '')) : row.id) + '</a> [' + row.turn_count + ']'
+      attributes: [readonly, no_sort]
 
     user_name:
       name: Игрок
-      attributes: [readonly]
+      template: >
+        '[' + row.user.id + '] ' + row.user.name
+      attributes: [readonly, no_sort, searchable]
 
     created_at:
       name: Дата начала
