@@ -9,6 +9,8 @@ use App\Models\User;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use Plasticode\Hydrators\Interfaces\HydratorInterface;
 use Plasticode\ObjectProxy;
+use Plasticode\Search\SearchParams;
+use Plasticode\Search\SearchResult;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Util\Sort;
 
@@ -98,5 +100,15 @@ class GameRepositoryMock extends RepositoryMock implements GameRepositoryInterfa
             ->first(
                 fn (Game $g) => $g->userId == $user->getId()
             );
+    }
+
+    public function getSearchResult(SearchParams $searchParams): SearchResult
+    {
+        // placeholder
+        return new SearchResult(
+            $this->games,
+            $this->games->count(),
+            $this->games->count()
+        );
     }
 }

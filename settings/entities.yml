@@ -137,7 +137,7 @@ games:
     game:
       name: Игра
       template: >
-        '<a href="' + row.url + '">' + (row.first_word ? (row.first_word.word + (row.last_word && row.last_word.id != row.first_word.id ? ' ... ' + row.last_word.word : '')) : row.id) + '</a> (' + row.turn_count + ')'
+        '<a href="' + row.url + '">' + row.turn_name + '</a> (' + row.turn_count + ')'
       attributes: [readonly, no_sort]
 
     user_name:

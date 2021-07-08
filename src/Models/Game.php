@@ -54,14 +54,11 @@ class Game extends DbModel implements CreatedInterface
             : null;
     }
 
-    private function recentTurns(): TurnCollection
+    public function firstTurnWord(): ?Word
     {
-        return $this->turns()->take(self::RECENT);
-    }
-
-    public function words(): WordCollection
-    {
-        return $this->turns()->words();
+        return $this->firstTurn()
+            ? $this->firstTurn()->word()
+            : null;
     }
 
     public function lastTurnWord(): ?Word
@@ -76,6 +73,16 @@ class Game extends DbModel implements CreatedInterface
         return $this->beforeLastTurn()
             ? $this->beforeLastTurn()->word()
             : null;
+    }
+
+    private function recentTurns(): TurnCollection
+    {
+        return $this->turns()->take(self::RECENT);
+    }
+
+    public function words(): WordCollection
+    {
+        return $this->turns()->words();
     }
 
     public function isStarted(): bool
@@ -164,15 +171,11 @@ class Game extends DbModel implements CreatedInterface
 
     public function serialize(): array
     {
-        $firstTurn = $this->firstTurn();
-        $lastTurn = $this->lastTurn();
-
         return [
             'id' => $this->getId(),
             'url' => $this->url(),
             'language' => $this->language()->serialize(),
-            'first_word' => $firstTurn ? $firstTurn->word()->serialize() : null,
-            'last_word' => $lastTurn ? $lastTurn->word()->serialize() : null,
+            'turn_name' => $this->turnName() ?? $this->getId(),
             'turn_count' => $this->turns()->count(),
             'user' => $this->user()->serialize(),
             'created_at' => $this->createdAtIso(),
@@ -180,9 +183,39 @@ class Game extends DbModel implements CreatedInterface
         ];
     }
 
+    /**
+     * Returns game's name in form "[first word] ... [last word]".
+     *
+     * Returns `null` if there are no turns.
+     */
+    public function turnName(): ?string
+    {
+        $firstWord = $this->firstTurnWord();
+
+        if ($firstWord === null) {
+            return null;
+        }
+
+        $name = $firstWord->word;
+
+        $lastWord = $this->lastTurnWord();
+
+        if ($lastWord !== null && !$lastWord->equals($firstWord)) {
+            $name .= ' ... ' . $lastWord->word;
+        }
+
+        return $name;
+    }
+
     public function displayName(): string
     {
-        return 'Игра #' . $this->getId();
+        $name = 'Игра #' . $this->getId();
+
+        if ($this->turnName() !== null) {
+            $name .= ' (' . $this->turnName() . ')';
+        }
+
+        return $name;
     }
 
     public function finishedAtIso(): ?string
