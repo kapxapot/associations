@@ -317,6 +317,8 @@ class UserAnswerer extends AbstractAnswerer
             $aliceUser->user()
         );
 
+        $this->finishGameFor($aliceUser);
+
         return $this->buildResponse(
             'Спасибо, ваш отзыв сохранен.',
             self::MESSAGE_START_ANEW,
@@ -341,6 +343,8 @@ class UserAnswerer extends AbstractAnswerer
             $aliceUser->user()
         );
 
+        $this->finishGameFor($aliceUser);
+
         return $this->buildResponse(
             'Спасибо, ваш отзыв сохранен.',
             self::MESSAGE_START_ANEW,
@@ -350,9 +354,7 @@ class UserAnswerer extends AbstractAnswerer
 
     private function skipCommand(AliceUser $aliceUser): AliceResponse
     {
-        $game = $this->getGame($aliceUser);
-
-        $this->turnService->finishGame($game);
+        $this->finishGameFor($aliceUser);
 
         return $this->buildResponse(
             self::MESSAGE_SKIP,
@@ -475,6 +477,13 @@ class UserAnswerer extends AbstractAnswerer
         return $deduplicatedWord !== null
             ? $deduplicatedWord->word
             : $question;
+    }
+
+    private function finishGameFor(AliceUser $aliceUser): void
+    {
+        $game = $this->getGame($aliceUser);
+
+        $this->turnService->finishGame($game);
     }
 
     private function newGameFor(AliceUser $aliceUser): string
