@@ -209,13 +209,7 @@ class Game extends DbModel implements CreatedInterface
 
     public function displayName(): string
     {
-        $name = 'Игра #' . $this->getId();
-
-        if ($this->turnName() !== null) {
-            $name .= ' (' . $this->turnName() . ')';
-        }
-
-        return $name;
+        return 'Игра #' . $this->getId();
     }
 
     public function finishedAtIso(): ?string

@@ -99,7 +99,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         // 2.1. visible only for those who used them
 
         if ($this->isDisabled()) {
-            return $user !== null && $this->isUsedBy($user);
+            return $user && $this->isUsedBy($user);
         }
 
         return
@@ -128,8 +128,9 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         return $this->isVisibleFor($user)
             && (
                 $this->isApproved()
-                || ($user && $this->isUsedBy($user) && !$this->isDislikedBy($user))
-            );
+                || ($user && $this->isUsedBy($user))
+            )
+            && !$this->isDislikedBy($user);
     }
 
     public function isVisibleForMe(): bool

@@ -40,23 +40,23 @@ word_max_length: 100
 admin_menu:
   - languages
   - games
-  - words
-  - associations
+  - group:
+      title: Слова
+      items:
+        - words
+        - word_feedbacks
+        - word_overrides
+  - group:
+      title: Ассоциации
+      items:
+        - associations
+        - association_feedbacks
+        - association_overrides
   - group:
       title: Лента
       items:
         - news
         - pages
-  - group:
-      title: Отзывы
-      items:
-        - word_feedbacks
-        - association_feedbacks
-  - group:
-      title: Исправления
-      items:
-        - word_overrides
-        - association_overrides
   - group:
       title: Сайт
       items:

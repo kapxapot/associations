@@ -440,8 +440,26 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
+     * Returns the most canonical and still playable word.
+     *
+     * Goes up the canonical chain until stumbles at an unplayable word.
+     */
+    public function canonicalPlayableAgainst(?User $user): ?self
+    {
+        if (!$this->isPlayableAgainst($user)) {
+            return null;
+        }
+
+        $mainPlayable = $this->hasMain()
+            ? $this->main()->canonicalPlayableAgainst($user)
+            : null;
+
+        return $mainPlayable ?? $this;
+    }
+
+    /**
      * Returns the word's canonical form.
-     * 
+     *
      * - If the word doesn't have a main word, returns itself.
      * - Otherwise, returns the root main word (main()->main()->...->main()).
      */

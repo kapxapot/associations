@@ -43,7 +43,7 @@ class GameService
     }
 
     /**
-     * Creates and starts a new game for a user.
+     * Creates and starts a new game for the user.
      */
     public function createGameFor(User $user, ?Language $language = null): Game
     {

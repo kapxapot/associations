@@ -20,7 +20,7 @@ use PHPUnit\Framework\TestCase;
 use Plasticode\Events\EventDispatcher;
 use Prophecy\PhpUnit\ProphecyTrait;
 
-final class WordTest extends TestCase
+final class WordRemotelyRelatedTest extends TestCase
 {
     use ProphecyTrait;
 

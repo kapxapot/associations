@@ -54,7 +54,7 @@ class WordSeeder implements ArraySeederInterface
                     $this->languageRepository->get($w->languageId)
                 )->withFeedbacks(
                     WordFeedbackCollection::empty()
-                ),
+                )->withMain(null),
             $words
         );
     }

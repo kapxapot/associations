@@ -68,6 +68,9 @@ class LanguageService
         return $this->getRandomWordFor(null, $language, $exceptWord);
     }
 
+    /**
+     * Returns **canonical** random word available for the user.
+     */
     public function getRandomWordFor(
         ?User $user,
         ?Language $language = null,
@@ -93,11 +96,13 @@ class LanguageService
             );
         }
 
-        return $words
+        $word = $words
             ->where(
                 fn (Word $w) => $w->isPlayableAgainst($user)
             )
             ->random();
+
+        return $word->canonicalPlayableAgainst($user);
     }
 
     public function normalizeWord(Language $language, ?string $word) : ?string

@@ -46,7 +46,7 @@
             {% if association.users|length > 0 %}
                 <p><strong>Использована игроками:</strong></p>
 
-                <ul>
+                <ul class="br-word">
                     {% for user in association.users %}
                         {% set turns = turns_by_user[user.id] %}
                         <li class="vgap-1">
@@ -55,7 +55,7 @@
                             {% if full_access %}
                                 <ul>
                                     {% for turn in turns %}
-                                        <li><a href="{{ turn.game.url }}">{{ turn.game.display_name }}</a>, {{ gm.moment_local(turn.created_at_iso) }}</li>
+                                        <li><a href="{{ turn.game.url }}">{{ turn.game.display_name ~ ' (' ~ turn.game.turnName ~ ')' }}</a>, {{ gm.moment_local(turn.created_at_iso) }}</li>
                                     {% endfor %}
                                 </ul>
                             {% endif %}
