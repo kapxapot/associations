@@ -6,8 +6,9 @@ use App\Collections\WordRelationCollection;
 use App\Models\Word;
 use App\Models\WordRelation;
 use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
+use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 
-interface WordRelationRepositoryInterface extends ChangingRepositoryInterface
+interface WordRelationRepositoryInterface extends ChangingRepositoryInterface, FilteringRepositoryInterface
 {
     public function get(?int $id): ?WordRelation;
 

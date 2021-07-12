@@ -16,4 +16,16 @@ class AssociationFeedback extends Feedback
             'association',
         ];
     }
+
+    public function serialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'association' => $this->association()->serialize(),
+            'dislike' => $this->dislike,
+            'mature' => $this->mature,
+            'creator' => $this->creator()->serialize(),
+            'created_at' => $this->createdAtIso(),
+        ];
+    }
 }

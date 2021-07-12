@@ -42,4 +42,17 @@ class WordRelation extends DbModel implements CreatedInterface, UpdatedAtInterfa
     {
         return self::toBool($this->primary);
     }
+
+    public function serialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'word' => $this->word()->serialize(),
+            'main_word' => $this->mainWord()->serialize(),
+            'type' => $this->type()->serialize(),
+            'primary' => $this->primary,
+            'creator' => $this->creator()->serialize(),
+            'created_at' => $this->createdAtIso(),
+        ];
+    }
 }

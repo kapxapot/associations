@@ -16,6 +16,8 @@ use Plasticode\Util\Convert;
 use Respect\Validation\Validator;
 
 /**
+ * This generator is for entity management via the front-end.
+ *
  * @emits WordRelationsChangedEvent
  */
 class WordRelationGenerator extends ChangingEntityGenerator
@@ -94,6 +96,7 @@ class WordRelationGenerator extends ChangingEntityGenerator
     {
         $options = parent::getOptions();
 
+        $options['no_default_uri'] = true;
         $options['uri'] = 'words/{id:\d+}/relations';
         $options['filter'] = 'word_id';
 

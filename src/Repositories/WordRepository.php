@@ -211,10 +211,22 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 
     public function applyFilter(Query $query, string $filter): Query
     {
-        return $query->search(
-            mb_strtolower($filter),
-            '(word_bin like ?)'
-        );
+        return $query
+            ->select($this->getTable() . '.*')
+            ->join(
+                'users',
+                [
+                    $this->getTable() . '.created_by',
+                    '=',
+                    'user.id'
+                ],
+                'user'
+            )
+            ->search(
+                mb_strtolower($filter),
+                '(word_bin like ? or user.login like ? or user.name like ?)',
+                3
+            );
     }
 
     // queries

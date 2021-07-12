@@ -30,24 +30,4 @@ class AssociationFeedbackGenerator extends ChangingEntityGenerator
     {
         return $this->associationFeedbackRepository;
     }
-
-    public function afterLoad(array $item): array
-    {
-        $item = parent::afterLoad($item);
-
-        $id = $item[$this->idField()];
-
-        $associationFeedback = $this->associationFeedbackRepository->get($id);
-
-        if ($associationFeedback) {
-            $association = $associationFeedback->association();
-
-            $item['association'] = [
-                'name' => $association->fullName(),
-                'url' => $association->url()
-            ];
-        }
-
-        return $item;
-    }
 }

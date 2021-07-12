@@ -9,11 +9,13 @@ use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
 use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
+use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Util\SortStep;
 
 class AssociationOverrideRepository extends IdiormRepository implements AssociationOverrideRepositoryInterface
 {
     use CreatedRepository;
+    use SearchRepository;
 
     protected function getSortOrder(): array
     {
@@ -52,6 +54,55 @@ class AssociationOverrideRepository extends IdiormRepository implements Associat
         return AssociationOverrideCollection::from(
             $this->byAssociationQuery($association)
         );
+    }
+
+    // SearchRepository
+
+    public function applyFilter(Query $query, string $filter): Query
+    {
+        return $query
+            ->select($this->getTable() . '.*')
+            ->join(
+                'associations',
+                [
+                    $this->getTable() . '.association_id',
+                    '=',
+                    'ass.id'
+                ],
+                'ass'
+            )
+            ->join(
+                'words',
+                [
+                    'ass.first_word_id',
+                    '=',
+                    'first_word.id'
+                ],
+                'first_word'
+            )
+            ->join(
+                'words',
+                [
+                    'ass.second_word_id',
+                    '=',
+                    'second_word.id'
+                ],
+                'second_word'
+            )
+            ->join(
+                'users',
+                [
+                    $this->getTable() . '.created_by',
+                    '=',
+                    'user.id'
+                ],
+                'user'
+            )
+            ->search(
+                mb_strtolower($filter),
+                '(first_word.word_bin like ? or second_word.word_bin like ? or user.login like ? or user.name like ?)',
+                4
+            );
     }
 
     // queries

@@ -8,6 +8,8 @@ use App\Models\AssociationFeedback;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use Plasticode\Hydrators\Interfaces\HydratorInterface;
 use Plasticode\ObjectProxy;
+use Plasticode\Search\SearchParams;
+use Plasticode\Search\SearchResult;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
 class AssociationFeedbackRepositoryMock extends RepositoryMock implements AssociationFeedbackRepositoryInterface
@@ -65,5 +67,15 @@ class AssociationFeedbackRepositoryMock extends RepositoryMock implements Associ
             ->where(
                 fn (AssociationFeedback $f) => $f->association()->equals($association)
             );
+    }
+
+    public function getSearchResult(SearchParams $searchParams): SearchResult
+    {
+        // placeholder
+        return new SearchResult(
+            $this->feedbacks,
+            $this->feedbacks->count(),
+            $this->feedbacks->count()
+        );
     }
 }

@@ -6,8 +6,9 @@ use App\Collections\WordFeedbackCollection;
 use App\Models\Word;
 use App\Models\WordFeedback;
 use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
+use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 
-interface WordFeedbackRepositoryInterface extends ChangingRepositoryInterface
+interface WordFeedbackRepositoryInterface extends ChangingRepositoryInterface, FilteringRepositoryInterface
 {
     function get(?int $id): ?WordFeedback;
 

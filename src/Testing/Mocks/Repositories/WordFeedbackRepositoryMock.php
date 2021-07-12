@@ -8,6 +8,8 @@ use App\Models\WordFeedback;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use Plasticode\Hydrators\Interfaces\HydratorInterface;
 use Plasticode\ObjectProxy;
+use Plasticode\Search\SearchParams;
+use Plasticode\Search\SearchResult;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
 class WordFeedbackRepositoryMock extends RepositoryMock implements WordFeedbackRepositoryInterface
@@ -63,5 +65,15 @@ class WordFeedbackRepositoryMock extends RepositoryMock implements WordFeedbackR
             ->where(
                 fn (WordFeedback $f) => $f->word()->equals($word)
             );
+    }
+
+    public function getSearchResult(SearchParams $searchParams): SearchResult
+    {
+        // placeholder
+        return new SearchResult(
+            $this->feedbacks,
+            $this->feedbacks->count(),
+            $this->feedbacks->count()
+        );
     }
 }

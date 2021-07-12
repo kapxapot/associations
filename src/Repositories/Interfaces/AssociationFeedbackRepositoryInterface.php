@@ -6,11 +6,15 @@ use App\Collections\AssociationFeedbackCollection;
 use App\Models\Association;
 use App\Models\AssociationFeedback;
 use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
+use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 
-interface AssociationFeedbackRepositoryInterface extends ChangingRepositoryInterface
+interface AssociationFeedbackRepositoryInterface extends ChangingRepositoryInterface, FilteringRepositoryInterface
 {
-    function get(?int $id): ?AssociationFeedback;
-    function create(array $data): AssociationFeedback;
-    function save(AssociationFeedback $feedback): AssociationFeedback;
-    function getAllByAssociation(Association $association): AssociationFeedbackCollection;
+    public function get(?int $id): ?AssociationFeedback;
+
+    public function create(array $data): AssociationFeedback;
+
+    public function save(AssociationFeedback $feedback): AssociationFeedback;
+
+    public function getAllByAssociation(Association $association): AssociationFeedbackCollection;
 }

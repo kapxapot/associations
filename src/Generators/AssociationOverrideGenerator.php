@@ -30,24 +30,4 @@ class AssociationOverrideGenerator extends EntityGenerator
     {
         return $this->associationOverrideRepository;
     }
-
-    public function afterLoad(array $item): array
-    {
-        $item = parent::afterLoad($item);
-
-        $id = $item[$this->idField()];
-
-        $override = $this->associationOverrideRepository->get($id);
-
-        if ($override) {
-            $association = $override->association();
-
-            $item['association'] = [
-                'name' => $association->fullName(),
-                'url' => $association->url(),
-            ];
-        }
-
-        return $item;
-    }
 }

@@ -7,10 +7,13 @@ use App\Models\Word;
 use App\Models\WordFeedback;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Traits\WithWordRepository;
+use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
+use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 
 class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRepositoryInterface
 {
+    use SearchRepository;
     use WithWordRepository;
 
     protected function entityClass(): string
@@ -38,5 +41,45 @@ class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRep
         return WordFeedbackCollection::from(
             $this->byWordQuery($word)
         );
+    }
+
+    // SearchRepository
+
+    public function applyFilter(Query $query, string $filter): Query
+    {
+        return $query
+            ->select($this->getTable() . '.*')
+            ->join(
+                'words',
+                [
+                    $this->getTable() . '.word_id',
+                    '=',
+                    'w.id'
+                ],
+                'w'
+            )
+            ->leftOuterJoin(
+                'words',
+                [
+                    $this->getTable() . '.duplicate_id',
+                    '=',
+                    'duplicate.id'
+                ],
+                'duplicate'
+            )
+            ->join(
+                'users',
+                [
+                    $this->getTable() . '.created_by',
+                    '=',
+                    'user.id'
+                ],
+                'user'
+            )
+            ->search(
+                mb_strtolower($filter),
+                '(w.word_bin like ? or (duplicate.id is not null and duplicate.word_bin like ?) or typo like ? or user.login like ? or user.name like ?)',
+                5
+            );
     }
 }

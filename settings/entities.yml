@@ -17,7 +17,7 @@ associations:
       name: Ассоциация
       template: >
         '<a href="' + row.url + '">' + row.name + '</a>'
-      attributes: [readonly, no_sort]
+      attributes: [readonly, searchable, no_sort]
 
     disabled:
       name: Откл.
@@ -42,7 +42,7 @@ associations:
     creator:
       name: Автор
       template: row.creator.name
-      attributes: [readonly, no_sort]
+      attributes: [readonly, searchable, no_sort]
 
 association_feedbacks:
   name_gen: отзыва об ассоциации
@@ -58,7 +58,7 @@ association_feedbacks:
       name: Ассоциация
       template: >
         '<a href="' + row.association.url + '">' + row.association.name + '</a>'
-      attributes: [readonly]
+      attributes: [readonly, searchable, no_sort]
 
     dislike:
       name: Не нравится
@@ -75,9 +75,10 @@ association_feedbacks:
       type: date
       attributes: [readonly]
 
-    created_by_name:
+    creator:
       name: Автор
-      attributes: [readonly]
+      template: row.creator.name
+      attributes: [readonly, searchable, no_sort]
 
 association_overrides:
   name_gen: исправления ассоциаций
@@ -93,7 +94,7 @@ association_overrides:
       name: Ассоциация
       template: >
         '<a href="' + row.association.url + '">' + row.association.name + '</a>'
-      attributes: [readonly]
+      attributes: [readonly, searchable, no_sort]
 
     approved:
       name: Общая
@@ -115,9 +116,10 @@ association_overrides:
       type: date
       attributes: [readonly]
 
-    created_by_name:
+    creator:
       name: Автор
-      attributes: [readonly]
+      template: row.creator.name
+      attributes: [readonly, searchable, no_sort]
 
 games:
   name_gen: игры
@@ -142,8 +144,7 @@ games:
 
     user_name:
       name: Игрок
-      template: >
-        '[' + row.user.id + '] ' + row.user.name
+      template: row.user.name
       attributes: [readonly, no_sort, searchable]
 
     created_at:
@@ -507,7 +508,7 @@ words:
     creator:
       name: Автор
       template: row.creator.name
-      attributes: [readonly, no_sort]
+      attributes: [readonly, searchable, no_sort]
 
 word_feedbacks:
   name_gen: отзыва о слове
@@ -522,8 +523,8 @@ word_feedbacks:
     word:
       name: Слово
       template: >
-        '<a href="' + row.word.url + '">' + row.word.name + '</a>'
-      attributes: [readonly]
+        '<a href="' + row.word.url + '">' + row.word.word + '</a>'
+      attributes: [readonly, searchable, no_sort]
 
     dislike:
       name: Не нравится
@@ -532,13 +533,13 @@ word_feedbacks:
 
     typo:
       name: Опечатка
-      attributes: [readonly]
+      attributes: [readonly, searchable]
 
     duplicate:
       name: Дублирует
       template: >
-        row.duplicate ? '<a href="' + row.duplicate.url + '">' + row.duplicate.name + '</a>' : ''
-      attributes: [readonly]
+        row.duplicate ? '<a href="' + row.duplicate.url + '">' + row.duplicate.word + '</a>' : ''
+      attributes: [readonly, searchable, no_sort]
 
     mature:
       name: 16+
@@ -550,9 +551,10 @@ word_feedbacks:
       type: date
       attributes: [readonly]
 
-    created_by_name:
+    creator:
       name: Автор
-      attributes: [readonly]
+      template: row.creator.name
+      attributes: [readonly, searchable, no_sort]
 
 word_overrides:
   name_gen: исправления слова
@@ -567,14 +569,14 @@ word_overrides:
     word:
       name: Слово
       template: >
-        '<a href="' + row.word.url + '">' + row.word.name + '</a>'
-      attributes: [readonly]
+        '<a href="' + row.word.url + '">' + row.word.word + '</a>'
+      attributes: [readonly, searchable, no_sort]
 
     original_word:
-      name: Ориг. слово
+      name: Оригинал
       template: >
         row.word.original_word ? row.word.original_word : ''
-      attributes: [readonly]
+      attributes: [readonly, searchable, no_sort]
 
     approved:
       name: Общее
@@ -593,9 +595,9 @@ word_overrides:
 
     word_correction:
       name: Коррект.
-      attributes: [readonly]
+      attributes: [readonly, searchable]
 
-    parts_of_speech:
+    pos_correction:
       name: Части речи
       attributes: [readonly]
 
@@ -604,6 +606,50 @@ word_overrides:
       type: date
       attributes: [readonly]
 
-    created_by_name:
+    creator:
       name: Автор
+      template: row.creator.name
+      attributes: [readonly, searchable, no_sort]
+
+word_relations_admin:
+  name_gen: связи
+  name_accus: связь
+  title: Связи между словами
+
+  columns:
+    id:
+      name: id
       attributes: [readonly]
+
+    word:
+      name: Слово
+      template: >
+        '<a class="ellipsis w-200" href="' + row.word.url + '">' + row.word.word + '</a>'
+      attributes: [readonly, searchable, no_sort]
+
+    main_word:
+      name: Главное слово
+      template: >
+        '<a class="ellipsis w-200" href="' + row.main_word.url + '">' + row.main_word.word + '</a>'
+      attributes: [readonly, searchable, no_sort]
+
+    type:
+      name: Тип
+      template: >
+        '[' + row.type.tag + '] ' + row.type.name
+      attributes: [readonly, searchable, no_sort]
+
+    primary:
+      name: Основная
+      type: bool
+      attributes: [readonly]
+
+    created_at:
+      name: Дата создания
+      type: date
+      attributes: [readonly]
+
+    creator:
+      name: Автор
+      template: row.creator.name
+      attributes: [readonly, searchable, no_sort]

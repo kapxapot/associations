@@ -68,14 +68,18 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     abstract public function matures(): FeedbackCollection;
 
-    public function isDislikedBy(User $user): bool
+    public function isDislikedBy(?User $user): bool
     {
-        return $this->dislikes()->anyBy($user);
+        return $user !== null
+            ? $this->dislikes()->anyBy($user)
+            : false;
     }
 
-    public function isUsedBy(User $user): bool
+    public function isUsedBy(?User $user): bool
     {
-        return $this->turns()->anyBy($user);
+        return $user !== null
+            ? $this->turns()->anyBy($user)
+            : false;
     }
 
     /**
@@ -126,10 +130,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         // 2. element is not approved, user disliked it
 
         return $this->isVisibleFor($user)
-            && (
-                $this->isApproved()
-                || ($user && $this->isUsedBy($user))
-            )
+            && ($this->isApproved() || $this->isUsedBy($user))
             && !$this->isDislikedBy($user);
     }
 

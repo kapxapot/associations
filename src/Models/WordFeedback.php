@@ -46,4 +46,18 @@ class WordFeedback extends Feedback
             $this->duplicatePropertyName
         );
     }
+
+    public function serialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'word' => $this->word()->serialize(),
+            'dislike' => $this->dislike,
+            'mature' => $this->mature,
+            'typo' => $this->typo,
+            'duplicate' => $this->duplicate() ? $this->duplicate()->serialize() : null,
+            'creator' => $this->creator()->serialize(),
+            'created_at' => $this->createdAtIso(),
+        ];
+    }
 }

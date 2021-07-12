@@ -146,8 +146,6 @@ class Association extends LanguageElement
     {
         return [
             'id' => $this->getId(),
-            'first_word_id' => $this->firstWordId,
-            'second_word_id' => $this->secondWordId,
             'name' => $this->fullName(),
             'disabled' => $this->disabled,
             'mature' => $this->mature,

@@ -56,4 +56,20 @@ class WordOverride extends Override
             || $this->hasWordCorrection()
             || $this->hasPosCorrection();
     }
+
+    public function serialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'word' => $this->word()->serialize(),
+            'original_word' => $this->word()->originalWord,
+            'approved' => $this->approved,
+            'mature' => $this->mature,
+            'disabled' => $this->disabled,
+            'word_correction' => $this->wordCorrection,
+            'pos_correction' => $this->posCorrection,
+            'creator' => $this->creator()->serialize(),
+            'created_at' => $this->createdAtIso(),
+        ];
+    }
 }

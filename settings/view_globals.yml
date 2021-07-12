@@ -46,6 +46,7 @@ admin_menu:
         - words
         - word_feedbacks
         - word_overrides
+        - word_relations_admin
   - group:
       title: Ассоциации
       items:

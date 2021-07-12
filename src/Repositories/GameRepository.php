@@ -68,9 +68,20 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
     public function applyFilter(Query $query, string $filter): Query
     {
         return $query
-            ->applyIf(
-                is_numeric($filter),
-                fn (Query $q) => $q->where('user_id', $filter)
+            ->select($this->getTable() . '.*')
+            ->join(
+                'users',
+                [
+                    $this->getTable() . '.user_id',
+                    '=',
+                    'user.id'
+                ],
+                'user'
+            )
+            ->search(
+                mb_strtolower($filter),
+                '(user.login like ? or user.name like ?)',
+                2
             );
     }
 

@@ -97,6 +97,9 @@ rights:
   word_relations:
     template: editor_strict
 
+  word_relations_admin:
+    template: strict_read
+
   word_relation_types:
     template: api_read
 

@@ -8,6 +8,7 @@ use App\Semantics\PartOfSpeech;
 use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Generators\Core\GeneratorContext;
 use Plasticode\Generators\Generic\EntityGenerator;
+use Plasticode\Search\SearchResult;
 
 class WordOverrideGenerator extends EntityGenerator
 {

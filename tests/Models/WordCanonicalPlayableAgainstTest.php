@@ -32,28 +32,35 @@ final class WordCanonicalPlayableAgainstTest extends TestCase
     }
 
     /**
-     * upl1 => null
-     */
-    public function testUpl1(): void
-    {
-        $upl1 = $this->makeDislikedWord(1);
-
-        $this->assertUnplayable($upl1);
-
-        $canonical = $upl1->canonicalPlayableAgainst($this->user);
-
-        $this->assertNull($canonical);
-    }
-
-    /**
      * pl1 => pl1
      */
     public function testPl1(): void
     {
         $pl1 = $this->makeWord(1);
 
+        // playable for user and canonical equals to the word
+        $this->assertPlayable($pl1, $this->user);
+        $this->assertCanonical($pl1, $pl1, $this->user);
+
+        // playable for **any** user and canonical equals to the word
         $this->assertPlayable($pl1);
         $this->assertCanonical($pl1, $pl1);
+    }
+
+    /**
+     * upl1 => null
+     */
+    public function testUpl1(): void
+    {
+        $upl1 = $this->makeDislikedWord(1, $this->user);
+
+        // unplayable for user & canonical is null
+        $this->assertUnplayable($upl1, $this->user);
+        $this->assertCanonical($upl1, null, $this->user);
+
+        // playable for **any** user and canonical equals to the word
+        $this->assertPlayable($upl1);
+        $this->assertCanonical($upl1, $upl1);
     }
 
     /**
@@ -64,6 +71,12 @@ final class WordCanonicalPlayableAgainstTest extends TestCase
         $pl2 = $this->makeWord(2);
         $pl1 = $this->makeWord(1)->withMain($pl2);
 
+        // both words are playable for user and canonical is $pl2
+        $this->assertPlayable($pl1, $this->user);
+        $this->assertPlayable($pl2, $this->user);
+        $this->assertCanonical($pl1, $pl2, $this->user);
+
+        // both words are playable for **any** user and canonical is $pl2
         $this->assertPlayable($pl1);
         $this->assertPlayable($pl2);
         $this->assertCanonical($pl1, $pl2);
@@ -74,12 +87,18 @@ final class WordCanonicalPlayableAgainstTest extends TestCase
      */
     public function testPl1Upl2(): void
     {
-        $upl2 = $this->makeDislikedWord(2);
+        $upl2 = $this->makeDislikedWord(2, $this->user);
         $pl1 = $this->makeWord(1)->withMain($upl2);
 
+        // $pl1 is playable, $upl2 is unplayable for user, $pl1 is canonical
+        $this->assertPlayable($pl1, $this->user);
+        $this->assertUnplayable($upl2, $this->user);
+        $this->assertCanonical($pl1, $pl1, $this->user);
+
+        // both words are playable for **any** user and canonical is $upl2
         $this->assertPlayable($pl1);
-        $this->assertUnplayable($upl2);
-        $this->assertCanonical($pl1, $pl1);
+        $this->assertPlayable($upl2);
+        $this->assertCanonical($pl1, $upl2);
     }
 
     /**
@@ -91,6 +110,13 @@ final class WordCanonicalPlayableAgainstTest extends TestCase
         $pl2 = $this->makeWord(2)->withMain($pl3);
         $pl1 = $this->makeWord(1)->withMain($pl2);
 
+        // all words are playable for user and canonical is $pl3
+        $this->assertPlayable($pl1, $this->user);
+        $this->assertPlayable($pl2, $this->user);
+        $this->assertPlayable($pl3, $this->user);
+        $this->assertCanonical($pl1, $pl3, $this->user);
+
+        // all words are playable for **any** user and canonical is $pl3
         $this->assertPlayable($pl1);
         $this->assertPlayable($pl2);
         $this->assertPlayable($pl3);
@@ -102,26 +128,33 @@ final class WordCanonicalPlayableAgainstTest extends TestCase
      */
     public function testPl1Pl2Upl3(): void
     {
-        $pl3 = $this->makeDislikedWord(3);
-        $pl2 = $this->makeWord(2)->withMain($pl3);
+        $upl3 = $this->makeDislikedWord(3, $this->user);
+        $pl2 = $this->makeWord(2)->withMain($upl3);
         $pl1 = $this->makeWord(1)->withMain($pl2);
 
+        // $pl1 & $pl2 are playable, $upl3 is unplayable for user, canonical is $pl2
+        $this->assertPlayable($pl1, $this->user);
+        $this->assertPlayable($pl2, $this->user);
+        $this->assertUnplayable($upl3, $this->user);
+        $this->assertCanonical($pl1, $pl2, $this->user);
+
+        // all words are playable for **any** user and canonical is $upl3
         $this->assertPlayable($pl1);
         $this->assertPlayable($pl2);
-        $this->assertUnplayable($pl3);
-        $this->assertCanonical($pl1, $pl2);
+        $this->assertPlayable($upl3);
+        $this->assertCanonical($pl1, $upl3);
     }
 
-    private function makeDislikedWord(int $id): Word
+    private function makeDislikedWord(int $id, User $user): Word
     {
-        return $this->makeWord($id, true);
+        return $this->makeWord($id, $user);
     }
 
-    private function makeWord(int $id, bool $isDisliked = false): Word
+    private function makeWord(int $id, ?User $dislikedByUser = null): Word
     {
-        $feedbacks = $isDisliked
+        $feedbacks = $dislikedByUser
             ? WordFeedbackCollection::collect(
-                new WordFeedback(['created_by' => $this->user->getId(), 'dislike' => 1])
+                new WordFeedback(['created_by' => $dislikedByUser->getId(), 'dislike' => 1])
             )
             : WordFeedbackCollection::empty();
 
@@ -133,26 +166,30 @@ final class WordCanonicalPlayableAgainstTest extends TestCase
             ->withFeedbacks($feedbacks);
     }
 
-    private function assertPlayable(Word $word): void
+    private function assertPlayable(Word $word, ?User $user = null): void
     {
         $this->assertTrue(
-            $word->isPlayableAgainst($this->user)
+            $word->isPlayableAgainst($user)
         );
     }
 
-    private function assertUnplayable(Word $word): void
+    private function assertUnplayable(Word $word, ?User $user = null): void
     {
         $this->assertFalse(
-            $word->isPlayableAgainst($this->user)
+            $word->isPlayableAgainst($user)
         );
     }
 
-    private function assertCanonical(Word $source, Word $expected): void
+    private function assertCanonical(Word $source, ?Word $expected = null, ?User $user = null): void
     {
-        $actual = $source->canonicalPlayableAgainst($this->user);
+        $actual = $source->canonicalPlayableAgainst($user);
 
-        $this->assertTrue(
-            $expected->equals($actual)
-        );
+        if ($expected === null) {
+            $this->assertNull($actual);
+        } else {
+            $this->assertTrue(
+                $expected->equals($actual)
+            );
+        }
     }
 }

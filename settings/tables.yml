@@ -8,6 +8,7 @@ associations:
 
 association_feedbacks:
   api: read
+  server_side: true
   sort: created_at
   reverse: true
   has: [created_at, created_by, updated_at]
@@ -15,6 +16,7 @@ association_feedbacks:
 
 association_overrides:
   api: read
+  server_side: true
   sort: created_at
   reverse: true
   has: [created_at, created_by]
@@ -90,6 +92,7 @@ words:
 
 word_feedbacks:
   api: read
+  server_side: true
   sort: created_at
   reverse: true
   has: [created_at, created_by, updated_at]
@@ -97,6 +100,7 @@ word_feedbacks:
 
 word_overrides:
   api: read
+  server_side: true
   sort: created_at
   reverse: true
   has: [created_at, created_by]
@@ -107,6 +111,14 @@ word_relations:
   sort: created_at
   has: [created_at, created_by, updated_at, updated_by]
   generator: App\Generators\WordRelationGenerator
+
+word_relations_admin:
+  api: read_all
+  server_side: true
+  sort: created_at
+  reverse: true
+  has: [created_at, created_by, updated_at, updated_by]
+  generator: App\Generators\WordRelationAdminGenerator
 
 word_relation_types:
   api: read

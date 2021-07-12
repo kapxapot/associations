@@ -113,10 +113,19 @@ class AssociationRepository extends LanguageElementRepository implements Associa
                 ],
                 'second_word'
             )
+            ->join(
+                'users',
+                [
+                    $this->getTable() . '.created_by',
+                    '=',
+                    'user.id'
+                ],
+                'user'
+            )
             ->search(
                 mb_strtolower($filter),
-                '(first_word.word_bin like ? or second_word.word_bin like ?)',
-                2
+                '(first_word.word_bin like ? or second_word.word_bin like ? or user.login like ? or user.name like ?)',
+                4
             );
     }
 }
