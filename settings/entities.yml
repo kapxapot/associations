@@ -570,12 +570,12 @@ word_overrides:
       name: Слово
       template: >
         '<a href="' + row.word.url + '">' + row.word.word + '</a>'
-      attributes: [readonly, searchable, no_sort]
+      attributes: [readonly, no_sort]
 
     original_word:
       name: Оригинал
       template: >
-        row.word.original_word ? row.word.original_word : ''
+        row.original_word ? row.original_word : ''
       attributes: [readonly, searchable, no_sort]
 
     approved:
