@@ -268,6 +268,7 @@ abstract class AbstractAnswerer
     {
         return $request->hasAny(
             'было',
+            'далее',
             'дальше',
             'другую',
             'заново',
