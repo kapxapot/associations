@@ -5,6 +5,11 @@ namespace App\Specifications;
 use App\Config\Interfaces\AssociationConfigInterface;
 use App\Models\Association;
 use App\Models\Word;
+use App\Specifications\Rules\AbstractRule;
+use App\Specifications\Rules\Association\AssociationDisabledByOverride;
+use App\Specifications\Rules\Association\AssociationDisabledByWords;
+use App\Specifications\Rules\Association\AssociationDisabledByWordsRelation;
+use Plasticode\Collections\Generic\Collection;
 
 class AssociationSpecification
 {
@@ -22,29 +27,14 @@ class AssociationSpecification
 
     public function isDisabled(Association $association): bool
     {
-        return $this->isDisabledByWords($association)
-            || $this->isDisabledByOverride($association)
-            || $this->isDisabledByRelations($association);
-    }
-
-    private function isDisabledByWords(Association $association): bool
-    {
-        return $association->words()->any(
-            fn (Word $w) => $w->isDisabled()
+        $rules = Collection::collect(
+            new AssociationDisabledByOverride(),
+            new AssociationDisabledByWords(),
+            new AssociationDisabledByWordsRelation()
         );
-    }
 
-    private function isDisabledByOverride(Association $association): bool
-    {
-        return $association->hasOverride()
-            ? $association->override()->isDisabled()
-            : false;
-    }
-
-    private function isDisabledByRelations(Association $association): bool
-    {
-        return $association->firstWord()->isCanonicallyRelatedTo(
-            $association->secondWord()
+        return $rules->anyFirst(
+            fn (AbstractRule $r) => $r->check($association)
         );
     }
 
