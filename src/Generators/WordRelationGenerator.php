@@ -81,12 +81,8 @@ class WordRelationGenerator extends ChangingEntityGenerator
 
         if ($word !== null) {
             $rules['main_word'] =
-                Validator::mainWordExists(
-                    $this->wordRepository,
-                    $this->languageService,
-                    $word->language(),
-                    $word
-                );
+                Validator::mainWordExists($this->languageService, $word)
+                    ->mainWordNonRecursive($this->languageService, $word);
         }
 
         return $rules;
@@ -130,10 +126,7 @@ class WordRelationGenerator extends ChangingEntityGenerator
         $word = $this->wordRepository->get($wordId);
         $language = $word->language();
 
-        $mainWord = $this->wordRepository->findInLanguage(
-            $language,
-            $this->languageService->normalizeWord($language, $data['main_word'])
-        );
+        $mainWord = $this->languageService->findWord($language, $data['main_word']);
 
         $data['main_word_id'] = $mainWord->getId();
 

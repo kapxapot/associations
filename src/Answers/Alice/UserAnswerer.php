@@ -9,7 +9,6 @@ use App\Models\DTO\AliceResponse;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\Word;
-use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Semantics\Tokenizer;
 use App\Services\AssociationFeedbackService;
 use App\Services\GameService;
@@ -40,7 +39,6 @@ class UserAnswerer extends AbstractAnswerer
     private Tokenizer $tokenizer;
 
     public function __construct(
-        WordRepositoryInterface $wordRepository,
         AssociationFeedbackService $associationFeedbackService,
         GameService $gameService,
         LanguageService $languageService,
@@ -50,7 +48,7 @@ class UserAnswerer extends AbstractAnswerer
         LoggerInterface $logger
     )
     {
-        parent::__construct($wordRepository, $languageService);
+        parent::__construct($languageService);
 
         $this->associationFeedbackService = $associationFeedbackService;
         $this->gameService = $gameService;
@@ -120,7 +118,7 @@ class UserAnswerer extends AbstractAnswerer
             return $this->wordDislikeFeedback($aliceUser);
         }
 
-        if ($request->isAny('плохая ассоциация', 'не нравится ассоциация')) {
+        if ($request->isAny('плохая ассоциация', 'плохой ассоциация', 'не нравится ассоциация')) {
             return $this->associationDislikeFeedback($aliceUser);
         }
 

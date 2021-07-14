@@ -470,6 +470,39 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             : $this;
     }
 
+    /**
+     * Checks if the current word belongs to transitive main words of
+     * the `$other` word.
+     * 
+     * If it belongs, the `$other` can't be added as a main word for the current word,
+     * because it will create a cycle.
+     * 
+     * In case when `$this === $other`, returns `true` as well, because a word
+     * mustn't be main to itself.
+     */
+    public function isTransitiveMainOf(Word $other): bool
+    {
+        return $other
+            ->mainChain()
+            ->add($other)
+            ->contains($this);
+    }
+
+    /**
+     * Returns the chain of `main()` words of the current word.
+     *
+     * @return WordCollection
+     */
+    public function mainChain(?Word $stopper = null): WordCollection
+    {
+        return ($this->hasMain() && !$this->equals($stopper))
+            ? WordCollection::collect($this->main())
+                ->concat(
+                    $this->main()->mainChain($stopper ?? $this)
+                )
+            : WordCollection::empty();
+    }
+
     public function hasMain(): bool
     {
         return $this->main() !== null;

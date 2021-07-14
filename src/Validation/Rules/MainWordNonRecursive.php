@@ -6,7 +6,7 @@ use App\Models\Word;
 use App\Services\LanguageService;
 use Respect\Validation\Rules\AbstractRule;
 
-class MainWordExists extends AbstractRule
+class MainWordNonRecursive extends AbstractRule
 {
     private LanguageService $languageService;
 
@@ -33,6 +33,7 @@ class MainWordExists extends AbstractRule
             $input
         );
 
-        return $mainWord && !$mainWord->equals($this->dependentWord);
+        return $mainWord === null
+            || !$this->dependentWord->isTransitiveMainOf($mainWord);
     }
 }

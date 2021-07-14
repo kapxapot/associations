@@ -142,7 +142,7 @@ class WordFeedbackService
         if (($data['typo'] ?? null) !== null) {
             $typoRule = $this->wordService->getRule();
 
-            if ($word) {
+            if ($word !== null) {
                 $typoRule = $typoRule->wordTypoNotEqualsWord(
                     $this->languageService,
                     $word
@@ -152,14 +152,8 @@ class WordFeedbackService
             $result['typo'] = $typoRule;
         }
 
-        if (($data['duplicate'] ?? null) !== null && $word) {
-            $result['duplicate'] =
-                Validator::mainWordExists(
-                    $this->wordRepository,
-                    $this->languageService,
-                    $word->language(),
-                    $word
-                );
+        if (($data['duplicate'] ?? null) !== null && $word !== null) {
+            $result['duplicate'] = Validator::mainWordExists($this->languageService, $word);
         }
 
         return $result;

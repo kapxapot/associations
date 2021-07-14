@@ -6,7 +6,6 @@ use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Services\WordService;
-use Plasticode\Auth\Access;
 use Plasticode\Core\Request;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
@@ -120,9 +119,7 @@ class GameController extends Controller
 
         $language ??= $this->languageService->getDefaultLanguage();
 
-        $wordStr = $this->languageService->normalizeWord($language, $wordStr);
-
-        $word = $this->wordRepository->findInLanguage($language, $wordStr);
+        $word = $this->languageService->findWord($language, $wordStr);
 
         $prevWord = ($prevWordId > 0)
             ? $this->wordRepository->get($prevWordId)

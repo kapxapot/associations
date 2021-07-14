@@ -34,7 +34,7 @@ class LanguageService
         $this->wordService = $wordService;
     }
 
-    public function getDefaultLanguage() : Language
+    public function getDefaultLanguage(): Language
     {
         $defaultId = $this->settingsProvider
             ->get('languages.default_id');
@@ -49,7 +49,14 @@ class LanguageService
         return $language;
     }
 
-    public function getCurrentLanguageFor(?User $user) : Language
+    public function findWord(Language $language, ?string $wordStr): ?Word
+    {
+        $wordStr = $this->normalizeWord($language, $wordStr);
+
+        return $this->wordRepository->findInLanguage($language, $wordStr);
+    }
+
+    public function getCurrentLanguageFor(?User $user): Language
     {
         $game = $user
             ? $user->currentGame() ?? $user->lastGame()
@@ -63,7 +70,7 @@ class LanguageService
     public function getRandomPublicWord(
         ?Language $language = null,
         ?Word $exceptWord = null
-    ) : ?Word
+    ): ?Word
     {
         return $this->getRandomWordFor(null, $language, $exceptWord);
     }
@@ -75,7 +82,7 @@ class LanguageService
         ?User $user,
         ?Language $language = null,
         ?Word $exceptWord = null
-    ) : ?Word
+    ): ?Word
     {
         // get common words
         $words = $this->wordRepository->getAllApproved($language);

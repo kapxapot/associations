@@ -6,7 +6,6 @@ use App\Models\DTO\AliceRequest;
 use App\Models\DTO\AliceResponse;
 use App\Models\Language;
 use App\Models\Word;
-use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\LanguageService;
 use Plasticode\Collections\Generic\StringCollection;
 use Plasticode\Util\Text;
@@ -52,15 +51,12 @@ abstract class AbstractAnswerer
     protected const MESSAGE_ERROR = 'Что-то пошло не так';
     protected const MESSAGE_CONTINUE = 'Продолжаем. Мое слово:';
 
-    protected WordRepositoryInterface $wordRepository;
     protected LanguageService $languageService;
 
     public function __construct(
-        WordRepositoryInterface $wordRepository,
         LanguageService $languageService
     )
     {
-        $this->wordRepository = $wordRepository;
         $this->languageService = $languageService;
     }
 
@@ -340,9 +336,8 @@ abstract class AbstractAnswerer
     protected function findWord(?string $wordStr): ?Word
     {
         $language = $this->getLanguage();
-        $wordStr = $this->languageService->normalizeWord($language, $wordStr);
 
-        return $this->wordRepository->findInLanguage($language, $wordStr);
+        return $this->languageService->findWord($language, $wordStr);
     }
 
     /**

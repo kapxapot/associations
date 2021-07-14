@@ -6,11 +6,25 @@ use App\Models\DTO\AliceRequest;
 use App\Models\DTO\AliceResponse;
 use App\Models\DTO\MetaTurn;
 use App\Models\Word;
+use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\LanguageService;
 use Plasticode\Semantics\Sentence;
 
 class ApplicationAnswerer extends AbstractAnswerer
 {
     protected const VAR_PREV_WORD = 'prev_word_id';
+
+    private WordRepositoryInterface $wordRepository;
+
+    public function __construct(
+        WordRepositoryInterface $wordRepository,
+        LanguageService $languageService
+    )
+    {
+        parent::__construct($languageService);
+
+        $this->wordRepository = $wordRepository;
+    }
 
     public function getResponse(AliceRequest $request): AliceResponse
     {
