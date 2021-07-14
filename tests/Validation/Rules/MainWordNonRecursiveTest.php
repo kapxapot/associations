@@ -2,42 +2,16 @@
 
 namespace App\Tests\Validation\Rules;
 
-use App\Hydrators\GameHydrator;
-use App\Hydrators\TurnHydrator;
 use App\Models\Language;
 use App\Models\Word;
-use App\Parsing\DefinitionParser;
-use App\Repositories\Interfaces\GameRepositoryInterface;
-use App\Repositories\Interfaces\TurnRepositoryInterface;
+use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Services\CasesService;
 use App\Services\LanguageService;
-use App\Services\WordService;
-use App\Testing\Factories\LanguageRepositoryFactory;
-use App\Testing\Factories\UserRepositoryFactory;
-use App\Testing\Factories\WordRepositoryFactory;
-use App\Testing\Mocks\Config\WordConfigMock;
-use App\Testing\Mocks\LinkerMock;
-use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
-use App\Testing\Mocks\Repositories\GameRepositoryMock;
-use App\Testing\Mocks\Repositories\TurnRepositoryMock;
+use App\Tests\WiredTest;
 use App\Validation\Rules\MainWordNonRecursive;
-use PHPUnit\Framework\TestCase;
-use Plasticode\Events\EventDispatcher;
-use Plasticode\ObjectProxy;
-use Plasticode\Settings\SettingsProvider;
-use Plasticode\Util\Cases;
-use Plasticode\Validation\ValidationRules;
-use Plasticode\Validation\Validator;
 
-final class MainWordNonRecursiveTest extends TestCase
+final class MainWordNonRecursiveTest extends WiredTest
 {
-    private GameRepositoryInterface $gameRepository;
-    private TurnRepositoryInterface $turnRepository;
-    private WordRepositoryInterface $wordRepository;
-
-    private LanguageService $languageService;
-
     private Language $language;
 
     private Word $word1;
@@ -49,79 +23,24 @@ final class MainWordNonRecursiveTest extends TestCase
     {
         parent::setUp();
 
-        $languageRepository = LanguageRepositoryFactory::make();
-        $associationRepository = new AssociationRepositoryMock();
+        /** @var LanguageRepositoryInterface $languageRepository */
+        $languageRepository = $this->get(LanguageRepositoryInterface::class);
 
-        $this->wordRepository = WordRepositoryFactory::make(
-            $languageRepository
-        );
-
-        $userRepository = UserRepositoryFactory::make();
-
-        $this->turnRepository = new TurnRepositoryMock(
-            new ObjectProxy(
-                fn () => new TurnHydrator(
-                    $associationRepository,
-                    $this->gameRepository,
-                    $this->turnRepository,
-                    $userRepository,
-                    $this->wordRepository
-                )
-            )
-        );
-
-        $this->gameRepository = new GameRepositoryMock(
-            new ObjectProxy(
-                fn () => new GameHydrator(
-                    $languageRepository,
-                    $this->turnRepository,
-                    $userRepository,
-                    new LinkerMock()
-                )
-            )
-        );
-
-        $casesService = new CasesService(
-            new Cases()
-        );
-
-        $validator = new Validator();
-
-        $settingsProvider = new SettingsProvider(); // dummy
-        $eventDispatcher = new EventDispatcher();
-
-        $wordService = new WordService(
-            $this->turnRepository,
-            $this->wordRepository,
-            $casesService,
-            $validator,
-            new ValidationRules($settingsProvider),
-            new WordConfigMock(),
-            $eventDispatcher,
-            new DefinitionParser()
-        );
-
-        $this->languageService = new LanguageService(
-            $languageRepository,
-            $this->wordRepository,
-            $settingsProvider,
-            $wordService
-        );
-
-        // init words
+        /** @var WordRepositoryInterface $wordRepository */
+        $wordRepository = $this->get(WordRepositoryInterface::class);
 
         $this->language = $languageRepository->get(Language::RUSSIAN);
 
-        $this->word1 = $this->wordRepository->store(['word' => 'word1']);
+        $this->word1 = $wordRepository->store(['word' => 'word1']);
         $this->word1->withLanguage($this->language);
 
-        $this->word2 = $this->wordRepository->store(['word' => 'word2']);
+        $this->word2 = $wordRepository->store(['word' => 'word2']);
         $this->word2->withLanguage($this->language);
 
-        $this->word3 = $this->wordRepository->store(['word' => 'word3']);
+        $this->word3 = $wordRepository->store(['word' => 'word3']);
         $this->word3->withLanguage($this->language);
 
-        $this->mainWord = $this->wordRepository->store(['word' => 'main word']);
+        $this->mainWord = $wordRepository->store(['word' => 'main word']);
         $this->mainWord->withLanguage($this->language);
 
         $this->word1->withMain($this->word2);
@@ -138,12 +57,6 @@ final class MainWordNonRecursiveTest extends TestCase
 
         unset($this->language);
 
-        unset($this->languageService);
-
-        unset($this->gameRepository);
-        unset($this->turnRepository);
-        unset($this->wordRepository);
-
         parent::tearDown();
     }
 
@@ -154,12 +67,15 @@ final class MainWordNonRecursiveTest extends TestCase
         bool $expected
     ): void
     {
-        $dependentWord = $this->languageService->findWord(
+        /** @var LanguageService $languageService */
+        $languageService = $this->get(LanguageService::class);
+
+        $dependentWord = $languageService->findWord(
             $this->language,
             $dependentWordStr
         );
 
-        $rule = new MainWordNonRecursive($this->languageService, $dependentWord);
+        $rule = new MainWordNonRecursive($languageService, $dependentWord);
 
         $this->assertEquals($expected, $rule->validate($mainWordStr));
     }

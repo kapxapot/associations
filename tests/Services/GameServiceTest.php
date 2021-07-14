@@ -3,170 +3,62 @@
 namespace App\Tests\Services;
 
 use App\Collections\WordCollection;
-use App\Hydrators\GameHydrator;
-use App\Hydrators\TurnHydrator;
+use App\Models\Language;
 use App\Models\Word;
-use App\Parsing\DefinitionParser;
 use App\Policies\UserPolicy;
-use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Services\AssociationService;
-use App\Services\CasesService;
 use App\Services\GameService;
-use App\Services\LanguageService;
-use App\Services\TurnService;
-use App\Services\WordService;
-use App\Testing\Factories\LanguageRepositoryFactory;
-use App\Testing\Factories\UserRepositoryFactory;
-use App\Testing\Factories\WordRepositoryFactory;
-use App\Testing\Mocks\Config\WordConfigMock;
-use App\Testing\Mocks\LinkerMock;
-use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
-use App\Testing\Mocks\Repositories\GameRepositoryMock;
-use App\Testing\Mocks\Repositories\TurnRepositoryMock;
-use PHPUnit\Framework\TestCase;
-use Plasticode\Events\EventDispatcher;
-use Plasticode\ObjectProxy;
-use Plasticode\Settings\SettingsProvider;
-use Plasticode\Util\Cases;
-use Plasticode\Validation\ValidationRules;
-use Plasticode\Validation\Validator;
+use App\Tests\WiredTest;
 
-class GameServiceTest extends TestCase
+final class GameServiceTest extends WiredTest
 {
-    private AssociationRepositoryInterface $associationRepository;
-    private GameRepositoryInterface $gameRepository;
-    private LanguageRepositoryInterface $languageRepository;
-    private TurnRepositoryInterface $turnRepository;
-    private UserRepositoryInterface $userRepository;
-    private WordRepositoryInterface $wordRepository;
-
-    public function setUp() : void
-    {
-        parent::setUp();
-
-        $this->languageRepository = LanguageRepositoryFactory::make();
-        $this->associationRepository = new AssociationRepositoryMock();
-
-        $this->wordRepository = WordRepositoryFactory::make(
-            $this->languageRepository
-        );
-
-        $this->userRepository = UserRepositoryFactory::make();
-
-        $this->turnRepository = new TurnRepositoryMock(
-            new ObjectProxy(
-                fn () => new TurnHydrator(
-                    $this->associationRepository,
-                    $this->gameRepository,
-                    $this->turnRepository,
-                    $this->userRepository,
-                    $this->wordRepository
-                )
-            )
-        );
-
-        $this->gameRepository = new GameRepositoryMock(
-            new ObjectProxy(
-                fn () => new GameHydrator(
-                    $this->languageRepository,
-                    $this->turnRepository,
-                    $this->userRepository,
-                    new LinkerMock()
-                )
-            )
-        );
-    }
-
-    public function tearDown() : void
-    {
-        parent::tearDown();
-
-        unset($this->gameRepository);
-        unset($this->turnRepository);
-        unset($this->userRepository);
-        unset($this->wordRepository);
-        unset($this->associationRepository);
-        unset($this->languageRepository);
-    }
-
     /**
      * The new game must be populated with AI turn on start
      * if there are any approved words in the language.
      */
-    public function testNewGame() : void
+    public function testNewGame(): void
     {
-        $casesService = new CasesService(
-            new Cases()
-        );
+        /** @var GameRepositoryInterface $gameRepository */
+        $gameRepository = $this->get(GameRepositoryInterface::class);
 
-        $validator = new Validator();
+        /** @var LanguageRepositoryInterface $languageRepository */
+        $languageRepository = $this->get(LanguageRepositoryInterface::class);
 
-        $settingsProvider = new SettingsProvider(); // dummy
-        $eventDispatcher = new EventDispatcher();
+        /** @var TurnRepositoryInterface $turnRepository */
+        $turnRepository = $this->get(TurnRepositoryInterface::class);
 
-        $wordService = new WordService(
-            $this->turnRepository,
-            $this->wordRepository,
-            $casesService,
-            $validator,
-            new ValidationRules($settingsProvider),
-            new WordConfigMock(),
-            $eventDispatcher,
-            new DefinitionParser()
-        );
+        /** @var UserRepositoryInterface $userRepository */
+        $userRepository = $this->get(UserRepositoryInterface::class);
 
-        $languageService = new LanguageService(
-            $this->languageRepository,
-            $this->wordRepository,
-            $settingsProvider,
-            $wordService
-        );
+        /** @var WordRepositoryInterface $wordRepository */
+        $wordRepository = $this->get(WordRepositoryInterface::class);
 
-        $associationService = new AssociationService(
-            $this->associationRepository,
-            $eventDispatcher
-        );
+        /** @var GameService $gameService */
+        $gameService = $this->get(GameService::class);
 
-        $turnService = new TurnService(
-            $this->gameRepository,
-            $this->turnRepository,
-            $this->wordRepository,
-            $associationService,
-            $eventDispatcher
-        );
+        // meat
 
-        $gameService = new GameService(
-            $this->gameRepository,
-            $languageService,
-            $turnService,
-            $wordService
-        );
+        $language = $languageRepository->get(Language::RUSSIAN);
 
-        // the meat
-        $language = $this->languageRepository->get(1);
-        $user = $this->userRepository->get(1);
+        $user = $userRepository->get(1);
 
         $user->withPolicy(new UserPolicy());
 
         // save game count to compare later
-        $gameCountFunc = fn () => $this->gameRepository->getCountByLanguage($language);
+        $gameCountFunc = fn () => $gameRepository->getCountByLanguage($language);
         $gameCount = $gameCountFunc();
 
         // save turn count to compare later
-        $turnCountFunc = fn () => $this->turnRepository->getCountByLanguage($language);
+        $turnCountFunc = fn () => $turnRepository->getCountByLanguage($language);
         $turnCount = $turnCountFunc();
 
         // ensure that there are approved words
-        $this->assertGreaterThan(
-            0,
-            $this->wordRepository
-                ->getAllApproved($language)
-                ->any()
+        $this->assertTrue(
+            $wordRepository->getAllApproved($language)->anyFirst()
         );
 
         // the test
@@ -196,7 +88,7 @@ class GameServiceTest extends TestCase
         $this->assertNotNull($firstTurn);
 
         $firstTurnWord = $firstTurn->word();
-        $word1 = $this->wordRepository->get(1); // стол (approved)
+        $word1 = $wordRepository->get(1); // стол (approved)
 
         $this->assertTrue(
             $firstTurnWord->equals($word1)
@@ -207,12 +99,12 @@ class GameServiceTest extends TestCase
         );
 
         // find answer
-        /** @var Word */
+        /** @var Word $answer */
         $answer =
             WordCollection::collect(
                 $word1,
-                $this->wordRepository->get(2),
-                $this->wordRepository->get(3)
+                $wordRepository->get(2),
+                $wordRepository->get(3)
             )
             ->where(
                 fn (Word $w) => !$game->containsWord($w)

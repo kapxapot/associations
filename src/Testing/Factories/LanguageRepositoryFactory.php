@@ -14,4 +14,9 @@ class LanguageRepositoryFactory
             new LanguageSeeder()
         );
     }
+
+    public function __invoke(): LanguageRepositoryInterface
+    {
+        return self::make();
+    }
 }

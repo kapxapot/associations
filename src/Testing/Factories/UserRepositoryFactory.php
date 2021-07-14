@@ -8,10 +8,15 @@ use App\Testing\Seeders\UserSeeder;
 
 class UserRepositoryFactory
 {
-    public static function make() : UserRepositoryInterface
+    public static function make(): UserRepositoryInterface
     {
         return new UserRepositoryMock(
             new UserSeeder()
         );
+    }
+
+    public function __invoke(): UserRepositoryInterface
+    {
+        return self::make();
     }
 }

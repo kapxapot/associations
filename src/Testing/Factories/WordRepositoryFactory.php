@@ -21,4 +21,11 @@ class WordRepositoryFactory
             )
         );
     }
+
+    public function __invoke(
+        LanguageRepositoryInterface $languageRepository
+    ): WordRepositoryInterface
+    {
+        return self::make($languageRepository);
+    }
 }
