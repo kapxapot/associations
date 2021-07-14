@@ -78,6 +78,8 @@ class LocalizationConfig extends BaseConfig
                 'Word "%s" is already used in the game.' => 'Слово "%s" уже использовано в игре.',
                 'Related word "%s" is already used in the game.' => 'Связанное слово "%s" уже использовано в игре.',
                 'Related word "%s" is recently used in the game.' => 'Связанное слово "%s" недавно использовано в игре.',
+
+                'Main word creates recursion.' => 'Главное слово создает рекурсию.',
             ]
         );
     }
