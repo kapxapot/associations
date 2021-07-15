@@ -86,7 +86,9 @@ class Controller extends BaseController
 
         $params['parts_of_speech'] = PartOfSpeech::known();
 
-        return parent::buildParams(['params' => $params]);
+        $settings['params'] = $params;
+
+        return parent::buildParams($settings);
     }
 
     /**
