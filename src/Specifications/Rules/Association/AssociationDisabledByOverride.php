@@ -11,8 +11,6 @@ class AssociationDisabledByOverride extends AbstractAssociationRule
 {
     public function checkAssociation(Association $association): bool
     {
-        return $association->hasOverride()
-            ? $association->override()->isDisabled()
-            : false;
+        return $association->disabledOverride() ?? false;
     }
 }
