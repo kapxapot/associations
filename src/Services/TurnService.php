@@ -3,11 +3,13 @@
 namespace App\Services;
 
 use App\Collections\TurnCollection;
+use App\Collections\WordCollection;
 use App\Events\Turn\TurnCreatedEvent;
 use App\Exceptions\DuplicateWordException;
 use App\Exceptions\RecentRelatedWordException;
 use App\Exceptions\StronglyRelatedWordException;
 use App\Exceptions\TurnException;
+use App\Models\DTO\GameOptions;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\User;
@@ -220,18 +222,44 @@ class TurnService
 
     public function findAnswer(Turn $turn): ?Word
     {
+        // first, we try to find a classic approved association
+
+        /** @var Word|null $goodWord */
+        $goodWord = $this->tryFindAnswers($turn)->random();
+
+        if ($goodWord !== null) {
+            return $goodWord;
+        }
+
+        // now we try to check unapproved associations
+
+        $options = new GameOptions();
+        $options->allowNotApprovedElements = true;
+
+        return $this
+            ->tryFindAnswers($turn, $options)
+            ->where(
+                fn (Word $w) => $w->isPlayableAgainst($turn->user())
+            )
+            ->random();
+    }
+
+    private function tryFindAnswers(Turn $turn, GameOptions $options = null): WordCollection
+    {
         $game = $turn->game();
         $user = $turn->user();
 
         return $turn
             ->word()
-            ->associatedWordsFor($user)
+            ->associatedWordsFor($user, $options)
             ->where(
                 fn (Word $w) => $this->canBePlayed($game, $w)
-            )
-            ->random();
+            );
     }
 
+    /**
+     * Exception wrapper for game context checks.
+     */
     private function canBePlayed(Game $game, Word $word): bool
     {
         try {
@@ -244,6 +272,8 @@ class TurnService
     }
 
     /**
+     * Game context checks.
+     * 
      * @throws TurnException
      */
     private function throwIfCantBePlayed(Game $game, Word $word): void

@@ -9,6 +9,7 @@ use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
 use App\Collections\WordOverrideCollection;
 use App\Collections\WordRelationCollection;
+use App\Models\DTO\GameOptions;
 use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
@@ -267,12 +268,15 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             : $chain;
     }
 
-    public function associatedWordsFor(User $user): WordCollection
+    public function associatedWordsFor(
+        User $user,
+        ?GameOptions $options = null
+    ): WordCollection
     {
         return WordCollection::from(
             $this
                 ->associations()
-                ->playableAgainst($user)
+                ->playableAgainst($user, $options)
                 ->map(
                     fn (Association $a) => $a->otherWord($this)
                 )

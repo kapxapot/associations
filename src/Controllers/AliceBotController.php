@@ -4,8 +4,8 @@ namespace App\Controllers;
 
 use App\Answers\Alice\ApplicationAnswerer;
 use App\Answers\Alice\UserAnswerer;
-use App\Models\DTO\AliceRequest;
-use App\Models\DTO\AliceResponse;
+use App\Bots\Alice\AliceRequest;
+use App\Bots\Alice\AliceResponse;
 use App\Services\AliceUserService;
 use Exception;
 use Plasticode\Core\Response;

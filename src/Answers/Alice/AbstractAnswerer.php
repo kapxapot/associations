@@ -2,8 +2,8 @@
 
 namespace App\Answers\Alice;
 
-use App\Models\DTO\AliceRequest;
-use App\Models\DTO\AliceResponse;
+use App\Bots\Alice\AliceRequest;
+use App\Bots\Alice\AliceResponse;
 use App\Models\Language;
 use App\Models\Word;
 use App\Services\LanguageService;
@@ -68,7 +68,7 @@ abstract class AbstractAnswerer
     protected function renderWord(?Word $word): string
     {
         return $word !== null
-            ? $word->word
+            ? mb_strtoupper($word->word)
             : 'У меня нет слов';
     }
 

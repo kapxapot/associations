@@ -2,10 +2,10 @@
 
 namespace App\Answers\Alice;
 
+use App\Bots\Alice\AliceRequest;
+use App\Bots\Alice\AliceResponse;
 use App\Exceptions\TurnException;
 use App\Models\AliceUser;
-use App\Models\DTO\AliceRequest;
-use App\Models\DTO\AliceResponse;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\Word;

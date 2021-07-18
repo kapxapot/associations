@@ -10,6 +10,7 @@ use App\Controllers\JobController;
 use App\Controllers\LanguageController;
 use App\Controllers\NewsController;
 use App\Controllers\PageController;
+use App\Controllers\SberBotController;
 use App\Controllers\SearchController;
 use App\Controllers\TagController;
 use App\Controllers\TelegramBotController;
@@ -280,6 +281,15 @@ $app->group(
             $this->post(
                 '/bots/alice/' . $aliceBotSecret,
                 AliceBotController::class
+            );
+        }
+
+        $sberBotSecret = $settingsProvider->get('sber.bot_secret');
+
+        if (strlen($sberBotSecret) > 0) {
+            $this->post(
+                '/bots/sber/' . $sberBotSecret,
+                SberBotController::class
             );
         }
 

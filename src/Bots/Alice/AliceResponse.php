@@ -1,18 +1,14 @@
 <?php
 
-namespace App\Models\DTO;
+namespace App\Bots\Alice;
 
-class AliceResponse
+use App\Bots\AbstractResponse;
+
+class AliceResponse extends AbstractResponse
 {
-    public ?string $text;
     public bool $endSession = false;
     public ?array $userState = null;
     public ?array $applicationState = null;
-
-    public function __construct(?string $text)
-    {
-        $this->text = $text;
-    }
 
     /**
      * @return $this

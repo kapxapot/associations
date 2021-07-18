@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Collections\FeedbackCollection;
 use App\Collections\OverrideCollection;
 use App\Collections\TurnCollection;
+use App\Models\DTO\GameOptions;
 use App\Models\Traits\Created;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedInterface;
@@ -103,7 +104,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         // 2.1. visible only for those who used them
 
         if ($this->isDisabled()) {
-            return $user && $this->isUsedBy($user);
+            return $this->isUsedBy($user);
         }
 
         return
@@ -117,20 +118,22 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
     /**
      * Is visible for all (public) and is approved.
      */
-    public function isPlayableAgainstAll(): bool
+    public function isPlayableAgainstAll(?GameOptions $options = null): bool
     {
-        return $this->isPlayableAgainst(null);
+        return $this->isPlayableAgainst(null, $options);
     }
 
-    public function isPlayableAgainst(?User $user): bool
+    public function isPlayableAgainst(?User $user, ?GameOptions $options = null): bool
     {
         // element can't be played against user, if
         //
         // 1. element is mature, user is not mature (maturity check)
         // 2. element is not approved, user disliked it
 
+        $allowNotApproved = $options && $options->allowNotApprovedElements;
+
         return $this->isVisibleFor($user)
-            && ($this->isApproved() || $this->isUsedBy($user))
+            && ($allowNotApproved || $this->isApproved() || $this->isUsedBy($user))
             && !$this->isDislikedBy($user);
     }
 

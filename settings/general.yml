@@ -83,6 +83,10 @@ alice:
   bot_secret: {ALICE_BOT_SECRET}
   bot_log: {DEBUG}
 
+sber:
+  bot_secret: {SBER_BOT_SECRET}
+  bot_log: {DEBUG}
+
 jobs:
   secret: {JOBS_SECRET}
   update_associations:

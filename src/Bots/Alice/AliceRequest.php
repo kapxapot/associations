@@ -1,18 +1,14 @@
 <?php
 
-namespace App\Models\DTO;
+namespace App\Bots\Alice;
 
-use App\Semantics\Tokenizer;
+use App\Bots\AbstractRequest;
 
-class AliceRequest
+class AliceRequest extends AbstractRequest
 {
     private const TRASH_TOKENS = [
         'говорю', 'алиса', 'блядь', 'алис', 'сама', 'этот', 'это', 'так', 'ты', 'ой', 'да', 'ну', 'я', 'э', 'а', '-', '='
     ];
-
-    public const WILDCARD = '*';
-
-    private Tokenizer $tokenizer;
 
     private ?string $originalCommand;
     private ?string $originalUtterance;
@@ -27,9 +23,6 @@ class AliceRequest
 
     private bool $isNewSession;
 
-    private ?string $userId;
-    private string $applicationId;
-
     private ?array $userState;
     private ?array $applicationState;
 
@@ -38,7 +31,7 @@ class AliceRequest
 
     public function __construct(array $data)
     {
-        $this->tokenizer = new Tokenizer();
+        parent::__construct();
 
         $this->originalCommand = $data['request']['command'] ?? null;
         $this->originalUtterance = $data['request']['original_utterance'] ?? null;
@@ -114,21 +107,6 @@ class AliceRequest
     public function isNewSession(): bool
     {
         return $this->isNewSession;
-    }
-
-    public function hasUser(): bool
-    {
-        return $this->userId !== null;
-    }
-
-    public function userId(): ?string
-    {
-        return $this->userId;
-    }
-
-    public function applicationId(): string
-    {
-        return $this->applicationId;
     }
 
     public function userState(): ?array
@@ -223,47 +201,5 @@ class AliceRequest
         }
 
         return false;
-    }
-
-    /**
-     * Checks if the request matches patterns such as "что такое *" and returns words
-     * matched by asterisks.
-     *
-     * @return string[]|null
-     */
-    public function matches(string $pattern): ?array
-    {
-        return $this->matchesTokens($pattern, $this->tokens)
-            ?? $this->matchesTokens($pattern, $this->originalTokens);
-    }
-
-    /**
-     * @param string[] $tokens
-     * @return string[]|null
-     */
-    private function matchesTokens(string $pattern, array $tokens): ?array
-    {
-        $patternTokens = $this->tokenizer->tokenize($pattern);
-
-        if (count($tokens) !== count($patternTokens)) {
-            return null;
-        }
-
-        $matches = [];
-
-        for ($i = 0; $i < count($patternTokens); $i++) {
-            $token = $patternTokens[$i];
-
-            if ($token === self::WILDCARD) {
-                $matches[] = $tokens[$i];
-                continue;
-            }
-
-            if ($token !== $tokens[$i]) {
-                return null;
-            }
-        }
-
-        return $matches;
     }
 }
