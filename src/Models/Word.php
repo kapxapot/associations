@@ -111,21 +111,12 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     public function randomPublicAssociation(?self $excludeOtherWord = null): ?Association
     {
         return $this
-            ->publicAssociations()
+            ->approvedAssociations()
+            ->visible()
             ->where(
                 fn (Association $a) => !$a->otherWord($this)->equals($excludeOtherWord)
             )
             ->random();
-    }
-
-    /**
-     * Returns approved associations that are visible for everyone (public).
-     */
-    public function publicAssociations(): AssociationCollection
-    {
-        return $this
-            ->approvedAssociations()
-            ->visible();
     }
 
     /**
