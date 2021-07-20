@@ -28,7 +28,7 @@ class SberRequest extends AbstractBotRequest
         $this->uuid = $data['uuid'] ?? [];
 
         $this->applicationId = $this->uuid['userId'] ?? null;
-        $this->userId = /*$this->uuid['sub'] ??*/ null;
+        $this->userId = $this->uuid['sub'] ?? null;
         $this->userChannel = $this->uuid['userChannel'] ?? null;
 
         $this->payload = $data['payload'] ?? [];
