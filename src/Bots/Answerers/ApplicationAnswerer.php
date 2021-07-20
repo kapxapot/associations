@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Answers\Alice;
+namespace App\Bots\Answerers;
 
-use App\Bots\Alice\AliceRequest;
-use App\Bots\Alice\AliceResponse;
+use App\Bots\AbstractBotRequest;
+use App\Bots\BotResponse;
 use App\Models\DTO\MetaTurn;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
@@ -26,7 +26,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         $this->wordRepository = $wordRepository;
     }
 
-    public function getResponse(AliceRequest $request): AliceResponse
+    public function getResponse(AbstractBotRequest $request): BotResponse
     {
         $question = $request->command();
         $isNewSession = $request->isNewSession();
@@ -67,7 +67,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         return $this->turnToAnswer($request, $turn);
     }
 
-    private function helpDialog(AliceRequest $request): AliceResponse
+    private function helpDialog(AbstractBotRequest $request): BotResponse
     {
         if ($this->isHelpRulesCommand($request)) {
             return $this
@@ -102,7 +102,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         );
     }
 
-    private function turnToAnswer(AliceRequest $request, MetaTurn $turn): AliceResponse
+    private function turnToAnswer(AbstractBotRequest $request, MetaTurn $turn): BotResponse
     {
         $questionWord = $turn->prevWord();
         $answerWord = $turn->word();
@@ -129,9 +129,9 @@ class ApplicationAnswerer extends AbstractAnswerer
     }
 
     private function answerWithAnyWord(
-        AliceRequest $request,
+        AbstractBotRequest $request,
         string ...$answerParts
-    ): AliceResponse
+    ): BotResponse
     {
         $word = $this->getAnyWord($request);
 
@@ -141,11 +141,11 @@ class ApplicationAnswerer extends AbstractAnswerer
     private function answerWithWord(
         ?Word $word,
         string ...$answerParts
-    ): AliceResponse
+    ): BotResponse
     {
         $answerParts[] = $this->renderWord($word);
 
-        $response = $this->buildResponse(...$answerParts);
+        $response = $this->buildResponse($answerParts);
 
         if ($word !== null) {
             $response->withApplicationVar(self::VAR_PREV_WORD, $word->getId());
@@ -169,7 +169,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         return new MetaTurn($answerAssociation, $answer, $word);
     }
 
-    private function getAnyWord(?AliceRequest $request = null): ?Word
+    private function getAnyWord(?AbstractBotRequest $request = null): ?Word
     {
         $language = $this->getLanguage();
 

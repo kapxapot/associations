@@ -2,10 +2,10 @@
 
 namespace App\Controllers;
 
-use App\Answers\Alice\ApplicationAnswerer;
-use App\Answers\Alice\UserAnswerer;
-use App\Bots\Alice\AliceRequest;
-use App\Bots\Alice\AliceResponse;
+use App\Bots\AliceRequest;
+use App\Bots\Answerers\ApplicationAnswerer;
+use App\Bots\Answerers\UserAnswerer;
+use App\Bots\BotResponse;
 use App\Services\AliceUserService;
 use Exception;
 use Plasticode\Core\Response;
@@ -74,7 +74,7 @@ class AliceBotController
         return Response::text($response, 'Error');
     }
 
-    private function getResponse(AliceRequest $request): AliceResponse
+    private function getResponse(AliceRequest $request): BotResponse
     {
         $aliceUser = $request->hasUser()
             ? $this->aliceUserService->getOrCreateAliceUser($request)
@@ -85,18 +85,18 @@ class AliceBotController
             : $this->userAnswerer->getResponse($request, $aliceUser);
     }
 
-    private function buildMessage(AliceResponse $response): array
+    private function buildMessage(BotResponse $response): array
     {
         $data = [
             'response' => [
-                'text' => $response->text,
-                'end_session' => $response->endSession,
+                'text' => $response->text(),
+                'end_session' => $response->endSession(),
             ],
             'version' => '1.0',
         ];
 
-        $data['user_state_update'] = $response->userState ?? new stdClass();
-        $data['application_state'] = $response->applicationState ?? new stdClass();
+        $data['user_state_update'] = $response->userState() ?? new stdClass();
+        $data['application_state'] = $response->applicationState() ?? new stdClass();
 
         return $data;
     }

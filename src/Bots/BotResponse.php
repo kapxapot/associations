@@ -1,14 +1,65 @@
 <?php
 
-namespace App\Bots\Alice;
+namespace App\Bots;
 
-use App\Bots\AbstractResponse;
+use Plasticode\Util\Text;
 
-class AliceResponse extends AbstractResponse
+class BotResponse
 {
-    public bool $endSession = false;
-    public ?array $userState = null;
-    public ?array $applicationState = null;
+    /** @var string[] */
+    protected array $lines;
+
+    protected string $text;
+
+    protected bool $endSession = false;
+
+    protected ?array $userState = null;
+    protected ?array $applicationState = null;
+
+    public function __construct(string ...$lines)
+    {
+        $this->lines = $lines;
+
+        $this->text = Text::join($lines, ' ');
+    }
+
+    /**
+     * @return string[]
+     */
+    public function lines(): array
+    {
+        return $this->lines;
+    }
+
+    public function text(): string
+    {
+        return $this->text;
+    }
+
+    public function endSession(): bool
+    {
+        return $this->endSession;
+    }
+
+    public function hasState(): bool
+    {
+        return !empty($this->state());
+    }
+
+    public function state(): ?array
+    {
+        return $this->userState() ?? $this->applicationState();
+    }
+
+    public function userState(): ?array
+    {
+        return $this->userState;
+    }
+
+    public function applicationState(): ?array
+    {
+        return $this->applicationState;
+    }
 
     /**
      * @return $this
@@ -24,7 +75,7 @@ class AliceResponse extends AbstractResponse
      * @param mixed $value
      * @return $this
      */
-    public function withVarBy(AliceRequest $request, string $name, $value): self
+    public function withVarBy(AbstractBotRequest $request, string $name, $value): self
     {
         return $request->hasUser()
             ? $this->withUserVar($name, $value)
@@ -34,7 +85,7 @@ class AliceResponse extends AbstractResponse
     /**
      * @return $this
      */
-    public function withStateFrom(AliceRequest $request): self
+    public function withStateFrom(AbstractBotRequest $request): self
     {
         return $request->hasUser()
             ? $this->withUserState($request->userState())

@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Answers\Alice;
+namespace App\Bots\Answerers;
 
-use App\Bots\Alice\AliceRequest;
-use App\Bots\Alice\AliceResponse;
+use App\Bots\AbstractBotRequest;
+use App\Bots\BotResponse;
 use App\Models\Language;
 use App\Models\Word;
 use App\Services\LanguageService;
 use Plasticode\Collections\Generic\StringCollection;
-use Plasticode\Util\Text;
 
 abstract class AbstractAnswerer
 {
@@ -38,9 +37,9 @@ abstract class AbstractAnswerer
 
     private const MESSAGE_RULES_COMMON = 'В игре в ассоциации мы с вами говорим по очереди слово, которое ассоциируется с предыдущим. Например, я говорю \'лес\', вы отвечаете \'заяц\', я говорю \'морковка\' и т.д.';
 
-    protected const MESSAGE_RULES_APPLICATION = self::MESSAGE_RULES_COMMON/* . ' Лучше использовать существительные.'*/;
+    protected const MESSAGE_RULES_APPLICATION = self::MESSAGE_RULES_COMMON;
 
-    protected const MESSAGE_RULES_USER = self::MESSAGE_RULES_COMMON/* . ' При этом игра запоминает ваши слова и ассоциации и учится на них. Лучше использовать существительные.'*/;
+    protected const MESSAGE_RULES_USER = self::MESSAGE_RULES_COMMON;
 
     protected const MESSAGE_COMMANDS_APPLICATION = 'Для пропуска слова скажите \'другое слово\' или \'дальше\'. Для выхода из игры скажите \'хватит\'.';
 
@@ -72,23 +71,34 @@ abstract class AbstractAnswerer
             : 'У меня нет слов';
     }
 
-    protected function cluelessResponse(): AliceResponse
+    protected function cluelessResponse(): BotResponse
     {
         return $this->buildResponse(self::MESSAGE_CLUELESS);
     }
 
+    public function helpCommand(
+        AbstractBotRequest $request,
+        string ...$prependMessages
+    ): BotResponse
+    {
+        return $this
+            ->buildResponse(
+                $prependMessages,
+                self::CHUNK_RULES,
+                self::CHUNK_COMMANDS,
+                self::CHUNK_PLAY
+            )
+            ->withVarBy($request, self::VAR_STATE, self::STATE_HELP);
+    }
+
     /**
-     * @param string[]|string|null $parts
+     * @param array<string[]|string> ...$parts
      */
-    protected function buildResponse(...$parts): AliceResponse
+    protected function buildResponse(...$parts): BotResponse
     {
         $lines = [];
 
         foreach ($parts as $part) {
-            if ($part === null) {
-                continue;
-            }
-
             if (is_array($part)) {
                 $lines = array_merge($lines, $part);
             } else {
@@ -96,12 +106,10 @@ abstract class AbstractAnswerer
             }
         }
 
-        return new AliceResponse(
-            Text::join($lines, ' ')
-        );
+        return new BotResponse(...$lines);
     }
 
-    protected function isHelpDialog(AliceRequest $request): bool
+    protected function isHelpDialog(AbstractBotRequest $request): bool
     {
         $state = $request->var(self::VAR_STATE);
 
@@ -114,7 +122,7 @@ abstract class AbstractAnswerer
         return in_array($state, $helpStates);
     }
 
-    protected function isHelpRulesCommand(AliceRequest $request): bool
+    protected function isHelpRulesCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAnySet(
             [self::COMMAND_RULES],
@@ -127,7 +135,7 @@ abstract class AbstractAnswerer
         );
     }
 
-    protected function isHelpCommandsCommand(AliceRequest $request): bool
+    protected function isHelpCommandsCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
             self::COMMAND_COMMANDS,
@@ -135,7 +143,7 @@ abstract class AbstractAnswerer
         );
     }
 
-    protected function isPlayCommand(AliceRequest $request): bool
+    protected function isPlayCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
             'играть',
@@ -145,22 +153,7 @@ abstract class AbstractAnswerer
         );
     }
 
-    public function helpCommand(
-        AliceRequest $request,
-        string ...$prependMessages
-    ): AliceResponse
-    {
-        return $this
-            ->buildResponse(
-                $prependMessages,
-                self::CHUNK_RULES,
-                self::CHUNK_COMMANDS,
-                self::CHUNK_PLAY
-            )
-            ->withVarBy($request, self::VAR_STATE, self::STATE_HELP);
-    }
-
-    protected function isNativeAliceCommand(AliceRequest $request): bool
+    protected function isNativeCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
             'включи',
@@ -212,7 +205,7 @@ abstract class AbstractAnswerer
         );
     }
 
-    protected function isWhatCommand(AliceRequest $request): bool
+    protected function isWhatCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
             'кто',
@@ -232,7 +225,7 @@ abstract class AbstractAnswerer
         );
     }
 
-    protected function isRepeatCommand(AliceRequest $request): bool
+    protected function isRepeatCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
             'играть',
@@ -252,7 +245,7 @@ abstract class AbstractAnswerer
         );
     }
 
-    protected function isHelpCommand(AliceRequest $request): bool
+    protected function isHelpCommand(AbstractBotRequest $request): bool
     {
         return $request->isAny(
             self::COMMAND_HELP,
@@ -260,7 +253,7 @@ abstract class AbstractAnswerer
         );
     }
 
-    protected function isSkipCommand(AliceRequest $request): bool
+    protected function isSkipCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
             'было',

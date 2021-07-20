@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use App\Bots\Alice\AliceRequest;
+use App\Bots\AliceRequest;
 use App\Models\AliceUser;
 use App\Repositories\Interfaces\AliceUserRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;

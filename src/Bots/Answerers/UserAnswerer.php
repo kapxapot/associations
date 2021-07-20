@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Answers\Alice;
+namespace App\Bots\Answerers;
 
-use App\Bots\Alice\AliceRequest;
-use App\Bots\Alice\AliceResponse;
+use App\Bots\AbstractBotRequest;
+use App\Bots\BotResponse;
 use App\Exceptions\TurnException;
 use App\Models\AliceUser;
 use App\Models\Game;
@@ -62,7 +62,10 @@ class UserAnswerer extends AbstractAnswerer
         $this->tokenizer = new Tokenizer();
     }
 
-    public function getResponse(AliceRequest $request, AliceUser $aliceUser): AliceResponse
+    public function getResponse(
+        AbstractBotRequest $request,
+        AliceUser $aliceUser
+    ): BotResponse
     {
         Assert::true($aliceUser->isValid());
 
@@ -102,7 +105,7 @@ class UserAnswerer extends AbstractAnswerer
             return $this->rulesCommand();
         }
 
-        if ($this->isNativeAliceCommand($request)) {
+        if ($this->isNativeCommand($request)) {
             return $this->nativeAliceCommand($aliceUser);
         }
 
@@ -133,7 +136,9 @@ class UserAnswerer extends AbstractAnswerer
         return $this->sayWord($aliceUser, $command);
     }
 
-    private function startCommand(AliceUser $aliceUser, AliceRequest $request): AliceResponse
+    private function startCommand(
+        AliceUser $aliceUser,
+        AbstractBotRequest $request): BotResponse
     {
         if ($aliceUser->isNew()) {
             return $this->helpCommand($request, self::MESSAGE_WELCOME);
@@ -149,7 +154,7 @@ class UserAnswerer extends AbstractAnswerer
     private function confirmCommand(
         string $command,
         string ...$prependMessages
-    ): AliceResponse
+    ): BotResponse
     {
         return $this
             ->buildResponse(
@@ -160,7 +165,7 @@ class UserAnswerer extends AbstractAnswerer
             ->withUserVar(self::VAR_COMMAND, $command);
     }
 
-    private function isConfirmDialog(AliceRequest $request): bool
+    private function isConfirmDialog(AbstractBotRequest $request): bool
     {
         return $request->var(self::VAR_STATE) === self::STATE_COMMAND_CONFIRM
             && $request->var(self::VAR_COMMAND) !== null;
@@ -168,8 +173,8 @@ class UserAnswerer extends AbstractAnswerer
 
     private function checkCommandConfirmation(
         AliceUser $aliceUser,
-        AliceRequest $request
-    ): AliceResponse
+        AbstractBotRequest $request
+    ): BotResponse
     {
         $command = $request->command();
         $commandToConfirm = $request->var(self::VAR_COMMAND);
@@ -197,7 +202,10 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function helpDialog(AliceUser $aliceUser, AliceRequest $request): AliceResponse
+    private function helpDialog(
+        AliceUser $aliceUser,
+        AbstractBotRequest $request
+    ): BotResponse
     {
         if ($this->isHelpRulesCommand($request)) {
             return $this->rulesCommand();
@@ -221,7 +229,7 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function rulesCommand(): AliceResponse
+    private function rulesCommand(): BotResponse
     {
         return $this
             ->buildResponse(
@@ -232,7 +240,7 @@ class UserAnswerer extends AbstractAnswerer
             ->withUserVar(self::VAR_STATE, self::STATE_RULES);
     }
 
-    private function commandsCommand(): AliceResponse
+    private function commandsCommand(): BotResponse
     {
         return $this
             ->buildResponse(
@@ -243,7 +251,7 @@ class UserAnswerer extends AbstractAnswerer
             ->withUserVar(self::VAR_STATE, self::STATE_COMMANDS);
     }
 
-    private function nativeAliceCommand(AliceUser $aliceUser): AliceResponse
+    private function nativeAliceCommand(AliceUser $aliceUser): BotResponse
     {
         return $this->buildResponse(
             'Я не могу выполнить эту команду в игре. Скажите \'хватит\', чтобы выйти. А мое слово:',
@@ -251,7 +259,10 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function whatCommand(AliceUser $aliceUser, AliceRequest $request): AliceResponse
+    private function whatCommand(
+        AliceUser $aliceUser,
+        AbstractBotRequest $request
+    ): BotResponse
     {
         $matches = $request->matches('что такое *')
             ?? $request->matches('* это что')
@@ -298,7 +309,7 @@ class UserAnswerer extends AbstractAnswerer
             : 'Я не знаю, что такое "' . $wordStr . '"';
     }
 
-    private function tooManyWords(AliceUser $aliceUser): AliceResponse
+    private function tooManyWords(AliceUser $aliceUser): BotResponse
     {
         return $this->buildResponse(
             'Давайте не больше трех слов сразу. Итак, я говорю:',
@@ -306,7 +317,7 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function wordDislikeFeedback(AliceUser $aliceUser): AliceResponse
+    private function wordDislikeFeedback(AliceUser $aliceUser): BotResponse
     {
         $word = $this->getLastTurn($aliceUser)->word();
 
@@ -324,7 +335,7 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function associationDislikeFeedback(AliceUser $aliceUser): AliceResponse
+    private function associationDislikeFeedback(AliceUser $aliceUser): BotResponse
     {
         $association = $this->getLastTurn($aliceUser)->association();
 
@@ -350,7 +361,7 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function skipCommand(AliceUser $aliceUser): AliceResponse
+    private function skipCommand(AliceUser $aliceUser): BotResponse
     {
         $this->finishGameFor($aliceUser);
 
@@ -361,7 +372,7 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function repeatCommand(AliceUser $aliceUser): AliceResponse
+    private function repeatCommand(AliceUser $aliceUser): BotResponse
     {
         return $this->buildResponse(
             $this->randomString('Повторяю', 'Хорошо', 'Еще раз', 'Мое слово', 'Я говорю') . ':',
@@ -369,7 +380,7 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function sayWord(AliceUser $aliceUser, string $question): AliceResponse
+    private function sayWord(AliceUser $aliceUser, string $question): BotResponse
     {
         $user = $aliceUser->user();
         $game = $this->getGame($aliceUser);
@@ -408,7 +419,7 @@ class UserAnswerer extends AbstractAnswerer
             // continuing current game
             $answerParts[] = $this->renderAiTurn($turns->skip(1)->first());
 
-            return $this->buildResponse(...$answerParts);
+            return $this->buildResponse($answerParts);
         }
 
         if (!$isMatureQuestion) {
@@ -420,7 +431,7 @@ class UserAnswerer extends AbstractAnswerer
         $answerParts[] = $this->newGameFor($aliceUser);
 
         // no answer, starting new game
-        return $this->buildResponse(...$answerParts);
+        return $this->buildResponse($answerParts);
     }
 
     /**
@@ -537,11 +548,11 @@ class UserAnswerer extends AbstractAnswerer
             : 'Мне нечего сказать. Начинайте вы';
     }
 
-    protected function buildResponse(...$parts): AliceResponse
+    protected function buildResponse(...$parts): BotResponse
     {
         $response = parent::buildResponse(...$parts);
 
-        $vars = $response->userState;
+        $vars = $response->userState();
 
         foreach ($this->getKnownVars() as $knownVar) {
             if ($vars === null || !array_key_exists($knownVar, $vars)) {

@@ -2,8 +2,10 @@
 
 namespace App\Controllers;
 
-use App\Bots\Sber\SberRequest;
-use App\Bots\Sber\SberResponse;
+use App\Bots\Answerers\ApplicationAnswerer;
+use App\Bots\Answerers\UserAnswerer;
+use App\Bots\BotResponse;
+use App\Bots\SberRequest;
 use Exception;
 use Plasticode\Core\Response;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
@@ -16,15 +18,23 @@ class SberBotController
 {
     use LoggerAwareTrait;
 
+    private ApplicationAnswerer $applicationAnswerer;
+    private UserAnswerer $userAnswerer;
+
     private SettingsProviderInterface $settingsProvider;
 
     private bool $logEnabled;
 
     public function __construct(
+        ApplicationAnswerer $applicationAnswerer,
+        UserAnswerer $userAnswerer,
         SettingsProviderInterface $settingsProvider,
         LoggerInterface $logger
     )
     {
+        $this->applicationAnswerer = $applicationAnswerer;
+        $this->userAnswerer = $userAnswerer;
+
         $this->settingsProvider = $settingsProvider;
         $this->logger = $logger;
 
@@ -63,20 +73,22 @@ class SberBotController
         return Response::text($response, 'Error');
     }
 
-    private function getResponse(SberRequest $request): SberResponse
+    private function getResponse(SberRequest $request): BotResponse
     {
         // $sberUser = $request->hasUser()
         //     ? $this->sberUserService->getOrCreateSberUser($request)
         //     : null;
 
-        // return ($sberUser === null)
-        //     ? $this->applicationAnswerer->getResponse($request)
-        //     : $this->userAnswerer->getResponse($request, $sberUser);
+        $sberUser = null;
 
-        return new SberResponse('test');
+        return ($sberUser === null)
+            ? $this->applicationAnswerer->getResponse($request)
+            : $this->userAnswerer->getResponse($request, $sberUser);
+
+        return new BotResponse('test');
     }
 
-    private function buildMessage(SberRequest $request, SberResponse $response): array
+    private function buildMessage(SberRequest $request, BotResponse $response): array
     {
         $data = [
             'messageName' => 'ANSWER_TO_USER',
@@ -85,16 +97,30 @@ class SberBotController
             'uuid' => $request->uuid,
             'payload' => [
                 'device' => $request->device,
-                'pronounceText' => $response->text,
+                'pronounceText' => $response->text(),
                 'items' => [
                     [
                         'bubble' => [
-                            'text' => $response->text,
+                            'text' => $response->text(),
                         ]
                     ],
                 ],
             ]
         ];
+
+        if ($response->hasState()) {
+            $state = [];
+
+            if (!empty($response->userState())) {
+                $state[SberRequest::USER_STATE] = $response->userState();
+            }
+
+            if (!empty($response->applicationState())) {
+                $state[SberRequest::APPLICATION_STATE] = $response->applicationState();
+            }
+
+            $data['payload'][SberRequest::STATE_ROOT] = json_encode($state);
+        }
 
         return $data;
     }
