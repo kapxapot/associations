@@ -6,6 +6,7 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Models\User;
 use App\Repositories\Interfaces\AliceUserRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
+use App\Repositories\Interfaces\SberUserRepositoryInterface;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\UserService;
 use Plasticode\External\Gravatar;
@@ -17,6 +18,7 @@ class UserHydrator extends BaseUserHydrator
 {
     private AliceUserRepositoryInterface $aliceUserRepository;
     private GameRepositoryInterface $gameRepository;
+    private SberUserRepositoryInterface $sberUserRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
     private UserService $userService;
 
@@ -24,6 +26,7 @@ class UserHydrator extends BaseUserHydrator
         AliceUserRepositoryInterface $aliceUserRepository,
         GameRepositoryInterface $gameRepository,
         RoleRepositoryInterface $roleRepository,
+        SberUserRepositoryInterface $sberUserRepository,
         TelegramUserRepositoryInterface $telegramUserRepository,
         LinkerInterface $linker,
         Gravatar $gravatar,
@@ -34,6 +37,7 @@ class UserHydrator extends BaseUserHydrator
 
         $this->aliceUserRepository = $aliceUserRepository;
         $this->gameRepository = $gameRepository;
+        $this->sberUserRepository = $sberUserRepository;
         $this->telegramUserRepository = $telegramUserRepository;
 
         $this->userService = $userService;
@@ -62,6 +66,9 @@ class UserHydrator extends BaseUserHydrator
             )
             ->withAliceUser(
                 fn () => $this->aliceUserRepository->getByUser($entity)
+            )
+            ->withSberUser(
+                fn () => $this->sberUserRepository->getByUser($entity)
             )
             ->withPolicy(
                 fn () => $this->userService->getUserPolicy($entity)

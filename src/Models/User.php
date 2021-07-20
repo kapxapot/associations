@@ -15,12 +15,14 @@ use Plasticode\Util\Date;
  * @method bool isMature()
  * @method Game|null lastGame()
  * @method UserPolicy policy()
+ * @method SberUser|null sberUser()
  * @method TelegramUser|null telegramUser()
  * @method static withAliceUser(AliceUser|callable|null $aliceUser)
  * @method static withCurrentGame(Game|callable|null $currentGame)
  * @method static withIsMature(bool|callable $mature)
  * @method static withLastGame(Game|callable|null $lastGame)
  * @method static withPolicy(UserPolicy $policy)
+ * @method static withSberUser(SberUser|callable|null $sberUser)
  * @method static withTelegramUser(TelegramUser|callable|null $telegramUser)
  */
 class User extends UserBase implements GenderedInterface
@@ -73,8 +75,14 @@ class User extends UserBase implements GenderedInterface
 
         $aliceUser = $this->aliceUser();
 
-        return $aliceUser
-            ? $aliceUser->name()
+        if ($aliceUser !== null) {
+            return $aliceUser->name();
+        }
+
+        $sberUser = $this->sberUser();
+
+        return $sberUser
+            ? $sberUser->name()
             : 'глюк какой-то';
     }
 
@@ -86,6 +94,11 @@ class User extends UserBase implements GenderedInterface
     public function isAliceUser(): bool
     {
         return $this->aliceUser() !== null;
+    }
+
+    public function isSberUser(): bool
+    {
+        return $this->sberUser() !== null;
     }
 
     // GenderedInterface

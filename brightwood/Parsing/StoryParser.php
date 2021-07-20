@@ -12,7 +12,7 @@ class StoryParser
         GenderedInterface $gendered,
         string $text,
         ?StoryData $data = null
-    ) : string
+    ): string
     {
         return preg_replace_callback(
             "/{(.+)}/Us",
@@ -25,7 +25,7 @@ class StoryParser
         GenderedInterface $gendered,
         string $match,
         ?StoryData $data
-    ) : string
+    ): string
     {
         if ($data) {
             $parsedVar = $this->parseVar($match, $data);
@@ -38,12 +38,12 @@ class StoryParser
         return $this->parseGenders($match, $gendered);
     }
 
-    private function parseVar(string $var, StoryData $data) : ?string
+    private function parseVar(string $var, StoryData $data): ?string
     {
         return $data[$var] ?? null;
     }
 
-    private function parseGenders(string $str, GenderedInterface $gendered) : string
+    private function parseGenders(string $str, GenderedInterface $gendered): string
     {
         $parts = explode('|', $str);
 

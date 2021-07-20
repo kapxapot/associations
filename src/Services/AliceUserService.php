@@ -28,15 +28,9 @@ class AliceUserService
 
         Assert::stringNotEmpty($aliceUserId);
 
-        $aliceUser = $this->aliceUserRepository->getByAliceId($aliceUserId);
-
-        if ($aliceUser === null) {
-            $aliceUser = $this->aliceUserRepository->store(
-                [
-                    'alice_id' => $aliceUserId,
-                ]
-            );
-        }
+        $aliceUser =
+            $this->aliceUserRepository->getByAliceId($aliceUserId)
+            ?? $this->aliceUserRepository->store(['alice_id' => $aliceUserId]);
 
         Assert::notNull($aliceUser);
 
@@ -52,13 +46,11 @@ class AliceUserService
             return $aliceUser;
         }
 
-        $user = $this->userRepository->store(
-            [
-                'login' => '',
-                'password' => '',
-                'age' => 0,
-            ]
-        );
+        $user = $this->userRepository->store([
+            'login' => '',
+            'password' => '',
+            'age' => 0,
+        ]);
 
         Assert::notNull($user);
 

@@ -12,6 +12,7 @@ use App\Config\Interfaces\UserConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Config\LocalizationConfig;
 use App\Controllers\AliceBotController;
+use App\Controllers\SberBotController;
 use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
 use App\Core\Serializer;
@@ -30,6 +31,7 @@ use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use App\Repositories\Interfaces\PageRepositoryInterface;
+use App\Repositories\Interfaces\SberUserRepositoryInterface;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -47,6 +49,7 @@ use App\Services\DictionaryService;
 use App\Services\GameService;
 use App\Services\Interfaces\ExternalDictServiceInterface;
 use App\Services\LanguageService;
+use App\Services\SberUserService;
 use App\Services\SearchService;
 use App\Services\TagPartsProviderService;
 use App\Services\TelegramUserService;
@@ -104,6 +107,7 @@ final class GeneralProviderTest extends AbstractProviderTest
             LanguageRepositoryInterface::class,
             NewsRepositoryInterface::class,
             PageRepositoryInterface::class,
+            SberUserRepositoryInterface::class,
             TelegramUserRepositoryInterface::class,
             TurnRepositoryInterface::class,
             UserRepositoryInterface::class,
@@ -181,6 +185,7 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(LanguageService::class);
         $this->check(NewsAggregatorService::class);
         $this->check(SearchService::class);
+        $this->check(SberUserService::class);
         $this->check(TagPartsProviderService::class);
         $this->check(TelegramUserService::class);
         $this->check(TurnService::class);
@@ -203,5 +208,6 @@ final class GeneralProviderTest extends AbstractProviderTest
         // controllers
 
         $this->check(AliceBotController::class);
+        $this->check(SberBotController::class);
     }
 }

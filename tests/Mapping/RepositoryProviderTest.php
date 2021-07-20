@@ -38,6 +38,7 @@ use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use App\Repositories\Interfaces\PageRepositoryInterface;
+use App\Repositories\Interfaces\SberUserRepositoryInterface;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -49,6 +50,7 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Repositories\LanguageRepository;
 use App\Repositories\NewsRepository;
 use App\Repositories\PageRepository;
+use App\Repositories\SberUserRepository;
 use App\Repositories\TelegramUserRepository;
 use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
@@ -174,6 +176,11 @@ final class RepositoryProviderTest extends AbstractProviderTest
         $this->check(
             CoreRepositories\PageRepositoryInterface::class,
             PageRepositoryInterface::class
+        );
+
+        $this->check(
+            SberUserRepositoryInterface::class,
+            SberUserRepository::class
         );
 
         $this->check(

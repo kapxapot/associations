@@ -5,7 +5,7 @@ namespace App\Bots\Answerers;
 use App\Bots\AbstractBotRequest;
 use App\Bots\BotResponse;
 use App\Exceptions\TurnException;
-use App\Models\AliceUser;
+use App\Models\AbstractBotUser;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\Word;
@@ -64,25 +64,25 @@ class UserAnswerer extends AbstractAnswerer
 
     public function getResponse(
         AbstractBotRequest $request,
-        AliceUser $aliceUser
+        AbstractBotUser $botUser
     ): BotResponse
     {
-        Assert::true($aliceUser->isValid());
+        Assert::true($botUser->isValid());
 
         $command = $request->command();
         $tokens = $request->tokens();
         $isNewSession = $request->isNewSession();
 
         if ($isNewSession) {
-            return $this->startCommand($aliceUser, $request);
+            return $this->startCommand($botUser, $request);
         }
 
         if ($this->isHelpDialog($request)) {
-            return $this->helpDialog($aliceUser, $request);
+            return $this->helpDialog($botUser, $request);
         }
 
         if ($this->isConfirmDialog($request)) {
-            return $this->checkCommandConfirmation($aliceUser, $request);
+            return $this->checkCommandConfirmation($botUser, $request);
         }
 
         if (strlen($command) === 0) {
@@ -105,49 +105,49 @@ class UserAnswerer extends AbstractAnswerer
             return $this->rulesCommand();
         }
 
-        if ($this->isNativeCommand($request)) {
-            return $this->nativeAliceCommand($aliceUser);
+        if ($this->isNativeBotCommand($request)) {
+            return $this->nativeBotCommand($botUser);
         }
 
         if ($this->isWhatCommand($request)) {
-            return $this->whatCommand($aliceUser, $request);
+            return $this->whatCommand($botUser, $request);
         }
 
         if ($this->isRepeatCommand($request)) {
-            return $this->repeatCommand($aliceUser);
+            return $this->repeatCommand($botUser);
         }
 
         if ($request->isAny('плохое слово', 'не нравится', 'не нравится слово')) {
-            return $this->wordDislikeFeedback($aliceUser);
+            return $this->wordDislikeFeedback($botUser);
         }
 
         if ($request->isAny('плохая ассоциация', 'плохой ассоциация', 'не нравится ассоциация')) {
-            return $this->associationDislikeFeedback($aliceUser);
+            return $this->associationDislikeFeedback($botUser);
         }
 
         if ($this->isSkipCommand($request)) {
-            return $this->skipCommand($aliceUser);
+            return $this->skipCommand($botUser);
         }
 
         if (count($tokens) > self::MAX_TOKENS) {
-            return $this->tooManyWords($aliceUser);
+            return $this->tooManyWords($botUser);
         }
 
-        return $this->sayWord($aliceUser, $command);
+        return $this->sayWord($botUser, $command);
     }
 
     private function startCommand(
-        AliceUser $aliceUser,
+        AbstractBotUser $botUser,
         AbstractBotRequest $request): BotResponse
     {
-        if ($aliceUser->isNew()) {
+        if ($botUser->isNew()) {
             return $this->helpCommand($request, self::MESSAGE_WELCOME);
         }
 
         return $this->buildResponse(
             self::MESSAGE_WELCOME_BACK,
             'Я продолжаю:',
-            $this->renderGameFor($aliceUser)
+            $this->renderGameFor($botUser)
         );
     }
 
@@ -172,7 +172,7 @@ class UserAnswerer extends AbstractAnswerer
     }
 
     private function checkCommandConfirmation(
-        AliceUser $aliceUser,
+        AbstractBotUser $botUser,
         AbstractBotRequest $request
     ): BotResponse
     {
@@ -193,7 +193,7 @@ class UserAnswerer extends AbstractAnswerer
         }
         
         if ($this->isPlayCommand($request)) {
-            return $this->sayWord($aliceUser, $commandToConfirm);
+            return $this->sayWord($botUser, $commandToConfirm);
         }
 
         return $this->confirmCommand(
@@ -203,7 +203,7 @@ class UserAnswerer extends AbstractAnswerer
     }
 
     private function helpDialog(
-        AliceUser $aliceUser,
+        AbstractBotUser $botUser,
         AbstractBotRequest $request
     ): BotResponse
     {
@@ -218,8 +218,8 @@ class UserAnswerer extends AbstractAnswerer
         if ($this->isPlayCommand($request)) {
             return $this
                 ->buildResponse(
-                    $aliceUser->isNew() ? 'Я начинаю:' : 'Я продолжаю:',
-                    $this->renderGameFor($aliceUser)
+                    $botUser->isNew() ? 'Я начинаю:' : 'Я продолжаю:',
+                    $this->renderGameFor($botUser)
                 );
         }
 
@@ -251,16 +251,16 @@ class UserAnswerer extends AbstractAnswerer
             ->withUserVar(self::VAR_STATE, self::STATE_COMMANDS);
     }
 
-    private function nativeAliceCommand(AliceUser $aliceUser): BotResponse
+    private function nativeBotCommand(AbstractBotUser $botUser): BotResponse
     {
         return $this->buildResponse(
             'Я не могу выполнить эту команду в игре. Скажите \'хватит\', чтобы выйти. А мое слово:',
-            $this->renderGameFor($aliceUser)
+            $this->renderGameFor($botUser)
         );
     }
 
     private function whatCommand(
-        AliceUser $aliceUser,
+        AbstractBotUser $botUser,
         AbstractBotRequest $request
     ): BotResponse
     {
@@ -274,7 +274,7 @@ class UserAnswerer extends AbstractAnswerer
             ? $matches[0]
             : null;
 
-        $lastWord = $this->getLastTurn($aliceUser)->word();
+        $lastWord = $this->getLastTurn($botUser)->word();
 
         $word = ($askedFor !== null)
             ? $this->findWord($askedFor)
@@ -289,7 +289,7 @@ class UserAnswerer extends AbstractAnswerer
         return $this->buildResponse(
             Sentence::tailPeriod($definition),
             'Итак, я говорю:',
-            $this->renderGameFor($aliceUser)
+            $this->renderGameFor($botUser)
         );
     }
 
@@ -309,81 +309,81 @@ class UserAnswerer extends AbstractAnswerer
             : 'Я не знаю, что такое "' . $wordStr . '"';
     }
 
-    private function tooManyWords(AliceUser $aliceUser): BotResponse
+    private function tooManyWords(AbstractBotUser $botUser): BotResponse
     {
         return $this->buildResponse(
             'Давайте не больше трех слов сразу. Итак, я говорю:',
-            $this->renderGameFor($aliceUser)
+            $this->renderGameFor($botUser)
         );
     }
 
-    private function wordDislikeFeedback(AliceUser $aliceUser): BotResponse
+    private function wordDislikeFeedback(AbstractBotUser $botUser): BotResponse
     {
-        $word = $this->getLastTurn($aliceUser)->word();
+        $word = $this->getLastTurn($botUser)->word();
 
         $this->wordFeedbackService->save(
             ['word_id' => $word->getId(), 'dislike' => true],
-            $aliceUser->user()
+            $botUser->user()
         );
 
-        $this->finishGameFor($aliceUser);
+        $this->finishGameFor($botUser);
 
         return $this->buildResponse(
             'Спасибо, ваш отзыв сохранен.',
             self::MESSAGE_START_ANEW,
-            $this->newGameFor($aliceUser)
+            $this->newGameFor($botUser)
         );
     }
 
-    private function associationDislikeFeedback(AliceUser $aliceUser): BotResponse
+    private function associationDislikeFeedback(AbstractBotUser $botUser): BotResponse
     {
-        $association = $this->getLastTurn($aliceUser)->association();
+        $association = $this->getLastTurn($botUser)->association();
 
         if ($association === null) {
             return $this->buildResponse(
                 'Я назвала слово без ассоциации, скажите \'плохое слово\' или \'не нравится\', если вам не нравится слово.',
                 'Я говорю:',
-                $this->renderGameFor($aliceUser)
+                $this->renderGameFor($botUser)
             );
         }
 
         $this->associationFeedbackService->save(
             ['association_id' => $association->getId(), 'dislike' => true],
-            $aliceUser->user()
+            $botUser->user()
         );
 
-        $this->finishGameFor($aliceUser);
+        $this->finishGameFor($botUser);
 
         return $this->buildResponse(
             'Спасибо, ваш отзыв сохранен.',
             self::MESSAGE_START_ANEW,
-            $this->newGameFor($aliceUser)
+            $this->newGameFor($botUser)
         );
     }
 
-    private function skipCommand(AliceUser $aliceUser): BotResponse
+    private function skipCommand(AbstractBotUser $botUser): BotResponse
     {
-        $this->finishGameFor($aliceUser);
+        $this->finishGameFor($botUser);
 
         return $this->buildResponse(
             self::MESSAGE_SKIP,
             self::MESSAGE_START_ANEW,
-            $this->newGameFor($aliceUser)
+            $this->newGameFor($botUser)
         );
     }
 
-    private function repeatCommand(AliceUser $aliceUser): BotResponse
+    private function repeatCommand(AbstractBotUser $botUser): BotResponse
     {
         return $this->buildResponse(
             $this->randomString('Повторяю', 'Хорошо', 'Еще раз', 'Мое слово', 'Я говорю') . ':',
-            $this->renderGameFor($aliceUser)
+            $this->renderGameFor($botUser)
         );
     }
 
-    private function sayWord(AliceUser $aliceUser, string $question): BotResponse
+    private function sayWord(AbstractBotUser $botUser, string $question): BotResponse
     {
-        $user = $aliceUser->user();
-        $game = $this->getGame($aliceUser);
+        $user = $botUser->user();
+        $game = $this->getGame($botUser);
 
         $prevWord = $game->lastTurnWord();
 
@@ -428,7 +428,7 @@ class UserAnswerer extends AbstractAnswerer
 
         $answerParts[] = self::MESSAGE_START_ANEW;
 
-        $answerParts[] = $this->newGameFor($aliceUser);
+        $answerParts[] = $this->newGameFor($botUser);
 
         // no answer, starting new game
         return $this->buildResponse($answerParts);
@@ -488,25 +488,25 @@ class UserAnswerer extends AbstractAnswerer
             : $question;
     }
 
-    private function finishGameFor(AliceUser $aliceUser): void
+    private function finishGameFor(AbstractBotUser $botUser): void
     {
-        $game = $this->getGame($aliceUser);
+        $game = $this->getGame($botUser);
 
         $this->turnService->finishGame($game);
     }
 
-    private function newGameFor(AliceUser $aliceUser): string
+    private function newGameFor(AbstractBotUser $botUser): string
     {
-        $user = $aliceUser->user();
+        $user = $botUser->user();
 
         $newGame = $this->gameService->createGameFor($user);
 
         return $this->renderLastTurn($newGame);
     }
 
-    private function getLastTurn(AliceUser $aliceUser): Turn
+    private function getLastTurn(AbstractBotUser $botUser): Turn
     {
-        $turn = $this->getGame($aliceUser)->lastTurn();
+        $turn = $this->getGame($botUser)->lastTurn();
 
         Assert::notNull($turn);
 
@@ -516,9 +516,9 @@ class UserAnswerer extends AbstractAnswerer
     /**
      * Gets the current game or creates a new one for the user.
      */
-    private function getGame(AliceUser $aliceUser): Game
+    private function getGame(AbstractBotUser $botUser): Game
     {
-        $user = $aliceUser->user();
+        $user = $botUser->user();
 
         $game = $this->gameService->getOrCreateGameFor($user);
 
@@ -527,9 +527,9 @@ class UserAnswerer extends AbstractAnswerer
         return $game;
     }
 
-    private function renderGameFor(AliceUser $aliceUser): string
+    private function renderGameFor(AbstractBotUser $botUser): string
     {
-        $game = $this->getGame($aliceUser);
+        $game = $this->getGame($botUser);
 
         return $this->renderLastTurn($game);
     }

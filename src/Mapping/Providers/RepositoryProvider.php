@@ -11,6 +11,7 @@ use App\Hydrators\GameHydrator;
 use App\Hydrators\LanguageHydrator;
 use App\Hydrators\NewsHydrator;
 use App\Hydrators\PageHydrator;
+use App\Hydrators\SberUserHydrator;
 use App\Hydrators\TelegramUserHydrator;
 use App\Hydrators\TurnHydrator;
 use App\Hydrators\UserHydrator;
@@ -35,6 +36,7 @@ use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use App\Repositories\Interfaces\PageRepositoryInterface;
+use App\Repositories\Interfaces\SberUserRepositoryInterface;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -46,6 +48,7 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Repositories\LanguageRepository;
 use App\Repositories\NewsRepository;
 use App\Repositories\PageRepository;
+use App\Repositories\SberUserRepository;
 use App\Repositories\TelegramUserRepository;
 use App\Repositories\TurnRepository;
 use App\Repositories\UserRepository;
@@ -128,6 +131,12 @@ class RepositoryProvider extends MappingProvider
                 ),
 
             CoreRepositories\PageRepositoryInterface::class => PageRepositoryInterface::class,
+
+            SberUserRepositoryInterface::class =>
+                fn (ContainerInterface $c) => new SberUserRepository(
+                    $c->get(RepositoryContext::class),
+                    $this->proxy($c, SberUserHydrator::class)
+                ),
 
             TelegramUserRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new TelegramUserRepository(

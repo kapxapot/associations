@@ -6,6 +6,7 @@ use App\Bots\Answerers\ApplicationAnswerer;
 use App\Bots\Answerers\UserAnswerer;
 use App\Bots\BotResponse;
 use App\Bots\SberRequest;
+use App\Services\SberUserService;
 use Exception;
 use Plasticode\Core\Response;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
@@ -21,6 +22,8 @@ class SberBotController
     private ApplicationAnswerer $applicationAnswerer;
     private UserAnswerer $userAnswerer;
 
+    private SberUserService $sberUserService;
+
     private SettingsProviderInterface $settingsProvider;
 
     private bool $logEnabled;
@@ -28,6 +31,7 @@ class SberBotController
     public function __construct(
         ApplicationAnswerer $applicationAnswerer,
         UserAnswerer $userAnswerer,
+        SberUserService $sberUserService,
         SettingsProviderInterface $settingsProvider,
         LoggerInterface $logger
     )
@@ -35,10 +39,12 @@ class SberBotController
         $this->applicationAnswerer = $applicationAnswerer;
         $this->userAnswerer = $userAnswerer;
 
+        $this->sberUserService = $sberUserService;
+
         $this->settingsProvider = $settingsProvider;
         $this->logger = $logger;
 
-        $this->logEnabled = $this->settingsProvider->get('sber.bot_log', false);
+        $this->logEnabled = $this->settingsProvider->get('sber.bot_log', false) === true;
     }
 
     public function __invoke(
@@ -75,17 +81,13 @@ class SberBotController
 
     private function getResponse(SberRequest $request): BotResponse
     {
-        // $sberUser = $request->hasUser()
-        //     ? $this->sberUserService->getOrCreateSberUser($request)
-        //     : null;
-
-        $sberUser = null;
+        $sberUser = $request->hasUser()
+            ? $this->sberUserService->getOrCreateSberUser($request)
+            : null;
 
         return ($sberUser === null)
             ? $this->applicationAnswerer->getResponse($request)
             : $this->userAnswerer->getResponse($request, $sberUser);
-
-        return new BotResponse('test');
     }
 
     private function buildMessage(SberRequest $request, BotResponse $response): array

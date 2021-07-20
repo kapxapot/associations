@@ -153,7 +153,7 @@ abstract class AbstractAnswerer
         );
     }
 
-    protected function isNativeCommand(AbstractBotRequest $request): bool
+    protected function isNativeBotCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
             'включи',
