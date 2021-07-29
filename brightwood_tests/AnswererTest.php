@@ -5,7 +5,6 @@ namespace Brightwood\Tests;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use Brightwood\Answers\Answerer;
-use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
@@ -14,7 +13,7 @@ use Brightwood\Testing\Factories\LoggerFactory;
 use Brightwood\Testing\Factories\RootDeserializerFactory;
 use Brightwood\Testing\Mocks\Repositories\StoryStatusRepositoryMock;
 use PHPUnit\Framework\TestCase;
-use Plasticode\Util\Cases;
+use Plasticode\Semantics\Gender;
 use Psr\Log\LoggerInterface;
 
 final class AnswererTest extends TestCase
@@ -65,7 +64,7 @@ final class AnswererTest extends TestCase
             [
                 'id' => 2,
                 'username' => 'kapxapot',
-                'gender_id' => Cases::MAS
+                'gender_id' => Gender::MAS
             ]
         );
 

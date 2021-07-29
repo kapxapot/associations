@@ -4,6 +4,7 @@ namespace App\Bots\Answerers;
 
 use App\Bots\AbstractBotRequest;
 use App\Bots\BotResponse;
+use App\Bots\Command;
 use App\Models\Language;
 use App\Models\Word;
 use App\Services\LanguageService;
@@ -19,35 +20,29 @@ abstract class AbstractAnswerer
     protected const STATE_COMMANDS = 'commands';
     protected const STATE_COMMAND_CONFIRM = 'command_confirm';
 
-    protected const COMMAND_HELP = 'помощь';
-    protected const COMMAND_RULES = 'правила';
-    protected const COMMAND_COMMAND = 'команда';
-    protected const COMMAND_COMMANDS = 'команды';
-    protected const COMMAND_PLAYING = 'играем';
-
-    protected const MESSAGE_CLUELESS = 'Извините, не поняла';
-    protected const MESSAGE_WELCOME = 'Привет! Поиграем в ассоциации?';
+    protected const MESSAGE_CLUELESS = 'Извини{att:те}, не понял{|а}.';
+    protected const MESSAGE_WELCOME = '{hello}! Поиграем в ассоциации?';
     protected const MESSAGE_WELCOME_BACK = 'С возвращением!';
 
-    protected const CHUNK_RULES = 'Чтобы узнать, как играть, скажите \'правила\'.';
-    protected const CHUNK_COMMANDS = 'Чтобы узнать, как управлять игрой, скажите \'команды\'.';
-    protected const CHUNK_PLAY = 'Чтобы перейти к игре, скажите \'играть\'.';
+    protected const CHUNK_RULES = 'Чтобы узнать, как играть, скажи{att:те} {cmd:rules}.';
+    protected const CHUNK_COMMANDS = 'Чтобы узнать, как управлять игрой, скажи{att:те} {cmd:commands}.';
+    protected const CHUNK_PLAY = 'Чтобы перейти к игре, скажи{att:те} {cmd:play}.';
 
-    protected const MESSAGE_DEMO = 'Игра идет в демо-режиме. Для полной игры, пожалуйста, авторизуйтесь.';
+    protected const MESSAGE_DEMO = 'Игра идёт в демо-режиме. Для полной игры, пожалуйста, авторизуй{att:тесь|ся}.';
 
-    private const MESSAGE_RULES_COMMON = 'В игре в ассоциации мы с вами говорим по очереди слово, которое ассоциируется с предыдущим. Например, я говорю \'лес\', вы отвечаете \'заяц\', я говорю \'морковка\' и т.д.';
+    private const MESSAGE_RULES_COMMON = 'В игре в ассоциации мы с {att:вами|тобой} говорим по очереди слово, которое ассоциируется с предыдущим. Например, я говорю {q:лес}, {att:вы|ты} отвечае{att:те|шь} {q:заяц}, я говорю {q:морковка} и так далее.';
 
     protected const MESSAGE_RULES_APPLICATION = self::MESSAGE_RULES_COMMON;
 
     protected const MESSAGE_RULES_USER = self::MESSAGE_RULES_COMMON;
 
-    protected const MESSAGE_COMMANDS_APPLICATION = 'Для пропуска слова скажите \'другое слово\' или \'дальше\'. Для выхода из игры скажите \'хватит\'.';
+    protected const MESSAGE_COMMANDS_APPLICATION = 'Для пропуска слова скажи{att:те} {cmd:skip} или {cmd:skip_2}. Для выхода скажи{att:те} {cmd:exit}.';
 
-    protected const MESSAGE_COMMANDS_USER = 'Для пропуска слова скажите \'другое слово\' или \'дальше\'. Для повтора слова скажите \'повтори\'. Спросите \'что?\' или \'что это?\', чтобы узнать значение слова. Если вам не нравится слово или ассоциация, скажите \'плохое слово\' или \'плохая ассоциация\'. Для выхода скажите \'хватит\'.';
+    protected const MESSAGE_COMMANDS_USER = 'Для пропуска слова скажи{att:те} {cmd:skip} или {cmd:skip_2}. Для повтора слова скажи{att:те} {cmd:repeat}. Спроси{att:те} {cmd:what} или {cmd:what_2}, чтобы узнать значение слова. Если {att:вам|тебе} не нравится слово или ассоциация, скажи{att:те} {cmd:word_dislike} или {cmd:association_dislike}. Для выхода скажи{att:те} {cmd:exit}.';
 
     protected const MESSAGE_SKIP = 'Хорошо.';
     protected const MESSAGE_START_ANEW = 'Начинаем заново:';
-    protected const MESSAGE_ERROR = 'Что-то пошло не так';
+    protected const MESSAGE_ERROR = 'Что-то пошло не так.';
     protected const MESSAGE_CONTINUE = 'Продолжаем. Мое слово:';
 
     protected LanguageService $languageService;
@@ -68,7 +63,7 @@ abstract class AbstractAnswerer
     {
         return $word !== null
             ? mb_strtoupper($word->word)
-            : 'У меня нет слов';
+            : 'У меня нет слов.';
     }
 
     protected function cluelessResponse(): BotResponse
@@ -87,6 +82,11 @@ abstract class AbstractAnswerer
                 self::CHUNK_RULES,
                 self::CHUNK_COMMANDS,
                 self::CHUNK_PLAY
+            )
+            ->withActions(
+                Command::RULES,
+                Command::COMMANDS,
+                Command::PLAY
             )
             ->withVarBy($request, self::VAR_STATE, self::STATE_HELP);
     }
@@ -125,7 +125,7 @@ abstract class AbstractAnswerer
     protected function isHelpRulesCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAnySet(
-            [self::COMMAND_RULES],
+            ['правила'],
             ['правила', 'игры'],
             ['смысл', 'игры'],
             ['цель', 'игры'],
@@ -138,18 +138,18 @@ abstract class AbstractAnswerer
     protected function isHelpCommandsCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
-            self::COMMAND_COMMANDS,
-            'команда'
+            'команда',
+            'команды'
         );
     }
 
     protected function isPlayCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
-            'играть',
             'игра',
-            'играю',
-            self::COMMAND_PLAYING
+            'играем',
+            'играть',
+            'играю'
         );
     }
 
@@ -193,6 +193,7 @@ abstract class AbstractAnswerer
             'прекращай',
             'прекращаем',
             'скажи',
+            'скучно',
             'устал',
             'устала',
             'хватит'
@@ -208,8 +209,8 @@ abstract class AbstractAnswerer
     protected function isWhatCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
-            'кто',
             'что',
+            'кто',
             'чего',
             'непонятная',
             'непонятное',
@@ -248,7 +249,7 @@ abstract class AbstractAnswerer
     protected function isHelpCommand(AbstractBotRequest $request): bool
     {
         return $request->isAny(
-            self::COMMAND_HELP,
+            'помощь',
             'что ты умеешь'
         );
     }
@@ -305,8 +306,8 @@ abstract class AbstractAnswerer
     {
         return $this->randomString(
             'Ой! Надеюсь, рядом нет детей.',
-            'Вы вгоняете меня в краску.',
-            'Ну у вас и словечки!',
+            '{att:В|Т}ы вгоняе{att:те|шь} меня в краску.',
+            'Ну у {att:вас|тебя} и словечки!',
             'Хм... Как скажете.'
         );
     }

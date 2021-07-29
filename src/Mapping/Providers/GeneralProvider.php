@@ -4,6 +4,8 @@ namespace App\Mapping\Providers;
 
 use App\Auth\Auth;
 use App\Auth\Interfaces\AuthInterface;
+use App\Bots\Interfaces\MessageRendererInterface;
+use App\Bots\MessageRenderer;
 use App\Config\CaptchaConfig;
 use App\Config\Config;
 use App\Config\Interfaces\AssociationConfigInterface;
@@ -51,7 +53,7 @@ class GeneralProvider extends MappingProvider
             ConfigCore\CaptchaConfigInterface::class => CaptchaConfig::class,
             ConfigCore\LocalizationConfigInterface::class => LocalizationConfig::class,
 
-            //aliases
+            // aliases
 
             AuthCore\AuthInterface::class => AuthInterface::class,
             Core\LinkerInterface::class => LinkerInterface::class,
@@ -75,9 +77,10 @@ class GeneralProvider extends MappingProvider
             ExternalDictServiceInterface::class => YandexDictService::class,
             NewsAggregatorService::class => NewsAggregatorServiceFactory::class,
 
-            // parsing
+            // parsing / rendering
 
             DoubleBracketsConfig::class => DoubleBracketsConfigFactory::class,
+            MessageRendererInterface::class => MessageRenderer::class,
 
             // slim
 

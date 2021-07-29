@@ -4,6 +4,7 @@ namespace App\Bots\Answerers;
 
 use App\Bots\AbstractBotRequest;
 use App\Bots\BotResponse;
+use App\Bots\Command;
 use App\Exceptions\TurnException;
 use App\Models\AbstractBotUser;
 use App\Models\Game;
@@ -28,6 +29,7 @@ class UserAnswerer extends AbstractAnswerer
     use LoggerAwareTrait;
 
     private const MAX_TOKENS = 3;
+    public const WORD_LIMIT = 'трёх слов';
 
     private AssociationFeedbackService $associationFeedbackService;
     private GameService $gameService;
@@ -90,9 +92,9 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         if ($request->isAny(
-            self::COMMAND_HELP,
-            self::COMMAND_COMMANDS,
-            self::COMMAND_RULES
+            Command::HELP,
+            Command::COMMANDS,
+            Command::RULES
         )) {
             return $this->confirmCommand($command);
         }
@@ -117,11 +119,19 @@ class UserAnswerer extends AbstractAnswerer
             return $this->repeatCommand($botUser);
         }
 
-        if ($request->isAny('плохое слово', 'не нравится', 'не нравится слово')) {
+        if ($request->isAny(
+            Command::WORD_DISLIKE,
+            'не нравится',
+            'не нравится слово'
+        )) {
             return $this->wordDislikeFeedback($botUser);
         }
 
-        if ($request->isAny('плохая ассоциация', 'плохой ассоциация', 'не нравится ассоциация')) {
+        if ($request->isAny(
+            Command::ASSOCIATION_DISLIKE,
+            'плохой ассоциация',
+            'не нравится ассоциация'
+        )) {
             return $this->associationDislikeFeedback($botUser);
         }
 
@@ -159,7 +169,7 @@ class UserAnswerer extends AbstractAnswerer
         return $this
             ->buildResponse(
                 $prependMessages,
-                'Для подтверждения команды \'' . $command . '\' скажите \'' . self::COMMAND_COMMAND . '\' или повторите ее. Если вы хотите сказать это слово в игре, скажите \'' . self::COMMAND_PLAYING . '\'.'
+                'Для подтверждения команды {cmd:' . $command . '} скажи{att:те} {cmd:command} или повтори{att:те} её. Если {att:в|т}ы хо{att:тите|чешь} сказать это слово в игре, скажи{att:те} {cmd:playing}.'
             )
             ->withUserVar(self::VAR_STATE, self::STATE_COMMAND_CONFIRM)
             ->withUserVar(self::VAR_COMMAND, $command);
@@ -179,15 +189,15 @@ class UserAnswerer extends AbstractAnswerer
         $command = $request->command();
         $commandToConfirm = $request->var(self::VAR_COMMAND);
 
-        if ($command === self::COMMAND_COMMAND || $command === $commandToConfirm) {
+        if ($command === Command::COMMAND || $command === $commandToConfirm) {
             switch ($commandToConfirm) {
-                case self::COMMAND_HELP:
+                case Command::HELP:
                     return $this->helpCommand($request);
 
-                case self::COMMAND_RULES:
+                case Command::RULES:
                     return $this->rulesCommand();
 
-                case self::COMMAND_COMMANDS:
+                case Command::COMMANDS:
                     return $this->commandsCommand();
             }
         }
@@ -237,6 +247,10 @@ class UserAnswerer extends AbstractAnswerer
                 self::CHUNK_COMMANDS,
                 self::CHUNK_PLAY
             )
+            ->withActions(
+                Command::COMMANDS,
+                Command::PLAY
+            )
             ->withUserVar(self::VAR_STATE, self::STATE_RULES);
     }
 
@@ -248,15 +262,21 @@ class UserAnswerer extends AbstractAnswerer
                 self::CHUNK_RULES,
                 self::CHUNK_PLAY
             )
+            ->withActions(
+                Command::RULES,
+                Command::PLAY
+            )
             ->withUserVar(self::VAR_STATE, self::STATE_COMMANDS);
     }
 
     private function nativeBotCommand(AbstractBotUser $botUser): BotResponse
     {
-        return $this->buildResponse(
-            'Я не могу выполнить эту команду в игре. Скажите \'хватит\', чтобы выйти. А мое слово:',
-            $this->renderGameFor($botUser)
-        );
+        return $this
+            ->buildResponse(
+                'Я не могу выполнить эту команду в игре. Скажи{att:те} {cmd:exit}, чтобы выйти.',
+                'А мое слово:',
+                $this->renderGameFor($botUser)
+            );
     }
 
     private function whatCommand(
@@ -296,7 +316,7 @@ class UserAnswerer extends AbstractAnswerer
     private function getDefinition(?Word $word): string
     {
         if ($word === null) {
-            return 'Я не знаю такого слова';
+            return 'Я не знаю такого слова.';
         }
 
         $wordStr = $word->word;
@@ -304,15 +324,15 @@ class UserAnswerer extends AbstractAnswerer
 
         return ($parsedDefinition !== null)
             ? Strings::upperCaseFirst($wordStr)
-                . ' - это '
+                . ' — это '
                 . Strings::lowerCaseFirst($parsedDefinition->firstDefinition())
-            : 'Я не знаю, что такое "' . $wordStr . '"';
+            : 'Я не знаю, что такое {q:' . $wordStr . '}.';
     }
 
     private function tooManyWords(AbstractBotUser $botUser): BotResponse
     {
         return $this->buildResponse(
-            'Давайте не больше трех слов сразу. Итак, я говорю:',
+            'Давай{att:те} не больше {word_limit} сразу. Итак, я говорю:',
             $this->renderGameFor($botUser)
         );
     }
@@ -329,7 +349,7 @@ class UserAnswerer extends AbstractAnswerer
         $this->finishGameFor($botUser);
 
         return $this->buildResponse(
-            'Спасибо, ваш отзыв сохранен.',
+            'Спасибо, {att:ваш|твой} отзыв сохранен.',
             self::MESSAGE_START_ANEW,
             $this->newGameFor($botUser)
         );
@@ -341,7 +361,7 @@ class UserAnswerer extends AbstractAnswerer
 
         if ($association === null) {
             return $this->buildResponse(
-                'Я назвала слово без ассоциации, скажите \'плохое слово\' или \'не нравится\', если вам не нравится слово.',
+                '{att:В|Т}ы о чём? Мы только начали игру. Скажи{att:те} {cmd:word_dislike} или {cmd:word_dislike_2}, если {att:вам|тебе} не нравится слово.',
                 'Я говорю:',
                 $this->renderGameFor($botUser)
             );
@@ -355,7 +375,7 @@ class UserAnswerer extends AbstractAnswerer
         $this->finishGameFor($botUser);
 
         return $this->buildResponse(
-            'Спасибо, ваш отзыв сохранен.',
+            'Спасибо, {att:ваш|твой} отзыв сохранен.',
             self::MESSAGE_START_ANEW,
             $this->newGameFor($botUser)
         );
@@ -375,7 +395,7 @@ class UserAnswerer extends AbstractAnswerer
     private function repeatCommand(AbstractBotUser $botUser): BotResponse
     {
         return $this->buildResponse(
-            $this->randomString('Повторяю', 'Хорошо', 'Еще раз', 'Мое слово', 'Я говорю') . ':',
+            $this->randomString('Повторяю', 'Хорошо', 'Ещё раз', 'Моё слово', 'Я говорю') . ':',
             $this->renderGameFor($botUser)
         );
     }
@@ -545,7 +565,7 @@ class UserAnswerer extends AbstractAnswerer
 
         return $turn !== null
             ? $this->renderWord($turn->word())
-            : 'Мне нечего сказать. Начинайте вы';
+            : 'Мне нечего сказать. Начинай{att:те} {att:в|т}ы.';
     }
 
     protected function buildResponse(...$parts): BotResponse

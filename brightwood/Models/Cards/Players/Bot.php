@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Cards\Players;
 
 use Plasticode\Collections\Generic\Collection;
-use Plasticode\Util\Cases;
+use Plasticode\Semantics\Gender;
 
 class Bot extends Player
 {
@@ -26,7 +26,7 @@ class Bot extends Player
             )
             ->random();
 
-        $this->gender = $gender ?? Cases::MAS;
+        $this->gender = $gender ?? Gender::MAS;
     }
 
     public function isBot(): bool

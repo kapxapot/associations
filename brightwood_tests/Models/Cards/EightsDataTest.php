@@ -2,6 +2,7 @@
 
 namespace Brightwood\Tests\Models\Cards;
 
+use App\Bots\Factories\MessageRendererFactory;
 use App\Models\TelegramUser;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\PlayerCollection;
@@ -23,6 +24,7 @@ use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Tests\SerializationTestCase;
+use Plasticode\Semantics\Gender;
 use Plasticode\Util\Cases;
 
 final class EightsDataTest extends SerializationTestCase
@@ -94,7 +96,9 @@ final class EightsDataTest extends SerializationTestCase
         );
 
         $game = new EightsGame(
-            new StoryParser(),
+            new StoryParser(
+                new MessageRendererFactory()
+            ),
             new Cases(),
             $players,
             new Deck() // empty deck
@@ -189,13 +193,13 @@ final class EightsDataTest extends SerializationTestCase
 
         // check 1st player - bot
         $this->assertInstanceOf(Bot::class, $player1);
-        $this->assertEquals(Cases::MAS, $player1->gender());
+        $this->assertEquals(Gender::MAS, $player1->gender());
         $this->assertInstanceOf(Hand::class, $player1->hand());
         $this->assertEquals(0, $player1->handSize());
 
         // check 2nd player - female bot
         $this->assertInstanceOf(FemaleBot::class, $player2);
-        $this->assertEquals(Cases::FEM, $player2->gender());
+        $this->assertEquals(Gender::FEM, $player2->gender());
 
         $this->assertEquals(
             '♦6, ♣10, ♣5',
@@ -210,7 +214,7 @@ final class EightsDataTest extends SerializationTestCase
 
         // check 3rd player - female bot
         $this->assertInstanceOf(FemaleBot::class, $player3);
-        $this->assertEquals(Cases::FEM, $player3->gender());
+        $this->assertEquals(Gender::FEM, $player3->gender());
 
         // check 4th player - human
         $this->assertInstanceOf(Human::class, $player4);

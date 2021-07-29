@@ -2,6 +2,7 @@
 
 namespace Brightwood\Controllers;
 
+use App\Bots\Factories\MessageRendererFactory;
 use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use App\Testing\Seeders\TelegramUserSeeder;
 use Brightwood\Collections\Cards\PlayerCollection;
@@ -32,8 +33,11 @@ class EightsTestController
             new FemaleBot('Аглая')
         );
 
-        $game =new EightsGame(
-            new StoryParser(),
+        $game = new EightsGame(
+            // todo: should be provided by container definitions (a factory!)
+            new StoryParser(
+                new MessageRendererFactory()
+            ),
             new Cases(),
             $players
         );

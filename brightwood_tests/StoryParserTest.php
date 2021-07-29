@@ -2,11 +2,12 @@
 
 namespace Brightwood\Tests;
 
+use App\Bots\Factories\MessageRendererFactory;
 use App\Models\TelegramUser;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Testing\Models\TestData;
 use PHPUnit\Framework\TestCase;
-use Plasticode\Util\Cases;
+use Plasticode\Semantics\Gender;
 
 final class StoryParserTest extends TestCase
 {
@@ -20,19 +21,21 @@ final class StoryParserTest extends TestCase
     {
         parent::setUp();
 
-        $this->parser = new StoryParser();
+        $this->parser = new StoryParser(
+            new MessageRendererFactory()
+        );
 
         $this->default = new TelegramUser();
 
         $this->male = new TelegramUser(
             [
-                'gender_id' => Cases::MAS
+                'gender_id' => Gender::MAS
             ]
         );
 
         $this->female = new TelegramUser(
             [
-                'gender_id' => Cases::FEM
+                'gender_id' => Gender::FEM
             ]
         );
     }

@@ -16,6 +16,9 @@ class BotResponse
     protected ?array $userState = null;
     protected ?array $applicationState = null;
 
+    /** @var string[]|null */
+    protected ?array $actions = null;
+
     public function __construct(string ...$lines)
     {
         $this->lines = $lines;
@@ -67,6 +70,26 @@ class BotResponse
     public function withEndSession(bool $endSession): self
     {
         $this->endSession = $endSession;
+
+        return $this;
+    }
+
+    public function hasActions(): bool
+    {
+        return !empty($this->actions);
+    }
+
+    public function actions(): ?array
+    {
+        return $this->actions;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withActions(string ...$actions): self
+    {
+        $this->actions = $actions;
 
         return $this;
     }

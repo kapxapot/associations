@@ -73,7 +73,7 @@ class EightsGame extends CardGame
         $this->withCases($cases);
     }
 
-    protected function parser() : StoryParser
+    protected function parser(): StoryParser
     {
         Assert::notNull($this->parser);
 
@@ -83,14 +83,14 @@ class EightsGame extends CardGame
     /**
      * @return $this
      */
-    public function withParser(?StoryParser $parser) : self
+    public function withParser(?StoryParser $parser): self
     {
         $this->parser = $parser;
 
         return $this;
     }
 
-    protected function cases() : Cases
+    protected function cases(): Cases
     {
         Assert::notNull($this->cases);
 
@@ -100,26 +100,26 @@ class EightsGame extends CardGame
     /**
      * @return $this
      */
-    public function withCases(?Cases $cases) : self
+    public function withCases(?Cases $cases): self
     {
         $this->cases = $cases;
 
         return $this;
     }
 
-    public function withPlayersLine() : self
+    public function withPlayersLine(): self
     {
         $this->showPlayersLine = true;
 
         return $this;
     }
 
-    public function discard() : EightsDiscard
+    public function discard(): EightsDiscard
     {
         return parent::discard();
     }
 
-    public function gift() : ?GiftAction
+    public function gift(): ?GiftAction
     {
         return $this->gift;
     }
@@ -127,19 +127,19 @@ class EightsGame extends CardGame
     /**
      * @return $this
      */
-    public function withGift(?GiftAction $gift) : self
+    public function withGift(?GiftAction $gift): self
     {
         $this->placeGift($gift);
 
         return $this;
     }
 
-    private function hasGift() : bool
+    private function hasGift(): bool
     {
         return $this->gift !== null;
     }
 
-    public function currentPlayer() : ?Player
+    public function currentPlayer(): ?Player
     {
         return $this->currentPlayer;
     }
@@ -147,7 +147,7 @@ class EightsGame extends CardGame
     /**
      * @return $this
      */
-    public function withCurrentPlayer(?Player $player) : self
+    public function withCurrentPlayer(?Player $player): self
     {
         $this->currentPlayer = $player;
 
@@ -157,7 +157,7 @@ class EightsGame extends CardGame
     /**
      * @return $this
      */
-    public function withMove(int $move) : self
+    public function withMove(int $move): self
     {
         $this->move = $move;
 
@@ -167,7 +167,7 @@ class EightsGame extends CardGame
     /**
      * @return $this
      */
-    public function withNoCardsInARow(int $count) : self
+    public function withNoCardsInARow(int $count): self
     {
         $this->noCardsInARow = $count;
 
@@ -177,7 +177,7 @@ class EightsGame extends CardGame
     /**
      * @return $this
      */
-    public function withShowPlayersLine(int $show) : self
+    public function withShowPlayersLine(int $show): self
     {
         $this->showPlayersLine = $show;
 
@@ -189,7 +189,7 @@ class EightsGame extends CardGame
         return 10;
     }
 
-    public function isFinished() : bool
+    public function isFinished(): bool
     {
         return $this->isStarted() && ($this->hasWinner() || $this->isDraw());
     }
@@ -197,7 +197,7 @@ class EightsGame extends CardGame
     /**
      * Starts the game ensuring that the deck is in place.
      */
-    public function start() : MessageInterface
+    public function start(): MessageInterface
     {
         if (!$this->hasDeck()) {
             $deckFactory = new FullDeckFactory();
@@ -214,7 +214,7 @@ class EightsGame extends CardGame
         return $message;
     }
 
-    public function runTillBreak() : MessageCollection
+    public function runTillBreak(): MessageCollection
     {
         return $this->run(true);
     }
@@ -222,7 +222,7 @@ class EightsGame extends CardGame
     /**
      * @param boolean $withBreak Should the game break and wait for the human interaction?
      */
-    public function run(bool $withBreak = false) : MessageCollection
+    public function run(bool $withBreak = false): MessageCollection
     {
         $messages = [];
 
@@ -262,7 +262,7 @@ class EightsGame extends CardGame
      * - The player has to skip a move and (optionally) do some pre-defined actions
      * (e.g., draw cards).
      */
-    private function canAutoMove(Player $player) : bool
+    private function canAutoMove(Player $player): bool
     {
         if ($player->isBot()) {
             return true;
@@ -271,7 +271,7 @@ class EightsGame extends CardGame
         return $this->isNextMoveASkip();
     }
 
-    private function isNextMoveASkip() : bool
+    private function isNextMoveASkip(): bool
     {
         return $this->hasGift()
             && ($this->gift instanceof SkipActionInterface);
@@ -287,7 +287,7 @@ class EightsGame extends CardGame
         $this->move++;
     }
 
-    private function winMessageFor(Player $player) : MessageInterface
+    private function winMessageFor(Player $player): MessageInterface
     {
         return new TextMessage(
             $player->equals($this->observer())
@@ -296,7 +296,7 @@ class EightsGame extends CardGame
         );
     }
 
-    protected function dealing() : MessageInterface
+    protected function dealing(): MessageInterface
     {
         $count = $this->players()->count();
 
@@ -341,7 +341,7 @@ class EightsGame extends CardGame
         return $message;
     }
 
-    public function makeMove(Player $player) : MessageInterface
+    public function makeMove(Player $player): MessageInterface
     {
         Assert::true($this->isValidPlayer($player));
         Assert::true($this->isStarted());
@@ -366,7 +366,7 @@ class EightsGame extends CardGame
         return $message;
     }
 
-    public function statusString() : string
+    public function statusString(): string
     {
         return
             '[' . $this->move . '] ' .
@@ -374,7 +374,7 @@ class EightsGame extends CardGame
             'Колода: ' . $this->deckSize();
     }
 
-    private function actualMove(Player $player) : CardEventAccumulator
+    private function actualMove(Player $player): CardEventAccumulator
     {
         $events = new CardEventAccumulator();
 
@@ -422,7 +422,7 @@ class EightsGame extends CardGame
     /**
      * This function must be called in case when the player has no cards to put.
      */
-    public function hasNoCardsToPut(Player $player) : CardEventInterface
+    public function hasNoCardsToPut(Player $player): CardEventInterface
     {
         $this->noCardsInARow++;
 
@@ -432,14 +432,14 @@ class EightsGame extends CardGame
     /**
      * Todo: extract this to strategy
      */
-    private function chooseCardToPut(Player $player) : ?Card
+    private function chooseCardToPut(Player $player): ?Card
     {
         return $this
             ->getPlayableCardsFor($player)
             ->random();
     }
 
-    public function putCard(Player $player, Card $card) : CardEventCollection
+    public function putCard(Player $player, Card $card): CardEventCollection
     {
         $events = new CardEventAccumulator();
 
@@ -465,7 +465,7 @@ class EightsGame extends CardGame
     /**
      * Returns the currently playable cards for the player.
      */
-    public function getPlayableCardsFor(Player $player) : CardCollection
+    public function getPlayableCardsFor(Player $player): CardCollection
     {
         Assert::true($this->isValidPlayer($player));
 
@@ -477,19 +477,19 @@ class EightsGame extends CardGame
             );
     }
 
-    protected function onDiscard(Card $card, ?Player $player = null) : void
+    protected function onDiscard(Card $card, ?Player $player = null): void
     {
         $this->placeGift(
             $this->toGift($card, $player)
         );
     }
 
-    protected function placeGift(?GiftAction $gift) : void
+    protected function placeGift(?GiftAction $gift): void
     {
         $this->gift = $gift;
     }
 
-    protected function retrieveGift() : ?GiftAction
+    protected function retrieveGift(): ?GiftAction
     {
         $gift = $this->gift;
         $this->gift = null;
@@ -497,14 +497,14 @@ class EightsGame extends CardGame
         return $gift;
     }
 
-    protected function giftAnnouncementEvents() : CardEventCollection
+    protected function giftAnnouncementEvents(): CardEventCollection
     {
         return $this->gift
             ? $this->gift->announcementEvents()
             : CardEventCollection::empty();
     }
 
-    private function toGift(Card $card, ?Player $player = null) : ?GiftAction
+    private function toGift(Card $card, ?Player $player = null): ?GiftAction
     {
         if (!($card instanceof SuitedCard)) {
             return null;
@@ -549,7 +549,7 @@ class EightsGame extends CardGame
         return null;
     }
 
-    private function chooseSuit(Player $player) : Suit
+    private function chooseSuit(Player $player): Suit
     {
         // todo: extract this to strategy
 
@@ -560,7 +560,7 @@ class EightsGame extends CardGame
             : Suit::random();
     }
 
-    public function canBeDiscarded(Card $card) : bool
+    public function canBeDiscarded(Card $card): bool
     {
         if ($this->isSuperCard($card)) {
             return true;
@@ -585,12 +585,12 @@ class EightsGame extends CardGame
         return $topDiscard->isSameSuit($card) || $topDiscard->isSameRank($card);
     }
 
-    private function isSuperCard(Card $card) : bool
+    private function isSuperCard(Card $card): bool
     {
         return $card->isJoker() || $card->isRank(Rank::eight());
     }
 
-    public function winner() : ?Player
+    public function winner(): ?Player
     {
         if (!$this->isStarted()) {
             return null;
@@ -601,22 +601,22 @@ class EightsGame extends CardGame
         );
     }
 
-    private function hasWinner() : bool
+    private function hasWinner(): bool
     {
         return $this->winner() !== null;
     }
 
-    private function hasWon(Player $player) : bool
+    private function hasWon(Player $player): bool
     {
         return $player->hand()->isEmpty();
     }
 
-    private function isDraw() : bool
+    private function isDraw(): bool
     {
         return $this->drawReason() !== null;
     }
 
-    private function drawReason() : ?string
+    private function drawReason(): ?string
     {
         if ($this->move >= $this->maxMoves) {
             return 'Превышено максимальное число ходов (' . $this->maxMoves . '), что-то явно не так!';
@@ -634,7 +634,7 @@ class EightsGame extends CardGame
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return parent::serialize(
             [

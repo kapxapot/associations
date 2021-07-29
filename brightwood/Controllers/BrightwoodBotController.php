@@ -46,7 +46,7 @@ class BrightwoodBotController
         $this->telegram = $container->get(TelegramTransport::class);
         $this->answerer = $container->get(Answerer::class);
 
-        $this->parser = new StoryParser();
+        $this->parser = $container->get(StoryParser::class);
     }
 
     public function __invoke(

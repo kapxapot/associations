@@ -11,6 +11,7 @@ use Exception;
 use Plasticode\Core\Response;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
+use Plasticode\Util\Strings;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -104,6 +105,7 @@ class SberBotController
                     [
                         'bubble' => [
                             'text' => $response->text(),
+                            'expand_policy' => 'force_expand',
                         ]
                     ],
                 ],
@@ -123,6 +125,33 @@ class SberBotController
 
             $data['payload'][SberRequest::STATE_ROOT] = json_encode($state);
         }
+
+        if ($response->hasActions()) {
+            $buttons = array_map(
+                fn (string $a) => [
+                    'title' => Strings::upperCaseFirst($a),
+                    'actions' => [
+                        [
+                            'text' => $a,
+                            'type' => 'text'
+                        ]
+                    ]
+                ],
+                $response->actions()
+            );
+
+            $data['payload']['suggestions'] = ['buttons' => $buttons];
+        }
+
+        // insert vars:
+        // - hello
+        // - word_limit
+        //
+        // parse:
+        // - cmd - render command, e.g. "«помощь»"
+        // - att - вы/ты
+        // - q - «»
+        // - (void) - genders - use assistant's gender, default = FEM
 
         return $data;
     }

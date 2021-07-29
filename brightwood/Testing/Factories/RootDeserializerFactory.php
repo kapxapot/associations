@@ -2,6 +2,7 @@
 
 namespace Brightwood\Testing\Factories;
 
+use App\Bots\Factories\MessageRendererFactory;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use App\Testing\Seeders\TelegramUserSeeder;
@@ -26,7 +27,9 @@ class RootDeserializerFactory
         return new RootDeserializer(
             new SerializationConfig(
                 $telegramUserRepository,
-                new StoryParser(),
+                new StoryParser(
+                    new MessageRendererFactory()
+                ),
                 new Cases()
             ),
             new CardSerializer(),

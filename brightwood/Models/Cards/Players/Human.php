@@ -3,7 +3,7 @@
 namespace Brightwood\Models\Cards\Players;
 
 use App\Models\TelegramUser;
-use Plasticode\Util\Cases;
+use Plasticode\Semantics\Gender;
 use Webmozart\Assert\Assert;
 
 class Human extends Player
@@ -34,7 +34,7 @@ class Human extends Player
         $this->telegramUser = $telegramUser;
 
         if ($this->gender()) {
-            $this->icon = $this->gender() == Cases::MAS
+            $this->icon = $this->gender() == Gender::MAS
                 ? '👦'
                 : '👧';
         }

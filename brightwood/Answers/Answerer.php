@@ -12,7 +12,7 @@ use Brightwood\Models\Stories\Story;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
-use Plasticode\Util\Cases;
+use Plasticode\Semantics\Gender;
 use Plasticode\Util\Strings;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
@@ -129,11 +129,11 @@ class Answerer
 
         switch ($text) {
             case $this->masAction:
-                $gender = Cases::MAS;
+                $gender = Gender::MAS;
                 break;
 
             case $this->femAction:
-                $gender = Cases::FEM;
+                $gender = Gender::FEM;
                 break;
         }
 

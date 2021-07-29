@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Cards\Players;
 
-use Plasticode\Util\Cases;
+use Plasticode\Semantics\Gender;
 
 class FemaleBot extends Bot
 {
@@ -10,6 +10,6 @@ class FemaleBot extends Bot
         ?string $name = null
     )
     {
-        parent::__construct($name, Cases::FEM);
+        parent::__construct($name, Gender::FEM);
     }
 }

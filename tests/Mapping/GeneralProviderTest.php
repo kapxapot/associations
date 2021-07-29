@@ -4,6 +4,8 @@ namespace App\Tests\Mapping;
 
 use App\Auth\Auth;
 use App\Auth\Interfaces\AuthInterface;
+use App\Bots\Interfaces\MessageRendererInterface;
+use App\Bots\MessageRenderer;
 use App\Config\CaptchaConfig;
 use App\Config\Config;
 use App\Config\Interfaces\AssociationConfigInterface;
@@ -194,12 +196,14 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(WordRecountService::class);
         $this->check(WordService::class);
 
-        // parsing
+        // parsing / rendering
 
         $this->check(DoubleBracketsConfig::class);
         $this->check(NewsLinkMapper::class);
         $this->check(PageLinkMapper::class);
         $this->check(TagLinkMapper::class);
+
+        $this->check(MessageRendererInterface::class, MessageRenderer::class);
 
         // slim
 

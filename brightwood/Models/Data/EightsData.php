@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Data;
 
+use App\Bots\Factories\MessageRendererFactory;
 use App\Models\TelegramUser;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Games\EightsGame;
@@ -81,7 +82,10 @@ class EightsData extends StoryData implements SerializableInterface
             ->shuffle();
 
         $game = new EightsGame(
-            new StoryParser(),
+            // todo: should be provided by container definitions (a factory!)
+            new StoryParser(
+                new MessageRendererFactory()
+            ),
             new Cases(),
             $players
         );

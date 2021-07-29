@@ -20,6 +20,7 @@ class EightsGameSerializer extends CardGameSerializer
         $this->parser = $parser;
         $this->cases = $cases;
     }
+
     /**
      * @param EightsGame $obj
      */
