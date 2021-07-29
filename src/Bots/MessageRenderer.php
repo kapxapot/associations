@@ -90,18 +90,22 @@ class MessageRenderer implements MessageRendererInterface
     }
 
     /**
+     * @param array<string, mixed>|null $context
+     *
      * @throws InvalidConfigurationException
      */
     public function render(string $text): string
     {
         return preg_replace_callback(
-            "/{(?:([^:]+):)?(.+)}/",
-            fn (array $m) => $this->renderMatch($m[1], $m[2]),
+            "/{(?:([^:]+):)?([^}]+)}/",
+            fn (array $m) => $this->renderMatch($m[1], $m[2], $context ?? []),
             $text
         );
     }
 
     /**
+     * @param array<string, mixed> $context
+     *
      * @throws InvalidConfigurationException
      */
     private function renderMatch(string $tag, string $text): string
@@ -120,17 +124,16 @@ class MessageRenderer implements MessageRendererInterface
                 return $this->renderByIndex($var, $text);
             }
 
-            throw new InvalidConfigurationException(
-                sprintf('No handler or var found for tag "%s".', $tag)
-            );
+            // rendering as a first option by default
+            return $this->renderByIndex(1, $text);
         }
 
-        // try render render as var
+        // try render as var
         if ($this->hasVar($text)) {
             return $this->vars[$text];
         }
 
-        // default: render gender
+        // default: render by gender
         return $this->renderByIndex($this->gender, $text);
     }
 

@@ -15,5 +15,11 @@ interface MessageRendererInterface
      */
     public function withVars(array $vars): self;
 
+    /**
+     * @param array<string, callable> $handlers
+     * @return $this
+     */
+    public function withHandlers(array $handlers): self;
+
     public function render(string $text): string;
 }
