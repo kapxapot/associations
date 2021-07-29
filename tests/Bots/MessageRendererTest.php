@@ -9,19 +9,6 @@ use PHPUnit\Framework\TestCase;
 use Plasticode\Semantics\Gender;
 use Plasticode\Util\Classes;
 
-/**
- * Must render:
- *
- * vars:
- * - hello
- * - word_limit
- *
- * handlers:
- * - cmd - render command, e.g. "«помощь»"
- * - att - вы/ты
- * - q - «»
- * - (void) - genders - use assistant's gender, default = FEM
- */
 final class MessageRendererTest extends TestCase
 {
     private MessageRendererInterface $renderer;
@@ -38,11 +25,10 @@ final class MessageRendererTest extends TestCase
             ->renderer
             ->withVars([
                 'hello' => 'Привет',
-                'word_limit' => 'трёх слов',
             ])
             ->withHandlers([
                 'cmd' => function (string $text) {
-                    $commands = Classes::getPublicConstants(Command::class);
+                    $commands = Classes::getConstants(Command::class);
 
                     $commandName = mb_strtoupper($text);
                     $commandText = $commands[$commandName] ?? $text;
@@ -107,6 +93,51 @@ final class MessageRendererTest extends TestCase
         $this->assertEquals(
             'Здоровье: hp',
             $this->renderer->render($text)
+        );
+    }
+
+    public function testQuoteHandler(): void
+    {
+        $text = '{q:ёлка}';
+
+        $this->assertEquals(
+            '«ёлка»',
+            $this->renderer->render($text)
+        );
+    }
+
+    public function testCommandHandler(): void
+    {
+        $text = '{cmd:exit}';
+
+        $this->assertEquals(
+            '«хватит»',
+            $this->renderer->render($text)
+        );
+    }
+
+    public function testUnknownCommandHandler(): void
+    {
+        $text = '{cmd:bark}';
+
+        $this->assertEquals(
+            '«bark»',
+            $this->renderer->render($text)
+        );
+    }
+
+    public function testAttitudeVar(): void
+    {
+        $text = '{att:Здравствуйте|Привет}, {att:уважаемый|чувак}!';
+
+        $this->assertEquals(
+            'Здравствуйте, уважаемый!',
+            $this->renderer->render($text)
+        );
+
+        $this->assertEquals(
+            'Привет, чувак!',
+            $this->renderer->withVar('att', 2)->render($text)
         );
     }
 }
