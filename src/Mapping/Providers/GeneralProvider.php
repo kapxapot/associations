@@ -4,8 +4,6 @@ namespace App\Mapping\Providers;
 
 use App\Auth\Auth;
 use App\Auth\Interfaces\AuthInterface;
-use App\Bots\Interfaces\MessageRendererInterface;
-use App\Bots\MessageRenderer;
 use App\Config\CaptchaConfig;
 use App\Config\Config;
 use App\Config\Interfaces\AssociationConfigInterface;
@@ -80,7 +78,6 @@ class GeneralProvider extends MappingProvider
             // parsing / rendering
 
             DoubleBracketsConfig::class => DoubleBracketsConfigFactory::class,
-            MessageRendererInterface::class => MessageRenderer::class,
 
             // slim
 

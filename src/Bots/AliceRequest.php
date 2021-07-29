@@ -2,6 +2,8 @@
 
 namespace App\Bots;
 
+use Plasticode\Semantics\Gender;
+
 class AliceRequest extends AbstractBotRequest
 {
     public function __construct(array $data)
@@ -23,6 +25,8 @@ class AliceRequest extends AbstractBotRequest
 
         $this->userState = $data['state']['user'] ?? null;
         $this->applicationState = $data['state']['application'] ?? null;
+
+        $this->gender = Gender::FEM;
     }
 
     protected function getTrashTokens(): array

@@ -2,6 +2,9 @@
 
 namespace App\Bots;
 
+use Plasticode\Semantics\Attitude;
+use Plasticode\Semantics\Gender;
+
 class SberRequest extends AbstractBotRequest
 {
     public const STATE_ROOT = 'intent';
@@ -50,6 +53,18 @@ class SberRequest extends AbstractBotRequest
 
         $this->userState = $decodedState[self::USER_STATE] ?? null;
         $this->applicationState = $decodedState[self::APPLICATION_STATE] ?? null;
+
+        $character = $this->payload['character'] ?? [];
+        $gender = $character['gender'] ?? null;
+        $appeal = $character['appeal'] ?? null;
+
+        if ($gender === 'female') {
+            $this->gender = Gender::FEM;
+        }
+
+        if ($appeal === 'unofficial') {
+            $this->attitude = Attitude::UNOFFICIAL;
+        }
     }
 
     /**

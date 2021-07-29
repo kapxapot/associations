@@ -5,10 +5,13 @@ namespace App\Controllers;
 use App\Bots\Answerers\ApplicationAnswerer;
 use App\Bots\Answerers\UserAnswerer;
 use App\Bots\BotResponse;
+use App\Bots\Factories\BotMessageRendererFactory;
+use App\Bots\Interfaces\MessageRendererInterface;
 use App\Bots\SberRequest;
 use App\Services\SberUserService;
 use Exception;
 use Plasticode\Core\Response;
+use Plasticode\Semantics\Attitude;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Strings;
@@ -27,6 +30,8 @@ class SberBotController
 
     private SettingsProviderInterface $settingsProvider;
 
+    private MessageRendererInterface $messageRenderer;
+
     private bool $logEnabled;
 
     public function __construct(
@@ -34,6 +39,7 @@ class SberBotController
         UserAnswerer $userAnswerer,
         SberUserService $sberUserService,
         SettingsProviderInterface $settingsProvider,
+        BotMessageRendererFactory $messageRendererFactory,
         LoggerInterface $logger
     )
     {
@@ -44,6 +50,8 @@ class SberBotController
 
         $this->settingsProvider = $settingsProvider;
         $this->logger = $logger;
+
+        $this->messageRenderer = ($messageRendererFactory)();
 
         $this->logEnabled = $this->settingsProvider->get('sber.bot_log', false) === true;
     }
@@ -93,6 +101,19 @@ class SberBotController
 
     private function buildMessage(SberRequest $request, BotResponse $response): array
     {
+        $gender = $request->gender();
+        $attitude = $request->attitude();
+
+        $text = $this
+            ->messageRenderer
+            ->withGender($gender)
+            ->withVars([
+                'att' => $attitude,
+                'hello' => $attitude == Attitude::OFFICIAL ? 'Здравствуйте' : 'Привет',
+                'word_limit' => UserAnswerer::WORD_LIMIT,
+            ])
+            ->render($response->text());
+
         $data = [
             'messageName' => 'ANSWER_TO_USER',
             'sessionId' => $request->sessionId,
@@ -100,11 +121,11 @@ class SberBotController
             'uuid' => $request->uuid,
             'payload' => [
                 'device' => $request->device,
-                'pronounceText' => $response->text(),
+                'pronounceText' => $text,
                 'items' => [
                     [
                         'bubble' => [
-                            'text' => $response->text(),
+                            'text' => $text,
                             'expand_policy' => 'force_expand',
                         ]
                     ],
@@ -142,16 +163,6 @@ class SberBotController
 
             $data['payload']['suggestions'] = ['buttons' => $buttons];
         }
-
-        // insert vars:
-        // - hello
-        // - word_limit
-        //
-        // parse:
-        // - cmd - render command, e.g. "«помощь»"
-        // - att - вы/ты
-        // - q - «»
-        // - (void) - genders - use assistant's gender, default = FEM
 
         return $data;
     }

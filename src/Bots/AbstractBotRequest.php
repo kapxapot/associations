@@ -3,6 +3,8 @@
 namespace App\Bots;
 
 use App\Semantics\Tokenizer;
+use Plasticode\Semantics\Attitude;
+use Plasticode\Semantics\Gender;
 
 abstract class AbstractBotRequest
 {
@@ -28,9 +30,18 @@ abstract class AbstractBotRequest
     protected ?array $userState;
     protected ?array $applicationState;
 
+    /** Masculine by default. */
+    protected int $gender;
+
+    /** Official by default. */
+    protected int $attitude;
+
     protected function __construct()
     {
         $this->tokenizer = new Tokenizer();
+
+        $this->gender = Gender::MAS;
+        $this->attitude = Attitude::OFFICIAL;
     }
 
     public function hasUser(): bool
@@ -130,6 +141,16 @@ abstract class AbstractBotRequest
         return $this->hasUser()
             ? $this->userState
             : $this->applicationState;
+    }
+
+    public function gender(): int
+    {
+        return $this->gender;
+    }
+
+    public function attitude(): int
+    {
+        return $this->attitude;
     }
 
     /**

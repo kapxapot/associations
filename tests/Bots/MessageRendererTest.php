@@ -2,12 +2,10 @@
 
 namespace App\Tests\Bots;
 
-use App\Bots\Command;
-use App\Bots\Factories\MessageRendererFactory;
+use App\Bots\Factories\BotMessageRendererFactory;
 use App\Bots\Interfaces\MessageRendererInterface;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Semantics\Gender;
-use Plasticode\Util\Classes;
 
 final class MessageRendererTest extends TestCase
 {
@@ -17,26 +15,9 @@ final class MessageRendererTest extends TestCase
     {
         parent::setUp();
 
-        $factory = new MessageRendererFactory();
+        $factory = new BotMessageRendererFactory();
 
         $this->renderer = ($factory)();
-
-        $this
-            ->renderer
-            ->withVars([
-                'hello' => 'Привет',
-            ])
-            ->withHandlers([
-                'cmd' => function (string $text) {
-                    $commands = Classes::getConstants(Command::class);
-
-                    $commandName = mb_strtoupper($text);
-                    $commandText = $commands[$commandName] ?? $text;
-
-                    return '«' . $commandText . '»';
-                },
-                'q' => fn (string $text) => '«' . $text . '»',
-            ]);
     }
 
     protected function tearDown(): void
@@ -74,6 +55,8 @@ final class MessageRendererTest extends TestCase
     public function testValidVarAndSemiEmptyGender(): void
     {
         $text = '{hello}, приятель{|ница}!';
+
+        $this->renderer->withVar('hello', 'Привет');
 
         $this->assertEquals(
             'Привет, приятель!',
