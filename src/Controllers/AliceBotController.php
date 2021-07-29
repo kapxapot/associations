@@ -6,6 +6,8 @@ use App\Bots\AliceRequest;
 use App\Bots\Answerers\ApplicationAnswerer;
 use App\Bots\Answerers\UserAnswerer;
 use App\Bots\BotResponse;
+use App\Bots\Factories\BotMessageRendererFactory;
+use App\Bots\Interfaces\MessageRendererInterface;
 use App\Services\AliceUserService;
 use Exception;
 use Plasticode\Core\Response;
@@ -27,11 +29,14 @@ class AliceBotController
 
     private SettingsProviderInterface $settingsProvider;
 
+    private MessageRendererInterface $messageRenderer;
+
     public function __construct(
         ApplicationAnswerer $applicationAnswerer,
         UserAnswerer $userAnswerer,
         AliceUserService $aliceUserService,
         SettingsProviderInterface $settingsProvider,
+        BotMessageRendererFactory $messageRendererFactory,
         LoggerInterface $logger
     )
     {
@@ -41,6 +46,9 @@ class AliceBotController
         $this->aliceUserService = $aliceUserService;
 
         $this->settingsProvider = $settingsProvider;
+
+        $this->messageRenderer = ($messageRendererFactory)();
+
         $this->logger = $logger;
     }
 
@@ -65,7 +73,7 @@ class AliceBotController
 
             return Response::json(
                 $response,
-                $this->buildMessage($aliceResponse)
+                $this->buildMessage($aliceRequest, $aliceResponse)
             );
         } catch (Exception $ex) {
             $this->logEx($ex);
@@ -85,11 +93,24 @@ class AliceBotController
             : $this->userAnswerer->getResponse($request, $aliceUser);
     }
 
-    private function buildMessage(BotResponse $response): array
+    private function buildMessage(AliceRequest $request, BotResponse $response): array
     {
+        $gender = $request->gender();
+        $attitude = $request->attitude();
+
+        $text = $this
+            ->messageRenderer
+            ->withGender($gender)
+            ->withVars([
+                'att' => $attitude,
+                'hello' => 'Привет',
+                'word_limit' => UserAnswerer::WORD_LIMIT,
+            ])
+            ->render($response->text());
+
         $data = [
             'response' => [
-                'text' => $response->text(),
+                'text' => $text,
                 'end_session' => $response->endSession(),
             ],
             'version' => '1.0',

@@ -97,8 +97,8 @@ class MessageRenderer implements MessageRendererInterface
     public function render(string $text): string
     {
         return preg_replace_callback(
-            "/{(?:([^:]+):)?([^}]+)}/",
-            fn (array $m) => $this->renderMatch($m[1], $m[2], $context ?? []),
+            "/{(?:([^:}]+):)?([^}]+)}/",
+            fn (array $m) => $this->renderMatch($m[1], $m[2]),
             $text
         );
     }
@@ -141,7 +141,7 @@ class MessageRenderer implements MessageRendererInterface
     {
         $parts = explode('|', $text);
 
-        return $parts[$index - 1] ?? $text;
+        return $parts[$index - 1] ?? '';
     }
 
     private function hasVar(string $name): bool

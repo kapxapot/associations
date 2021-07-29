@@ -5,6 +5,7 @@ namespace App\Tests\Bots;
 use App\Bots\Factories\BotMessageRendererFactory;
 use App\Bots\Interfaces\MessageRendererInterface;
 use PHPUnit\Framework\TestCase;
+use Plasticode\Semantics\Attitude;
 use Plasticode\Semantics\Gender;
 
 final class MessageRendererTest extends TestCase
@@ -120,7 +121,22 @@ final class MessageRendererTest extends TestCase
 
         $this->assertEquals(
             'Привет, чувак!',
-            $this->renderer->withVar('att', 2)->render($text)
+            $this->renderer->withVar('att', Attitude::UNOFFICIAL)->render($text)
+        );
+    }
+
+    public function testAttitudeShortVar(): void
+    {
+        $text = 'скажи{att:те}';
+
+        $this->assertEquals(
+            'скажите',
+            $this->renderer->render($text)
+        );
+
+        $this->assertEquals(
+            'скажи',
+            $this->renderer->withVar('att', Attitude::UNOFFICIAL)->render($text)
         );
     }
 }

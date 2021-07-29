@@ -2,6 +2,7 @@
 
 namespace App\Bots\Factories;
 
+use App\Bots\Command;
 use App\Bots\MessageRenderer;
 use Plasticode\Util\Classes;
 

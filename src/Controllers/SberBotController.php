@@ -49,10 +49,10 @@ class SberBotController
         $this->sberUserService = $sberUserService;
 
         $this->settingsProvider = $settingsProvider;
-        $this->logger = $logger;
 
         $this->messageRenderer = ($messageRendererFactory)();
 
+        $this->logger = $logger;
         $this->logEnabled = $this->settingsProvider->get('sber.bot_log', false) === true;
     }
 
