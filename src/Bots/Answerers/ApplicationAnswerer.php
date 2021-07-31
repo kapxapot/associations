@@ -9,7 +9,6 @@ use App\Models\DTO\MetaTurn;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\LanguageService;
-use Plasticode\Semantics\Sentence;
 
 class ApplicationAnswerer extends AbstractAnswerer
 {
@@ -47,7 +46,7 @@ class ApplicationAnswerer extends AbstractAnswerer
             );
         }
 
-        if (strlen($question) === 0) {
+        if (strlen($question) == 0) {
             return $this->cluelessResponse();
         }
 
@@ -123,8 +122,7 @@ class ApplicationAnswerer extends AbstractAnswerer
             ->buildResponse($answerParts)
             ->withActions(
                 Command::SKIP,
-                Command::HELP,
-                Command::ENOUGH
+                Command::HELP
             );
 
         if ($word !== null) {

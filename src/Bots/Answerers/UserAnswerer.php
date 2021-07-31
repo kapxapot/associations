@@ -16,6 +16,7 @@ use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
 use App\Services\WordFeedbackService;
+use InvalidArgumentException;
 use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Semantics\Sentence;
@@ -93,7 +94,7 @@ class UserAnswerer extends AbstractAnswerer
             return $this->checkCommandConfirmation($botUser, $request);
         }
 
-        if (strlen($command) === 0) {
+        if (strlen($command) == 0) {
             return $this->cluelessResponse();
         }
 
@@ -102,6 +103,11 @@ class UserAnswerer extends AbstractAnswerer
             Command::COMMANDS,
             Command::RULES
         )) {
+            // no need to confirm a command when it's triggered by a button click
+            if ($request->isButtonPressed()) {
+                return $this->applyHelpSubCommand($request, $command);
+            }
+
             return $this->confirmCommand($command);
         }
 
@@ -200,16 +206,7 @@ class UserAnswerer extends AbstractAnswerer
         $commandToConfirm = $request->var(self::VAR_COMMAND);
 
         if ($command === Command::COMMAND || $command === $commandToConfirm) {
-            switch ($commandToConfirm) {
-                case Command::HELP:
-                    return $this->helpCommand($request);
-
-                case Command::RULES:
-                    return $this->rulesCommand($request);
-
-                case Command::COMMANDS:
-                    return $this->commandsCommand($request);
-            }
+            return $this->applyHelpSubCommand($request, $commandToConfirm);
         }
 
         if ($this->isPlayCommand($request)) {
@@ -217,6 +214,25 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         return $this->confirmCommand($commandToConfirm, self::MESSAGE_CLUELESS);
+    }
+
+    private function applyHelpSubCommand(
+        AbstractBotRequest $request,
+        string $command
+    ): BotResponse
+    {
+        switch ($command) {
+            case Command::HELP:
+                return $this->helpCommand($request);
+
+            case Command::RULES:
+                return $this->rulesCommand($request);
+
+            case Command::COMMANDS:
+                return $this->commandsCommand($request);
+        }
+
+        throw new InvalidArgumentException('Unknown help sub-command: ' . $command);
     }
 
     protected function getCommandsMessage(): string
@@ -586,9 +602,7 @@ class UserAnswerer extends AbstractAnswerer
             }
         }
 
-        $commands[] = Command::SKIP;
         $commands[] = Command::HELP;
-        $commands[] = Command::ENOUGH;
 
         return $commands;
     }

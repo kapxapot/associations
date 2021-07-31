@@ -2,6 +2,8 @@
 
 namespace App\Bots;
 
+use Plasticode\Util\Strings;
+
 class Command
 {
     const ASSOCIATION_DISLIKE = 'плохая ассоциация';
@@ -14,6 +16,17 @@ class Command
     const REPEAT = 'повтори';
     const RULES = 'правила';
     const SKIP = 'дальше';
-    const WHAT = 'что';
+    const WHAT = 'что это';
     const WORD_DISLIKE = 'плохое слово';
+
+    public static function getLabel(string $command): string
+    {
+        $labels = [
+            self::WHAT => 'что это?',
+        ];
+
+        $label = $labels[$command] ?? $command;
+
+        return Strings::upperCaseFirst($label);
+    }
 }

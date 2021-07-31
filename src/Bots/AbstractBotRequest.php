@@ -36,12 +36,16 @@ abstract class AbstractBotRequest
     /** Official by default. */
     protected int $attitude;
 
+    protected bool $isButtonPressed;
+
     protected function __construct()
     {
         $this->tokenizer = new Tokenizer();
 
         $this->gender = Gender::MAS;
         $this->attitude = Attitude::OFFICIAL;
+
+        $this->isButtonPressed = false;
     }
 
     public function hasUser(): bool
@@ -115,7 +119,9 @@ abstract class AbstractBotRequest
      */
     protected function getTrashTokens(): array
     {
-        return [];
+        return [
+            'говорю', 'блядь', 'сама', 'этот', 'это', 'так', 'ты', 'ой', 'да', 'ну', 'я', 'э', 'а', '-', '=', '?'
+        ];
     }
 
     /**
@@ -151,6 +157,11 @@ abstract class AbstractBotRequest
     public function attitude(): int
     {
         return $this->attitude;
+    }
+
+    public function isButtonPressed(): bool
+    {
+        return $this->isButtonPressed;
     }
 
     /**

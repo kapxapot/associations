@@ -37,7 +37,7 @@ abstract class AbstractAnswerer
     protected const MESSAGE_COMMANDS_USER = 'Для пропуска слова скажи{att:те} {cmd:skip}. Для повтора слова скажи{att:те} {cmd:repeat}. Спроси{att:те} {cmd:what}, чтобы узнать значение слова. Если {att:вам|тебе} не нравится слово или ассоциация, скажи{att:те} {cmd:word_dislike} или {cmd:association_dislike}. Для выхода скажи{att:те} {cmd:enough}.';
 
     protected const MESSAGE_SKIP = 'Хорошо.';
-    protected const MESSAGE_START_ANEW = 'Моё новое слово:';
+    protected const MESSAGE_START_ANEW = 'Новое слово:';
     protected const MESSAGE_ERROR = 'Что-то пошло не так.';
     protected const MESSAGE_CONTINUE = 'Продолжаем. Моё слово:';
 
@@ -79,7 +79,7 @@ abstract class AbstractAnswerer
             return ($playCommandHandler)();
         }
 
-        return $this->shortHelpCommand($request, self::MESSAGE_CLUELESS);
+        return $this->helpCommand($request, self::MESSAGE_CLUELESS);
     }
 
     protected function cluelessResponse(): BotResponse

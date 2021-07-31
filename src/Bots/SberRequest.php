@@ -42,6 +42,11 @@ class SberRequest extends AbstractBotRequest
         $message = $this->payload['message'] ?? [];
 
         $this->originalCommand = $message['original_text'] ?? null;
+
+        if (strlen($this->originalCommand) > 0) {
+            $this->originalCommand = mb_strtolower($this->originalCommand);
+        }
+
         $this->originalTokens = $this->getOriginalTokens($message);
 
         $this->tokens = $this->parseTokens($this->originalCommand);
@@ -62,7 +67,7 @@ class SberRequest extends AbstractBotRequest
             $this->gender = Gender::FEM;
         }
 
-        if ($appeal === 'unofficial') {
+        if ($appeal === 'no_official') {
             $this->attitude = Attitude::UNOFFICIAL;
         }
     }
@@ -83,7 +88,7 @@ class SberRequest extends AbstractBotRequest
                 continue;
             }
 
-            $tokens[] = $tokenData['text'];
+            $tokens[] = mb_strtolower($tokenData['text']);
         }
 
         return $tokens;

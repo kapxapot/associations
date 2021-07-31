@@ -10,29 +10,40 @@ class AliceRequest extends AbstractBotRequest
     {
         parent::__construct();
 
-        $this->originalCommand = $data['request']['command'] ?? null;
-        $this->originalTokens = $data['request']['nlu']['tokens'] ?? [];
+        $request = $data['request'] ?? [];
 
-        $originalUtterance = $data['request']['original_utterance'] ?? null;
+        $this->originalCommand = $request['command'] ?? null;
+        $this->originalTokens = $request['nlu']['tokens'] ?? [];
 
-        $this->tokens = $this->parseTokens($originalUtterance);
+        $command = $request['original_utterance'] ?? $request['payload'] ?? null;
+
+        $this->tokens = $this->parseTokens($command);
         $this->command = $this->rebuildFrom($this->tokens);
 
-        $this->isNewSession = $data['session']['new'] ?? true;
+        $type = $request['type'] ?? null;
 
-        $this->userId = $data['session']['user']['user_id'] ?? null;
-        $this->applicationId = $data['session']['application']['application_id'] ?? null;
+        $this->isButtonPressed = ($type === 'ButtonPressed');
 
-        $this->userState = $data['state']['user'] ?? null;
-        $this->applicationState = $data['state']['application'] ?? null;
+        $session = $data['session'] ?? [];
+
+        $this->isNewSession = $session['new'] ?? true;
+
+        $this->userId = $session['user']['user_id'] ?? null;
+        $this->applicationId = $session['application']['application_id'] ?? null;
+
+        $state = $data['state'] ?? [];
+
+        $this->userState = $state['user'] ?? null;
+        $this->applicationState = $state['application'] ?? null;
 
         $this->gender = Gender::FEM;
     }
 
     protected function getTrashTokens(): array
     {
-        return [
-            'говорю', 'алиса', 'блядь', 'алис', 'сама', 'этот', 'это', 'так', 'ты', 'ой', 'да', 'ну', 'я', 'э', 'а', '-', '='
-        ];
+        return array_merge(
+            parent::getTrashTokens(),
+            ['алиса', 'алис']
+        );
     }
 }

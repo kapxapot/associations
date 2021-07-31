@@ -6,6 +6,7 @@ use App\Bots\AliceRequest;
 use App\Bots\Answerers\ApplicationAnswerer;
 use App\Bots\Answerers\UserAnswerer;
 use App\Bots\BotResponse;
+use App\Bots\Command;
 use App\Bots\Factories\BotMessageRendererFactory;
 use App\Bots\Interfaces\MessageRendererInterface;
 use App\Services\AliceUserService;
@@ -13,7 +14,6 @@ use Exception;
 use Plasticode\Core\Response;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
-use Plasticode\Util\Strings;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -123,8 +123,8 @@ class AliceBotController
         if ($response->hasActions()) {
             $buttons = array_map(
                 fn (string $a) => [
-                    'title' => Strings::upperCaseFirst($a),
-                    'payload' => $a,
+                    'title' => Command::getLabel($a),
+                    'payload' => Command::getLabel($a),
                     'hide' => true,
                 ],
                 $response->actions()

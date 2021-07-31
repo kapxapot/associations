@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Bots\Answerers\ApplicationAnswerer;
 use App\Bots\Answerers\UserAnswerer;
 use App\Bots\BotResponse;
+use App\Bots\Command;
 use App\Bots\Factories\BotMessageRendererFactory;
 use App\Bots\Interfaces\MessageRendererInterface;
 use App\Bots\SberRequest;
@@ -14,7 +15,6 @@ use Plasticode\Core\Response;
 use Plasticode\Semantics\Attitude;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
-use Plasticode\Util\Strings;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -150,10 +150,10 @@ class SberBotController
         if ($response->hasActions()) {
             $buttons = array_map(
                 fn (string $a) => [
-                    'title' => Strings::upperCaseFirst($a),
+                    'title' => Command::getLabel($a),
                     'actions' => [
                         [
-                            'text' => $a,
+                            'text' => Command::getLabel($a),
                             'type' => 'text'
                         ]
                     ]
