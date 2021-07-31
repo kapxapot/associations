@@ -30,20 +30,16 @@ abstract class AbstractAnswerer
 
     protected const MESSAGE_DEMO = 'Игра идёт в демо-режиме. Для полной игры, пожалуйста, авторизуй{att:тесь|ся}.';
 
-    private const MESSAGE_RULES_COMMON = 'В игре в ассоциации мы с {att:вами|тобой} говорим по очереди слово, которое ассоциируется с предыдущим. Например, я говорю {q:лес}, {att:вы|ты} отвечае{att:те|шь} {q:заяц}, я говорю {q:морковка} и так далее.';
+    private const MESSAGE_RULES = 'В игре в ассоциации мы с {att:вами|тобой} говорим по очереди слово, которое ассоциируется с предыдущим. Например, я говорю {q:лес}, {att:вы|ты} отвечае{att:те|шь} {q:заяц}, я говорю {q:морковка} и так далее.';
 
-    protected const MESSAGE_RULES_APPLICATION = self::MESSAGE_RULES_COMMON;
+    protected const MESSAGE_COMMANDS_APPLICATION = 'Для пропуска слова скажи{att:те} {cmd:skip}. Для выхода скажи{att:те} {cmd:enough}.';
 
-    protected const MESSAGE_RULES_USER = self::MESSAGE_RULES_COMMON;
-
-    protected const MESSAGE_COMMANDS_APPLICATION = 'Для пропуска слова скажи{att:те} {cmd:skip} или {cmd:skip_2}. Для выхода скажи{att:те} {cmd:exit}.';
-
-    protected const MESSAGE_COMMANDS_USER = 'Для пропуска слова скажи{att:те} {cmd:skip} или {cmd:skip_2}. Для повтора слова скажи{att:те} {cmd:repeat}. Спроси{att:те} {cmd:what} или {cmd:what_2}, чтобы узнать значение слова. Если {att:вам|тебе} не нравится слово или ассоциация, скажи{att:те} {cmd:word_dislike} или {cmd:association_dislike}. Для выхода скажи{att:те} {cmd:exit}.';
+    protected const MESSAGE_COMMANDS_USER = 'Для пропуска слова скажи{att:те} {cmd:skip}. Для повтора слова скажи{att:те} {cmd:repeat}. Спроси{att:те} {cmd:what}, чтобы узнать значение слова. Если {att:вам|тебе} не нравится слово или ассоциация, скажи{att:те} {cmd:word_dislike} или {cmd:association_dislike}. Для выхода скажи{att:те} {cmd:enough}.';
 
     protected const MESSAGE_SKIP = 'Хорошо.';
-    protected const MESSAGE_START_ANEW = 'Начинаем заново:';
+    protected const MESSAGE_START_ANEW = 'Моё новое слово:';
     protected const MESSAGE_ERROR = 'Что-то пошло не так.';
-    protected const MESSAGE_CONTINUE = 'Продолжаем. Мое слово:';
+    protected const MESSAGE_CONTINUE = 'Продолжаем. Моё слово:';
 
     protected LanguageService $languageService;
 
@@ -66,23 +62,52 @@ abstract class AbstractAnswerer
             : 'У меня нет слов.';
     }
 
+    protected function helpDialog(
+        AbstractBotRequest $request,
+        callable $playCommandHandler
+    ): BotResponse
+    {
+        if ($this->isHelpRulesCommand($request)) {
+            return $this->rulesCommand($request);
+        }
+
+        if ($this->isHelpCommandsCommand($request)) {
+            return $this->commandsCommand($request);
+        }
+
+        if ($this->isPlayCommand($request)) {
+            return ($playCommandHandler)();
+        }
+
+        return $this->shortHelpCommand($request, self::MESSAGE_CLUELESS);
+    }
+
     protected function cluelessResponse(): BotResponse
     {
         return $this->buildResponse(self::MESSAGE_CLUELESS);
     }
 
-    public function helpCommand(
+    protected function helpCommand(
         AbstractBotRequest $request,
         string ...$prependMessages
     ): BotResponse
     {
         return $this
-            ->buildResponse(
-                $prependMessages,
+            ->shortHelpCommand($request, ...$prependMessages)
+            ->addLines(
                 self::CHUNK_RULES,
                 self::CHUNK_COMMANDS,
                 self::CHUNK_PLAY
-            )
+            );
+    }
+
+    protected function shortHelpCommand(
+        AbstractBotRequest $request,
+        string ...$messages
+    ): BotResponse
+    {
+        return $this
+            ->buildResponse($messages)
             ->withActions(
                 Command::RULES,
                 Command::COMMANDS,
@@ -91,8 +116,45 @@ abstract class AbstractAnswerer
             ->withVarBy($request, self::VAR_STATE, self::STATE_HELP);
     }
 
+    protected function rulesCommand(AbstractBotRequest $request): BotResponse
+    {
+        return $this
+            ->buildResponse(
+                $this->getRulesMessage(),
+                self::CHUNK_COMMANDS,
+                self::CHUNK_PLAY
+            )
+            ->withActions(
+                Command::COMMANDS,
+                Command::PLAY
+            )
+            ->withVarBy($request, self::VAR_STATE, self::STATE_RULES);
+    }
+
+    protected function commandsCommand(AbstractBotRequest $request): BotResponse
+    {
+        return $this
+            ->buildResponse(
+                $this->getCommandsMessage(),
+                self::CHUNK_RULES,
+                self::CHUNK_PLAY
+            )
+            ->withActions(
+                Command::RULES,
+                Command::PLAY
+            )
+            ->withVarBy($request, self::VAR_STATE, self::STATE_COMMANDS);
+    }
+
+    protected function getRulesMessage(): string
+    {
+        return self::MESSAGE_RULES;
+    }
+
+    abstract protected function getCommandsMessage(): string;
+
     /**
-     * @param array<string[]|string> ...$parts
+     * @param array<string[]|string> $parts
      */
     protected function buildResponse(...$parts): BotResponse
     {

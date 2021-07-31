@@ -4,6 +4,7 @@ namespace App\Bots\Answerers;
 
 use App\Bots\AbstractBotRequest;
 use App\Bots\BotResponse;
+use App\Bots\Command;
 use App\Models\DTO\MetaTurn;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
@@ -40,7 +41,10 @@ class ApplicationAnswerer extends AbstractAnswerer
         }
 
         if ($this->isHelpDialog($request)) {
-            return $this->helpDialog($request);
+            return $this->helpDialog(
+                $request,
+                fn () => $this->answerWithAnyWord($request, 'Я начинаю:')
+            );
         }
 
         if (strlen($question) === 0) {
@@ -67,39 +71,9 @@ class ApplicationAnswerer extends AbstractAnswerer
         return $this->turnToAnswer($request, $turn);
     }
 
-    private function helpDialog(AbstractBotRequest $request): BotResponse
+    protected function getCommandsMessage(): string
     {
-        if ($this->isHelpRulesCommand($request)) {
-            return $this
-                ->buildResponse(
-                    self::MESSAGE_RULES_APPLICATION,
-                    self::CHUNK_COMMANDS,
-                    self::CHUNK_PLAY
-                )
-                ->withVarBy($request, self::VAR_STATE, self::STATE_RULES);
-        }
-
-        if ($this->isHelpCommandsCommand($request)) {
-            return $this
-                ->buildResponse(
-                    self::MESSAGE_COMMANDS_APPLICATION,
-                    self::CHUNK_RULES,
-                    self::CHUNK_PLAY
-                )
-                ->withVarBy($request, self::VAR_STATE, self::STATE_COMMANDS);
-        }
-
-        if ($this->isPlayCommand($request)) {
-            return $this->answerWithAnyWord(
-                $request,
-                'Я начинаю:'
-            );
-        }
-
-        return $this->helpCommand(
-            $request,
-            Sentence::tailPeriod(self::MESSAGE_CLUELESS)
-        );
+        return self::MESSAGE_COMMANDS_APPLICATION;
     }
 
     private function turnToAnswer(AbstractBotRequest $request, MetaTurn $turn): BotResponse
@@ -145,7 +119,13 @@ class ApplicationAnswerer extends AbstractAnswerer
     {
         $answerParts[] = $this->renderWord($word);
 
-        $response = $this->buildResponse($answerParts);
+        $response = $this
+            ->buildResponse($answerParts)
+            ->withActions(
+                Command::SKIP,
+                Command::HELP,
+                Command::ENOUGH
+            );
 
         if ($word !== null) {
             $response->withApplicationVar(self::VAR_PREV_WORD, $word->getId());

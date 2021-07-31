@@ -80,7 +80,13 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         if ($this->isHelpDialog($request)) {
-            return $this->helpDialog($botUser, $request);
+            return $this->helpDialog(
+                $request,
+                fn () => $this->currentGameResponse(
+                    $botUser,
+                    $botUser->isNew() ? 'Я начинаю:' : 'Я продолжаю:'
+                )
+            );
         }
 
         if ($this->isConfirmDialog($request)) {
@@ -104,7 +110,7 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         if ($this->isHelpRulesCommand($request)) {
-            return $this->rulesCommand();
+            return $this->rulesCommand($request);
         }
 
         if ($this->isNativeBotCommand($request)) {
@@ -154,10 +160,10 @@ class UserAnswerer extends AbstractAnswerer
             return $this->helpCommand($request, self::MESSAGE_WELCOME);
         }
 
-        return $this->buildResponse(
+        return $this->currentGameResponse(
+            $botUser,
             self::MESSAGE_WELCOME_BACK,
-            'Я продолжаю:',
-            $this->renderGameFor($botUser)
+            'Я продолжаю:'
         );
     }
 
@@ -172,7 +178,11 @@ class UserAnswerer extends AbstractAnswerer
                 'Для подтверждения команды {cmd:' . $command . '} скажи{att:те} {cmd:command} или повтори{att:те} её. Если {att:в|т}ы хо{att:тите|чешь} сказать это слово в игре, скажи{att:те} {cmd:playing}.'
             )
             ->withUserVar(self::VAR_STATE, self::STATE_COMMAND_CONFIRM)
-            ->withUserVar(self::VAR_COMMAND, $command);
+            ->withUserVar(self::VAR_COMMAND, $command)
+            ->withActions(
+                $command,
+                Command::PLAYING
+            );
     }
 
     private function isConfirmDialog(AbstractBotRequest $request): bool
@@ -195,88 +205,32 @@ class UserAnswerer extends AbstractAnswerer
                     return $this->helpCommand($request);
 
                 case Command::RULES:
-                    return $this->rulesCommand();
+                    return $this->rulesCommand($request);
 
                 case Command::COMMANDS:
-                    return $this->commandsCommand();
+                    return $this->commandsCommand($request);
             }
         }
-        
+
         if ($this->isPlayCommand($request)) {
             return $this->sayWord($botUser, $commandToConfirm);
         }
 
-        return $this->confirmCommand(
-            $commandToConfirm,
-            Sentence::tailPeriod(self::MESSAGE_CLUELESS)
-        );
+        return $this->confirmCommand($commandToConfirm, self::MESSAGE_CLUELESS);
     }
 
-    private function helpDialog(
-        AbstractBotUser $botUser,
-        AbstractBotRequest $request
-    ): BotResponse
+    protected function getCommandsMessage(): string
     {
-        if ($this->isHelpRulesCommand($request)) {
-            return $this->rulesCommand();
-        }
-
-        if ($this->isHelpCommandsCommand($request)) {
-            return $this->commandsCommand();
-        }
-
-        if ($this->isPlayCommand($request)) {
-            return $this
-                ->buildResponse(
-                    $botUser->isNew() ? 'Я начинаю:' : 'Я продолжаю:',
-                    $this->renderGameFor($botUser)
-                );
-        }
-
-        return $this->helpCommand(
-            $request,
-            Sentence::tailPeriod(self::MESSAGE_CLUELESS)
-        );
-    }
-
-    private function rulesCommand(): BotResponse
-    {
-        return $this
-            ->buildResponse(
-                self::MESSAGE_RULES_USER,
-                self::CHUNK_COMMANDS,
-                self::CHUNK_PLAY
-            )
-            ->withActions(
-                Command::COMMANDS,
-                Command::PLAY
-            )
-            ->withUserVar(self::VAR_STATE, self::STATE_RULES);
-    }
-
-    private function commandsCommand(): BotResponse
-    {
-        return $this
-            ->buildResponse(
-                self::MESSAGE_COMMANDS_USER,
-                self::CHUNK_RULES,
-                self::CHUNK_PLAY
-            )
-            ->withActions(
-                Command::RULES,
-                Command::PLAY
-            )
-            ->withUserVar(self::VAR_STATE, self::STATE_COMMANDS);
+        return self::MESSAGE_COMMANDS_USER;
     }
 
     private function nativeBotCommand(AbstractBotUser $botUser): BotResponse
     {
-        return $this
-            ->buildResponse(
-                'Я не могу выполнить эту команду в игре. Скажи{att:те} {cmd:exit}, чтобы выйти.',
-                'А мое слово:',
-                $this->renderGameFor($botUser)
-            );
+        return $this->currentGameResponse(
+            $botUser,
+            'Я не могу выполнить эту команду в игре. Скажи{att:те} {cmd:enough}, чтобы выйти.',
+            'А мое слово:'
+        );
     }
 
     private function whatCommand(
@@ -303,13 +257,17 @@ class UserAnswerer extends AbstractAnswerer
         $definition = $this->getDefinition($word);
 
         if ($lastWord->equals($word)) {
-            return $this->buildResponse($definition);
+            return $this
+                ->buildResponse($definition)
+                ->withActions(
+                    ...$this->getCommands($this->getGame($botUser))
+                );
         }
 
-        return $this->buildResponse(
+        return $this->currentGameResponse(
+            $botUser,
             Sentence::tailPeriod($definition),
-            'Итак, я говорю:',
-            $this->renderGameFor($botUser)
+            'Итак, я говорю:'
         );
     }
 
@@ -322,18 +280,19 @@ class UserAnswerer extends AbstractAnswerer
         $wordStr = $word->word;
         $parsedDefinition = $word->parsedDefinition();
 
-        return ($parsedDefinition !== null)
-            ? Strings::upperCaseFirst($wordStr)
-                . ' — это '
-                . Strings::lowerCaseFirst($parsedDefinition->firstDefinition())
-            : 'Я не знаю, что такое {q:' . $wordStr . '}.';
+        if ($parsedDefinition === null) {
+            return 'Я не знаю, что такое {q:' . $wordStr . '}.';
+        }
+
+        return Strings::upperCaseFirst($wordStr) . ' — это '
+            . Strings::lowerCaseFirst($parsedDefinition->firstDefinition());
     }
 
     private function tooManyWords(AbstractBotUser $botUser): BotResponse
     {
-        return $this->buildResponse(
-            'Давай{att:те} не больше {word_limit} сразу. Итак, я говорю:',
-            $this->renderGameFor($botUser)
+        return $this->currentGameResponse(
+            $botUser,
+            'Давай{att:те} не больше {word_limit} сразу. Итак, я говорю:'
         );
     }
 
@@ -348,10 +307,10 @@ class UserAnswerer extends AbstractAnswerer
 
         $this->finishGameFor($botUser);
 
-        return $this->buildResponse(
+        return $this->newGameResponse(
+            $botUser,
             'Спасибо, {att:ваш|твой} отзыв сохранен.',
-            self::MESSAGE_START_ANEW,
-            $this->newGameFor($botUser)
+            self::MESSAGE_START_ANEW
         );
     }
 
@@ -360,10 +319,10 @@ class UserAnswerer extends AbstractAnswerer
         $association = $this->getLastTurn($botUser)->association();
 
         if ($association === null) {
-            return $this->buildResponse(
-                '{att:В|Т}ы о чём? Мы только начали игру. Скажи{att:те} {cmd:word_dislike} или {cmd:word_dislike_2}, если {att:вам|тебе} не нравится слово.',
-                'Я говорю:',
-                $this->renderGameFor($botUser)
+            return $this->currentGameResponse(
+                $botUser,
+                'Названо только одно слово, и ассоциации ещё нет. Скажи{att:те} {cmd:word_dislike}, если {att:вам|тебе} не нравится слово.',
+                'Я говорю:'
             );
         }
 
@@ -374,10 +333,10 @@ class UserAnswerer extends AbstractAnswerer
 
         $this->finishGameFor($botUser);
 
-        return $this->buildResponse(
+        return $this->newGameResponse(
+            $botUser,
             'Спасибо, {att:ваш|твой} отзыв сохранен.',
-            self::MESSAGE_START_ANEW,
-            $this->newGameFor($botUser)
+            self::MESSAGE_START_ANEW
         );
     }
 
@@ -385,18 +344,18 @@ class UserAnswerer extends AbstractAnswerer
     {
         $this->finishGameFor($botUser);
 
-        return $this->buildResponse(
+        return $this->newGameResponse(
+            $botUser,
             self::MESSAGE_SKIP,
-            self::MESSAGE_START_ANEW,
-            $this->newGameFor($botUser)
+            self::MESSAGE_START_ANEW
         );
     }
 
     private function repeatCommand(AbstractBotUser $botUser): BotResponse
     {
-        return $this->buildResponse(
-            $this->randomString('Повторяю', 'Хорошо', 'Ещё раз', 'Моё слово', 'Я говорю') . ':',
-            $this->renderGameFor($botUser)
+        return $this->currentGameResponse(
+            $botUser,
+            $this->randomString('Повторяю', 'Хорошо', 'Ещё раз', 'Моё слово', 'Я говорю') . ':'
         );
     }
 
@@ -416,13 +375,21 @@ class UserAnswerer extends AbstractAnswerer
         try {
             $turns = $this->gameService->makeTurn($user, $game, $question);
         } catch (ValidationException $vEx) {
-            return $this->buildResponse(
-                $vEx->firstError()
-            );
+            return $this
+                ->buildResponse(
+                    $vEx->firstError()
+                )
+                ->withActions(
+                    ...$this->getCommands($game)
+                );
         } catch (TurnException $tEx) {
-            return $this->buildResponse(
-                $tEx->getTranslatedMessage($this->translator)
-            );
+            return $this
+                ->buildResponse(
+                    $tEx->getTranslatedMessage($this->translator)
+                )
+                ->withActions(
+                    ...$this->getCommands($game)
+                );
         }
 
         $answerParts = [];
@@ -439,7 +406,11 @@ class UserAnswerer extends AbstractAnswerer
             // continuing current game
             $answerParts[] = $this->renderAiTurn($turns->skip(1)->first());
 
-            return $this->buildResponse($answerParts);
+            return $this
+                ->buildResponse($answerParts)
+                ->withActions(
+                    ...$this->getCommands($game)
+                );
         }
 
         if (!$isMatureQuestion) {
@@ -448,10 +419,11 @@ class UserAnswerer extends AbstractAnswerer
 
         $answerParts[] = self::MESSAGE_START_ANEW;
 
-        $answerParts[] = $this->newGameFor($botUser);
-
         // no answer, starting new game
-        return $this->buildResponse($answerParts);
+        return $this->newGameResponse(
+            $botUser,
+            ...$answerParts
+        );
     }
 
     /**
@@ -515,15 +487,6 @@ class UserAnswerer extends AbstractAnswerer
         $this->turnService->finishGame($game);
     }
 
-    private function newGameFor(AbstractBotUser $botUser): string
-    {
-        $user = $botUser->user();
-
-        $newGame = $this->gameService->createGameFor($user);
-
-        return $this->renderLastTurn($newGame);
-    }
-
     private function getLastTurn(AbstractBotUser $botUser): Turn
     {
         $turn = $this->getGame($botUser)->lastTurn();
@@ -547,13 +510,6 @@ class UserAnswerer extends AbstractAnswerer
         return $game;
     }
 
-    private function renderGameFor(AbstractBotUser $botUser): string
-    {
-        $game = $this->getGame($botUser);
-
-        return $this->renderLastTurn($game);
-    }
-
     private function renderLastTurn(Game $game): string
     {
         return $this->renderAiTurn($game->lastTurn());
@@ -566,6 +522,75 @@ class UserAnswerer extends AbstractAnswerer
         return $turn !== null
             ? $this->renderWord($turn->word())
             : 'Мне нечего сказать. Начинай{att:те} {att:в|т}ы.';
+    }
+
+    /**
+     * @param array<string[]|string> $parts
+     */
+    private function newGameResponse(AbstractBotUser $botUser, ...$parts): BotResponse
+    {
+        $user = $botUser->user();
+
+        $newGame = $this->gameService->createGameFor($user);
+
+        return $this->buildGameResponse($newGame, ...$parts);
+    }
+
+    /**
+     * @param array<string[]|string> $parts
+     */
+    private function currentGameResponse(AbstractBotUser $botUser, ...$parts): BotResponse
+    {
+        $game = $this->getGame($botUser);
+
+        return $this->buildGameResponse($game, ...$parts);
+    }
+
+    /**
+     * @param array<string[]|string> $parts
+     */
+    private function buildGameResponse(Game $game, ...$parts): BotResponse
+    {
+        return $this
+            ->buildResponse(...$parts)
+            ->addLines(
+                $this->renderLastTurn($game)
+            )
+            ->withActions(
+                ...$this->getCommands($game)
+            );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function getCommands(Game $game): array
+    {
+        $lastTurn = $game->lastTurn();
+
+        $commands = [];
+
+        if ($lastTurn !== null) {
+            $word = $lastTurn->word();
+            $association = $lastTurn->association();
+
+            if ($word->parsedDefinition() !== null) {
+                $commands[] = Command::WHAT;
+            }
+
+            $commands[] = Command::SKIP;
+            $commands[] = Command::WORD_DISLIKE;
+
+            if ($association !== null) {
+                $commands[] = Command::ASSOCIATION_DISLIKE;
+            }
+        }
+
+        $commands[] = Command::SKIP;
+        $commands[] = Command::HELP;
+        $commands[] = Command::ENOUGH;
+
+        return $commands;
     }
 
     protected function buildResponse(...$parts): BotResponse

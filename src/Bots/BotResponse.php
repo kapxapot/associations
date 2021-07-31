@@ -9,8 +9,6 @@ class BotResponse
     /** @var string[] */
     protected array $lines;
 
-    protected string $text;
-
     protected bool $endSession = false;
 
     protected ?array $userState = null;
@@ -22,8 +20,6 @@ class BotResponse
     public function __construct(string ...$lines)
     {
         $this->lines = $lines;
-
-        $this->text = Text::join($lines, ' ');
     }
 
     /**
@@ -34,9 +30,19 @@ class BotResponse
         return $this->lines;
     }
 
+    /**
+     * @return $this
+     */
+    public function addLines(string ...$lines): self
+    {
+        $this->lines = array_merge($this->lines, $lines);
+
+        return $this;
+    }
+
     public function text(): string
     {
-        return $this->text;
+        return Text::join($this->lines, ' ');
     }
 
     public function endSession(): bool

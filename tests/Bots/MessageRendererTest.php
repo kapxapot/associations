@@ -92,7 +92,7 @@ final class MessageRendererTest extends TestCase
 
     public function testCommandHandler(): void
     {
-        $text = '{cmd:exit}';
+        $text = '{cmd:enough}';
 
         $this->assertEquals(
             '«хватит»',

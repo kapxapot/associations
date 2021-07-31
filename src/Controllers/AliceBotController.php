@@ -13,6 +13,7 @@ use Exception;
 use Plasticode\Core\Response;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
+use Plasticode\Util\Strings;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -118,6 +119,19 @@ class AliceBotController
 
         $data['user_state_update'] = $response->userState() ?? new stdClass();
         $data['application_state'] = $response->applicationState() ?? new stdClass();
+
+        if ($response->hasActions()) {
+            $buttons = array_map(
+                fn (string $a) => [
+                    'title' => Strings::upperCaseFirst($a),
+                    'payload' => $a,
+                    'hide' => true,
+                ],
+                $response->actions()
+            );
+
+            $data['response']['buttons'] = $buttons;
+        }
 
         return $data;
     }
