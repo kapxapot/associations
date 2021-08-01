@@ -17,6 +17,10 @@ class AliceRequest extends AbstractBotRequest
 
         $command = $request['original_utterance'] ?? $request['payload'] ?? null;
 
+        if (strlen($command) > 0) {
+            $command = mb_strtolower($command);
+        }
+
         $this->tokens = $this->parseTokens($command);
         $this->command = $this->rebuildFrom($this->tokens);
 
