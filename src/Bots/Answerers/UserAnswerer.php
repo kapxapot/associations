@@ -95,7 +95,11 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         if (strlen($command) == 0) {
-            return $this->cluelessResponse();
+            return $this->currentGameResponse(
+                $botUser,
+                self::MESSAGE_CLUELESS,
+                'Я говорю:'
+            );
         }
 
         if ($request->isAny(

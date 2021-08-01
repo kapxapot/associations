@@ -7,9 +7,10 @@ use Plasticode\Semantics\Gender;
 
 class SberRequest extends AbstractBotRequest
 {
-    public const STATE_ROOT = 'intent';
-    public const USER_STATE = 'u';
-    public const APPLICATION_STATE = 'a';
+    const STATE_ROOT = 'intent';
+    const USER_STATE = 'u';
+    const APPLICATION_STATE = 'a';
+    const SERVER_ACTION = 'SERVER_ACTION';
 
     public ?int $messageId;
     public ?string $sessionId;
@@ -27,6 +28,7 @@ class SberRequest extends AbstractBotRequest
 
         $this->messageId = $data['messageId'] ?? 0;
         $this->sessionId = $data['sessionId'] ?? null;
+        $messageName = $data['messageName'] ?? null;
 
         $this->uuid = $data['uuid'] ?? [];
 
@@ -42,15 +44,27 @@ class SberRequest extends AbstractBotRequest
         $message = $this->payload['message'] ?? [];
 
         $this->originalCommand = $message['original_text'] ?? null;
+        $this->originalTokens = $this->getOriginalTokens($message);
+
+        $isServerAction = ($messageName === self::SERVER_ACTION);
+
+        $this->isButtonPressed = $isServerAction;
+
+        if ($isServerAction) {
+            $this->originalCommand ??= $this->payload['server_action']['action_id'] ?? null;
+        }
 
         if (strlen($this->originalCommand) > 0) {
             $this->originalCommand = mb_strtolower($this->originalCommand);
         }
 
-        $this->originalTokens = $this->getOriginalTokens($message);
-
         $this->tokens = $this->parseTokens($this->originalCommand);
         $this->command = $this->rebuildFrom($this->tokens);
+
+        // in case of server action token list is empty
+        if (empty($this->originalTokens)) {
+            $this->originalTokens = $this->tokens;
+        }
 
         $state = $this->payload[self::STATE_ROOT] ?? null;
 

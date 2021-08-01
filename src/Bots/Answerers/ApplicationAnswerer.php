@@ -47,7 +47,12 @@ class ApplicationAnswerer extends AbstractAnswerer
         }
 
         if (strlen($question) == 0) {
-            return $this->cluelessResponse();
+            return $this
+                ->buildResponse(self::MESSAGE_CLUELESS)
+                ->withActions(
+                    Command::SKIP,
+                    Command::HELP
+                );
         }
 
         $prevWordId = $request->var(self::VAR_PREV_WORD);

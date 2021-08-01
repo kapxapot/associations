@@ -152,10 +152,7 @@ class SberBotController
                 fn (string $a) => [
                     'title' => Command::getLabel($a),
                     'actions' => [
-                        [
-                            'text' => Command::getLabel($a),
-                            'type' => 'text'
-                        ]
+                        $this->commandAsServerAction($a),
                     ]
                 ],
                 $response->actions()
@@ -165,5 +162,24 @@ class SberBotController
         }
 
         return $data;
+    }
+
+    private function commandAsTextAction(string $command): array
+    {
+        return [
+            'text' => Command::getLabel($command),
+            'type' => 'text'
+        ];
+    }
+
+    private function commandAsServerAction(string $command): array
+    {
+        return [
+            'type' => 'server_action',
+            'message_name' => SberRequest::SERVER_ACTION,
+            'server_action' => [
+                'action_id' => $command,
+            ]
+        ];
     }
 }

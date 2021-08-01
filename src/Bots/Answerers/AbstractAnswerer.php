@@ -82,11 +82,6 @@ abstract class AbstractAnswerer
         return $this->helpCommand($request, self::MESSAGE_CLUELESS);
     }
 
-    protected function cluelessResponse(): BotResponse
-    {
-        return $this->buildResponse(self::MESSAGE_CLUELESS);
-    }
-
     protected function helpCommand(
         AbstractBotRequest $request,
         string ...$prependMessages
