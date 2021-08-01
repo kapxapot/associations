@@ -433,10 +433,7 @@ class UserAnswerer extends AbstractAnswerer
                 );
         }
 
-        if (!$isMatureQuestion) {
-            $answerParts[] = $this->noAssociationMessage();
-        }
-
+        $answerParts[] = $this->noAssociationMessage();
         $answerParts[] = self::MESSAGE_START_ANEW;
 
         // no answer, starting new game
