@@ -10,6 +10,7 @@ class Command
     const COMMAND = 'команда';
     const COMMANDS = 'команды';
     const ENOUGH = 'хватит';
+    const EXIT = 'выход';
     const HELP = 'помощь';
     const PLAY = 'играть';
     const PLAYING = 'играем';

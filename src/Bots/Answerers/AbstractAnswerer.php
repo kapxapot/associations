@@ -23,6 +23,7 @@ abstract class AbstractAnswerer
     protected const MESSAGE_CLUELESS = 'Извини{att:те}, не понял{|а}.';
     protected const MESSAGE_WELCOME = '{hello}! Поиграем в ассоциации?';
     protected const MESSAGE_WELCOME_BACK = 'С возвращением!';
+    protected const MESSAGE_BYE = '{att:До свидания|Пока}! Заходи{att:те} ещё!';
 
     protected const CHUNK_RULES = 'Чтобы узнать, как играть, скажи{att:те} {cmd:rules}.';
     protected const CHUNK_COMMANDS = 'Чтобы узнать, как управлять игрой, скажи{att:те} {cmd:commands}.';
@@ -139,6 +140,13 @@ abstract class AbstractAnswerer
                 Command::PLAY
             )
             ->withVarBy($request, self::VAR_STATE, self::STATE_COMMANDS);
+    }
+
+    protected function exitCommand(): BotResponse
+    {
+        return $this
+            ->buildResponse(self::MESSAGE_BYE)
+            ->withEndSession(true);
     }
 
     protected function getRulesMessage(): string

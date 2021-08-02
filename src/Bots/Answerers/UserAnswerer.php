@@ -104,12 +104,13 @@ class UserAnswerer extends AbstractAnswerer
 
         if ($request->isAny(
             Command::HELP,
+            Command::RULES,
             Command::COMMANDS,
-            Command::RULES
+            Command::EXIT
         )) {
             // no need to confirm a command when it's triggered by a button click
             if ($request->isButtonPressed()) {
-                return $this->applyHelpSubCommand($request, $command);
+                return $this->applyCommand($request, $command);
             }
 
             return $this->confirmCommand($command);
@@ -210,7 +211,7 @@ class UserAnswerer extends AbstractAnswerer
         $commandToConfirm = $request->var(self::VAR_COMMAND);
 
         if ($command === Command::COMMAND || $command === $commandToConfirm) {
-            return $this->applyHelpSubCommand($request, $commandToConfirm);
+            return $this->applyCommand($request, $commandToConfirm);
         }
 
         if ($this->isPlayCommand($request)) {
@@ -220,7 +221,7 @@ class UserAnswerer extends AbstractAnswerer
         return $this->confirmCommand($commandToConfirm, self::MESSAGE_CLUELESS);
     }
 
-    private function applyHelpSubCommand(
+    private function applyCommand(
         AbstractBotRequest $request,
         string $command
     ): BotResponse
@@ -234,9 +235,12 @@ class UserAnswerer extends AbstractAnswerer
 
             case Command::COMMANDS:
                 return $this->commandsCommand($request);
+
+            case Command::EXIT:
+                return $this->exitCommand();
         }
 
-        throw new InvalidArgumentException('Unknown help sub-command: ' . $command);
+        throw new InvalidArgumentException('Unknown command: ' . $command);
     }
 
     protected function getCommandsMessage(): string

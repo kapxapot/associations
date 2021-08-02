@@ -121,6 +121,7 @@ class SberBotController
             'uuid' => $request->uuid,
             'payload' => [
                 'device' => $request->device,
+                'finished' => $response->endSession(),
                 'pronounceText' => $text,
                 'items' => [
                     [
