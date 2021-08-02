@@ -20,6 +20,7 @@ no_search: true
 folders:
   global: {PLASTICODE_PUBLIC_PATH}
   local: {SITE_PUBLIC_PATH}
+  assets: {ASSETS_PATH}
 
 mde: true
 

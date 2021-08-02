@@ -141,6 +141,16 @@ a.assoc-arrow {
     margin-bottom: -6px;
 }
 
+.sber-inline img {
+    width: 16px;
+    height: 16.21px;
+}
+
+.sber-avatar img {
+    width: 22px;
+    height: 22.29px;
+}
+
 /* sidebar */
 
 .sidebar-links img,

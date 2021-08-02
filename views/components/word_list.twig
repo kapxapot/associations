@@ -3,7 +3,7 @@
 <ul class="mb-0 pl-3">
     {% for word in words %}
         <li>
-            {% include 'components/word.twig' %}{% if word.creator %}<span class="ml-1">{{ lm.user(word.creator) }}</span>{% endif %}
+            {% include 'components/word.twig' %}{% if word.creator %}<span class="ml-1">{{ lm.user(_context, word.creator) }}</span>{% endif %}
         </li>
     {% endfor %}
 </ul>

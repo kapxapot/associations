@@ -72,13 +72,18 @@ class AssociationController extends Controller
                 $this->associationConfig->associationLastAddedLimit()
             );
 
-        $result = $associations->any()
-            ? $this->renderer->component(
-                'association_list',
-                ['associations' => $associations]
+        return $associations->any()
+            ? $this->render(
+                $response,
+                'components/association_list.twig',
+                $this->buildParams(
+                    [
+                        'params' => [
+                            'associations' => $associations,
+                        ],
+                    ]
+                )
             )
-            : $this->translate('No associations yet. :(');
-
-        return Response::text($response, $result);
+            : Response::text($response, $this->translate('No associations yet. :('));
     }
 }

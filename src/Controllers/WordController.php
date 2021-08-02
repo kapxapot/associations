@@ -132,13 +132,18 @@ class WordController extends Controller
                 $this->wordConfig->wordLastAddedLimit()
             );
 
-        $result = $words->any()
-            ? $this->renderer->component(
-                'word_list',
-                ['words' => $words]
+        return $words->any()
+            ? $this->render(
+                $response,
+                'components/word_list.twig',
+                $this->buildParams(
+                    [
+                        'params' => [
+                            'words' => $words,
+                        ],
+                    ]
+                )
             )
-            : $this->translate('No words yet. :(');
-
-        return Response::text($response, $result);
+            : Response::text($response, $this->translate('No words yet. :('));
     }
 }

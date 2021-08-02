@@ -41,7 +41,7 @@
                 {% include "components/word.twig" with { 'word': association.second_word, 'show_lock': is_moderator } only %}
             </p>
 
-            <p>{{ lm.genderize(association.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
+            <p>{{ lm.genderize(association.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user_full(_context, association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
 
             {% if association.users|length > 0 %}
                 <p><strong>Использована игроками:</strong></p>
@@ -51,7 +51,7 @@
                         {% set turns = turns_by_user[user.id] %}
                         <li class="vgap-1">
                             {% set full_access = can_see_all_games or user.id == auth.user.id %}
-                            <div>{{ lm.user_full(user) }}{% if not full_access %} ({{ turns.count }}){% endif %}</div>
+                            <div>{{ lm.user_full(_context, user) }}{% if not full_access %} ({{ turns.count }}){% endif %}</div>
                             {% if full_access %}
                                 <ul>
                                     {% for turn in turns %}
@@ -98,7 +98,7 @@
                                     <td>{% if feedback.isDisliked %}<i class="fas fa-check"></i>{% endif %}</td>
                                     <td>{% if feedback.isMature %}<i class="fas fa-check"></i>{% endif %}</td>
                                     <td>{{ gm.moment_local(feedback.updated_at_iso) }}</td>
-                                    <td>{{ lm.user(feedback.creator) }}</td>
+                                    <td>{{ lm.user(_context, feedback.creator) }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -131,7 +131,7 @@
                                         <td>{% if override.hasMature %}{{ override.mature ? '16+' : '0+' }}{% endif %}</td>
                                         <td>{% if override.isDisabled %}<i class="fas fa-check"></i>{% endif %}</td>
                                         <td>{{ gm.moment_local(override.created_at_iso) }}</td>
-                                        <td>{{ lm.user(override.creator) }}</td>
+                                        <td>{{ lm.user(_context, override.creator) }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>
