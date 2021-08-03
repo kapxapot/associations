@@ -24,6 +24,11 @@ class AliceRequest extends AbstractBotRequest
         $this->tokens = $this->parseTokens($command);
         $this->command = $this->rebuildFrom($this->tokens);
 
+        // in case of server action token list *can* be empty
+        if (empty($this->originalTokens)) {
+            $this->originalTokens = $this->tokens;
+        }
+
         $type = $request['type'] ?? null;
 
         $this->isButtonPressed = ($type === 'ButtonPressed');
