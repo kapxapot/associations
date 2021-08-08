@@ -81,6 +81,7 @@ class DefinitionParser
     private function postProcessDefinition(string $def): string
     {
         $replaces = [
+            'в знач.' => 'в значении',
             'к-рого' => 'которого',
             'к-рой' => 'которой',
             'к-ром' => 'котором',
@@ -111,6 +112,7 @@ class DefinitionParser
             'чём-н.' => 'чём-нибудь',
             'что-н.' => 'что-нибудь',
             'чьей-н.' => 'чьей-нибудь',
+            'чьим-н.' => 'чьим-нибудь',
         ];
 
         $def = str_replace(
