@@ -1,6 +1,11 @@
 <p><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Игра идет в <strong>демо-режиме</strong>.</p>
 
-<p>Полная версия <strong>Ассоциаций</strong> доступна после <a href="javascript:void(0);" ng-click="signUp()">регистрации</a>, а еще в <a href="https://t.me/{{ telegram_bot_name }}" class="nowrap"><i class="fab fa-telegram-plane telegram-color"></i> Telegram</a> и в <a href="{{ alice_url }}" class="alice-inline nowrap">{% include 'svg/alice.twig' %} Яндекс.Алисе</a>.</p>
+<p>Полная версия <strong>Ассоциаций</strong> доступна после <a href="javascript:void(0);" ng-click="signUp()">регистрации</a>, а также в интеграциях для:</p>
+<ul>
+    <li><a href="https://t.me/{{ telegram_bot_name }}" class="nowrap"><i class="fab fa-telegram-plane telegram-color"></i> Telegram</a></li>
+    <li><a href="{{ alice_url }}" class="alice-inline nowrap">{% include 'svg/alice.twig' %} Яндекс.Алиса</a></li>
+    <li><a href="{{ sber_url }}" class="sber-inline nowrap">{% include 'svg/sber.twig' %} SmartMarket (Сбер)</a></li>
+</ul>
 
 {% set c_id = 'collapse-why-register' %}
 
@@ -10,13 +15,15 @@
 <div class="collapse mt-2" id="{{ c_id }}">
     <p>После регистрации вы получите следующие преимущества:</p>
 
-    <div class="ml-3 mb-3">
+    <div class="ml-3 mb-2">
         <p><i class="fas fa-check success-color mr-1"></i> Состояние вашей игры, ее ход и история всех игр будут храниться на сервере.</p>
         <p><i class="fas fa-check success-color mr-1"></i> Система будет учиться на ваших играх и будет использовать ваши слова и ассоциации (<a href="{{ path_for('main.page', { 'slug': 'mechanics' }) }}">как это работает</a>).</p>
         <p><i class="fas fa-check success-color mr-1"></i> Вы сможете выражать свое мнение о конкретных словах и ассоциациях, например, отмечать, какие из них вам не нравятся.</p>
-        <p><i class="fas fa-check success-color mr-1"></i> Будет возможность выбирать язык и режим игры (скоро).</p>
-        <p><i class="fas fa-check success-color mr-1"></i> Вы будете участвовать в рейтингах и сможете состязаться с другими игроками (скоро).</p>
+        {#<p><i class="fas fa-check success-color mr-1"></i> Будет возможность выбирать язык и режим игры (скоро).</p>
+        <p><i class="fas fa-check success-color mr-1"></i> Вы будете участвовать в рейтингах и сможете состязаться с другими игроками (скоро).</p>#}
     </div>
 
-    <button href="javascript:void(0);" ng-click="signUp()" class="btn btn-success">Уговорили!</button>
+    <div><i class="fas fa-exclamation-triangle danger-color mr-1"></i> При игре на сайте и в Telegram используется также и <strong>взрослая лексика</strong> (для взрослых игроков).</div>
+
+    {#<button href="javascript:void(0);" ng-click="signUp()" class="btn btn-success">Регистрация</button>#}
 </div>

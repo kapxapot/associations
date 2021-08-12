@@ -19,7 +19,7 @@
             <p>
                 <strong>Участники:</strong>
                 {% for player in game.extended_players %}
-                    {{ player ? lm.user(_context, player, true) : 'компьютер' }}{% if not loop.last %}, {% endif %}
+                    {{ player ? lm.user(player, true) : 'компьютер' }}{% if not loop.last %}, {% endif %}
                 {% endfor %}
             </p>
 

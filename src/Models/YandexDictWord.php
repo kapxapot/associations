@@ -53,9 +53,6 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
         return $this->linkedWord();
     }
 
-    /**
-     * @return $this
-     */
     public function linkWord(Word $word): self
     {
         $this->wordId = $word->getId();
@@ -63,9 +60,6 @@ class YandexDictWord extends DbModel implements CreatedAtInterface, DictWordInte
         return $this->withLinkedWord($word);
     }
 
-    /**
-     * @return $this
-     */
     public function unlinkWord(): self
     {
         $this->wordId = null;

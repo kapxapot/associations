@@ -86,7 +86,7 @@
                             {{ lm.association(assoc, word) }}
 
                             {% for user in assoc.extended_users %}
-                                {{ lm.user(_context, user) }}
+                                {{ lm.user(user) }}
                             {% endfor %}
                         </li>
                     {% endfor %}
@@ -110,7 +110,7 @@
                             {{ lm.association(assoc, word) }}
 
                             {% for user in assoc.extended_users %}
-                                {{ lm.user(_context, user) }}
+                                {{ lm.user(user) }}
                             {% endfor %}
                         </li>
                     {% endfor %}
@@ -134,7 +134,7 @@
                             {{ lm.association(assoc, word) }}
 
                             {% for user in assoc.extended_users %}
-                                {{ lm.user(_context, user) }}
+                                {{ lm.user(user) }}
                             {% endfor %}
                         </li>
                     {% endfor %}
@@ -195,7 +195,7 @@
     <div class="panel-secondary-heading">Происхождение</div>
     <div class="panel panel-primary">
         <div class="panel-body">
-            <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user(_context, word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
+            <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user(word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
 
             {% if word.origin_chain.any %}
                 <p>Цепочка ассоциаций, которая привела к добавлению:</p>
@@ -212,7 +212,7 @@
                         } only %}
 
                         {% if meta_assoc.user %}
-                            {{ lm.user(_context, meta_assoc.user) }}
+                            {{ lm.user(meta_assoc.user) }}
                         {% endif %}
 
                         {{ lm.word(meta_assoc.fromWord) }}
@@ -250,7 +250,7 @@
                                     <td>{% if feedback.hasDuplicate %}{{ lm.word(feedback.duplicate) }}{% endif %}</td>
                                     <td>{% if feedback.isMature %}<i class="fas fa-check"></i>{% endif %}</td>
                                     <td>{{ gm.moment_local(feedback.updated_at_iso) }}</td>
-                                    <td>{{ lm.user(_context, feedback.creator) }}</td>
+                                    <td>{{ lm.user(feedback.creator) }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -292,7 +292,7 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ gm.moment_local(override.created_at_iso) }}</td>
-                                    <td>{{ lm.user(_context, override.creator) }}</td>
+                                    <td>{{ lm.user(override.creator) }}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

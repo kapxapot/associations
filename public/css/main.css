@@ -107,12 +107,17 @@ a.assoc-arrow {
     vertical-align: top;
 }
 
-/* alice */
+/* alice & sber */
 
 :root {
     --color-alice-start: #C926FF;
     --color-alice-end: #4A26FF;
     --color-alice-inner: white;
+
+    --color-sber-1: #F2E913;
+    --color-sber-1-1: #A3CD39;
+    --color-sber-2: #0C8ACB;
+    --color-sber-2-1: #21A038;
 }
 
 .alice-start {
@@ -123,32 +128,45 @@ a.assoc-arrow {
     stop-color: var(--color-alice-end);
 }
 
+.sber-stop-1 {
+    stop-color: var(--color-sber-1);
+}
+
+.sber-stop-1-1 {
+    stop-color: var(--color-sber-1-1);
+}
+
+.sber-stop-2 {
+    stop-color: var(--color-sber-2);
+}
+
+.sber-stop-2-1 {
+    stop-color: var(--color-sber-2-1);
+}
+
 .social-links {
     --color-alice-start: currentColor;
     --color-alice-end: currentColor;
     --color-alice-inner: transparent;
+
+    --color-sber-1: currentColor;
+    --color-sber-1-1: currentColor;
+    --color-sber-2: currentColor;
+    --color-sber-2-1: currentColor;
 }
 
-.alice-inline svg {
+.alice-inline svg,
+.sber-inline svg {
     width: 16px;
     height: 16px;
     margin-bottom: -2px;
 }
 
-.alice-avatar svg {
+.alice-avatar svg,
+.sber-avatar svg {
     width: 22px;
     height: 22px;
     margin-bottom: -6px;
-}
-
-.sber-inline img {
-    width: 16px;
-    height: 16.21px;
-}
-
-.sber-avatar img {
-    width: 22px;
-    height: 22.29px;
 }
 
 /* sidebar */
