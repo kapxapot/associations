@@ -136,19 +136,31 @@ class UserAnswerer extends AbstractAnswerer
             return $this->repeatCommand($botUser);
         }
 
-        if ($request->isAny(
-            Command::WORD_DISLIKE,
-            'не нравится',
-            'не нравится слово'
-        )) {
+        if (
+            $request->isAny(
+                Command::WORD_DISLIKE,
+                'не нравится',
+                'не нравится слово'
+            )
+            || $request->hasAnySet(
+                ['плохое', 'слово'],
+                ['не', 'нравится', 'слово']
+            )
+        ) {
             return $this->wordDislikeFeedback($botUser);
         }
 
-        if ($request->isAny(
-            Command::ASSOCIATION_DISLIKE,
-            'плохой ассоциация',
-            'не нравится ассоциация'
-        )) {
+        if (
+            $request->isAny(
+                Command::ASSOCIATION_DISLIKE,
+                'плохой ассоциация',
+                'не нравится ассоциация'
+            )
+            || $request->hasAnySet(
+                ['плохая', 'ассоциация'],
+                ['не', 'нравится', 'ассоциация']
+            )
+        ) {
             return $this->associationDislikeFeedback($botUser);
         }
 
