@@ -7,5 +7,5 @@ use Plasticode\Repositories\Interfaces\Generic\RepositoryInterface;
 
 interface WithLanguageRepositoryInterface extends RepositoryInterface
 {
-    function getCountByLanguage(Language $language): int;
+    public function getCountByLanguage(Language $language): int;
 }
