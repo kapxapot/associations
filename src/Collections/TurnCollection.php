@@ -52,7 +52,7 @@ class TurnCollection extends DbModelCollection
     /**
      * Groups turns by their user ids.
      *
-     * @return array<int, TurnCollection>
+     * @return array<int, self>
      */
     public function groupByUser(): array
     {

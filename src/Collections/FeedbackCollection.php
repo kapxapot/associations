@@ -41,7 +41,7 @@ class FeedbackCollection extends DbModelCollection
     }
 
     /**
-     * Sorts the collection by updatedAt DESC.
+     * Sorts the collection by `updatedAt` DESC.
      *
      * @return static
      */

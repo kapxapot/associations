@@ -32,7 +32,7 @@ class WordRelationCollection extends DbModelCollection
 
     /**
      * Sorts the collection by `updatedAt` descending.
-     * 
+     *
      * @return static
      */
     public function descByUpdate(): self
