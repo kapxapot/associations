@@ -190,31 +190,37 @@
         <div class="panel panel-secondary">
             <div class="panel-body">
                 {% if word.mainWord %}
-                    <p><strong>Главное слово:</strong> {{ lm.word(word.mainWord) }}</p>
+                    <div class="vgap-3">
+                        <p><strong>Главное слово:</strong> {{ lm.word(word.mainWord) }}</p>
 
-                    {% if word.mainWord.id != word.canonical.id %}
-                        <p><strong>Каноническое слово:</strong> {{ lm.word(word.canonical) }}</p>
-                    {% endif %}
+                        {% if word.mainWord.id != word.canonical.id %}
+                            <p><strong>Каноническое слово:</strong> {{ lm.word(word.canonical) }}</p>
+                        {% endif %}
+                    </div>
                 {% endif %}
 
                 {% if word.relations|length > 0 %}
-                    <p class="b mt-3">Прямые связи ({{ word.relations.count }}):</p>
+                    <div class="vgap-3">
+                        <p class="b">Прямые связи ({{ word.relations.count }}):</p>
 
-                    <ul class="mb-0">
-                        {% for relation in word.relations %}
-                            <li>{% if relation.isPrimary %}<i class="fas fa-fist-raised action-color" title="Сильная связь" data-toggle="tooltip"></i> {% endif %}<em>{{ translate(relation.type.name) }}</em> слова {{ lm.word(relation.mainWord) }}</li>
-                        {% endfor %}
-                    </ul>
+                        <ul class="mb-0">
+                            {% for relation in word.relations %}
+                                <li>{% if relation.isPrimary %}<i class="fas fa-fist-raised action-color" title="Сильная связь" data-toggle="tooltip"></i> {% endif %}<em>{{ translate(relation.type.name) }}</em> слова {{ lm.word(relation.mainWord) }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 {% endif %}
 
                 {% if word.counterRelations|length > 0 %}
-                    <p class="b mt-3">Обратные связи ({{ word.counterRelations.count }}):</p>
+                    <div class="vgap-3">
+                        <p class="b">Обратные связи ({{ word.counterRelations.count }}):</p>
 
-                    <ul class="mb-0">
-                        {% for relation in word.counterRelations %}
-                            <li>{% if relation.isPrimary %}<i class="fas fa-fist-raised action-color" title="Сильная связь" data-toggle="tooltip"></i> {% endif %}{{ lm.word(relation.word) }}: <em>{{ translate(relation.type.name) }}</em> слова {{ lm.word(relation.mainWord) }}</li>
-                        {% endfor %}
-                    </ul>
+                        <ul class="mb-0">
+                            {% for relation in word.counterRelations %}
+                                <li>{% if relation.isPrimary %}<i class="fas fa-fist-raised action-color" title="Сильная связь" data-toggle="tooltip"></i> {% endif %}{{ lm.word(relation.word) }}: <em>{{ translate(relation.type.name) }}</em> слова {{ lm.word(relation.mainWord) }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 {% endif %}
             </div>
         </div>
