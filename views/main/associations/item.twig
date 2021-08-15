@@ -43,6 +43,10 @@
 
             <p>{{ lm.genderize(association.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
 
+            {% if association.firstWord.hasMain or association.secondWord.hasMain %}
+                <p><strong>Каноническая ассоциация:</strong> {{ lm.word(association.firstWord.canonical) }} &#x21E2; {{ lm.word(association.secondWord.canonical) }}</p>
+            {% endif %}
+
             {% if association.users|length > 0 %}
                 <p><strong>Использована игроками:</strong></p>
 

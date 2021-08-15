@@ -453,6 +453,14 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
+     * Duplicate of `main()` for Twig.
+     */
+    public function mainWord(): ?self
+    {
+        return $this->main();
+    }
+
+    /**
      * Returns the word's canonical form.
      *
      * - If the word doesn't have a main word, returns itself.
@@ -535,6 +543,17 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this->allRelatedCanonicalWords()->contains(
             $word->canonical()
         );
+    }
+
+    /**
+     * Concats relations and counter-relations.
+     */
+    public function allRelations(): WordRelationCollection
+    {
+        $out = $this->relations();
+        $in = $this->counterRelations();
+
+        return WordRelationCollection::merge($out, $in);
     }
 
     /**

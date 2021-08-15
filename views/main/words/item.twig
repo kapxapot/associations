@@ -22,12 +22,12 @@
                 <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
 
                 {% if word.primaryRelation %}
-                    <span class="label label-primary" title="{{ translate(word.primaryRelation.type.name) }} слова {{ word.primaryRelation.mainWord.word|upper }}" data-toggle="tooltip"><i class="fas fa-link"></i> {{ word.primaryRelation.mainWord.word }}</span>
-                {% endif %}
+                    <span class="label label-primary" title="{{ translate(word.primaryRelation.type.name) }} слова {{ word.primaryRelation.mainWord.word|upper }}" data-toggle="tooltip"><i class="fas fa-angle-up"></i> {{ word.primaryRelation.mainWord.word }}</span>
 
-                {% for relation in word.relations if not relation.isPrimary %}
-                    <span class="label label-default" title="{{ translate(relation.type.name) }} слова {{ relation.mainWord.word|upper }}" data-toggle="tooltip"><i class="fas fa-link"></i> {{ relation.mainWord.word }}</span>
-                {% endfor %}
+                    {% if word.mainWord.id != word.canonical.id %}
+                        <span class="label label-primary" title="Каноническое слово" data-toggle="tooltip"><i class="fas fa-angle-double-up"></i> {{ word.canonical.word }}</span>
+                    {% endif %}
+                {% endif %}
 
                 {% if word.is_disabled %}
                     <span class="label label-default">{% if word.hasDisabledOverride %}<i class="fas fa-lock"></i> {% endif %}отключено</span>
@@ -160,7 +160,7 @@
     </div>
 
     <div class="panel-secondary-heading">Что это?</div>
-    <div class="panel panel-primary">
+    <div class="panel panel-secondary">
         <div class="panel-body">
             {% if definition %}
                 {% for def_entry in definition.entries %}
@@ -176,13 +176,6 @@
                         </ol>
                     {% endif %}
                 {% endfor %}
-            {% elseif word.relations|length > 0 %}
-                <p class="br-word"><strong>{{ word.word|upper }}</strong></p>
-                <ul class="mb-0">
-                    {% for relation in word.relations %}
-                        <li>{% if relation.isPrimary %}<i class="fas fa-fist-raised action-color" title="Сильная связь" data-toggle="tooltip"></i> {% endif %}<em>{{ translate(relation.type.name) }}</em> слова {{ lm.word(relation.mainWord) }}.</li>
-                    {% endfor %}
-                </ul>
             {% else %}
                 <p class="i">Определение отсутствует.</p>
             {% endif %}
@@ -192,8 +185,43 @@
         </div>
     </div>
 
+    {% if is_moderator and word.allRelations|length > 0 %}
+        <div class="panel-secondary-heading">Связи</div>
+        <div class="panel panel-secondary">
+            <div class="panel-body">
+                {% if word.mainWord %}
+                    <p><strong>Главное слово:</strong> {{ lm.word(word.mainWord) }}</p>
+
+                    {% if word.mainWord.id != word.canonical.id %}
+                        <p><strong>Каноническое слово:</strong> {{ lm.word(word.canonical) }}</p>
+                    {% endif %}
+                {% endif %}
+
+                {% if word.relations|length > 0 %}
+                    <p class="b mt-3">Прямые связи ({{ word.relations.count }}):</p>
+
+                    <ul class="mb-0">
+                        {% for relation in word.relations %}
+                            <li>{% if relation.isPrimary %}<i class="fas fa-fist-raised action-color" title="Сильная связь" data-toggle="tooltip"></i> {% endif %}<em>{{ translate(relation.type.name) }}</em> слова {{ lm.word(relation.mainWord) }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+
+                {% if word.counterRelations|length > 0 %}
+                    <p class="b mt-3">Обратные связи ({{ word.counterRelations.count }}):</p>
+
+                    <ul class="mb-0">
+                        {% for relation in word.counterRelations %}
+                            <li>{% if relation.isPrimary %}<i class="fas fa-fist-raised action-color" title="Сильная связь" data-toggle="tooltip"></i> {% endif %}{{ lm.word(relation.word) }}: <em>{{ translate(relation.type.name) }}</em> слова {{ lm.word(relation.mainWord) }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
     <div class="panel-secondary-heading">Происхождение</div>
-    <div class="panel panel-primary">
+    <div class="panel panel-secondary">
         <div class="panel-body">
             <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user(word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
 
