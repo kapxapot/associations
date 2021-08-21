@@ -93,34 +93,63 @@ abstract class AbstractBotRequest
     {
         $tokens = $this->tokenizer->tokenize($command);
 
-        return $this->filterTokens($tokens);
+        $trashTokens = $this->getTrashTokens();
+        $semiTrashTokens = $this->getSemiTrashTokens();
+
+        // filter trash tokens
+        $tokens = $this->filterTokens($tokens, $trashTokens);
+
+        // filter semi-trash tokens (but only if there isn't just one semi-trash token)
+        if (count($tokens) == 1 && in_array($tokens[0], $semiTrashTokens)) {
+            return $tokens;
+        }
+
+        return $this->filterTokens($tokens, $semiTrashTokens);
     }
 
     /**
-     * Filters trash tokens.
+     * Removes bad tokens from tokens.
      *
      * @param string[] $tokens
+     * @param string[] $badTokens
      * @return string[]
      */
-    private function filterTokens(array $tokens): array
+    private function filterTokens(array $tokens, array $badTokens): array
     {
         $filteredTokens = array_filter(
             $tokens,
-            fn (string $t) => !in_array($t, $this->getTrashTokens())
+            fn (string $t) => !in_array($t, $badTokens)
         );
 
         return array_values($filteredTokens);
     }
 
     /**
+     * Returns semi-trash tokens.
+     *
+     * These tokens are allowed to be used in case of just one token,
+     * but are filtered if there are more than one token.
+     *
+     * @return string[]
+     */
+    protected function getSemiTrashTokens(): array
+    {
+        return [
+            'сейчас', 'блядь', 'блин'
+        ];
+    }
+
+    /**
      * Returns trash tokens.
+     *
+     * These tokens are always filtered.
      *
      * @return string[]
      */
     protected function getTrashTokens(): array
     {
         return [
-            'говорю', 'сказал', 'сказала', 'блядь', 'сама', 'этот', 'это', 'эта', 'так', 'ты', 'ой', 'да', 'ну', 'я', 'э', 'а', '-', '=', '?'
+            'говорю', 'сказал', 'сказала', 'сама', 'этот', 'это', 'эта', 'так', 'ты', 'ой', 'да', 'ну', 'я', 'э', 'а', '-', '=', '?'
         ];
     }
 
