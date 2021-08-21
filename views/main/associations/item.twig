@@ -41,10 +41,10 @@
                 {% include "components/word.twig" with { 'word': association.second_word, 'show_lock': is_moderator } only %}
             </p>
 
-            <p>{{ lm.genderize(association.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
+            <p class="mb-3">{{ lm.genderize(association.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user_full(association.creator) }} ({{ gm.moment_local(association.created_at_iso) }})</p>
 
-            {% if association.firstWord.hasMain or association.secondWord.hasMain %}
-                <p><strong>Каноническая ассоциация:</strong> {{ lm.word(association.firstWord.canonical) }} &#x21E2; {{ lm.word(association.secondWord.canonical) }}</p>
+            {% if not association.isCanonical %}
+                <p class="mb-3"><strong>Каноническая ассоциация:</strong> {{ lm.association(association.canonical) }}</p>
             {% endif %}
 
             {% if association.users|length > 0 %}

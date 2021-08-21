@@ -6,26 +6,32 @@ use App\Collections\AssociationFeedbackCollection;
 use App\Collections\AssociationOverrideCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
+use App\Models\Interfaces\AssociationInterface;
 
 /**
  * @property integer $firstWordId
  * @property integer $secondWordId
+ * @method AssociationInterface canonical()
  * @method Word firstWord()
  * @method Word secondWord()
+ * @method static withCanonical(AssociationInterface $canonical)
  * @method static withFeedbacks(AssociationFeedbackCollection|callable $feedbacks)
  * @method static withFirstWord(Word|callable $firstWord)
  * @method static withOverrides(AssociationOverrideCollection|callable $overrides)
  * @method static withSecondWord(Word|callable $secondWord)
  */
-class Association extends LanguageElement
+class Association extends LanguageElement implements AssociationInterface
 {
     const DEFAULT_SIGN = '→';
     const APPROVED_SIGN = '⇉';
+
+    private string $canonicalPropertyName = 'canonical';
 
     protected function requiredWiths(): array
     {
         return [
             ...parent::requiredWiths(),
+            $this->canonicalPropertyName,
             'firstWord',
             'secondWord',
         ];
@@ -46,9 +52,13 @@ class Association extends LanguageElement
         );
     }
 
-    public function canonicalWords(): WordCollection
+    /**
+     * The association is canonical if its words are canonical.
+     */
+    public function isCanonical(): bool
     {
-        return $this->words()->canonical()->order();
+        return $this->firstWord()->isCanonical()
+            && $this->secondWord()->isCanonical();
     }
 
     public function hasWords(Word $first, Word $second): bool
@@ -170,5 +180,32 @@ class Association extends LanguageElement
         return $this->isApproved()
             ? self::APPROVED_SIGN
             : self::DEFAULT_SIGN;
+    }
+
+    /**
+     * For unknown reason Twig can't read 'canonical' fake method.
+     */
+    public function canonical(): AssociationInterface
+    {
+        return $this->getWithProperty(
+            $this->canonicalPropertyName
+        );
+    }
+
+    // AssociationInterface
+
+    public function getFirstWord(): Word
+    {
+        return $this->firstWord();
+    }
+
+    public function getSecondWord(): Word
+    {
+        return $this->secondWord();
+    }
+
+    public function isReal(): bool
+    {
+        return $this->isPersisted();
     }
 }

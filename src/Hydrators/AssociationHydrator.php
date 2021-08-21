@@ -5,8 +5,10 @@ namespace App\Hydrators;
 use App\Auth\Interfaces\AuthInterface;
 use App\Core\Interfaces\LinkerInterface;
 use App\Models\Association;
+use App\Models\DTO\EtherealAssociation;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -16,6 +18,7 @@ use Plasticode\Models\Generic\DbModel;
 
 class AssociationHydrator extends Hydrator
 {
+    private AssociationRepositoryInterface $associationRepository;
     private AssociationFeedbackRepositoryInterface $associationFeedbackRepository;
     private AssociationOverrideRepositoryInterface $associationOverrideRepository;
     private LanguageRepositoryInterface $languageRepository;
@@ -27,6 +30,7 @@ class AssociationHydrator extends Hydrator
     private LinkerInterface $linker;
 
     public function __construct(
+        AssociationRepositoryInterface $associationRepository,
         AssociationFeedbackRepositoryInterface $associationFeedbackRepository,
         AssociationOverrideRepositoryInterface $associationOverrideRepository,
         LanguageRepositoryInterface $languageRepository,
@@ -37,6 +41,7 @@ class AssociationHydrator extends Hydrator
         LinkerInterface $linker
     )
     {
+        $this->associationRepository = $associationRepository;
         $this->associationFeedbackRepository = $associationFeedbackRepository;
         $this->associationOverrideRepository = $associationOverrideRepository;
         $this->languageRepository = $languageRepository;
@@ -60,9 +65,20 @@ class AssociationHydrator extends Hydrator
             ->withSecondWord(
                 fn () => $this->wordRepository->get($entity->secondWordId)
             )
+            ->withCanonical(
+                function () use ($entity) {
+                    if ($entity->isCanonical()) {
+                        return $this;
+                    }
+
+                    [$w1, $w2] = $entity->words()->canonical()->order();
+
+                    return $this->associationRepository->getByPair($w1, $w2)
+                        ?? new EtherealAssociation($w1, $w2);
+                }
+            )
             ->withFeedbacks(
-                fn () =>
-                $this
+                fn () => $this
                     ->associationFeedbackRepository
                     ->getAllByAssociation($entity)
             )

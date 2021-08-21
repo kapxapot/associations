@@ -1,18 +1,20 @@
 {% spaceless %}
+    {% import 'main/local_macros.twig' as lm %}
+
     {% set sign %}{% include 'components/association_sign.twig' %}{% endset %}
 
     {% if association %}
-        {% set is_visible = association.is_visible_for_me %}
+        {% set is_visible = not association.isReal or association.is_visible_for_me %}
         {% set no_link = no_link or not is_visible %}
 
-        {% if by_word and association.first_word.id != by_word.id %}
-            {% set first = association.second_word %}
-            {% set second = association.first_word %}
+        {% if by_word and association.getFirstWord.id != by_word.id %}
+            {% set first = association.getSecondWord %}
+            {% set second = association.getFirstWord %}
         {% else %}
-            {% set first = association.first_word %}
-            {% set second = association.second_word %}
+            {% set first = association.getFirstWord %}
+            {% set second = association.getSecondWord %}
         {% endif %}
 
-        {% if not no_link %}<a href="{{ association.url }}"{% if short %} class="assoc-arrow"{% endif %}>{% endif %}{% if not short %}{{ first.display_name }} {% endif %}{{ sign }}{% if not short %} {{ second.display_name }}{% endif %}{% if not no_link %}</a>{% endif %}
+        {% if not no_link and association.isReal %}<a href="{{ association.url }}"{% if short %} class="assoc-arrow"{% endif %}>{% endif %}{% if not short %}{{ association.isReal ? first.display_name : lm.word(first) }} {% endif %}{{ sign }}{% if not short %} {{ association.isReal ? second.display_name : lm.word(second) }}{% endif %}{% if not no_link %}</a>{% endif %}
     {% else %}{{ sign }}{% endif %}
 {% endspaceless %}

@@ -463,14 +463,22 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Returns the word's canonical form.
      *
-     * - If the word doesn't have a main word, returns itself.
+     * - If the word is canonical, returns itself.
      * - Otherwise, returns the root main word (main()->main()->...->main()).
      */
     public function canonical(): self
     {
-        return $this->hasMain()
-            ? $this->main()->canonical()
-            : $this;
+        return $this->isCanonical()
+            ? $this
+            : $this->main()->canonical();
+    }
+
+    /**
+     * The word is canonical if it doesn't have main word.
+     */
+    public function isCanonical(): bool
+    {
+        return !$this->hasMain();
     }
 
     /**
