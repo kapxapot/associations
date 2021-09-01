@@ -2,17 +2,14 @@
 
 namespace App\EventHandlers\Word;
 
-use App\Events\Word\WordDisabledChangedEvent;
+use App\Events\Word\WordScopeChangedEvent;
 use App\Models\Association;
 use App\Services\AssociationRecountService;
 
 /**
  * Recounts associations that use the word.
- * 
- * If the word was disabled/enabled, all its associations disabled/approved
- * statuses must be recounted.
  */
-class WordDisabledChangedHandler
+class WordScopeChangedHandler
 {
     private AssociationRecountService $associationRecountService;
 
@@ -21,7 +18,7 @@ class WordDisabledChangedHandler
         $this->associationRecountService = $associationRecountService;
     }
 
-    public function __invoke(WordDisabledChangedEvent $event) : void
+    public function __invoke(WordScopeChangedEvent $event) : void
     {
         $event
             ->getWord()

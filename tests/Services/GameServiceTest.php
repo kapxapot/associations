@@ -88,7 +88,7 @@ final class GameServiceTest extends WiredTest
         $this->assertNotNull($firstTurn);
 
         $firstTurnWord = $firstTurn->word();
-        $word1 = $wordRepository->get(1); // стол (approved)
+        $word1 = $wordRepository->get(1); // стол (common)
 
         $this->assertTrue(
             $firstTurnWord->equals($word1)

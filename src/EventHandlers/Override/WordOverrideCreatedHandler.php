@@ -6,7 +6,7 @@ use App\Events\Override\WordOverrideCreatedEvent;
 use App\Services\WordRecountService;
 
 /**
- * Recounts all statuses (approved & mature, etc.) for the word based on the word override.
+ * Recounts all word's attributes based on its override.
  */
 class WordOverrideCreatedHandler
 {

@@ -142,7 +142,7 @@ class AssociationRepositoryMock extends RepositoryMock implements AssociationRep
         return $this
             ->getAllByLanguageConditional($language)
             ->where(
-                fn (Association $a) => $a->isApproved()
+                fn (Association $a) => $a->isPublic()
             );
     }
 

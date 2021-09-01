@@ -7,6 +7,8 @@ use App\Collections\OverrideCollection;
 use App\Collections\TurnCollection;
 use App\Models\DTO\GameOptions;
 use App\Models\Traits\Created;
+use App\Semantics\Scope;
+use App\Semantics\Severity;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedInterface;
 use Plasticode\Models\Interfaces\LinkableInterface;
@@ -15,13 +17,13 @@ use Plasticode\Models\Traits\Linkable;
 use Plasticode\Models\Traits\UpdatedAt;
 
 /**
- * @property integer $approved
- * @property string|null $approvedUpdatedAt
- * @property integer $disabled
- * @property string|null $disabledUpdatedAt
+ * @property integer $disabled Deprecated.
  * @property integer $languageId
- * @property integer $mature
- * @property string|null $matureUpdatedAt
+ * @property integer $mature Deprecated.
+ * @property integer $scope
+ * @property string|null $scopeUpdatedAt
+ * @property integer $severity
+ * @property string|null $severityUpdatedAt
  * @method Language language()
  * @method User|null me()
  * @method TurnCollection turns()
@@ -65,16 +67,16 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         );
     }
 
-    abstract public function dislikes(): FeedbackCollection;
-
-    abstract public function matures(): FeedbackCollection;
-
     public function isDislikedBy(?User $user): bool
     {
         return $user !== null
             ? $this->dislikes()->anyBy($user)
             : false;
     }
+
+    abstract public function dislikes(): FeedbackCollection;
+
+    abstract public function matures(): FeedbackCollection;
 
     public function isUsedBy(?User $user): bool
     {
@@ -85,8 +87,6 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     /**
      * Is visible for everyone.
-     *
-     * Equivalent to "not disabled" & "non mature".
      */
     public function isVisible(): bool
     {
@@ -95,29 +95,25 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isVisibleFor(?User $user): bool
     {
-        // 1. for enabled:
-        // 1.1. non-mature elements are visible for everyone
-        // 1.2. mature elements are invisible for non-authed users ($user == null)
-        // 1.3. mature elements are visible for mature users
-        // 1.4. mature elements are visible for non-mature users only if they used them
-        // 2. for disabled:
-        // 2.1. visible only for those who used them
+        // 1. for disabled:
+        // 1.1. visible only for those who used them
+        // 2. for enabled:
+        // 2.1. non-mature elements are visible for everyone
+        // 2.2. mature elements are invisible for non-authed users ($user == null)
+        // 2.3. mature elements are visible for mature users
+        // 2.4. mature elements are visible for non-mature users only if they used them
 
         if ($this->isDisabled()) {
             return $this->isUsedBy($user);
         }
 
-        return
-            !$this->isMature()
-            || (
-                $user
-                && ($user->isMature() || $this->isUsedBy($user))
-            );
+        if (!$this->isMature()) {
+            return true;
+        }
+
+        return $user && $user->isMature() || $this->isUsedBy($user);
     }
 
-    /**
-     * Is visible for all (public) and is approved.
-     */
     public function isPlayableAgainstAll(?GameOptions $options = null): bool
     {
         return $this->isPlayableAgainst(null, $options);
@@ -125,15 +121,10 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isPlayableAgainst(?User $user, ?GameOptions $options = null): bool
     {
-        // element can't be played against user, if
-        //
-        // 1. element is mature, user is not mature (maturity check)
-        // 2. element is not approved, user disliked it
-
-        $allowNotApproved = $options && $options->allowNotApprovedElements;
+        $allowPrivate = $options && $options->allowPrivateElements;
 
         return $this->isVisibleFor($user)
-            && ($allowNotApproved || $this->isApproved() || $this->isUsedBy($user))
+            && ($this->isPublic() || $allowPrivate || $this->isUsedBy($user))
             && !$this->isDislikedBy($user);
     }
 
@@ -153,34 +144,37 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     abstract public function feedbackByMe(): ?Feedback;
 
+    /**
+     * @deprecated Use `isPublic()`.
+     */
     public function isApproved(): bool
     {
-        return self::toBool($this->approved);
+        return $this->isPublic();
+    }
+
+    public function isPublic(): bool
+    {
+        return Scope::isPublic($this->scope);
     }
 
     public function isMature(): bool
     {
-        return self::toBool($this->mature);
-    }
-
-    public function approvedUpdatedAtIso(): ?string
-    {
-        return self::toIso($this->approvedUpdatedAt);
-    }
-
-    public function matureUpdatedAtIso(): ?string
-    {
-        return self::toIso($this->matureUpdatedAt);
+        return Severity::isMature($this->severity);
     }
 
     public function isDisabled(): bool
     {
-        return self::toBool($this->disabled);
+        return Scope::isDisabled($this->scope);
     }
 
-    public function disabledUpdatedAtIso(): ?string
+    public function scopeUpdatedAtIso(): ?string
     {
-        return self::toIso($this->disabledUpdatedAt);
+        return self::toIso($this->scopeUpdatedAt);
+    }
+
+    public function severityUpdatedAtIso(): ?string
+    {
+        return self::toIso($this->severityUpdatedAt);
     }
 
     abstract public function override(): ?Override;

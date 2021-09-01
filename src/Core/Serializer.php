@@ -35,7 +35,9 @@ class Serializer
             $array,
             [
                 'id' => $word->getId(),
-                'is_approved' => $word->isApproved(),
+                'is_public' => $word->isPublic(),
+                'scope' => $word->scope,
+                'severity' => $word->severity,
                 'url' => $word->url(),
                 'display_name' => $word->displayName(),
             ]
@@ -54,7 +56,9 @@ class Serializer
         if ($association) {
             $array['association'] = [
                 'id' => $association->getId(),
-                'is_approved' => $association->isApproved(),
+                'is_public' => $association->isPublic(),
+                'scope' => $association->scope,
+                'severity' => $association->severity,
                 'url' => $association->url(),
             ];
 

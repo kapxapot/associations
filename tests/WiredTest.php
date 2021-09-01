@@ -91,15 +91,4 @@ abstract class WiredTest extends TestCase
     {
         return $this->container->get($key);
     }
-
-    /**
-     * @param string|callable $to
-     * @return $this
-     */
-    protected function map(string $from, $to): self
-    {
-        $this->container->set($from, $to);
-
-        return $this;
-    }
 }

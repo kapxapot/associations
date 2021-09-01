@@ -8,6 +8,8 @@ use App\Models\LanguageElement;
 use App\Models\User;
 use App\Repositories\Interfaces\LanguageElementRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
+use App\Semantics\Scope;
+use App\Semantics\Severity;
 use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
@@ -99,7 +101,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     // queries
 
     /**
-     * Filters approved & non-mature elements, ordered by `approved_updated_at` DESC.
+     * Filters approved & non-mature elements, ordered by `scope_updated_at` DESC.
      */
     protected function publicQuery(?Language $language = null): Query
     {
@@ -123,7 +125,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     }
 
     /**
-     * Filters approved elements, ordering them by `approved_updated_at` DESC.
+     * Filters approved elements, ordering them by `scope_updated_at` DESC.
      */
     protected function approvedQuery(?Language $language = null): Query
     {
@@ -132,33 +134,33 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
             ->apply(
                 fn (Query $q) => $this->filterApproved($q)
             )
-            ->orderByDesc('approved_updated_at');
+            ->orderByDesc('scope_updated_at');
     }
 
     // filters
 
-    protected function filterApproved(Query $query, bool $approved = true): Query
+    protected function filterApproved(Query $query): Query
     {
-        return $query->where('approved', self::toBit($approved));
+        return $query->whereIn('scope', Scope::publicScopes());
     }
 
     protected function filterNotApproved(Query $query): Query
     {
-        return $this->filterApproved($query, false);
+        return $query->whereNotIn('scope', Scope::publicScopes());
     }
 
-    protected function filterMature(Query $query, bool $mature = true): Query
+    protected function filterMature(Query $query): Query
     {
-        return $query->where('mature', self::toBit($mature));
+        return $query->where('severity', Severity::MATURE);
     }
 
     protected function filterNotMature(Query $query): Query
     {
-        return $this->filterMature($query, false);
+        return $query->whereNotEqual('severity', Severity::MATURE);
     }
 
     protected function filterEnabled(Query $query): Query
     {
-        return $query->whereNotEqual('disabled', 1);
+        return $query->whereNotEqual('scope', Scope::DISABLED);
     }
 }

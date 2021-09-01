@@ -56,15 +56,13 @@ class GameRepositoryMock extends RepositoryMock implements GameRepositoryInterfa
 
     public function save(Game $game) : Game
     {
-        if ($this->games->contains($game)) {
-            return $this->hydrator->hydrate($game);
-        }
+        if (!$this->games->contains($game)) {
+            if (!$game->isPersisted()) {
+                $game->id = $this->games->nextId();
+            }
 
-        if (!$game->isPersisted()) {
-            $game->id = $this->games->nextId();
+            $this->games = $this->games->add($game);
         }
-
-        $this->games = $this->games->add($game);
 
         return $this->hydrator->hydrate($game);
     }

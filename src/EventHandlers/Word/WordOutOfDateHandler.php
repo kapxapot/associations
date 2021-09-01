@@ -6,7 +6,7 @@ use App\Events\Word\WordOutOfDateEvent;
 use App\Services\WordRecountService;
 
 /**
- * Recounts all statuses (approved & mature) for the word if it's out of date.
+ * Recounts all attributes for the word if it's out of date.
  */
 class WordOutOfDateHandler
 {

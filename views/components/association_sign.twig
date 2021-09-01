@@ -1,1 +1,1 @@
-{% set approved = reversed ? '&#x21C7;' : '&#x21C9;' %}{% set not_approved = reversed ? '&#x2190;' : '&#x2192;' %}{% set ethereal = reversed ? '&#x21E0;' : '&#x21E2;' %}{% if association.isReal %}{{ (association.is_approved ? approved : not_approved)|raw }}{% else %}{{ ethereal|raw }}{% endif %}
+{% set public = reversed ? '&#x21C7;' : '&#x21C9;' %}{% set notPublic = reversed ? '&#x2190;' : '&#x2192;' %}{% set ethereal = reversed ? '&#x21E0;' : '&#x21E2;' %}{% if association.isReal %}{{ (association.isPublic ? public : notPublic)|raw }}{% else %}{{ ethereal|raw }}{% endif %}

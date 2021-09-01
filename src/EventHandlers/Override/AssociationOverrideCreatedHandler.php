@@ -6,8 +6,7 @@ use App\Events\Override\AssociationOverrideCreatedEvent;
 use App\Services\AssociationRecountService;
 
 /**
- * Recounts all statuses (approved & mature, etc.) for the association
- * based on the association override.
+ * Recounts all association's attributes based on its override.
  */
 class AssociationOverrideCreatedHandler
 {

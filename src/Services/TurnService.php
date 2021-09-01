@@ -234,7 +234,7 @@ class TurnService
         // now we try to check unapproved associations
 
         $options = new GameOptions();
-        $options->allowNotApprovedElements = true;
+        $options->allowPrivateElements = true;
 
         return $this
             ->tryFindAnswers($turn, $options)

@@ -2,16 +2,17 @@
 
 namespace App\EventHandlers\Word;
 
-use App\Events\Word\WordMatureChangedEvent;
+use App\Events\Word\WordSeverityChangedEvent;
 use App\Models\Association;
 use App\Models\Word;
 use App\Services\AssociationRecountService;
 use App\Services\WordRecountService;
 
 /**
- * If the word is mature, all its associations and dependent words must be mature.
+ * If the word is not neutral, all its associations and dependent words must have
+ * the same (or higher) severity.
  */
-class WordMatureChangedHandler
+class WordSeverityChangedHandler
 {
     private AssociationRecountService $associationRecountService;
     private WordRecountService $wordRecountService;
@@ -25,7 +26,7 @@ class WordMatureChangedHandler
         $this->wordRecountService = $wordRecountService;
     }
 
-    public function __invoke(WordMatureChangedEvent $event) : void
+    public function __invoke(WordSeverityChangedEvent $event) : void
     {
         $word = $event->getWord();
 
@@ -33,13 +34,13 @@ class WordMatureChangedHandler
             ->associations()
             ->apply(
                 fn (Association $a) =>
-                $this->associationRecountService->recountMature($a, $event)
+                    $this->associationRecountService->recountSeverity($a, $event)
             );
 
         $word
             ->dependents()
             ->apply(
-                fn (Word $w) => $this->wordRecountService->recountMature($w, $event)
+                fn (Word $w) => $this->wordRecountService->recountSeverity($w, $event)
             );
     }
 }

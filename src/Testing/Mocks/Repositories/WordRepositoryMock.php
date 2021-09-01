@@ -32,15 +32,13 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
 
     public function save(Word $word) : Word
     {
-        if ($this->words->contains($word)) {
-            return $word;
-        }
+        if (!$this->words->contains($word)) {
+            if (!$word->isPersisted()) {
+                $word->id = $this->words->nextId();
+            }
 
-        if (!$word->isPersisted()) {
-            $word->id = $this->words->nextId();
+            $this->words = $this->words->add($word);
         }
-
-        $this->words = $this->words->add($word);
 
         return $word;
     }
@@ -130,7 +128,7 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
         return $this
             ->getAllByLanguageConditional($language)
             ->where(
-                fn (Word $w) => $w->isApproved()
+                fn (Word $w) => $w->isPublic()
             );
     }
 

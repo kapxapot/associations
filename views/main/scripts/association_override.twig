@@ -2,8 +2,6 @@
 
 {% set override = association.override %}
 
-{# approved, mature, disabled #}
-
 $scope.override = {
     association_id: {{ association.id }},
     association: '{{ association.fullName|e('js') }}',

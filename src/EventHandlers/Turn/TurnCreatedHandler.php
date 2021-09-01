@@ -6,7 +6,7 @@ use App\Events\Turn\TurnCreatedEvent;
 use App\Services\AssociationRecountService;
 
 /**
- * Recounts approved status for the association if it relates to the created turn.
+ * Recounts scope for the association if it relates to the created turn.
  */
 class TurnCreatedHandler
 {
@@ -22,7 +22,7 @@ class TurnCreatedHandler
         $assoc = $event->getTurn()->association();
 
         if ($assoc) {
-            $assoc = $this->associationRecountService->recountApproved($assoc, $event);
+            $assoc = $this->associationRecountService->recountScope($assoc, $event);
         }
     }
 }

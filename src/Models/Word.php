@@ -18,7 +18,6 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
 /**
  * @property integer|null $mainId
  * @property string|null $originalWord
- * @property string|null $tokenizedWord
  * @property string $word
  * @property string|null $wordUpdatedAt
  * @method AssociationCollection associations()
@@ -282,9 +281,11 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return [
             'id' => $this->getId(),
             'word' => $this->word,
-            'disabled' => $this->disabled,
-            'mature' => $this->mature,
-            'approved' => $this->approved,
+            'scope' => $this->scope,
+            'severity' => $this->severity,
+            'approved' => $this->isPublic(),
+            'mature' => $this->isMature(),
+            'disabled' => $this->isDisabled(),
             'has_dict_word' => $dw && $dw->isValid(),
             'has_definition' => $def && $def->isValid(),
             'url' => $this->url(),

@@ -5,6 +5,8 @@ namespace App\Specifications;
 use App\Config\Interfaces\AssociationConfigInterface;
 use App\Models\Association;
 use App\Models\Word;
+use App\Semantics\Scope;
+use App\Semantics\Severity;
 use App\Specifications\Rules\AbstractRule;
 use App\Specifications\Rules\Association\AssociationDisabledByOverride;
 use App\Specifications\Rules\Association\AssociationDisabledByWords;
@@ -25,7 +27,27 @@ class AssociationSpecification
         $this->wordSpecification = $wordSpecification;
     }
 
-    public function isDisabled(Association $association): bool
+    /**
+     * Todo: add override for INACTIVE & COMMON
+     */
+    public function countScope(Association $association): int
+    {
+        // if ($association->hasScopeOverride()) {
+        //     return $association->scopeOverride();
+        // }
+
+        if ($this->isDisabled($association)) {
+            return Scope::DISABLED;
+        }
+
+        if ($this->isApproved($association)) {
+            return Scope::PUBLIC;
+        }
+
+        return Scope::PRIVATE;
+    }
+
+    private function isDisabled(Association $association): bool
     {
         $rules = Collection::collect(
             new AssociationDisabledByOverride(),
@@ -38,13 +60,8 @@ class AssociationSpecification
         );
     }
 
-    public function isApproved(Association $association): bool
+    private function isApproved(Association $association): bool
     {
-        // shortcut
-        if ($this->isDisabled($association)) {
-            return false;
-        }
-
         if ($association->hasApprovedOverride()) {
             return $association->approvedOverride();
         }
@@ -83,7 +100,23 @@ class AssociationSpecification
         return $score >= $threshold;
     }
 
-    public function isMature(Association $association): bool
+    /**
+     * Todo: add override for OFFENDING
+     */
+    public function countSeverity(Association $association): int
+    {
+        // if ($association->hasSeverityOverride()) {
+        //     return $association->severityOverride();
+        // }
+
+        if ($this->isMature($association)) {
+            return Severity::MATURE;
+        }
+
+        return Severity::NEUTRAL;
+    }
+
+    private function isMature(Association $association): bool
     {
         if ($association->hasMatureOverride()) {
             return $association->matureOverride();

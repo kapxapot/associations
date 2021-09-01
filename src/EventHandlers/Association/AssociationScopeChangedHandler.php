@@ -2,16 +2,16 @@
 
 namespace App\EventHandlers\Association;
 
-use App\Events\Association\AssociationApprovedChangedEvent;
+use App\Events\Association\AssociationScopeChangedEvent;
 use App\Models\Word;
 use App\Services\WordRecountService;
 
 /**
- * Recounts approved status for words in the association.
- * 
- * If the association is approved, the words in it should be approved too.
+ * Recounts scope for words in the association.
+ *
+ * If the association is public, the words in it should be public too.
  */
-class AssociationApprovedChangedHandler
+class AssociationScopeChangedHandler
 {
     private WordRecountService $wordRecountService;
 
@@ -20,13 +20,13 @@ class AssociationApprovedChangedHandler
         $this->wordRecountService = $wordRecountService;
     }
 
-    public function __invoke(AssociationApprovedChangedEvent $event): void
+    public function __invoke(AssociationScopeChangedEvent $event): void
     {
         $event
             ->getAssociation()
             ->words()
             ->apply(
-                fn (Word $w) => $this->wordRecountService->recountApproved($w, $event)
+                fn (Word $w) => $this->wordRecountService->recountScope($w, $event)
             );
     }
 }

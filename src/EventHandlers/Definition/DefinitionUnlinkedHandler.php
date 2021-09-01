@@ -18,6 +18,6 @@ class DefinitionUnlinkedHandler
     {
         $word = $event->getUnlinkedWord();
 
-        $this->wordRecountService->recountApproved($word, $event);
+        $this->wordRecountService->recountScope($word, $event);
     }
 }

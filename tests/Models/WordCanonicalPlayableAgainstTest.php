@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\Word;
 use App\Models\WordFeedback;
 use App\Policies\UserPolicy;
+use App\Semantics\Scope;
+use App\Semantics\Severity;
 use PHPUnit\Framework\TestCase;
 
 final class WordCanonicalPlayableAgainstTest extends TestCase
@@ -158,7 +160,13 @@ final class WordCanonicalPlayableAgainstTest extends TestCase
             )
             : WordFeedbackCollection::empty();
 
-        return (new Word(['id' => $id, 'approved' => 1]))
+        $word = new Word([
+            'id' => $id,
+            'scope' => Scope::PUBLIC,
+            'severity' => Severity::NEUTRAL
+        ]);
+
+        return $word
             ->withMain(null)
             ->withTurns(
                 TurnCollection::empty()

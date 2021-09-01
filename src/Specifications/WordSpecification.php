@@ -5,6 +5,8 @@ namespace App\Specifications;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Word;
 use App\Models\WordRelation;
+use App\Semantics\Scope;
+use App\Semantics\Severity;
 use App\Services\WordService;
 
 class WordSpecification
@@ -21,7 +23,27 @@ class WordSpecification
         $this->wordService = $wordService;
     }
 
-    public function isDisabled(Word $word): bool
+    /**
+     * Todo: add override for INACTIVE & COMMON
+     */
+    public function countScope(Word $word): int
+    {
+        // if ($word->hasScopeOverride()) {
+        //     return $word->scopeOverride();
+        // }
+
+        if ($this->isDisabled($word)) {
+            return Scope::DISABLED;
+        }
+
+        if ($this->isApproved($word)) {
+            return Scope::PUBLIC;
+        }
+
+        return Scope::PRIVATE;
+    }
+
+    private function isDisabled(Word $word): bool
     {
         return $this->isDisabledByOverride($word)
             || $this->isDisabledByRelations($word);
@@ -43,7 +65,7 @@ class WordSpecification
             );
     }
 
-    public function isApproved(Word $word): bool
+    private function isApproved(Word $word): bool
     {
         $approvedOverride = $this->approvedOverride($word);
 
@@ -111,7 +133,23 @@ class WordSpecification
         return $score >= $threshold;
     }
 
-    public function isMature(Word $word): bool
+    /**
+     * Todo: add override for OFFENDING
+     */
+    public function countSeverity(Word $word): int
+    {
+        // if ($word->hasSeverityOverride()) {
+        //     return $word->severityOverride();
+        // }
+
+        if ($this->isMature($word)) {
+            return Severity::MATURE;
+        }
+
+        return Severity::NEUTRAL;
+    }
+
+    private function isMature(Word $word): bool
     {
         $matureOverride = $word->matureOverride();
 

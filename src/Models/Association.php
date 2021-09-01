@@ -157,9 +157,11 @@ class Association extends LanguageElement implements AssociationInterface
         return [
             'id' => $this->getId(),
             'name' => $this->fullName(),
-            'disabled' => $this->disabled,
-            'mature' => $this->mature,
-            'approved' => $this->approved,
+            'scope' => $this->scope,
+            'severity' => $this->severity,
+            'approved' => $this->isPublic(),
+            'mature' => $this->isMature(),
+            'disabled' => $this->isDisabled(),
             'url' => $this->url(),
             'language' => $this->language()->serialize(),
             'creator' => $this->creator()->serialize(),
@@ -177,7 +179,7 @@ class Association extends LanguageElement implements AssociationInterface
 
     public function sign(): string
     {
-        return $this->isApproved()
+        return $this->isPublic()
             ? self::APPROVED_SIGN
             : self::DEFAULT_SIGN;
     }

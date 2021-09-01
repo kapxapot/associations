@@ -32,7 +32,7 @@
                 {% if word.is_disabled %}
                     <span class="label label-default">{% if word.hasDisabledOverride %}<i class="fas fa-lock"></i> {% endif %}отключено</span>
                 {% else %}
-                    <span class="label {{ word.is_approved ? 'label-success' : 'label-primary' }}" title="{{ word.is_approved ? 'Доступно всем игрокам' : 'Доступно только тем, кто использовал слово' }}" data-toggle="tooltip">{% if word.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif word.is_approved %}<i class="fas fa-check"></i> {% endif %}{{ word.is_approved ? 'общее' : 'личное' }}</span>
+                    <span class="label {{ word.isPublic ? 'label-success' : 'label-primary' }}" title="{{ word.isPublic ? 'Доступно всем игрокам' : 'Доступно только тем, кто использовал слово' }}" data-toggle="tooltip">{% if word.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif word.isPublic %}<i class="fas fa-check"></i> {% endif %}{{ word.isPublic ? 'общее' : 'личное' }}</span>
                 {% endif %}
 
                 {% if word.is_mature or word.hasMatureOverride %}
@@ -339,9 +339,8 @@
         <div class="panel panel-secondary">
             <div class="panel-body">
                 <strong>Обновлено:</strong> {{ gm.moment_local(word.updated_at_iso) }}<br/>
-                <strong>Отключено:</strong> {{ gm.moment_local(word.disabled_updated_at_iso, 'никогда') }}<br/>
-                <strong>Общее:</strong> {{ gm.moment_local(word.approved_updated_at_iso, 'никогда') }}<br/>
-                <strong>Не для детей:</strong> {{ gm.moment_local(word.mature_updated_at_iso, 'никогда') }}<br/>
+                <strong>Видимость:</strong> {{ gm.moment_local(word.scopeUpdatedAtIso, 'никогда') }}<br/>
+                <strong>Жестокость:</strong> {{ gm.moment_local(word.severityUpdatedAtIso, 'никогда') }}<br/>
                 <strong>Корректировка слова:</strong> {{ gm.moment_local(word.word_updated_at_iso, 'никогда') }}
                 {% if word.dict_word %}
                     <br/><strong>Проверено в словаре:</strong> {{ gm.moment_local(word.dict_word.updated_at_iso) }}

@@ -2,9 +2,8 @@
 
 namespace App\Services;
 
-use App\Events\Association\AssociationApprovedChangedEvent;
-use App\Events\Association\AssociationDisabledChangedEvent;
-use App\Events\Association\AssociationMatureChangedEvent;
+use App\Events\Association\AssociationScopeChangedEvent;
+use App\Events\Association\AssociationSeverityChangedEvent;
 use App\Models\Association;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Specifications\AssociationSpecification;
@@ -14,9 +13,8 @@ use Plasticode\Traits\Convert\ToBit;
 use Plasticode\Util\Date;
 
 /**
- * @emits AssociationApprovedChangedEvent
- * @emits AssociationDisabledChangedEvent
- * @emits AssociationMatureChangedEvent
+ * @emits AssociationScopeChangedEvent
+ * @emits AssociationSeverityChangedEvent
  */
 class AssociationRecountService
 {
@@ -42,14 +40,13 @@ class AssociationRecountService
         ?Event $sourceEvent = null
     ): Association
     {
-        $assoc = $this->recountDisabled($association, $sourceEvent);
-        $assoc = $this->recountApproved($association, $sourceEvent);
-        $assoc = $this->recountMature($association, $sourceEvent);
+        $assoc = $this->recountScope($association, $sourceEvent);
+        $assoc = $this->recountSeverity($association, $sourceEvent);
 
         return $assoc;
     }
 
-    public function recountDisabled(
+    public function recountScope(
         Association $association,
         ?Event $sourceEvent = null
     ): Association
@@ -57,11 +54,11 @@ class AssociationRecountService
         $now = Date::dbNow();
         $changed = false;
 
-        $disabled = $this->associationSpecification->isDisabled($association);
+        $scope = $this->associationSpecification->countScope($association);
 
-        if ($association->isDisabled() !== $disabled) {
-            $association->disabled = self::toBit($disabled);
-            $association->disabledUpdatedAt = $now;
+        if ($association->scope !== $scope) {
+            $association->scope = $scope;
+            $association->scopeUpdatedAt = $now;
 
             $changed = true;
         }
@@ -72,14 +69,14 @@ class AssociationRecountService
 
         if ($changed) {
             $this->eventDispatcher->dispatch(
-                new AssociationDisabledChangedEvent($association, $sourceEvent)
+                new AssociationScopeChangedEvent($association, $sourceEvent)
             );
         }
 
         return $association;
     }
 
-    public function recountApproved(
+    public function recountSeverity(
         Association $association,
         ?Event $sourceEvent = null
     ): Association
@@ -87,11 +84,11 @@ class AssociationRecountService
         $now = Date::dbNow();
         $changed = false;
 
-        $approved = $this->associationSpecification->isApproved($association);
+        $severity = $this->associationSpecification->countSeverity($association);
 
-        if ($association->isApproved() !== $approved) {
-            $association->approved = self::toBit($approved);
-            $association->approvedUpdatedAt = $now;
+        if ($association->severity !== $severity) {
+            $association->severity = $severity;
+            $association->severityUpdatedAt = $now;
 
             $changed = true;
         }
@@ -102,37 +99,7 @@ class AssociationRecountService
 
         if ($changed) {
             $this->eventDispatcher->dispatch(
-                new AssociationApprovedChangedEvent($association, $sourceEvent)
-            );
-        }
-
-        return $association;
-    }
-
-    public function recountMature(
-        Association $association,
-        ?Event $sourceEvent = null
-    ): Association
-    {
-        $now = Date::dbNow();
-        $changed = false;
-
-        $mature = $this->associationSpecification->isMature($association);
-
-        if ($association->isMature() !== $mature) {
-            $association->mature = self::toBit($mature);
-            $association->matureUpdatedAt = $now;
-
-            $changed = true;
-        }
-
-        $association->updatedAt = $now;
-
-        $association = $this->associationRepository->save($association);
-
-        if ($changed) {
-            $this->eventDispatcher->dispatch(
-                new AssociationMatureChangedEvent($association, $sourceEvent)
+                new AssociationSeverityChangedEvent($association, $sourceEvent)
             );
         }
 

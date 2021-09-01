@@ -21,6 +21,6 @@ class DefinitionLinkedHandler
 
         Assert::notNull($word);
 
-        $this->wordRecountService->recountApproved($word, $event);
+        $this->wordRecountService->recountScope($word, $event);
     }
 }

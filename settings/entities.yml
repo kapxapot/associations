@@ -19,19 +19,14 @@ associations:
         '<a href="' + row.url + '">' + row.name + '</a>'
       attributes: [readonly, searchable, no_sort]
 
-    disabled:
-      name: Откл.
-      type: bool
+    scope:
+      name: Видимость
+      type: number
       attributes: [readonly]
 
-    mature:
-      name: 16+
-      type: bool
-      attributes: [readonly]
-
-    approved:
-      name: Общая
-      type: bool
+    severity:
+      name: Жестокость
+      type: number
       attributes: [readonly]
 
     created_at:
@@ -475,19 +470,14 @@ words:
         '<a class="ellipsis w-200" href="' + row.url + '">' + row.word + '</a>'
       attributes: [readonly, searchable]
 
-    disabled:
-      name: Откл.
-      type: bool
+    scope:
+      name: Видимость
+      type: number
       attributes: [readonly]
 
-    mature:
-      name: 16+
-      type: bool
-      attributes: [readonly]
-
-    approved:
-      name: Общее
-      type: bool
+    severity:
+      name: Жестокость
+      type: number
       attributes: [readonly]
 
     has_dict_word:

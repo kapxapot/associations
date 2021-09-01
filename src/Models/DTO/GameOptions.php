@@ -4,5 +4,5 @@ namespace App\Models\DTO;
 
 class GameOptions
 {
-    public bool $allowNotApprovedElements = false;
+    public bool $allowPrivateElements = false;
 }

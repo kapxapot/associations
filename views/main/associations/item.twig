@@ -19,7 +19,7 @@
                 {% if association.is_disabled %}
                     <span class="label label-default">{% if association.hasDisabledOverride %}<i class="fas fa-lock"></i> {% endif %}отключена</span>
                 {% else %}
-                    <span class="label {{ association.is_approved ? 'label-success' : 'label-primary' }}" title="{{ association.is_approved ? 'Доступна всем игрокам' : 'Доступна только тем, кто ее использовал' }}" data-toggle="tooltip">{% if association.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif association.is_approved %}<i class="fas fa-check"></i> {% endif %}{{ association.is_approved ? 'общая' : 'личная' }}</span>
+                    <span class="label {{ association.isPublic ? 'label-success' : 'label-primary' }}" title="{{ association.isPublic ? 'Доступна всем игрокам' : 'Доступна только тем, кто ее использовал' }}" data-toggle="tooltip">{% if association.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif association.isPublic %}<i class="fas fa-check"></i> {% endif %}{{ association.isPublic ? 'общая' : 'личная' }}</span>
                 {% endif %}
 
                 {% if association.is_mature or association.hasMatureOverride %}
@@ -149,9 +149,8 @@
         <div class="panel panel-secondary">
             <div class="panel-body">
                 <strong>Обновлена:</strong> {{ gm.moment_local(association.updated_at_iso) }}<br/>
-                <strong>Отключена:</strong> {{ gm.moment_local(association.disabled_updated_at_iso, 'никогда') }}<br/>
-                <strong>Общая:</strong> {{ gm.moment_local(association.approved_updated_at_iso, 'никогда') }}<br/>
-                <strong>Не для детей:</strong> {{ gm.moment_local(association.mature_updated_at_iso, 'никогда') }}
+                <strong>Видимость:</strong> {{ gm.moment_local(association.scopeUpdatedAtIso, 'никогда') }}<br/>
+                <strong>Жестокость:</strong> {{ gm.moment_local(association.severityUpdatedAtIso, 'никогда') }}
             </div>
         </div>
     {% endif %}
