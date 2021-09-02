@@ -170,10 +170,6 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isDisabled(): bool
     {
-        if ($this->scope === null) {
-            dd($this->toArray());
-        }
-
         return Scope::isDisabled($this->scope);
     }
 
