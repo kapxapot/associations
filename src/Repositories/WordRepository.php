@@ -224,7 +224,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             )
             ->search(
                 mb_strtolower($filter),
-                '(word_bin like ? or user.login like ? or user.name like ?)',
+                '(word like ? or user.login like ? or user.name like ?)',
                 3
             );
     }
