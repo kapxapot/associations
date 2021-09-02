@@ -140,7 +140,8 @@ class UserAnswerer extends AbstractAnswerer
             $request->isAny(
                 Command::WORD_DISLIKE,
                 'не нравится',
-                'не нравится слово'
+                'не нравится слово',
+                'плохой слово'
             )
             || $request->hasAnySet(
                 ['плохое', 'слово'],
