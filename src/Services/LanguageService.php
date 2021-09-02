@@ -104,10 +104,10 @@ class LanguageService
         }
 
         $word = $words
-            ->where(
+            ->shuffle()
+            ->first(
                 fn (Word $w) => $w->isPlayableAgainst($user)
-            )
-            ->random();
+            );
 
         return $word->canonicalPlayableAgainst($user);
     }

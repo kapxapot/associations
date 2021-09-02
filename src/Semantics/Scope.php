@@ -25,6 +25,11 @@ class Scope
         return $scope == self::DISABLED;
     }
 
+    public static function isCommon(int $scope): bool
+    {
+        return $scope == self::COMMON;
+    }
+
     /**
      * Public scopes are PUBLIC & COMMON!
      */

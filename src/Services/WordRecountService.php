@@ -67,7 +67,7 @@ class WordRecountService
 
         $scope = $this->wordSpecification->countScope($word);
 
-        if ($word->scope !== $scope) {
+        if ($word->scope != $scope) {
             $word->scope = $scope;
             $word->scopeUpdatedAt = $now;
 
@@ -94,7 +94,7 @@ class WordRecountService
 
         $severity = $this->wordSpecification->countSeverity($word);
 
-        if ($word->severity !== $severity) {
+        if ($word->severity != $severity) {
             $word->severity = $severity;
             $word->severityUpdatedAt = $now;
 

@@ -15,6 +15,7 @@ use Plasticode\Models\Interfaces\LinkableInterface;
 use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Models\Traits\Linkable;
 use Plasticode\Models\Traits\UpdatedAt;
+use Webmozart\Assert\Assert;
 
 /**
  * @property integer $disabled Deprecated.
@@ -157,6 +158,11 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         return Scope::isPublic($this->scope);
     }
 
+    public function isCommon(): bool
+    {
+        return Scope::isCommon($this->scope);
+    }
+
     public function isMature(): bool
     {
         return Severity::isMature($this->severity);
@@ -164,6 +170,10 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isDisabled(): bool
     {
+        if ($this->scope === null) {
+            dd($this->toArray());
+        }
+
         return Scope::isDisabled($this->scope);
     }
 

@@ -56,7 +56,7 @@ class AssociationRecountService
 
         $scope = $this->associationSpecification->countScope($association);
 
-        if ($association->scope !== $scope) {
+        if ($association->scope != $scope) {
             $association->scope = $scope;
             $association->scopeUpdatedAt = $now;
 
@@ -86,7 +86,7 @@ class AssociationRecountService
 
         $severity = $this->associationSpecification->countSeverity($association);
 
-        if ($association->severity !== $severity) {
+        if ($association->severity != $severity) {
             $association->severity = $severity;
             $association->severityUpdatedAt = $now;
 

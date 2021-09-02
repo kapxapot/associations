@@ -225,7 +225,7 @@ class TurnService
         // first, we try to find a classic approved association
 
         /** @var Word|null $goodWord */
-        $goodWord = $this->tryFindAnswers($turn)->random();
+        $goodWord = $this->getRandomAnswer($turn);
 
         if ($goodWord !== null) {
             return $goodWord;
@@ -236,15 +236,10 @@ class TurnService
         $options = new GameOptions();
         $options->allowPrivateElements = true;
 
-        return $this
-            ->tryFindAnswers($turn, $options)
-            ->where(
-                fn (Word $w) => $w->isPlayableAgainst($turn->user())
-            )
-            ->random();
+        return $this->getRandomAnswer($turn, $options);
     }
 
-    private function tryFindAnswers(Turn $turn, GameOptions $options = null): WordCollection
+    private function getRandomAnswer(Turn $turn, GameOptions $options = null): ?Word
     {
         $game = $turn->game();
         $user = $turn->user();
@@ -252,7 +247,8 @@ class TurnService
         return $turn
             ->word()
             ->associatedWordsFor($user, $options)
-            ->where(
+            ->shuffle()
+            ->first(
                 fn (Word $w) => $this->canBePlayed($game, $w)
             );
     }
