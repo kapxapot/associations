@@ -77,21 +77,17 @@ class WordService
         User $user
     ): Word
     {
-        $word = $this->wordRepository->findInLanguage($language, $wordStr);
-
-        if ($word !== null) {
-            // use canonical word for disabled words
-            if ($word->isDisabled() && $word->hasMain()) {
-                $word = $word->canonical();
-            }
-        }
-
-        $word ??= $this->create($language, $wordStr, $user);
+        $word = $this->wordRepository->findInLanguage($language, $wordStr)
+            ?? $this->create($language, $wordStr, $user);
 
         if ($word === null) {
             throw new InvalidResultException(
                 'Word can\'t be found or added.'
             );
+        }
+
+        if ($word->shouldUseCanonical()) {
+            $word = $word->canonical();
         }
 
         return $word;

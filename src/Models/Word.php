@@ -426,6 +426,15 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
+     * Checks if the word is "bad" and the canonical word must be used instead.
+     */
+    public function shouldUseCanonical(): bool
+    {
+        // use canonical word for disabled words
+        return $this->isDisabled() && $this->hasMain();
+    }
+
+    /**
      * Checks if the words have the same canonical word.
      */
     public function canonicalEquals(Word $word): bool
