@@ -97,13 +97,13 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             ->one();
     }
 
-    public function searchAllNonMature(
+    public function searchAllNotMature(
         SearchParams $searchParams,
         ?Language $language = null
     ): WordCollection
     {
         $query = $this
-            ->nonMatureQuery($language)
+            ->notMatureQuery($language)
             ->apply(
                 fn (Query $q) => $this->applySearchParams($q, $searchParams)
             );
@@ -111,13 +111,13 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         return WordCollection::from($query);
     }
 
-    public function getNonMatureCount(
+    public function getNotMatureCount(
         ?Language $language = null,
         ?string $filter = null
     ): int
     {
         return $this
-            ->nonMatureQuery($language)
+            ->notMatureQuery($language)
             ->applyIf(
                 strlen($filter) > 0,
                 fn (Query $q) => $this->applyFilter($q, $filter)
@@ -232,11 +232,11 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     // queries
 
     /**
-     * Filters non-mature & enabled words.
+     * Filters not mature & enabled words.
      */
-    protected function nonMatureQuery(?Language $language = null): Query
+    protected function notMatureQuery(?Language $language = null): Query
     {
-        return parent::nonMatureQuery($language)->apply(
+        return parent::notMatureQuery($language)->apply(
             fn (Query $q) => $this->filterEnabled($q)
         );
     }

@@ -61,7 +61,7 @@ class LanguageElementCollection extends DbModelCollection
     }
 
     /**
-     * Returns elements visible to everyone (equivalent to "non mature").
+     * Returns elements visible to everyone (equivalent to "not mature").
      * 
      * @return static
      */

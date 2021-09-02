@@ -15,12 +15,9 @@ use Plasticode\Models\Interfaces\LinkableInterface;
 use Plasticode\Models\Interfaces\UpdatedAtInterface;
 use Plasticode\Models\Traits\Linkable;
 use Plasticode\Models\Traits\UpdatedAt;
-use Webmozart\Assert\Assert;
 
 /**
- * @property integer $disabled Deprecated.
  * @property integer $languageId
- * @property integer $mature Deprecated.
  * @property integer $scope
  * @property string|null $scopeUpdatedAt
  * @property integer $severity
@@ -99,10 +96,10 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         // 1. for disabled:
         // 1.1. visible only for those who used them
         // 2. for enabled:
-        // 2.1. non-mature elements are visible for everyone
-        // 2.2. mature elements are invisible for non-authed users ($user == null)
+        // 2.1. not mature elements are visible for everyone
+        // 2.2. mature elements are invisible for not authed users ($user == null)
         // 2.3. mature elements are visible for mature users
-        // 2.4. mature elements are visible for non-mature users only if they used them
+        // 2.4. mature elements are visible for not mature users only if they used them
 
         if ($this->isDisabled()) {
             return $this->isUsedBy($user);
@@ -145,12 +142,9 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     abstract public function feedbackByMe(): ?Feedback;
 
-    /**
-     * @deprecated Use `isPublic()`.
-     */
-    public function isApproved(): bool
+    public function isDisabled(): bool
     {
-        return $this->isPublic();
+        return Scope::isDisabled($this->scope);
     }
 
     public function isPublic(): bool
@@ -166,11 +160,6 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
     public function isMature(): bool
     {
         return Severity::isMature($this->severity);
-    }
-
-    public function isDisabled(): bool
-    {
-        return Scope::isDisabled($this->scope);
     }
 
     public function scopeUpdatedAtIso(): ?string

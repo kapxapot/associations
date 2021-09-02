@@ -45,7 +45,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         );
     }
 
-    public function getAllNonMature(
+    public function getAllNotMature(
         ?Language $language = null
     ): LanguageElementCollection
     {
@@ -101,7 +101,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     // queries
 
     /**
-     * Filters approved & non-mature elements, ordered by `scope_updated_at` DESC.
+     * Filters approved & not mature elements, ordered by `scope_updated_at` DESC.
      */
     protected function publicQuery(?Language $language = null): Query
     {
@@ -113,9 +113,9 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     }
 
     /**
-     * Filters non-mature elements.
+     * Filters not mature elements.
      */
-    protected function nonMatureQuery(?Language $language = null): Query
+    protected function notMatureQuery(?Language $language = null): Query
     {
         return $this
             ->getByLanguageQuery($language)

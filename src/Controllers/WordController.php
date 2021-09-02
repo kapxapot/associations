@@ -59,7 +59,7 @@ class WordController extends Controller
 
         $searchResult = $this
             ->wordService
-            ->searchAllNonMature($searchParams);
+            ->searchAllNotMature($searchParams);
 
         return Response::json($response, $searchResult);
     }

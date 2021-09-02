@@ -48,7 +48,7 @@
                 <input type="text" id="problemsWordDuplicate" placeholder="главное слово" class="form-control" maxlength="{{ word_max_length }}" required ng-model="problems.word.duplicate" />
             </div>
 
-            {% if auth.user.is_mature %}
+            {% if auth.user.isMature %}
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" ng-model="problems.word.mature">
@@ -68,7 +68,7 @@
                 </label>
             </div>
 
-            {% if auth.user.is_mature %}
+            {% if auth.user.isMature %}
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" ng-model="problems.association.mature">

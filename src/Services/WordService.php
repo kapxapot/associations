@@ -228,19 +228,19 @@ class WordService
             ->words();
     }
 
-    public function searchAllNonMature(
+    public function searchAllNotMature(
         SearchParams $searchParams,
         ?Language $language = null
     ): SearchResult
     {
         $data = $this
             ->wordRepository
-            ->searchAllNonMature($searchParams, $language);
+            ->searchAllNotMature($searchParams, $language);
 
-        $totalCount = $this->wordRepository->getNonMatureCount($language);
+        $totalCount = $this->wordRepository->getNotMatureCount($language);
 
         $filteredCount = $searchParams->hasFilter()
-            ? $this->wordRepository->getNonMatureCount($language, $searchParams->filter())
+            ? $this->wordRepository->getNotMatureCount($language, $searchParams->filter())
             : $totalCount;
 
         return new SearchResult($data, $totalCount, $filteredCount);

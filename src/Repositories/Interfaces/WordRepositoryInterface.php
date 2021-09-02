@@ -31,12 +31,12 @@ interface WordRepositoryInterface extends FilteringRepositoryInterface, Language
         bool $strict = false
     ): ?Word;
 
-    public function searchAllNonMature(
+    public function searchAllNotMature(
         SearchParams $searchParams,
         ?Language $language = null
     ): WordCollection;
 
-    public function getNonMatureCount(
+    public function getNotMatureCount(
         ?Language $language = null,
         ?string $substr = null
     ): int;

@@ -10,32 +10,30 @@ use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
 
 interface LanguageElementRepositoryInterface extends ChangingRepositoryInterface, WithLanguageRepositoryInterface
 {
-    function get(?int $id): ?LanguageElement;
+    public function get(?int $id): ?LanguageElement;
 
-    function getAllByLanguage(Language $language): LanguageElementCollection;
+    public function getAllByLanguage(Language $language): LanguageElementCollection;
 
-    function getAllCreatedByUser(
+    public function getAllCreatedByUser(
         User $user,
         ?Language $language = null
     ): LanguageElementCollection;
 
-    function getAllNonMature(?Language $language = null): LanguageElementCollection;
+    public function getAllNotMature(?Language $language = null): LanguageElementCollection;
 
     /**
      * Returns out of date language elements.
      *
      * @param integer $ttlMin Time to live in minutes
      */
-    function getAllOutOfDate(
+    public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
     ): LanguageElementCollection;
 
-    function getAllApproved(
-        ?Language $language = null
-    ): LanguageElementCollection;
+    public function getAllApproved(?Language $language = null): LanguageElementCollection;
 
-    function getLastAddedByLanguage(
+    public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = 0
     ): LanguageElementCollection;

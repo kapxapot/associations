@@ -91,12 +91,12 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             );
     }
 
-    public function searchAllNonMature(
+    public function searchAllNotMature(
         SearchParams $searchParams,
         ?Language $language = null
     ): WordCollection
     {
-        $public = $this->getAllNonMature($language);
+        $public = $this->getAllNotMature($language);
 
         // todo: add filter & sort
 
@@ -105,13 +105,13 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             : $public;
     }
 
-    public function getNonMatureCount(
+    public function getNotMatureCount(
         ?Language $language = null,
         ?string $substr = null
     ): int
     {
         // todo: add filtering by substr
-        return $this->getAllNonMature($language)->count();
+        return $this->getAllNotMature($language)->count();
     }
 
     public function getAllOutOfDate(
@@ -178,7 +178,7 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
         return WordCollection::empty();
     }
 
-    public function getAllNonMature(?Language $language = null): WordCollection
+    public function getAllNotMature(?Language $language = null): WordCollection
     {
         return $this
             ->getAllByLanguageConditional($language)
