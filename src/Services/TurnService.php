@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Collections\TurnCollection;
-use App\Collections\WordCollection;
 use App\Events\Turn\TurnCreatedEvent;
 use App\Exceptions\DuplicateWordException;
 use App\Exceptions\RecentRelatedWordException;
