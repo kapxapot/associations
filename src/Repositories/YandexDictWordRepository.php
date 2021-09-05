@@ -77,7 +77,7 @@ class YandexDictWordRepository extends IdiormRepository implements YandexDictWor
     ): ?YandexDictWord
     {
         return $this
-            ->getByLanguageQuery($language)
+            ->byLanguageQuery($language)
             ->where('word_bin', $wordStr)
             ->one();
     }

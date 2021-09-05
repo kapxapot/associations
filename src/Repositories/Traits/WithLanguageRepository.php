@@ -14,11 +14,11 @@ trait WithLanguageRepository
     public function getCountByLanguage(Language $language): int
     {
         return $this
-            ->getByLanguageQuery($language)
+            ->byLanguageQuery($language)
             ->count();
     }
 
-    protected function getByLanguageQuery(?Language $language): Query
+    protected function byLanguageQuery(?Language $language): Query
     {
         return $this->filterByLanguage($this->query(), $language);
     }

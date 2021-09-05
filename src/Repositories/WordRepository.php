@@ -2,10 +2,12 @@
 
 namespace App\Repositories;
 
+use App\Collections\LanguageElementCollection;
 use App\Collections\WordCollection;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Scope;
 use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Search\SearchParams;
@@ -81,7 +83,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     ): ?Word
     {
         return $this
-            ->getByLanguageQuery($language)
+            ->byLanguageQuery($language)
             ->applyIfElse(
                 $strict,
                 fn (Query $q) => $q->where('word_bin', $wordStr),
@@ -132,6 +134,13 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     {
         return WordCollection::from(
             parent::getAllOutOfDate($ttlMin, $limit)
+        );
+    }
+
+    public function getAllByScope(int $scope, ?Language $language = null): WordCollection
+    {
+        return WordCollection::from(
+            parent::getAllByScope($scope, $language)
         );
     }
 
@@ -237,7 +246,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     protected function notMatureQuery(?Language $language = null): Query
     {
         return parent::notMatureQuery($language)->apply(
-            fn (Query $q) => $this->filterEnabled($q)
+            fn (Query $q) => $this->filterByScopeNot($q, Scope::DISABLED)
         );
     }
 }

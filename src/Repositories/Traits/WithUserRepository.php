@@ -5,7 +5,7 @@ namespace App\Repositories\Traits;
 use App\Models\User;
 use Plasticode\Data\Query;
 
-trait ByUserRepository
+trait WithUserRepository
 {
     protected string $userIdField = 'user_id';
 

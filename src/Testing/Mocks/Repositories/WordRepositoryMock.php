@@ -25,12 +25,12 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
         );
     }
 
-    public function get(?int $id) : ?Word
+    public function get(?int $id): ?Word
     {
         return $this->words->first('id', $id);
     }
 
-    public function save(Word $word) : Word
+    public function save(Word $word): Word
     {
         if (!$this->words->contains($word)) {
             if (!$word->isPersisted()) {
@@ -43,21 +43,21 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
         return $word;
     }
 
-    public function store(array $data) : Word
+    public function store(array $data): Word
     {
         $word = Word::create($data);
 
         return $this->save($word);
     }
 
-    private function getAllByLanguageConditional(?Language $language) : WordCollection
+    private function getAllByLanguageConditional(?Language $language): WordCollection
     {
         return $language
             ? $this->getAllByLanguage($language)
             : $this->words;
     }
 
-    public function getAllByLanguage(Language $language) : WordCollection
+    public function getAllByLanguage(Language $language): WordCollection
     {
         return $this
             ->words
@@ -70,7 +70,7 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
         Language $language,
         ?string $wordStr,
         ?int $exceptId = null
-    ) : ?Word
+    ): ?Word
     {
         return $this->findInLanguage($language, $wordStr, $exceptId);
     }
@@ -80,7 +80,7 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
         ?string $wordStr,
         ?int $exceptId = null,
         bool $strict = false
-    ) : ?Word
+    ): ?Word
     {
         // todo: add originalWord + exceptId + strict management
 
@@ -117,13 +117,25 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
     public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
-    ) : WordCollection
+    ): WordCollection
     {
         // placeholder
         return WordCollection::empty();
     }
 
-    public function getAllApproved(?Language $language = null) : WordCollection
+    public function getAllByScope(
+        int $scope,
+        ?Language $language = null
+    ): WordCollection
+    {
+        return $this
+            ->getAllByLanguageConditional($language)
+            ->where(
+                fn (Word $w) => $w->scope == $scope
+            );
+    }
+
+    public function getAllApproved(?Language $language = null): WordCollection
     {
         return $this
             ->getAllByLanguageConditional($language)

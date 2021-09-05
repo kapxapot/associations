@@ -135,6 +135,18 @@ class AssociationRepositoryMock extends RepositoryMock implements AssociationRep
             );
     }
 
+    public function getAllByScope(
+        int $scope,
+        ?Language $language = null
+    ): LanguageElementCollection
+    {
+        return $this
+            ->getAllByLanguageConditional($language)
+            ->where(
+                fn (Association $a) => $a->scope == $scope
+            );
+    }
+
     public function getAllApproved(
         ?Language $language = null
     ): LanguageElementCollection

@@ -13,9 +13,11 @@ class Scope
     const COMMON = 5;
 
     /**
+     * Returns scopes that are >= Scope::PUBLIC.
+     *
      * @return integer[]
      */
-    public static function publicScopes(): array
+    public static function allPublic(): array
     {
         return [self::PUBLIC, self::COMMON];
     }
@@ -31,17 +33,17 @@ class Scope
     }
 
     /**
-     * Public scopes are PUBLIC & COMMON!
+     * Currently public scopes are PUBLIC & COMMON!
      */
     public static function isPublic(int $scope): bool
     {
-        return in_array($scope, self::publicScopes());
+        return in_array($scope, self::allPublic());
     }
 
     /**
      * @return array<integer, string>
      */
-    public static function all(): array
+    public static function allNames(): array
     {
         return [
             self::DISABLED => 'disabled',
@@ -54,7 +56,8 @@ class Scope
 
     public static function getName(int $scope): string
     {
-        $name = self::all()[$scope] ?? null;
+        $names = self::allNames();
+        $name = $names[$scope] ?? null;
 
         Assert::notNull($name);
 

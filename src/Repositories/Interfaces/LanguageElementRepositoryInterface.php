@@ -31,6 +31,11 @@ interface LanguageElementRepositoryInterface extends ChangingRepositoryInterface
         int $limit = 0
     ): LanguageElementCollection;
 
+    public function getAllByScope(
+        int $scope,
+        ?Language $language = null
+    ): LanguageElementCollection;
+
     public function getAllApproved(?Language $language = null): LanguageElementCollection;
 
     public function getLastAddedByLanguage(

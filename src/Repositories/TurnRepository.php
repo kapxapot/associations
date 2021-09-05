@@ -10,15 +10,15 @@ use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
-use App\Repositories\Traits\ByUserRepository;
 use App\Repositories\Traits\WithLanguageRepository;
+use App\Repositories\Traits\WithUserRepository;
 use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
 class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
 {
-    use ByUserRepository;
     use WithLanguageRepository;
+    use WithUserRepository;
     use WithWordRepository;
 
     protected string $sortField = 'id';
@@ -60,7 +60,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
     public function getAllByLanguage(Language $language): TurnCollection
     {
         return TurnCollection::from(
-            $this->getByLanguageQuery($language)
+            $this->byLanguageQuery($language)
         );
     }
 
@@ -69,7 +69,7 @@ class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
         ?Language $language = null
     ): TurnCollection
     {
-        $query = $this->getByLanguageQuery($language);
+        $query = $this->byLanguageQuery($language);
 
         return TurnCollection::from(
             $this->filterByUser($query, $user)

@@ -21,6 +21,11 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     use ToBit;
     use WithLanguageRepository;
 
+    protected string $scopeField = 'scope';
+    protected string $severityField = 'severity';
+    protected string $updatedAtField = 'updated_at';
+    protected string $scopeUpdatedAtField = 'scope_updated_at';
+
     public function get(?int $id): ?LanguageElement
     {
         return $this->getEntity($id);
@@ -29,7 +34,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     public function getAllByLanguage(Language $language): LanguageElementCollection
     {
         return LanguageElementCollection::from(
-            $this->getByLanguageQuery($language)
+            $this->byLanguageQuery($language)
         );
     }
 
@@ -38,7 +43,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         ?Language $language = null
     ): LanguageElementCollection
     {
-        $query = $this->getByLanguageQuery($language);
+        $query = $this->byLanguageQuery($language);
 
         return LanguageElementCollection::from(
             $this->filterByCreator($query, $user)
@@ -49,10 +54,12 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         ?Language $language = null
     ): LanguageElementCollection
     {
-        $query = $this->getByLanguageQuery($language);
-
         return LanguageElementCollection::from(
-            $this->filterNotMature($query)
+            $this
+                ->byLanguageQuery($language)
+                ->apply(
+                    fn (Query $q) => $this->filterNotMature($q)
+                )
         );
     }
 
@@ -69,11 +76,23 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         return LanguageElementCollection::from(
             $this
                 ->query()
-                ->whereRaw(
-                    '(updated_at < date_sub(now(), interval ' . $ttlMin . ' minute))'
-                )
+                ->whereRaw(sprintf(
+                    '(%s < date_sub(now(), interval %d minute))',
+                    $this->updatedAtField,
+                    $ttlMin
+                ))
                 ->limit($limit)
-                ->orderByAsc('updated_at')
+                ->orderByAsc($this->updatedAtField)
+        );
+    }
+
+    public function getAllByScope(
+        int $scope,
+        ?Language $language = null
+    ): LanguageElementCollection
+    {
+        return LanguageElementCollection::from(
+            $this->byScopeQuery($scope, $language)
         );
     }
 
@@ -86,6 +105,9 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         );
     }
 
+    /**
+     * Filters approved & not mature elements, ordered by `scope_updated_at` DESC.
+     */
     public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = 0
@@ -93,24 +115,16 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     {
         return LanguageElementCollection::from(
             $this
-                ->publicQuery($language)
+                ->approvedQuery($language)
+                ->apply(
+                    fn (Query $q) => $this->filterNotMature($q)
+                )
                 ->limit($limit)
+                ->orderByDesc($this->scopeUpdatedAtField)
         );
     }
 
     // queries
-
-    /**
-     * Filters approved & not mature elements, ordered by `scope_updated_at` DESC.
-     */
-    protected function publicQuery(?Language $language = null): Query
-    {
-        return $this
-            ->approvedQuery($language)
-            ->apply(
-                fn (Query $q) => $this->filterNotMature($q)
-            );
-    }
 
     /**
      * Filters not mature elements.
@@ -118,49 +132,64 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     protected function notMatureQuery(?Language $language = null): Query
     {
         return $this
-            ->getByLanguageQuery($language)
+            ->byLanguageQuery($language)
             ->apply(
                 fn (Query $q) => $this->filterNotMature($q)
             );
     }
 
-    /**
-     * Filters approved elements, ordering them by `scope_updated_at` DESC.
-     */
+    protected function byScopeQuery(int $scope, ?Language $language = null): Query
+    {
+        return $this
+            ->byLanguageQuery($language)
+            ->apply(
+                fn (Query $q) => $this->filterByScope($q, $scope)
+            );
+    }
+
     protected function approvedQuery(?Language $language = null): Query
     {
         return $this
-            ->getByLanguageQuery($language)
+            ->byLanguageQuery($language)
             ->apply(
                 fn (Query $q) => $this->filterApproved($q)
-            )
-            ->orderByDesc('scope_updated_at');
+            );
     }
 
     // filters
 
     protected function filterApproved(Query $query): Query
     {
-        return $query->whereIn('scope', Scope::publicScopes());
-    }
-
-    protected function filterNotApproved(Query $query): Query
-    {
-        return $query->whereNotIn('scope', Scope::publicScopes());
-    }
-
-    protected function filterMature(Query $query): Query
-    {
-        return $query->where('severity', Severity::MATURE);
+        return $query->whereIn(
+            $this->scopeField,
+            Scope::allPublic()
+        );
     }
 
     protected function filterNotMature(Query $query): Query
     {
-        return $query->whereNotEqual('severity', Severity::MATURE);
+        return $this->filterBySeverityNot($query, Severity::MATURE);
     }
 
-    protected function filterEnabled(Query $query): Query
+    // generic filters
+
+    protected function filterByScope(Query $query, int $scope): Query
     {
-        return $query->whereNotEqual('scope', Scope::DISABLED);
+        return $query->where($this->scopeField, $scope);
+    }
+
+    protected function filterByScopeNot(Query $query, int $scope): Query
+    {
+        return $query->whereNotEqual($this->scopeField, $scope);
+    }
+
+    protected function filterBySeverity(Query $query, int $severity): Query
+    {
+        return $query->where($this->severityField, $severity);
+    }
+
+    protected function filterBySeverityNot(Query $query, int $severity): Query
+    {
+        return $query->whereNotEqual($this->severityField, $severity);
     }
 }

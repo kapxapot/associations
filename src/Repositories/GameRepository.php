@@ -7,17 +7,17 @@ use App\Models\Game;
 use App\Models\Language;
 use App\Models\User;
 use App\Repositories\Interfaces\GameRepositoryInterface;
-use App\Repositories\Traits\ByUserRepository;
 use App\Repositories\Traits\WithLanguageRepository;
+use App\Repositories\Traits\WithUserRepository;
 use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 
 class GameRepository extends IdiormRepository implements GameRepositoryInterface
 {
-    use ByUserRepository;
     use SearchRepository;
     use WithLanguageRepository;
+    use WithUserRepository;
 
     protected function entityClass(): string
     {
@@ -32,7 +32,7 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
     public function getAllByLanguage(Language $language): GameCollection
     {
         return GameCollection::from(
-            $this->getByLanguageQuery($language)
+            $this->byLanguageQuery($language)
         );
     }
 

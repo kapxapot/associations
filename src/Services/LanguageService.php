@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
+use App\Collections\WordCollection;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Scope;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Webmozart\Assert\Assert;
 
@@ -77,6 +79,10 @@ class LanguageService
 
     /**
      * Returns **canonical** random word available for the user.
+     *
+     * - Prioritizes common and public words, if available.
+     * - If they are absent, returns any of user's words.
+     * - Otherwise, returns any word.
      */
     public function getRandomWordFor(
         ?User $user,
@@ -84,32 +90,49 @@ class LanguageService
         ?Word $exceptWord = null
     ): ?Word
     {
-        // get common words
-        $words = $this->wordRepository->getAllApproved($language);
+        // 1. try find a common word
+        // 2. try find a public word
+        // 3. select one of the user's words
+        // 4. any word
+        $sources = [
+            fn () => $this->wordRepository->getAllByScope(Scope::COMMON, $language),
+            fn () => $this->wordRepository->getAllByScope(Scope::PUBLIC, $language),
+            fn () => $this->wordService->getAllUsedBy($user, $language),
+            fn () => $this->wordRepository->getAllByLanguage($language)
+        ];
 
-        if ($user) {
-            // get user's words
-            $userWords = $this->wordService->getAllUsedBy($user, $language);
+        foreach ($sources as $source) {
+            $words = ($source)();
+            $word = $this->extractRandomWord($words, $user, $exceptWord);
 
-            // union them & distinct
-            $words = $words
-                ->concat($userWords)
-                ->distinct();
+            if ($word !== null) {
+                return $word;
+            }
         }
 
+        return null;
+    }
+
+    private function extractRandomWord(
+        WordCollection $words,
+        ?User $user,
+        ?Word $exceptWord = null
+    ): ?Word
+    {
         if ($exceptWord !== null) {
-            $words = $words->where(
-                fn (Word $w) => !$w->equals($exceptWord)
-            );
+            $words = $words->except($exceptWord);
         }
 
+        /** @var Word $word */
         $word = $words
             ->shuffle()
             ->first(
                 fn (Word $w) => $w->isPlayableAgainst($user)
             );
 
-        return $word->canonicalPlayableAgainst($user);
+        return $word !== null
+            ? $word->canonicalPlayableAgainst($user)
+            : null;
     }
 
     public function normalizeWord(Language $language, ?string $word) : ?string

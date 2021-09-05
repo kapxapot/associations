@@ -48,6 +48,11 @@ interface WordRepositoryInterface extends FilteringRepositoryInterface, Language
      */
     public function getAllOutOfDate(int $ttlMin, int $limit = 0): WordCollection;
 
+    public function getAllByScope(
+        int $scope,
+        ?Language $language = null
+    ): WordCollection;
+
     public function getAllApproved(?Language $language = null): WordCollection;
 
     public function getLastAddedByLanguage(
