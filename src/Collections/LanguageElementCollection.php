@@ -11,22 +11,26 @@ class LanguageElementCollection extends DbModelCollection
     protected string $class = LanguageElement::class;
 
     /**
+     * Filters fuzzy public elements.
+     *
      * @return static
      */
-    public function approved(): self
+    public function public(): self
     {
         return $this->where(
-            fn (LanguageElement $el) => $el->isPublic()
+            fn (LanguageElement $el) => $el->isFuzzyPublic()
         );
     }
 
     /**
+     * Filters fuzzy private elements.
+     *
      * @return static
      */
-    public function notApproved(): self
+    public function private(): self
     {
         return $this->where(
-            fn (LanguageElement $el) => !$el->isPublic() && !$el->isDisabled()
+            fn (LanguageElement $el) => $el->isFuzzyPrivate()
         );
     }
 

@@ -140,7 +140,7 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
         return $this
             ->getAllByLanguageConditional($language)
             ->where(
-                fn (Word $w) => $w->isPublic()
+                fn (Word $w) => $w->isFuzzyPublic()
             );
     }
 

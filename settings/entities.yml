@@ -91,19 +91,14 @@ association_overrides:
         '<a href="' + row.association.url + '">' + row.association.name + '</a>'
       attributes: [readonly, searchable, no_sort]
 
-    approved:
-      name: Общая
-      type: bool
+    scope:
+      name: Видимость
+      type: number
       attributes: [readonly]
 
-    mature:
-      name: 16+
-      type: bool
-      attributes: [readonly]
-
-    disabled:
-      name: Откл.
-      type: bool
+    severity:
+      name: Жестокость
+      type: number
       attributes: [readonly]
 
     created_at:
@@ -568,19 +563,14 @@ word_overrides:
         row.original_word ? row.original_word : ''
       attributes: [readonly, searchable, no_sort]
 
-    approved:
-      name: Общее
-      type: bool
+    scope:
+      name: Видимость
+      type: number
       attributes: [readonly]
 
-    mature:
-      name: 16+
-      type: bool
-      attributes: [readonly]
-
-    disabled:
-      name: Откл.
-      type: bool
+    severity:
+      name: Жестокость
+      type: number
       attributes: [readonly]
 
     word_correction:

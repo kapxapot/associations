@@ -16,14 +16,28 @@
             <p>
                 <span class="label label-default" title="Язык: {{ association.language.name }}" data-toggle="tooltip">{{ association.language.name|lower }}</span>
 
-                {% if association.is_disabled %}
-                    <span class="label label-default">{% if association.hasDisabledOverride %}<i class="fas fa-lock"></i> {% endif %}отключена</span>
+                {% set scopeLock = association.hasScopeOverride ? '<i class="fas fa-lock"></i> ' : '' %}
+
+                {% if association.isDisabled %}
+                    <span class="label label-danger">{{ scopeLock|raw }}отключена</span>
+                {% elseif association.isInactive %}
+                    <span class="label label-default">{{ scopeLock|raw }}неактивная</span>
+                {% elseif association.isPublic %}
+                    <span class="label label-warning" title="Доступна всем игрокам" data-toggle="tooltip"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичная</span>
+                {% elseif association.isCommon %}
+                    <span class="label label-success" title="Доступна всем игрокам" data-toggle="tooltip"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общая</span>
                 {% else %}
-                    <span class="label {{ association.isPublic ? 'label-success' : 'label-primary' }}" title="{{ association.isPublic ? 'Доступна всем игрокам' : 'Доступна только тем, кто ее использовал' }}" data-toggle="tooltip">{% if association.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif association.isPublic %}<i class="fas fa-check"></i> {% endif %}{{ association.isPublic ? 'общая' : 'личная' }}</span>
+                    <span class="label label-primary" title="Доступна только тем, кто ее использовал" data-toggle="tooltip">{{ scopeLock|raw }}личная</span>
                 {% endif %}
 
-                {% if association.isMature or association.hasMatureOverride %}
-                    <span class="label {{ association.isMature ? 'label-danger' : 'label-success' }}" title="{{ association.isMature ? 'Не для детей' : 'Для всех' }}" data-toggle="tooltip">{% if association.hasMatureOverride %}<i class="fas fa-lock"></i> {% endif %}{{ association.isMature ? '16+' : '0+' }}</span>
+                {% set severityLock = association.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}
+
+                {% if association.isOffending %}
+                    <span class="label label-warning" title="Неприятная или оскорбительная" data-toggle="tooltip">{{ severityLock|raw }}неприятная</span>
+                {% elseif association.isMature %}
+                    <span class="label label-danger" title="Для взрослых" data-toggle="tooltip">{{ severityLock|raw }}16+</span>
+                {% elseif association.hasMatureOverride %}
+                    <span class="label label-success" title="Нейтральная" data-toggle="tooltip">{{ severityLock|raw }}0+</span>
                 {% endif %}
 
                 {% if turns_by_user|length > 0 %}
@@ -120,9 +134,8 @@
                             <thead>
                                 <tr>
                                     <th>Id</th>
-                                    <th>Общая</th>
-                                    <th>16+</th>
-                                    <th>Откл.</th>
+                                    <th>Видимость</th>
+                                    <th>Жестокость</th>
                                     <th>Дата</th>
                                     <th>Автор</th>
                                 </tr>
@@ -131,9 +144,8 @@
                                 {% for override in association.overrides.sort %}
                                     <tr>
                                         <td>{{ override.id }}</td>
-                                        <td>{% if override.hasApproved %}{{ override.approved ? 'общая' : 'личная' }}{% endif %}</td>
-                                        <td>{% if override.hasMature %}{{ override.mature ? '16+' : '0+' }}{% endif %}</td>
-                                        <td>{% if override.isDisabled %}<i class="fas fa-check"></i>{% endif %}</td>
+                                        <td>{% if override.hasScope %}{{ scopes[override.scope]|capitalize }}{% endif %}</td>
+                                        <td>{% if override.hasSeverity %}{{ severities[override.severity]|capitalize }}{% endif %}</td>
                                         <td>{{ gm.moment_local(override.created_at_iso) }}</td>
                                         <td>{{ lm.user(override.creator) }}</td>
                                     </tr>

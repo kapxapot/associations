@@ -1,0 +1,9 @@
+$scope.severities = [
+    {% for id, name in severities %}
+        {
+            id: {{ id }},
+            name: '{{ name|capitalize }}'{#,
+            selected: {{ selected == id ? 'true' : 'false' }}#}
+        }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];

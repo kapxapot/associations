@@ -119,10 +119,10 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isPlayableAgainst(?User $user, ?GameOptions $options = null): bool
     {
-        $allowPrivate = $options && $options->allowPrivateElements;
+        $allowFuzzyPrivate = $options && $options->allowFuzzyPrivateElements;
 
         return $this->isVisibleFor($user)
-            && ($this->isPublic() || $allowPrivate || $this->isUsedBy($user))
+            && ($this->isFuzzyPublic() || $allowFuzzyPrivate || $this->isUsedBy($user))
             && !$this->isDislikedBy($user);
     }
 
@@ -144,22 +144,58 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isDisabled(): bool
     {
-        return Scope::isDisabled($this->scope);
+        return $this->scope == Scope::DISABLED;
+    }
+
+    public function isInactive(): bool
+    {
+        return $this->scope == Scope::INACTIVE;
+    }
+
+    public function isPrivate(): bool
+    {
+        return $this->scope == Scope::PRIVATE;
     }
 
     public function isPublic(): bool
     {
-        return Scope::isPublic($this->scope);
+        return $this->scope == Scope::PUBLIC;
     }
 
     public function isCommon(): bool
     {
-        return Scope::isCommon($this->scope);
+        return $this->scope == Scope::COMMON;
+    }
+
+    /**
+     * Is the scope one of the (fuzzy) private ones.
+     */
+    public function isFuzzyPrivate(): bool
+    {
+        return Scope::isFuzzyPrivate($this->scope);
+    }
+
+    /**
+     * Is the scope one of the (fuzzy) public ones.
+     */
+    public function isFuzzyPublic(): bool
+    {
+        return Scope::isFuzzyPublic($this->scope);
+    }
+
+    public function isNeutral(): bool
+    {
+        return $this->severity == Severity::NEUTRAL;
+    }
+
+    public function isOffending(): bool
+    {
+        return $this->severity == Severity::OFFENDING;
     }
 
     public function isMature(): bool
     {
-        return Severity::isMature($this->severity);
+        return $this->severity == Severity::MATURE;
     }
 
     public function scopeUpdatedAtIso(): ?string
@@ -172,13 +208,6 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         return self::toIso($this->severityUpdatedAt);
     }
 
-    abstract public function override(): ?Override;
-
-    public function hasOverride(): bool
-    {
-        return $this->override() !== null;
-    }
-
     /**
      * Returns true if the element has an override AND
      * that override has some actual changes (is not empty).
@@ -188,39 +217,34 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         return $this->hasOverride() && $this->override()->isNotEmpty();
     }
 
-    public function hasApprovedOverride(): bool
+    public function hasScopeOverride(): bool
     {
-        return $this->approvedOverride() !== null;
+        return $this->scopeOverride() !== null;
     }
 
-    public function approvedOverride(): ?bool
+    public function scopeOverride(): ?int
     {
         return $this->hasOverride()
-            ? $this->override()->isApproved()
+            ? $this->override()->scope
             : null;
     }
 
-    public function hasMatureOverride(): bool
+    public function hasSeverityOverride(): bool
     {
-        return $this->matureOverride() !== null;
+        return $this->severityOverride() !== null;
     }
 
-    public function matureOverride(): ?bool
+    public function severityOverride(): ?bool
     {
         return $this->hasOverride()
-            ? $this->override()->isMature()
+            ? $this->override()->severity
             : null;
     }
 
-    public function hasDisabledOverride(): bool
-    {
-        return $this->disabledOverride() === true;
-    }
+    abstract public function override(): ?Override;
 
-    public function disabledOverride(): ?bool
+    public function hasOverride(): bool
     {
-        return $this->hasOverride()
-            ? $this->override()->isDisabled()
-            : null;
+        return $this->override() !== null;
     }
 }

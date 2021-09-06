@@ -159,7 +159,7 @@ class Association extends LanguageElement implements AssociationInterface
             'name' => $this->fullName(),
             'scope' => $this->scope,
             'severity' => $this->severity,
-            'approved' => $this->isPublic(),
+            'approved' => $this->isFuzzyPublic(),
             'mature' => $this->isMature(),
             'disabled' => $this->isDisabled(),
             'url' => $this->url(),
@@ -179,7 +179,7 @@ class Association extends LanguageElement implements AssociationInterface
 
     public function sign(): string
     {
-        return $this->isPublic()
+        return $this->isFuzzyPublic()
             ? self::APPROVED_SIGN
             : self::DEFAULT_SIGN;
     }

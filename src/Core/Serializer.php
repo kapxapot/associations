@@ -35,7 +35,7 @@ class Serializer
             $array,
             [
                 'id' => $word->getId(),
-                'is_public' => $word->isPublic(),
+                'is_public' => $word->isFuzzyPublic(),
                 'scope' => $word->scope,
                 'severity' => $word->severity,
                 'url' => $word->url(),
@@ -56,7 +56,7 @@ class Serializer
         if ($association) {
             $array['association'] = [
                 'id' => $association->getId(),
-                'is_public' => $association->isPublic(),
+                'is_public' => $association->isFuzzyPublic(),
                 'scope' => $association->scope,
                 'severity' => $association->severity,
                 'url' => $association->url(),

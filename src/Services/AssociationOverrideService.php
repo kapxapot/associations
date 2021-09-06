@@ -8,7 +8,6 @@ use App\Models\User;
 use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use Plasticode\Events\EventDispatcher;
-use Plasticode\Util\Convert;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
 
@@ -70,21 +69,8 @@ class AssociationOverrideService
             'created_by' => $user->getId(),
         ]);
 
-        /** @var bool|null $approved */
-        $approved = $data['approved'] ?? null;
-
-        if ($approved !== null) {
-            $model->approved = Convert::toBit($approved);
-        }
-
-        /** @var bool|null $mature */
-        $mature = $data['mature'] ?? null;
-
-        if ($mature !== null) {
-            $model->mature = Convert::toBit($mature);
-        }
-
-        $model->disabled = Convert::toBit($data['disabled'] ?? null);
+        $model->scope = $data['scope'] ?? null;
+        $model->severity = $data['severity'] ?? null;
 
         return $model;
     }

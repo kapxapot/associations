@@ -59,17 +59,14 @@ class WordOverride extends Override
 
     public function serialize(): array
     {
-        return [
-            'id' => $this->getId(),
-            'word' => $this->word()->serialize(),
-            'original_word' => $this->word()->originalWord,
-            'approved' => $this->approved,
-            'mature' => $this->mature,
-            'disabled' => $this->disabled,
-            'word_correction' => $this->wordCorrection,
-            'pos_correction' => $this->posCorrection,
-            'creator' => $this->creator()->serialize(),
-            'created_at' => $this->createdAtIso(),
-        ];
+        return array_merge(
+            parent::serialize(),
+            [
+                'word' => $this->word()->serialize(),
+                'original_word' => $this->word()->originalWord,
+                'word_correction' => $this->wordCorrection,
+                'pos_correction' => $this->posCorrection,
+            ]
+        );
     }
 }

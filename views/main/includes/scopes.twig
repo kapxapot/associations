@@ -1,0 +1,9 @@
+$scope.scopes = [
+    {% for id, name in scopes %}
+        {
+            id: {{ id }},
+            name: '{{ name|capitalize }}'{#,
+            selected: {{ selected == id ? 'true' : 'false' }}#}
+        }{% if not loop.last %},{% endif %}
+    {% endfor %}
+];

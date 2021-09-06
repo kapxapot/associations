@@ -221,7 +221,7 @@ class TurnService
 
     public function findAnswer(Turn $turn): ?Word
     {
-        // first, we try to find a classic approved association
+        // first, we try to find a classic fuzzy public association
 
         /** @var Word|null $goodWord */
         $goodWord = $this->getRandomAnswer($turn);
@@ -230,10 +230,10 @@ class TurnService
             return $goodWord;
         }
 
-        // now we try to check unapproved associations
+        // now we try to check fuzzy private associations
 
         $options = new GameOptions();
-        $options->allowPrivateElements = true;
+        $options->allowFuzzyPrivateElements = true;
 
         return $this->getRandomAnswer($turn, $options);
     }

@@ -10,6 +10,8 @@ use App\Core\Serializer;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Semantics\PartOfSpeech;
+use App\Semantics\Scope;
+use App\Semantics\Severity;
 use App\Services\CasesService;
 use App\Services\LanguageService;
 use Plasticode\Controllers\Controller as BaseController;
@@ -85,6 +87,8 @@ class Controller extends BaseController
         }
 
         $params['parts_of_speech'] = PartOfSpeech::known();
+        $params['scopes'] = Scope::allNames();
+        $params['severities'] = Severity::allNames();
 
         $settings['params'] = $params;
 

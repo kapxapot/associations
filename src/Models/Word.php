@@ -182,7 +182,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     {
         return $this
             ->associations()
-            ->approved()
+            ->public()
             ->ascStr(
                 fn (Association $a) => $a->otherWord($this)->word
             );
@@ -192,7 +192,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     {
         return $this
             ->associations()
-            ->notApproved()
+            ->private()
             ->ascStr(
                 fn (Association $a) => $a->otherWord($this)->word
             );
@@ -283,7 +283,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             'word' => $this->word,
             'scope' => $this->scope,
             'severity' => $this->severity,
-            'approved' => $this->isPublic(),
+            'approved' => $this->isFuzzyPublic(),
             'mature' => $this->isMature(),
             'disabled' => $this->isDisabled(),
             'has_dict_word' => $dw && $dw->isValid(),

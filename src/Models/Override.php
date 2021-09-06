@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use App\Models\Traits\Created;
+use App\Semantics\Scope;
+use App\Semantics\Severity;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedInterface;
 
 /**
- * @property integer|null $approved
- * @property integer $disabled
- * @property integer|null $mature
+ * @property integer|null $scope
+ * @property integer|null $severity
  */
 abstract class Override extends DbModel implements CreatedInterface
 {
@@ -22,39 +23,44 @@ abstract class Override extends DbModel implements CreatedInterface
         ];
     }
 
-    public function isApproved(): ?bool
+    public function isPublic(): bool
     {
-        return $this->hasApproved()
-            ? self::toBool($this->approved)
-            : null;
-    }
-
-    public function hasApproved(): bool
-    {
-        return $this->approved !== null;
-    }
-
-    public function isMature(): ?bool
-    {
-        return $this->hasMature()
-            ? self::toBool($this->mature)
-            : null;
-    }
-
-    public function hasMature(): bool
-    {
-        return $this->mature !== null;
+        return $this->scope == Scope::PUBLIC;
     }
 
     public function isDisabled(): bool
     {
-        return self::toBool($this->disabled);
+        return $this->scope == Scope::DISABLED;
+    }
+
+    public function isMature(): bool
+    {
+        return $this->severity == Severity::MATURE;
+    }
+
+    public function hasScope(): bool
+    {
+        return $this->scope !== null;
+    }
+
+    public function hasSeverity(): bool
+    {
+        return $this->severity !== null;
     }
 
     public function isNotEmpty(): bool
     {
-        return $this->hasApproved()
-            || $this->hasMature()
-            || $this->isDisabled();
+        return $this->hasScope() || $this->hasSeverity();
+    }
+
+    public function serialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'scope' => $this->scope,
+            'severity' => $this->severity,
+            'creator' => $this->creator()->serialize(),
+            'created_at' => $this->createdAtIso(),
+        ];
     }
 }

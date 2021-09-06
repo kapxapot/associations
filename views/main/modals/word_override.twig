@@ -15,41 +15,32 @@
 
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" ng-model="override.with_approved">
-                    Общее?
+                    <input type="checkbox" ng-model="override.with_scope">
+                    Видимость...
                 </label>
             </div>
 
-            <div class="form-group ml-3 check-inside" ng-if="override.with_approved">
-                <label class="radio-inline">
-                    <input type="radio" ng-model="override.approved" value="1"> Общее
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" ng-model="override.approved" value="0"> Личное
-                </label>
-            </div>
-
-            <div class="checkbox">
-                <label>
-                    <input type="checkbox" ng-model="override.with_mature">
-                    Не для детей?
-                </label>
-            </div>
-
-            <div class="form-group ml-3 check-inside" ng-if="override.with_mature">
-                <label class="radio-inline">
-                    <input type="radio" ng-model="override.mature" value="1"> Для взрослых
-                </label>
-                <label class="radio-inline">
-                    <input type="radio" ng-model="override.mature" value="0"> Для всех
-                </label>
+            <div class="form-group ml-3 check-inside" ng-if="override.with_scope">
+                <div class="radio" ng-repeat="scope in scopes">
+                    <label>
+                        <input type="radio" ng-model="override.scope" value="{{ '{{scope.id}}' }}"> {{ '{{scope.name}}' }}
+                    </label>
+                </div>
             </div>
 
             <div class="checkbox">
                 <label>
-                    <input type="checkbox" ng-model="override.disabled">
-                    Отключить
+                    <input type="checkbox" ng-model="override.with_severity">
+                    Жестокость...
                 </label>
+            </div>
+
+            <div class="form-group ml-3 check-inside" ng-if="override.with_severity">
+                <div class="radio" ng-repeat="severity in severities">
+                    <label>
+                        <input type="radio" ng-model="override.severity" value="{{ '{{severity.id}}' }}"> {{ '{{severity.name}}' }}
+                    </label>
+                </div>
             </div>
         </div>
 

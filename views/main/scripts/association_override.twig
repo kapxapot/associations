@@ -2,14 +2,16 @@
 
 {% set override = association.override %}
 
+{% include 'main/includes/scopes.twig' with { 'selected': override.scope } %}
+{% include 'main/includes/severities.twig' with { 'selected': override.severity } %}
+
 $scope.override = {
     association_id: {{ association.id }},
     association: '{{ association.fullName|e('js') }}',
-    with_approved: {{ override.hasApproved ? 'true' : 'false' }},
-    approved: {{ override.hasApproved ? (override.isApproved ? 'true' : 'false') : 'null' }},
-    with_mature: {{ override.hasMature ? 'true' : 'false' }},
-    mature: {{ override.hasMature ? (override.isMature ? 'true' : 'false') : 'null' }},
-    disabled: {{ override.isDisabled ? 'true' : 'false' }}
+    with_scope: {{ override.hasScope ? 'true' : 'false' }},
+    scope: {{ override.scope ?? association.scope ?? 'null' }},
+    with_severity: {{ override.hasSeverity ? 'true' : 'false' }},
+    severity: {{ override.severity ?? association.severity ?? 'null' }}
 };
 
 $scope.overrideDialog = () => {
@@ -21,16 +23,16 @@ $('#overrideForm').submit(function(e) {
 
     let obj = $.extend(true, {}, $scope.override);
 
-    if (obj.with_approved !== true || obj.approved === null) {
-        delete obj.approved;
+    if (obj.with_scope !== true) {
+        obj.scope = null;
     }
 
-    if (obj.with_mature !== true || obj.mature === null) {
-        delete obj.mature;
+    if (obj.with_severity !== true) {
+        obj.severity = null;
     }
 
-    delete obj.with_approved;
-    delete obj.with_mature;
+    delete obj.with_scope;
+    delete obj.with_severity;
 
     $scope.modalAjax({
         url: '{{ path_for('actions.association.override') }}',

@@ -19,14 +19,10 @@ class AssociationOverride extends Override
 
     public function serialize(): array
     {
-        return [
-            'id' => $this->getId(),
-            'association' => $this->association()->serialize(),
-            'approved' => $this->approved,
-            'mature' => $this->mature,
-            'disabled' => $this->disabled,
-            'creator' => $this->creator()->serialize(),
-            'created_at' => $this->createdAtIso(),
-        ];
+        $result = parent::serialize();
+
+        $result['association'] = $this->association()->serialize();
+
+        return $result;
     }
 }

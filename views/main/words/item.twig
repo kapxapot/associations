@@ -29,14 +29,28 @@
                     {% endif %}
                 {% endif %}
 
+                {% set scopeLock = word.hasScopeOverride ? '<i class="fas fa-lock"></i> ' : '' %}
+
                 {% if word.isDisabled %}
-                    <span class="label label-default">{% if word.hasDisabledOverride %}<i class="fas fa-lock"></i> {% endif %}отключено</span>
+                    <span class="label label-danger">{{ scopeLock|raw }}отключено</span>
+                {% elseif word.isInactive %}
+                    <span class="label label-default">{{ scopeLock|raw }}неактивное</span>
+                {% elseif word.isPublic %}
+                    <span class="label label-warning" title="Доступно всем игрокам" data-toggle="tooltip"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичное</span>
+                {% elseif word.isCommon %}
+                    <span class="label label-success" title="Доступно всем игрокам" data-toggle="tooltip"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общее</span>
                 {% else %}
-                    <span class="label {{ word.isPublic ? 'label-success' : 'label-primary' }}" title="{{ word.isPublic ? 'Доступно всем игрокам' : 'Доступно только тем, кто использовал слово' }}" data-toggle="tooltip">{% if word.hasApprovedOverride %}<i class="fas fa-lock"></i> {% elseif word.isPublic %}<i class="fas fa-check"></i> {% endif %}{{ word.isPublic ? 'общее' : 'личное' }}</span>
+                    <span class="label label-primary" title="Доступно только тем, кто его использовал" data-toggle="tooltip">{{ scopeLock|raw }}личное</span>
                 {% endif %}
 
-                {% if word.isMature or word.hasMatureOverride %}
-                    <span class="label {{ word.isMature ? 'label-danger' : 'label-success' }}" title="{{ word.isMature ? 'Не для детей' : 'Для всех' }}" data-toggle="tooltip">{% if word.hasMatureOverride %}<i class="fas fa-lock"></i> {% endif %}{{ word.isMature ? '16+' : '0+' }}</span>
+                {% set severityLock = word.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}
+
+                {% if word.isOffending %}
+                    <span class="label label-warning" title="Неприятное или оскорбительное" data-toggle="tooltip">{{ severityLock|raw }}неприятное</span>
+                {% elseif word.isMature %}
+                    <span class="label label-danger" title="Для взрослых" data-toggle="tooltip">{{ severityLock|raw }}16+</span>
+                {% elseif word.hasMatureOverride %}
+                    <span class="label label-success" title="Нейтральное" data-toggle="tooltip">{{ severityLock|raw }}0+</span>
                 {% endif %}
 
                 {% if word.dict_word %}
@@ -301,9 +315,8 @@
                         <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>Общее</th>
-                                <th>16+</th>
-                                <th>Откл.</th>
+                                <th>Видимость</th>
+                                <th>Жестокость</th>
                                 <th>Исправление</th>
                                 <th>Части речи</th>
                                 <th>Дата</th>
@@ -314,9 +327,8 @@
                             {% for override in word.overrides.sort %}
                                 <tr>
                                     <td>{{ override.id }}</td>
-                                    <td>{% if override.hasApproved %}{{ override.approved ? 'общее' : 'личное' }}{% endif %}</td>
-                                    <td>{% if override.hasMature %}{{ override.mature ? '16+' : '0+' }}{% endif %}</td>
-                                    <td>{% if override.isDisabled %}<i class="fas fa-check"></i>{% endif %}</td>
+                                    <td>{% if override.hasScope %}{{ scopes[override.scope]|capitalize }}{% endif %}</td>
+                                    <td>{% if override.hasSeverity %}{{ severities[override.severity]|capitalize }}{% endif %}</td>
                                     <td>{% if override.hasWordCorrection %}{{ word.original_word }} &#x2192; {{ override.wordCorrection }}{% endif %}</td>
                                     <td>
                                         {% if override.hasPosCorrection %}

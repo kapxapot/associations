@@ -8,7 +8,6 @@ use App\Models\WordOverride;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Plasticode\Events\EventDispatcher;
-use Plasticode\Util\Convert;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Plasticode\Validation\ValidationRules;
 
@@ -78,21 +77,8 @@ class WordOverrideService
             'created_by' => $user->getId(),
         ]);
 
-        /** @var bool|null $approved */
-        $approved = $data['approved'] ?? null;
-
-        if ($approved !== null) {
-            $model->approved = Convert::toBit($approved);
-        }
-
-        /** @var bool|null $mature */
-        $mature = $data['mature'] ?? null;
-
-        if ($mature !== null) {
-            $model->mature = Convert::toBit($mature);
-        }
-
-        $model->disabled = Convert::toBit($data['disabled'] ?? null);
+        $model->scope = $data['scope'] ?? null;
+        $model->severity = $data['severity'] ?? null;
 
         $wordCorrection = $this->languageService->normalizeWord(
             $word->language(),

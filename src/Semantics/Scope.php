@@ -13,31 +13,39 @@ class Scope
     const COMMON = 5;
 
     /**
-     * Returns scopes that are >= Scope::PUBLIC.
-     *
-     * @return integer[]
+     * Is the scope one of the fuzzy private ones.
      */
-    public static function allPublic(): array
+    public static function isFuzzyPrivate(int $scope): bool
     {
-        return [self::PUBLIC, self::COMMON];
-    }
-
-    public static function isDisabled(int $scope): bool
-    {
-        return $scope == self::DISABLED;
-    }
-
-    public static function isCommon(int $scope): bool
-    {
-        return $scope == self::COMMON;
+        return in_array($scope, self::allFuzzyPrivate());
     }
 
     /**
-     * Currently public scopes are PUBLIC & COMMON!
+     * Is the scope one of the fuzzy public ones.
      */
-    public static function isPublic(int $scope): bool
+    public static function isFuzzyPublic(int $scope): bool
     {
-        return in_array($scope, self::allPublic());
+        return in_array($scope, self::allFuzzyPublic());
+    }
+
+    /**
+     * Returns scopes that are Scope::INACTIVE or Scope::PRIVATE.
+     *
+     * @return integer[]
+     */
+    public static function allFuzzyPrivate(): array
+    {
+        return [self::INACTIVE, self::PRIVATE];
+    }
+
+    /**
+     * Returns scopes that are Scope::PUBLIC or Scope::COMMON.
+     *
+     * @return integer[]
+     */
+    public static function allFuzzyPublic(): array
+    {
+        return [self::PUBLIC, self::COMMON];
     }
 
     /**

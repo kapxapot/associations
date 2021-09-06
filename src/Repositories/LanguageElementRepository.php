@@ -106,7 +106,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     }
 
     /**
-     * Filters approved & not mature elements, ordered by `scope_updated_at` DESC.
+     * Filters fuzzy public & not mature elements, ordered by `scope_updated_at` DESC.
      */
     public function getLastAddedByLanguage(
         ?Language $language = null,
@@ -162,7 +162,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     {
         return $query->whereIn(
             $this->scopeField,
-            Scope::allPublic()
+            Scope::allFuzzyPublic()
         );
     }
 
