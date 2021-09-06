@@ -2,8 +2,7 @@ $scope.scopes = [
     {% for id, name in scopes %}
         {
             id: {{ id }},
-            name: '{{ name|capitalize }}'{#,
-            selected: {{ selected == id ? 'true' : 'false' }}#}
+            name: '{{ translate(name, obj)|capitalize }}'
         }{% if not loop.last %},{% endif %}
     {% endfor %}
 ];

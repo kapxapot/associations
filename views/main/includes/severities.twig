@@ -2,8 +2,7 @@ $scope.severities = [
     {% for id, name in severities %}
         {
             id: {{ id }},
-            name: '{{ name|capitalize }}'{#,
-            selected: {{ selected == id ? 'true' : 'false' }}#}
+            name: '{{ translate(name, obj)|capitalize }}'
         }{% if not loop.last %},{% endif %}
     {% endfor %}
 ];

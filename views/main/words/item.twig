@@ -34,13 +34,13 @@
                 {% if word.isDisabled %}
                     <span class="label label-danger">{{ scopeLock|raw }}отключено</span>
                 {% elseif word.isInactive %}
-                    <span class="label label-default">{{ scopeLock|raw }}неактивное</span>
+                    <span class="label label-warning">{{ scopeLock|raw }}неактивное</span>
                 {% elseif word.isPublic %}
-                    <span class="label label-warning" title="Доступно всем игрокам" data-toggle="tooltip"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичное</span>
+                    <span class="label label-primary" title="Доступно всем игрокам" data-toggle="tooltip"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичное</span>
                 {% elseif word.isCommon %}
                     <span class="label label-success" title="Доступно всем игрокам" data-toggle="tooltip"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общее</span>
                 {% else %}
-                    <span class="label label-primary" title="Доступно только тем, кто его использовал" data-toggle="tooltip">{{ scopeLock|raw }}личное</span>
+                    <span class="label label-info" title="Доступно только тем, кто его использовал" data-toggle="tooltip">{{ scopeLock|raw }}личное</span>
                 {% endif %}
 
                 {% set severityLock = word.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}
@@ -49,8 +49,8 @@
                     <span class="label label-warning" title="Неприятное или оскорбительное" data-toggle="tooltip">{{ severityLock|raw }}🤢</span>
                 {% elseif word.isMature %}
                     <span class="label label-danger" title="Для взрослых" data-toggle="tooltip">{{ severityLock|raw }}🤬</span>
-                {% elseif word.hasSeverityOverride %}
-                    <span class="label label-success" title="Нейтральное" data-toggle="tooltip">{{ severityLock|raw }}👶</span>
+                {% else %}
+                    <span class="label label-success" title="Нейтральное — безопасно для детей" data-toggle="tooltip"><i class="fas {{ word.hasSeverityOverride ? 'fa-lock' : 'fa-check' }}"></i> 👶</span>
                 {% endif %}
 
                 {% if word.dict_word %}
@@ -327,8 +327,8 @@
                             {% for override in word.overrides.sort %}
                                 <tr>
                                     <td>{{ override.id }}</td>
-                                    <td>{% if override.hasScope %}{{ scopes[override.scope]|capitalize }}{% endif %}</td>
-                                    <td>{% if override.hasSeverity %}{{ severities[override.severity]|capitalize }}{% endif %}</td>
+                                    <td>{% if override.hasScope %}{{ translate(scopes[override.scope], word)|capitalize }}{% endif %}</td>
+                                    <td>{% if override.hasSeverity %}{{ translate(severities[override.severity], word)|capitalize }}{% endif %}</td>
                                     <td>{% if override.hasWordCorrection %}{{ word.original_word }} &#x2192; {{ override.wordCorrection }}{% endif %}</td>
                                     <td>
                                         {% if override.hasPosCorrection %}

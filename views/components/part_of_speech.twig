@@ -1,12 +1,12 @@
 {% set raw = raw ?? 'undefined POS' %}
 {% if bare %}
     {% if short and pos %}
-        <span title="{{ translate(pos.name, lang) }}" data-toggle="tooltip">{{ translate(pos.shortName, lang) }}</span>
+        <span title="{{ translate(pos.name) }}" data-toggle="tooltip">{{ translate(pos.shortName) }}</span>
     {% else %}
-        {{ translate(pos ? pos.name : raw, lang) }}
+        {{ translate(pos ? pos.name : raw) }}
     {% endif %}
 {% elseif pos %}
-    <span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}">{% if is_override %}<i class="fas fa-lock"></i> {% endif %}{{ translate(short ? pos.shortName : pos.name, lang) }}</span>
+    <span class="label {{ pos.isGood ? 'label-success' : (pos.isBad ? 'label-warning' : 'label-danger') }}">{% if is_override %}<i class="fas fa-lock"></i> {% endif %}{{ translate(short ? pos.shortName : pos.name) }}</span>
 {% else %}
-    <span class="label label-danger">{{ translate(raw, lang) }}</span>
+    <span class="label label-danger">{{ translate(raw) }}</span>
 {% endif %}

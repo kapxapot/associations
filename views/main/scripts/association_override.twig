@@ -2,8 +2,8 @@
 
 {% set override = association.override %}
 
-{% include 'main/includes/scopes.twig' with { 'selected': override.scope } %}
-{% include 'main/includes/severities.twig' with { 'selected': override.severity } %}
+{% include 'main/includes/scopes.twig' with { 'obj': association } %}
+{% include 'main/includes/severities.twig' with { 'obj': association } %}
 
 $scope.override = {
     association_id: {{ association.id }},

@@ -21,13 +21,13 @@
                 {% if association.isDisabled %}
                     <span class="label label-danger">{{ scopeLock|raw }}отключена</span>
                 {% elseif association.isInactive %}
-                    <span class="label label-default">{{ scopeLock|raw }}неактивная</span>
+                    <span class="label label-warning">{{ scopeLock|raw }}неактивная</span>
                 {% elseif association.isPublic %}
-                    <span class="label label-warning" title="Доступна всем игрокам" data-toggle="tooltip"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичная</span>
+                    <span class="label label-primary" title="Доступна всем игрокам" data-toggle="tooltip"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичная</span>
                 {% elseif association.isCommon %}
                     <span class="label label-success" title="Доступна всем игрокам" data-toggle="tooltip"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общая</span>
                 {% else %}
-                    <span class="label label-primary" title="Доступна только тем, кто ее использовал" data-toggle="tooltip">{{ scopeLock|raw }}личная</span>
+                    <span class="label label-info" title="Доступна только тем, кто ее использовал" data-toggle="tooltip">{{ scopeLock|raw }}личная</span>
                 {% endif %}
 
                 {% set severityLock = association.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}
@@ -36,8 +36,8 @@
                     <span class="label label-warning" title="Неприятная или оскорбительная" data-toggle="tooltip">{{ severityLock|raw }}🤢</span>
                 {% elseif association.isMature %}
                     <span class="label label-danger" title="Для взрослых" data-toggle="tooltip">{{ severityLock|raw }}🤬</span>
-                {% elseif association.hasSeverityOverride %}
-                    <span class="label label-success" title="Нейтральная" data-toggle="tooltip">{{ severityLock|raw }}👶</span>
+                {% else %}
+                    <span class="label label-success" title="Нейтральная — безопасно для детей" data-toggle="tooltip"><i class="fas {{ association.hasSeverityOverride ? 'fa-lock' : 'fa-check' }}"></i> 👶</span>
                 {% endif %}
 
                 {% if turns_by_user|length > 0 %}
@@ -144,8 +144,8 @@
                                 {% for override in association.overrides.sort %}
                                     <tr>
                                         <td>{{ override.id }}</td>
-                                        <td>{% if override.hasScope %}{{ scopes[override.scope]|capitalize }}{% endif %}</td>
-                                        <td>{% if override.hasSeverity %}{{ severities[override.severity]|capitalize }}{% endif %}</td>
+                                        <td>{% if override.hasScope %}{{ translate(scopes[override.scope], association)|capitalize }}{% endif %}</td>
+                                        <td>{% if override.hasSeverity %}{{ translate(severities[override.severity], association)|capitalize }}{% endif %}</td>
                                         <td>{{ gm.moment_local(override.created_at_iso) }}</td>
                                         <td>{{ lm.user(override.creator) }}</td>
                                     </tr>

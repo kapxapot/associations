@@ -50,6 +50,26 @@ class LocalizationConfig extends BaseConfig
                 'Translation' => 'Перевод',
                 'Localization' => 'Локализация',
 
+                'Word:disabled' => 'отключено',
+                'Word:inactive' => 'неактивное',
+                'Word:private' => 'личное',
+                'Word:public' => 'публичное',
+                'Word:common' => 'общее',
+
+                'Word:neutral' => 'нейтральное',
+                'Word:offending' => 'неприятное',
+                'Word:mature' => 'для взрослых',
+
+                'Association:disabled' => 'отключена',
+                'Association:inactive' => 'неактивная',
+                'Association:private' => 'личная',
+                'Association:public' => 'публичная',
+                'Association:common' => 'общая',
+
+                'Association:neutral' => 'нейтральная',
+                'Association:offending' => 'неприятная',
+                'Association:mature' => 'для взрослых',
+
                 'Language not found.' => 'Язык не найден.',
                 'New game started.' => 'Начата новая игра.',
                 'Association not found.' => 'Ассоциация не найдена.',
