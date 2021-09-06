@@ -120,9 +120,11 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
     public function isPlayableAgainst(?User $user, ?GameOptions $options = null): bool
     {
         $allowFuzzyPrivate = $options && $options->allowFuzzyPrivateElements;
+        $isGameStart = $options && $options->isGameStart;
 
         return $this->isVisibleFor($user)
             && ($this->isFuzzyPublic() || $allowFuzzyPrivate || $this->isUsedBy($user))
+            && ($this->isNeutral() || !$isGameStart)
             && !$this->isDislikedBy($user);
     }
 

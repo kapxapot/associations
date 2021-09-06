@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Collections\WordCollection;
+use App\Models\DTO\GameOptions;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
@@ -123,11 +124,14 @@ class LanguageService
             $words = $words->except($exceptWord);
         }
 
+        $options = new GameOptions();
+        $options->isGameStart = true;
+
         /** @var Word $word */
         $word = $words
             ->shuffle()
             ->first(
-                fn (Word $w) => $w->isPlayableAgainst($user)
+                fn (Word $w) => $w->isPlayableAgainst($user, $options)
             );
 
         return $word !== null
