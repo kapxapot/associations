@@ -23,11 +23,11 @@
                 {% elseif association.isInactive %}
                     <span class="label label-warning">{{ scopeLock|raw }}неактивная</span>
                 {% elseif association.isPublic %}
-                    <span class="label label-primary" title="Доступна всем игрокам" data-toggle="tooltip"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичная</span>
+                    <span class="label label-primary"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичная</span>
                 {% elseif association.isCommon %}
-                    <span class="label label-success" title="Доступна всем игрокам" data-toggle="tooltip"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общая</span>
+                    <span class="label label-success"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общая</span>
                 {% else %}
-                    <span class="label label-info" title="Доступна только тем, кто ее использовал" data-toggle="tooltip">{{ scopeLock|raw }}личная</span>
+                    <span class="label label-info">{{ scopeLock|raw }}личная</span>
                 {% endif %}
 
                 {% set severityLock = association.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}

@@ -36,11 +36,11 @@
                 {% elseif word.isInactive %}
                     <span class="label label-warning">{{ scopeLock|raw }}неактивное</span>
                 {% elseif word.isPublic %}
-                    <span class="label label-primary" title="Доступно всем игрокам" data-toggle="tooltip"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичное</span>
+                    <span class="label label-primary"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичное</span>
                 {% elseif word.isCommon %}
-                    <span class="label label-success" title="Доступно всем игрокам" data-toggle="tooltip"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общее</span>
+                    <span class="label label-success"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общее</span>
                 {% else %}
-                    <span class="label label-info" title="Доступно только тем, кто его использовал" data-toggle="tooltip">{{ scopeLock|raw }}личное</span>
+                    <span class="label label-info">{{ scopeLock|raw }}личное</span>
                 {% endif %}
 
                 {% set severityLock = word.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}
