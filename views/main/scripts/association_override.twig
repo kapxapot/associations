@@ -9,9 +9,9 @@ $scope.override = {
     association_id: {{ association.id }},
     association: '{{ association.fullName|e('js') }}',
     with_scope: {{ override.hasScope ? 'true' : 'false' }},
-    scope: {{ override.scope ?? association.scope ?? 'null' }},
+    scope: {{ override.scope ?: association.scope }},
     with_severity: {{ override.hasSeverity ? 'true' : 'false' }},
-    severity: {{ override.severity ?? association.severity ?? 'null' }}
+    severity: {{ override.severity ?: association.severity }}
 };
 
 $scope.overrideDialog = () => {

@@ -23,14 +23,11 @@ class WordSpecification
         $this->wordService = $wordService;
     }
 
-    /**
-     * Todo: add override for INACTIVE & COMMON
-     */
     public function countScope(Word $word): int
     {
-        // if ($word->hasScopeOverride()) {
-        //     return $word->scopeOverride();
-        // }
+        if ($word->hasScopeOverride()) {
+            return $word->scopeOverride();
+        }
 
         if ($this->isDisabled($word)) {
             return Scope::DISABLED;
@@ -45,15 +42,7 @@ class WordSpecification
 
     private function isDisabled(Word $word): bool
     {
-        return $this->isDisabledByOverride($word)
-            || $this->isDisabledByRelations($word);
-    }
-
-    private function isDisabledByOverride(Word $word): bool
-    {
-        return $word->hasOverride()
-            ? $word->override()->isDisabled()
-            : false;
+        return $this->isDisabledByRelations($word);
     }
 
     private function isDisabledByRelations(Word $word): bool
@@ -67,26 +56,9 @@ class WordSpecification
 
     private function isApproved(Word $word): bool
     {
-        $approvedOverride = $this->approvedOverride($word);
-
-        if ($approvedOverride !== null) {
-            return $approvedOverride;
-        }
-
         return $this->isApprovedByDictWord($word)
             || $this->isApprovedByDefinition($word)
             || $this->isApprovedByAssociations($word);
-    }
-
-    public function approvedOverride(Word $word): ?bool
-    {
-        // disabled word works as an override as well
-        // it has priority over manual override
-        if ($this->isDisabled($word)) {
-            return false;
-        }
-
-        return $word->approvedOverride();
     }
 
     private function isApprovedByDictWord(Word $word): bool
@@ -133,14 +105,11 @@ class WordSpecification
         return $score >= $threshold;
     }
 
-    /**
-     * Todo: add override for OFFENDING
-     */
     public function countSeverity(Word $word): int
     {
-        // if ($word->hasSeverityOverride()) {
-        //     return $word->severityOverride();
-        // }
+        if ($word->hasSeverityOverride()) {
+            return $word->severityOverride();
+        }
 
         if ($this->isMature($word)) {
             return Severity::MATURE;
@@ -151,12 +120,6 @@ class WordSpecification
 
     private function isMature(Word $word): bool
     {
-        $matureOverride = $word->matureOverride();
-
-        if ($matureOverride !== null) {
-            return $matureOverride;
-        }
-
         return $this->isMatureByFeedbacks($word)
             || $this->isMatureByMainWord($word);
     }
@@ -177,7 +140,7 @@ class WordSpecification
             : false;
     }
 
-    public function correctedWord(Word $word): string
+    public function countCorrectedWord(Word $word): string
     {
         $override = $word->override();
 

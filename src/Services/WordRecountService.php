@@ -119,7 +119,7 @@ class WordRecountService
         $now = Date::dbNow();
         $changed = false;
 
-        $correctedWord = $this->wordSpecification->correctedWord($word);
+        $correctedWord = $this->wordSpecification->countCorrectedWord($word);
 
         if ($correctedWord !== $word->word) {
             $word->word = $correctedWord;

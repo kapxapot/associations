@@ -27,14 +27,11 @@ class AssociationSpecification
         $this->wordSpecification = $wordSpecification;
     }
 
-    /**
-     * Todo: add override for INACTIVE & COMMON
-     */
     public function countScope(Association $association): int
     {
-        // if ($association->hasScopeOverride()) {
-        //     return $association->scopeOverride();
-        // }
+        if ($association->hasScopeOverride()) {
+            return $association->scopeOverride();
+        }
 
         if ($this->isDisabled($association)) {
             return Scope::DISABLED;
@@ -44,13 +41,12 @@ class AssociationSpecification
             return Scope::PUBLIC;
         }
 
-        return Scope::PRIVATE;
+        return $association->minWordScope();
     }
 
     private function isDisabled(Association $association): bool
     {
         $rules = Collection::collect(
-            new AssociationDisabledByOverride(),
             new AssociationDisabledByWords(),
             new AssociationDisabledByWordsRelation()
         );
@@ -62,24 +58,6 @@ class AssociationSpecification
 
     private function isApproved(Association $association): bool
     {
-        if ($association->hasApprovedOverride()) {
-            return $association->approvedOverride();
-        }
-
-        // any word has approved override and is not approved?
-        $anyWordDisapprovedByOverride = $association
-            ->words()
-            ->map(
-                fn (Word $w) => $this->wordSpecification->approvedOverride($w)
-            )
-            ->any(
-                fn (?bool $ao) => $ao === false
-            );
-
-        if ($anyWordDisapprovedByOverride) {
-            return false;
-        }
-
         return $this->isApprovedByUsage($association);
     }
 
@@ -100,35 +78,22 @@ class AssociationSpecification
         return $score >= $threshold;
     }
 
-    /**
-     * Todo: add override for OFFENDING
-     */
     public function countSeverity(Association $association): int
     {
-        // if ($association->hasSeverityOverride()) {
-        //     return $association->severityOverride();
-        // }
+        if ($association->hasSeverityOverride()) {
+            return $association->severityOverride();
+        }
 
         if ($this->isMature($association)) {
             return Severity::MATURE;
         }
 
-        return Severity::NEUTRAL;
+        return $association->maxWordSeverity();
     }
 
     private function isMature(Association $association): bool
     {
-        if ($association->hasMatureOverride()) {
-            return $association->matureOverride();
-        }
-
-        return $this->isMatureByWords($association)
-            || $this->isMatureByFeedbacks($association);
-    }
-
-    private function isMatureByWords(Association $association): bool
-    {
-        return $association->hasMatureWords();
+        return $this->isMatureByFeedbacks($association);
     }
 
     private function isMatureByFeedbacks(Association $association): bool

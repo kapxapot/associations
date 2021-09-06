@@ -143,15 +143,6 @@ class Association extends LanguageElement implements AssociationInterface
             ->distinct();
     }
 
-    public function hasMatureWords(): bool
-    {
-        return $this
-            ->words()
-            ->any(
-                fn (Word $w) => $w->isMature()
-            );
-    }
-
     public function serialize(): array
     {
         return [
@@ -192,6 +183,26 @@ class Association extends LanguageElement implements AssociationInterface
         return $this->getWithProperty(
             $this->canonicalPropertyName
         );
+    }
+
+    public function minWordScope(): int
+    {
+        return $this
+            ->words()
+            ->numerize(
+                fn (Word $w) => intval($w->scope)
+            )
+            ->min();
+    }
+
+    public function maxWordSeverity(): int
+    {
+        return $this
+            ->words()
+            ->numerize(
+                fn (Word $w) => intval($w->severity)
+            )
+            ->max();
     }
 
     // AssociationInterface

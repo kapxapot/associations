@@ -234,7 +234,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         return $this->severityOverride() !== null;
     }
 
-    public function severityOverride(): ?bool
+    public function severityOverride(): ?int
     {
         return $this->hasOverride()
             ? $this->override()->severity
