@@ -19,12 +19,14 @@ associations:
         '<a href="' + row.url + '">' + row.name + '</a>'
       attributes: [readonly, searchable, no_sort]
 
-    scope_name:
+    scope:
       name: Видимость
+      template: row.scope_name
       attributes: [readonly]
 
-    severity_name:
+    severity:
       name: Жестокость
+      template: row.severity_name
       attributes: [readonly]
 
     created_at:
@@ -89,12 +91,14 @@ association_overrides:
         '<a href="' + row.association.url + '">' + row.association.name + '</a>'
       attributes: [readonly, searchable, no_sort]
 
-    scope_name:
+    scope:
       name: Видимость
+      template: row.scope_name
       attributes: [readonly]
 
-    severity_name:
+    severity:
       name: Жестокость
+      template: row.severity_name
       attributes: [readonly]
 
     created_at:
@@ -461,23 +465,25 @@ words:
         '<a class="ellipsis w-200" href="' + row.url + '">' + row.word + '</a>'
       attributes: [readonly, searchable]
 
-    scope_name:
+    scope:
       name: Видимость
+      template: row.scope_name
       attributes: [readonly]
 
-    severity_name:
+    severity:
       name: Жестокость
+      template: row.severity_name
       attributes: [readonly]
 
     has_dict_word:
       name: Словарь
       type: bool
-      attributes: [readonly]
+      attributes: [readonly, no_sort]
 
     has_definition:
       name: Определение
       type: bool
-      attributes: [readonly]
+      attributes: [readonly, no_sort]
 
     created_at:
       name: Дата создания
@@ -557,12 +563,14 @@ word_overrides:
         row.original_word ? row.original_word : ''
       attributes: [readonly, searchable, no_sort]
 
-    scope_name:
+    scope:
       name: Видимость
+      template: row.scope_name
       attributes: [readonly]
 
-    severity_name:
+    severity:
       name: Жестокость
+      template: row.severity_name
       attributes: [readonly]
 
     word_correction:
