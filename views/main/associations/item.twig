@@ -144,8 +144,8 @@
                                 {% for override in association.overrides.sort %}
                                     <tr>
                                         <td>{{ override.id }}</td>
-                                        <td>{% if override.hasScope %}{{ translate(scopes[override.scope], association)|capitalize }}{% endif %}</td>
-                                        <td>{% if override.hasSeverity %}{{ translate(severities[override.severity], association)|capitalize }}{% endif %}</td>
+                                        <td>{% if override.hasScope %}{{ translate(scopes[override.scope], association) }}{% endif %}</td>
+                                        <td>{% if override.hasSeverity %}{{ translate(severities[override.severity], association) }}{% endif %}</td>
                                         <td>{{ gm.moment_local(override.created_at_iso) }}</td>
                                         <td>{{ lm.user(override.creator) }}</td>
                                     </tr>

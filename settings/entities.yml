@@ -19,14 +19,12 @@ associations:
         '<a href="' + row.url + '">' + row.name + '</a>'
       attributes: [readonly, searchable, no_sort]
 
-    scope:
+    scope_name:
       name: Видимость
-      type: number
       attributes: [readonly]
 
-    severity:
+    severity_name:
       name: Жестокость
-      type: number
       attributes: [readonly]
 
     created_at:
@@ -91,14 +89,12 @@ association_overrides:
         '<a href="' + row.association.url + '">' + row.association.name + '</a>'
       attributes: [readonly, searchable, no_sort]
 
-    scope:
+    scope_name:
       name: Видимость
-      type: number
       attributes: [readonly]
 
-    severity:
+    severity_name:
       name: Жестокость
-      type: number
       attributes: [readonly]
 
     created_at:
@@ -465,14 +461,12 @@ words:
         '<a class="ellipsis w-200" href="' + row.url + '">' + row.word + '</a>'
       attributes: [readonly, searchable]
 
-    scope:
+    scope_name:
       name: Видимость
-      type: number
       attributes: [readonly]
 
-    severity:
+    severity_name:
       name: Жестокость
-      type: number
       attributes: [readonly]
 
     has_dict_word:
@@ -563,14 +557,12 @@ word_overrides:
         row.original_word ? row.original_word : ''
       attributes: [readonly, searchable, no_sort]
 
-    scope:
+    scope_name:
       name: Видимость
-      type: number
       attributes: [readonly]
 
-    severity:
+    severity_name:
       name: Жестокость
-      type: number
       attributes: [readonly]
 
     word_correction:
@@ -579,6 +571,8 @@ word_overrides:
 
     pos_correction:
       name: Части речи
+      template: >
+        row.pos_correction ? row.pos_correction.split(',').join(', ') : null
       attributes: [readonly]
 
     created_at:

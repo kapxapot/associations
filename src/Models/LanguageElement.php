@@ -249,4 +249,24 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
     {
         return $this->override() !== null;
     }
+
+    // serialization
+
+    public function serialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'scope' => $this->scope,
+            'scope_name' => Scope::getName(intval($this->scope)),
+            'severity' => $this->severity,
+            'severity_name' => Severity::getName(intval($this->severity)),
+            'approved' => $this->isFuzzyPublic(),
+            'mature' => $this->isMature(),
+            'disabled' => $this->isDisabled(),
+            'url' => $this->url(),
+            'language' => $this->language()->serialize(),
+            'creator' => $this->creator()->serialize(),
+            'created_at' => $this->createdAtIso(),
+        ];
+    }
 }

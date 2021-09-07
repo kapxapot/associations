@@ -58,7 +58,13 @@ abstract class Override extends DbModel implements CreatedInterface
         return [
             'id' => $this->getId(),
             'scope' => $this->scope,
+            'scope_name' => $this->scope !== null
+                ? Scope::getName(intval($this->scope))
+                : null,
             'severity' => $this->severity,
+            'severity_name' => $this->severity !== null
+                ? Severity::getName(intval($this->severity))
+                : null,
             'creator' => $this->creator()->serialize(),
             'created_at' => $this->createdAtIso(),
         ];

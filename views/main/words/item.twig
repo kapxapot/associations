@@ -327,8 +327,8 @@
                             {% for override in word.overrides.sort %}
                                 <tr>
                                     <td>{{ override.id }}</td>
-                                    <td>{% if override.hasScope %}{{ translate(scopes[override.scope], word)|capitalize }}{% endif %}</td>
-                                    <td>{% if override.hasSeverity %}{{ translate(severities[override.severity], word)|capitalize }}{% endif %}</td>
+                                    <td>{% if override.hasScope %}{{ translate(scopes[override.scope], word) }}{% endif %}</td>
+                                    <td>{% if override.hasSeverity %}{{ translate(severities[override.severity], word) }}{% endif %}</td>
                                     <td>{% if override.hasWordCorrection %}{{ word.original_word }} &#x2192; {{ override.wordCorrection }}{% endif %}</td>
                                     <td>
                                         {% if override.hasPosCorrection %}

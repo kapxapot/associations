@@ -143,23 +143,6 @@ class Association extends LanguageElement implements AssociationInterface
             ->distinct();
     }
 
-    public function serialize(): array
-    {
-        return [
-            'id' => $this->getId(),
-            'name' => $this->fullName(),
-            'scope' => $this->scope,
-            'severity' => $this->severity,
-            'approved' => $this->isFuzzyPublic(),
-            'mature' => $this->isMature(),
-            'disabled' => $this->isDisabled(),
-            'url' => $this->url(),
-            'language' => $this->language()->serialize(),
-            'creator' => $this->creator()->serialize(),
-            'created_at' => $this->createdAtIso(),
-        ];
-    }
-
     public function fullName(): string
     {
         return
@@ -220,5 +203,17 @@ class Association extends LanguageElement implements AssociationInterface
     public function isReal(): bool
     {
         return $this->isPersisted();
+    }
+
+    // serialization
+
+    public function serialize(): array
+    {
+        return array_merge(
+            parent::serialize(),
+            [
+                'name' => $this->fullName(),
+            ]
+        );
     }
 }
