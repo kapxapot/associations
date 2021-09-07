@@ -41,7 +41,7 @@ class AssociationSpecification
             return Scope::PUBLIC;
         }
 
-        return $association->minWordScope();
+        return min([Scope::PRIVATE, $association->minWordScope()]);
     }
 
     private function isDisabled(Association $association): bool
