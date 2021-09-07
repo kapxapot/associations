@@ -111,7 +111,9 @@ class WordSpecification
 
     private function isCommon(Word $word): bool
     {
-        return !$word->hasMain() && $this->isCommonByAssociations($word);
+        return !$word->hasMain()
+            && $word->isNeutral()
+            && $this->isCommonByAssociations($word);
     }
 
     private function isCommonByAssociations(Word $word): bool
