@@ -115,13 +115,14 @@ class WordSpecification
             return Severity::MATURE;
         }
 
-        return Severity::NEUTRAL;
+        return $word->hasMain()
+            ? $word->main()->severity
+            : Severity::NEUTRAL;
     }
 
     private function isMature(Word $word): bool
     {
-        return $this->isMatureByFeedbacks($word)
-            || $this->isMatureByMainWord($word);
+        return $this->isMatureByFeedbacks($word);
     }
 
     private function isMatureByFeedbacks(Word $word): bool
@@ -131,13 +132,6 @@ class WordSpecification
         $score = $word->matures()->count();
 
         return $score >= $threshold;
-    }
-
-    private function isMatureByMainWord(Word $word): bool
-    {
-        return $word->hasMain()
-            ? $word->main()->isMature()
-            : false;
     }
 
     public function countCorrectedWord(Word $word): string
