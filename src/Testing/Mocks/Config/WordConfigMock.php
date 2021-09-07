@@ -31,6 +31,11 @@ class WordConfigMock implements WordConfigInterface
         return 1;
     }
 
+    public function wordCommonThreshold() : float
+    {
+        return 10;
+    }
+
     public function wordMatureThreshold() : float
     {
         return 2;

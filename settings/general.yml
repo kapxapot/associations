@@ -62,6 +62,7 @@ users:
 
 words:
   approval_threshold: 1
+  common_threshold: 10
   mature_threshold: 2
   coeffs:
     approved_association: 1

@@ -14,6 +14,8 @@ interface WordConfigInterface
 
     public function wordApprovalThreshold() : float;
 
+    public function wordCommonThreshold() : float;
+
     public function wordMatureThreshold() : float;
 
     public function wordLastAddedLimit() : int;

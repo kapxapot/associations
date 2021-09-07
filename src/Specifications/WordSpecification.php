@@ -33,7 +33,11 @@ class WordSpecification
             return Scope::DISABLED;
         }
 
-        if ($this->isApproved($word)) {
+        if ($this->isCommon($word)) {
+            return Scope::COMMON;
+        }
+
+        if ($this->isPublic($word)) {
             return Scope::PUBLIC;
         }
 
@@ -54,14 +58,14 @@ class WordSpecification
             );
     }
 
-    private function isApproved(Word $word): bool
+    private function isPublic(Word $word): bool
     {
-        return $this->isApprovedByDictWord($word)
-            || $this->isApprovedByDefinition($word)
-            || $this->isApprovedByAssociations($word);
+        return $this->isPublicByDictWord($word)
+            || $this->isPublicByDefinition($word)
+            || $this->isPublicByAssociations($word);
     }
 
-    private function isApprovedByDictWord(Word $word): bool
+    private function isPublicByDictWord(Word $word): bool
     {
         $dictWord = $word->dictWord();
 
@@ -75,7 +79,7 @@ class WordSpecification
         return $partsOfSpeech->isAnyGood();
     }
 
-    private function isApprovedByDefinition(Word $word): bool
+    private function isPublicByDefinition(Word $word): bool
     {
         $definition = $word->definition();
 
@@ -91,11 +95,30 @@ class WordSpecification
         return $partsOfSpeech->isAnyGood();
     }
 
-    private function isApprovedByAssociations(Word $word): bool
+    private function isPublicByAssociations(Word $word): bool
     {
         $assocCoeff = $this->config->wordApprovedAssociationCoeff();
         $dislikeCoeff = $this->config->wordDislikeCoeff();
         $threshold = $this->config->wordApprovalThreshold();
+
+        $approvedAssocs = $word->approvedAssociations()->count();
+        $dislikes = $word->dislikes()->count();
+
+        $score = $approvedAssocs * $assocCoeff - $dislikes * $dislikeCoeff;
+
+        return $score >= $threshold;
+    }
+
+    private function isCommon(Word $word): bool
+    {
+        return $this->isCommonByAssociations($word);
+    }
+
+    private function isCommonByAssociations(Word $word): bool
+    {
+        $assocCoeff = $this->config->wordApprovedAssociationCoeff();
+        $dislikeCoeff = $this->config->wordDislikeCoeff();
+        $threshold = $this->config->wordCommonThreshold();
 
         $approvedAssocs = $word->approvedAssociations()->count();
         $dislikes = $word->dislikes()->count();
