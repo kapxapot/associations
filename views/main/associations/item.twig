@@ -37,7 +37,7 @@
                 {% elseif association.isMature %}
                     <span class="label label-danger" title="Для взрослых" data-toggle="tooltip">{{ severityLock|raw }}🤬</span>
                 {% else %}
-                    <span class="label label-success" title="Нейтральная — безопасно для детей" data-toggle="tooltip"><i class="fas {{ association.hasSeverityOverride ? 'fa-lock' : 'fa-check' }}"></i> 🧒</span>
+                    <span class="label label-success" title="Нейтральная — безопасно для детей" data-toggle="tooltip"><i class="fas {{ association.hasSeverityOverride ? 'fa-lock' : 'fa-check' }}"></i> 👶</span>
                 {% endif %}
 
                 {% if turns_by_user|length > 0 %}

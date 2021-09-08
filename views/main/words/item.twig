@@ -50,7 +50,7 @@
                 {% elseif word.isMature %}
                     <span class="label label-danger" title="Для взрослых" data-toggle="tooltip">{{ severityLock|raw }}🤬</span>
                 {% else %}
-                    <span class="label label-success" title="Нейтральное — безопасно для детей" data-toggle="tooltip"><i class="fas {{ word.hasSeverityOverride ? 'fa-lock' : 'fa-check' }}"></i> 🧒</span>
+                    <span class="label label-success" title="Нейтральное — безопасно для детей" data-toggle="tooltip"><i class="fas {{ word.hasSeverityOverride ? 'fa-lock' : 'fa-check' }}"></i> 👶</span>
                 {% endif %}
 
                 {% if word.dict_word %}
