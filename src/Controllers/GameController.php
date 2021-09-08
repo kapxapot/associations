@@ -5,6 +5,9 @@ namespace App\Controllers;
 use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
+use App\Services\AssociationService;
+use App\Services\GameService;
+use App\Services\TurnService;
 use App\Services\WordService;
 use Plasticode\Core\Request;
 use Plasticode\Core\Response;
@@ -19,6 +22,9 @@ class GameController extends Controller
     private GameRepositoryInterface $gameRepository;
     private LanguageRepositoryInterface $languageRepository;
 
+    private AssociationService $associationService;
+    private GameService $gameService;
+    private TurnService $turnService;
     private WordService $wordService;
 
     private NotFoundHandlerInterface $notFoundHandler;
@@ -30,6 +36,9 @@ class GameController extends Controller
         $this->gameRepository = $container->get(GameRepositoryInterface::class);
         $this->languageRepository = $container->get(LanguageRepositoryInterface::class);
 
+        $this->associationService = $container->get(AssociationService::class);
+        $this->gameService = $container->get(GameService::class);
+        $this->turnService = $container->get(TurnService::class);
         $this->wordService = $container->get(WordService::class);
 
         $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
@@ -133,13 +142,20 @@ class GameController extends Controller
             ? $word->associationByWord($prevWord)
             : null;
 
-        $answerAssociation = $word
-            ? $word->randomPublicAssociation($prevWord)
+        $game = $this->gameService->buildEtherealGame($prevWord, $word);
+
+        $answer = $word !== null
+            ? $this->turnService->findAnswer($game, $word)
             : null;
 
-        $answer = $answerAssociation
-            ? $answerAssociation->otherWord($word)
-            : $this->languageService->getRandomPublicWord($language);
+        /** @var Association|null $answerAssociation */
+        $answerAssociation = null;
+
+        if ($answer !== null) {
+            $answerAssociation = $this->associationService->getByPair($word, $answer);
+        } else {
+            $answer = $this->languageService->getRandomStartingWord($language);
+        }
 
         $wordResponse = ['word' => $wordStr];
 

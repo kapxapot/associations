@@ -25,7 +25,7 @@ class EightsData extends StoryData implements SerializableInterface
      */
     private ?EightsGame $game = null;
 
-    public function game() : EightsGame
+    public function game(): EightsGame
     {
         Assert::notNull($this->game);
 
@@ -35,7 +35,7 @@ class EightsData extends StoryData implements SerializableInterface
     /**
      * @return $this
      */
-    public function withGame(?EightsGame $game) : self
+    public function withGame(?EightsGame $game): self
     {
         $this->game = $game;
 
@@ -46,7 +46,7 @@ class EightsData extends StoryData implements SerializableInterface
         return $this;
     }
 
-    protected function init() : void
+    protected function init(): void
     {
         $this->playerCount = EightsGame::minPlayers();
     }
@@ -54,7 +54,7 @@ class EightsData extends StoryData implements SerializableInterface
     /**
      * @return $this
      */
-    public function withPlayerCount(int $playerCount) : self
+    public function withPlayerCount(int $playerCount): self
     {
         Assert::range(
             $playerCount,
@@ -70,7 +70,7 @@ class EightsData extends StoryData implements SerializableInterface
     /**
      * @return $this
      */
-    public function initGame(TelegramUser $tgUser) : self
+    public function initGame(TelegramUser $tgUser): self
     {
         $botCount = $this->playerCount - 1;
 
@@ -90,10 +90,9 @@ class EightsData extends StoryData implements SerializableInterface
             $players
         );
 
-        return $this
-            ->withGame(
-                $game->withObserver($human)
-            );
+        return $this->withGame(
+            $game->withObserver($human)
+        );
     }
 
     private function fetchBots(int $count) : PlayerCollection

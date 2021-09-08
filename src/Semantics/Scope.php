@@ -13,11 +13,11 @@ class Scope
     const COMMON = 5;
 
     /**
-     * Is the scope one of the fuzzy private ones.
+     * Is the scope one of the fuzzy disabled ones.
      */
-    public static function isFuzzyPrivate(int $scope): bool
+    public static function isFuzzyDisabled(int $scope): bool
     {
-        return in_array($scope, self::allFuzzyPrivate());
+        return in_array($scope, [self::DISABLED, self::INACTIVE]);
     }
 
     /**
@@ -26,16 +26,6 @@ class Scope
     public static function isFuzzyPublic(int $scope): bool
     {
         return in_array($scope, self::allFuzzyPublic());
-    }
-
-    /**
-     * Returns scopes that are Scope::INACTIVE or Scope::PRIVATE.
-     *
-     * @return integer[]
-     */
-    public static function allFuzzyPrivate(): array
-    {
-        return [self::INACTIVE, self::PRIVATE];
     }
 
     /**

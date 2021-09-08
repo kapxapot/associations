@@ -73,7 +73,7 @@ class AssociationHydrator extends Hydrator
 
                     [$w1, $w2] = $entity->words()->canonical()->order();
 
-                    return $this->associationRepository->getByPair($w1, $w2)
+                    return $this->associationRepository->getByOrderedPair($w1, $w2)
                         ?? new EtherealAssociation($w1, $w2);
                 }
             )

@@ -132,7 +132,7 @@ class AssociationService
         return WordCollection::collect($first, $second)->order();
     }
 
-    private function getByPair(
+    public function getByPair(
         Word $first,
         Word $second,
         Language $language = null
@@ -142,6 +142,6 @@ class AssociationService
 
         [$first, $second] = $this->orderPair($first, $second);
 
-        return $this->associationRepository->getByPair($first, $second);
+        return $this->associationRepository->getByOrderedPair($first, $second);
     }
 }

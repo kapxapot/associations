@@ -5,10 +5,12 @@ namespace App\Bots\Answerers;
 use App\Bots\AbstractBotRequest;
 use App\Bots\BotResponse;
 use App\Bots\Command;
-use App\Models\DTO\MetaTurn;
+use App\Models\DTO\PseudoTurn;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\GameService;
 use App\Services\LanguageService;
+use App\Services\TurnService;
 
 class ApplicationAnswerer extends AbstractAnswerer
 {
@@ -16,14 +18,22 @@ class ApplicationAnswerer extends AbstractAnswerer
 
     private WordRepositoryInterface $wordRepository;
 
+    private GameService $gameService;
+    private TurnService $turnService;
+
     public function __construct(
         WordRepositoryInterface $wordRepository,
+        GameService $gameService,
+        TurnService $turnService,
         LanguageService $languageService
     )
     {
         parent::__construct($languageService);
 
         $this->wordRepository = $wordRepository;
+
+        $this->gameService = $gameService;
+        $this->turnService = $turnService;
     }
 
     public function getResponse(AbstractBotRequest $request): BotResponse
@@ -80,7 +90,7 @@ class ApplicationAnswerer extends AbstractAnswerer
         return self::MESSAGE_COMMANDS_APPLICATION;
     }
 
-    private function turnToAnswer(AbstractBotRequest $request, MetaTurn $turn): BotResponse
+    private function turnToAnswer(AbstractBotRequest $request, PseudoTurn $turn): BotResponse
     {
         $questionWord = $turn->prevWord();
         $answerWord = $turn->word();
@@ -137,19 +147,21 @@ class ApplicationAnswerer extends AbstractAnswerer
         return $response;
     }
 
-    private function getWordFor(?string $question, ?Word $prevWord): MetaTurn
+    private function getWordFor(?string $question, ?Word $prevWord): PseudoTurn
     {
         $word = $this->findWord($question);
 
-        $answerAssociation = $word
-            ? $word->randomPublicAssociation($prevWord)
+        $game = $this->gameService->buildEtherealGame($prevWord, $word);
+
+        $answer = $word !== null
+            ? $this->turnService->findAnswer($game, $word)
             : null;
 
-        $answer = $answerAssociation
-            ? $answerAssociation->otherWord($word)
+        $answerAssociation = $answer !== null
+            ? $this->associationService->getByPair($word, $answer)
             : null;
 
-        return new MetaTurn($answerAssociation, $answer, $word);
+        return new PseudoTurn($answerAssociation, $answer, $word);
     }
 
     private function getAnyWord(?AbstractBotRequest $request = null): ?Word
@@ -160,6 +172,6 @@ class ApplicationAnswerer extends AbstractAnswerer
             ? $this->findWord($request->command())
             : null;
 
-        return $this->languageService->getRandomPublicWord($language, $word);
+        return $this->languageService->getRandomStartingWord($language, $word);
     }
 }

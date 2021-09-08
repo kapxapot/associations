@@ -70,22 +70,22 @@ class LanguageService
             : $this->getDefaultLanguage();
     }
 
-    public function getRandomPublicWord(
+    public function getRandomStartingWord(
         ?Language $language = null,
         ?Word $exceptWord = null
     ): ?Word
     {
-        return $this->getRandomWordFor(null, $language, $exceptWord);
+        return $this->getRandomStartingWordFor(null, $language, $exceptWord);
     }
 
     /**
-     * Returns **canonical** random word available for the user.
+     * Returns **canonical** random word available for the user to start the game.
      *
      * - Prioritizes common and public words, if available.
      * - If they are absent, returns any of user's words.
      * - Otherwise, returns any word.
      */
-    public function getRandomWordFor(
+    public function getRandomStartingWordFor(
         ?User $user,
         ?Language $language = null,
         ?Word $exceptWord = null
@@ -94,12 +94,12 @@ class LanguageService
         // 1. try find a common word
         // 2. try find a public word
         // 3. select one of the user's words
-        // 4. any word
+        // 4. try find a private word
         $sources = [
             fn () => $this->wordRepository->getAllByScope(Scope::COMMON, $language),
             fn () => $this->wordRepository->getAllByScope(Scope::PUBLIC, $language),
             fn () => $this->wordService->getAllUsedBy($user, $language),
-            fn () => $this->wordRepository->getAllByLanguage($language)
+            fn () => $this->wordRepository->getAllByScope(Scope::PRIVATE, $language)
         ];
 
         foreach ($sources as $source) {

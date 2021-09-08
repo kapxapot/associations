@@ -55,7 +55,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
         );
     }
 
-    public function getByPair(Word $first, Word $second): ?Association
+    public function getByOrderedPair(Word $first, Word $second): ?Association
     {
         return $this
             ->query()

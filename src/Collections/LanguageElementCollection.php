@@ -15,7 +15,7 @@ class LanguageElementCollection extends DbModelCollection
      *
      * @return static
      */
-    public function public(): self
+    public function fuzzyPublic(): self
     {
         return $this->where(
             fn (LanguageElement $el) => $el->isFuzzyPublic()
@@ -23,24 +23,34 @@ class LanguageElementCollection extends DbModelCollection
     }
 
     /**
-     * Filters fuzzy private elements.
-     *
      * @return static
      */
     public function private(): self
     {
         return $this->where(
-            fn (LanguageElement $el) => $el->isFuzzyPrivate()
+            fn (LanguageElement $el) => $el->isPrivate()
         );
     }
 
     /**
      * @return static
      */
-    public function disabled(): self
+    public function fuzzyDisabled(): self
     {
         return $this->where(
-            fn (LanguageElement $el) => $el->isDisabled()
+            fn (LanguageElement $el) => $el->isFuzzyDisabled()
+        );
+    }
+
+    /**
+     * Filters the elements by scopes.
+     *
+     * @return static
+     */
+    public function scopedTo(int ...$scopes): self
+    {
+        return $this->where(
+            fn (LanguageElement $el) => in_array(intval($el->scope), $scopes)
         );
     }
 

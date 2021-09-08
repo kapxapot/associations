@@ -34,6 +34,11 @@ associations:
       type: date
       attributes: [readonly]
 
+    updated_at:
+      name: Дата изменения
+      type: date
+      attributes: [readonly]
+
     creator:
       name: Автор
       template: row.creator.name
@@ -487,6 +492,11 @@ words:
 
     created_at:
       name: Дата создания
+      type: date
+      attributes: [readonly]
+
+    updated_at:
+      name: Дата изменения
       type: date
       attributes: [readonly]
 

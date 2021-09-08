@@ -5,7 +5,7 @@ namespace App\Models\DTO;
 use App\Models\Association;
 use App\Models\Word;
 
-class MetaTurn
+class PseudoTurn
 {
     private ?Association $association;
     private ?Word $word;

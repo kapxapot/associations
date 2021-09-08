@@ -13,11 +13,17 @@ use Plasticode\Repositories\Interfaces\Generic\GetRepositoryInterface;
 
 interface TurnRepositoryInterface extends GetRepositoryInterface, WithLanguageRepositoryInterface
 {
-    function get(?int $id): ?Turn;
-    function save(Turn $turn): Turn;
-    function getAllByGame(Game $game): TurnCollection;
-    function getAllByAssociation(Association $association): TurnCollection;
-    function getAllByLanguage(Language $language): TurnCollection;
-    function getAllByUser(User $user, ?Language $language = null): TurnCollection;
-    function getAllByWord(Word $word): TurnCollection;
+    public function get(?int $id): ?Turn;
+
+    public function save(Turn $turn): Turn;
+
+    public function getAllByGame(Game $game): TurnCollection;
+
+    public function getAllByAssociation(Association $association): TurnCollection;
+
+    public function getAllByLanguage(Language $language): TurnCollection;
+
+    public function getAllByUser(User $user, ?Language $language = null): TurnCollection;
+
+    public function getAllByWord(Word $word): TurnCollection;
 }

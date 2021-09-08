@@ -40,8 +40,8 @@ class AssociationRecountService
         ?Event $sourceEvent = null
     ): Association
     {
-        $assoc = $this->recountScope($association, $sourceEvent);
         $assoc = $this->recountSeverity($association, $sourceEvent);
+        $assoc = $this->recountScope($association, $sourceEvent);
 
         return $assoc;
     }

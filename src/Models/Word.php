@@ -9,7 +9,6 @@ use App\Collections\WordCollection;
 use App\Collections\WordFeedbackCollection;
 use App\Collections\WordOverrideCollection;
 use App\Collections\WordRelationCollection;
-use App\Models\DTO\GameOptions;
 use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
@@ -107,17 +106,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             );
     }
 
-    public function randomPublicAssociation(?self $excludeOtherWord = null): ?Association
-    {
-        return $this
-            ->approvedAssociations()
-            ->visible()
-            ->where(
-                fn (Association $a) => !$a->otherWord($this)->equals($excludeOtherWord)
-            )
-            ->random();
-    }
-
     /**
      * Returns approved associations visible for *the current user*.
      */
@@ -182,7 +170,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     {
         return $this
             ->associations()
-            ->public()
+            ->fuzzyPublic()
             ->ascStr(
                 fn (Association $a) => $a->otherWord($this)->word
             );
@@ -202,7 +190,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     {
         return $this
             ->associations()
-            ->disabled()
+            ->fuzzyDisabled()
             ->ascStr(
                 fn (Association $a) => $a->otherWord($this)->word
             );
@@ -256,21 +244,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
                 ...$this->originWord()->originChain()
             )
             : $chain;
-    }
-
-    public function associatedWordsFor(
-        User $user,
-        ?GameOptions $options = null
-    ): WordCollection
-    {
-        return WordCollection::from(
-            $this
-                ->associations()
-                ->playableAgainst($user, $options)
-                ->map(
-                    fn (Association $a) => $a->otherWord($this)
-                )
-        );
     }
 
     public function proposedTypos(): array

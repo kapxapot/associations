@@ -53,8 +53,8 @@ class WordRecountService
     public function recountAll(Word $word, ?Event $sourceEvent = null): Word
     {
         $word = $this->recountRelations($word, $sourceEvent);
-        $word = $this->recountScope($word, $sourceEvent);
         $word = $this->recountSeverity($word, $sourceEvent);
+        $word = $this->recountScope($word, $sourceEvent);
         $word = $this->recountCorrectedWord($word, $sourceEvent);
 
         return $word;

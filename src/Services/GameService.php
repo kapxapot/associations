@@ -3,13 +3,16 @@
 namespace App\Services;
 
 use App\Collections\TurnCollection;
+use App\Collections\WordCollection;
 use App\Exceptions\TurnException;
 use App\Models\Game;
 use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
+use App\Models\Word;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use Plasticode\Exceptions\ValidationException;
+use Plasticode\Util\Arrays;
 use Webmozart\Assert\Assert;
 
 class GameService
@@ -76,7 +79,7 @@ class GameService
 
         // if language has words, AI goes first
         // otherwise player goes first
-        $word = $this->languageService->getRandomWordFor($user, $language);
+        $word = $this->languageService->getRandomStartingWordFor($user, $language);
 
         return $word
             ? $this->turnService->newAiTurn($game, $word)
@@ -121,5 +124,27 @@ class GameService
         Assert::minCount($turns, 1);
 
         return $turns;
+    }
+
+    /**
+     * Builds an `ethereal` game with the words provided.
+     *
+     * `null` words are ignored.
+     *
+     * @param array<Word|null> $words Game words in ASC order (!).
+     */
+    public function buildEtherealGame(?Word ...$words): Game
+    {
+        $words = Arrays::clean($words);
+
+        $turns = TurnCollection::from(
+            WordCollection::make($words)
+                ->reverse()
+                ->map(
+                    fn (Word $w) => (new Turn())->withWord($w)
+                )
+        );
+
+        return (new Game())->withTurns($turns);
     }
 }

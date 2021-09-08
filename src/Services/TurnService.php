@@ -3,12 +3,13 @@
 namespace App\Services;
 
 use App\Collections\TurnCollection;
+use App\Collections\WordCollection;
 use App\Events\Turn\TurnCreatedEvent;
 use App\Exceptions\DuplicateWordException;
 use App\Exceptions\RecentRelatedWordException;
 use App\Exceptions\StronglyRelatedWordException;
 use App\Exceptions\TurnException;
-use App\Models\DTO\GameOptions;
+use App\Models\Association;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\User;
@@ -16,6 +17,7 @@ use App\Models\Word;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Scope;
 use Exception;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Traits\LoggerAwareTrait;
@@ -160,7 +162,8 @@ class TurnService
     private function nextAiTurn(Turn $turn): ?Turn
     {
         $game = $turn->game();
-        $word = $this->findAnswer($turn);
+
+        $word = $this->findAnswer($game, $turn->word(), $turn->user());
 
         if ($word) {
             return $this->newAiTurn($game, $word);
@@ -173,7 +176,7 @@ class TurnService
 
     /**
      * Returns true on success.
-     * 
+     *
      * Todo: this should belong to GameService, but creates a circular dependency
      */
     public function finishGame(Game $game): bool
@@ -198,9 +201,9 @@ class TurnService
 
     /**
      * Validates player turn.
-     * 
+     *
      * Normalized word string expected.
-     * 
+     *
      * @throws TurnException
      */
     public function validatePlayerTurn(Game $game, string $wordStr): void
@@ -219,37 +222,37 @@ class TurnService
         $this->throwIfCantBePlayed($game, $word);
     }
 
-    public function findAnswer(Turn $turn): ?Word
+    public function findAnswer(Game $game, Word $word, ?User $user = null): ?Word
     {
-        // first, we try to find a classic fuzzy public association
+        // 1. looking in fuzzy public associations
+        // 2. looking in private associations
 
-        /** @var Word|null $goodWord */
-        $goodWord = $this->getRandomAnswer($turn);
+        $selectors = [
+            fn (Association $a) => $a->isFuzzyPublic(),
+            fn (Association $a) => $a->isPrivate(),
+        ];
 
-        if ($goodWord !== null) {
-            return $goodWord;
+        foreach ($selectors as $selector) {
+            $answer = $word
+                ->associations()
+                ->where($selector)
+                ->where(
+                    fn (Association $a) => $a->isPlayableAgainst($user)
+                )
+                ->map(
+                    fn (Association $a) => $a->otherWord($word)
+                )
+                ->shuffle()
+                ->first(
+                    fn (Word $w) => $this->canBePlayed($game, $w)
+                );
+
+            if ($answer !== null) {
+                return $answer;
+            }
         }
 
-        // now we try to check fuzzy private associations
-
-        $options = new GameOptions();
-        $options->allowFuzzyPrivateElements = true;
-
-        return $this->getRandomAnswer($turn, $options);
-    }
-
-    private function getRandomAnswer(Turn $turn, GameOptions $options = null): ?Word
-    {
-        $game = $turn->game();
-        $user = $turn->user();
-
-        return $turn
-            ->word()
-            ->associatedWordsFor($user, $options)
-            ->shuffle()
-            ->first(
-                fn (Word $w) => $this->canBePlayed($game, $w)
-            );
+        return null;
     }
 
     /**
@@ -268,7 +271,7 @@ class TurnService
 
     /**
      * Game context checks.
-     * 
+     *
      * @throws TurnException
      */
     private function throwIfCantBePlayed(Game $game, Word $word): void

@@ -10,26 +10,32 @@ use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 
 interface AssociationRepositoryInterface extends FilteringRepositoryInterface, LanguageElementRepositoryInterface
 {
-    function get(?int $id): ?Association;
+    public function get(?int $id): ?Association;
 
-    function save(Association $association): Association;
+    public function save(Association $association): Association;
 
-    function store(array $data): Association;
+    public function store(array $data): Association;
 
-    function getAllByLanguage(Language $language): AssociationCollection;
+    public function getAllByLanguage(Language $language): AssociationCollection;
 
-    function getAllByWord(Word $word): AssociationCollection;
+    public function getAllByWord(Word $word): AssociationCollection;
 
-    function getByPair(Word $first, Word $second): ?Association;
+    /**
+     * Looks for an association by ordered pair of words.
+     *
+     * Use `AssociationService->getByPair()` for convenience
+     * (it doesn't require the pair to be ordered).
+     */
+    public function getByOrderedPair(Word $first, Word $second): ?Association;
 
     /**
      * Returns out of date language elements.
      *
      * @param integer $ttlMin Time to live in minutes
      */
-    function getAllOutOfDate(int $ttlMin, int $limit = 0): AssociationCollection;
+    public function getAllOutOfDate(int $ttlMin, int $limit = 0): AssociationCollection;
 
-    function getLastAddedByLanguage(
+    public function getLastAddedByLanguage(
         ?Language $language = null,
         int $limit = 0
     ): AssociationCollection;

@@ -93,7 +93,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isVisibleFor(?User $user): bool
     {
-        // 1. for disabled:
+        // 1. for fuzzy disabled:
         // 1.1. visible only for those who used them
         // 2. for enabled:
         // 2.1. not mature elements are visible for everyone
@@ -101,7 +101,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         // 2.3. mature elements are visible for mature users
         // 2.4. mature elements are visible for not mature users only if they used them
 
-        if ($this->isDisabled()) {
+        if ($this->isFuzzyDisabled()) {
             return $this->isUsedBy($user);
         }
 
@@ -119,11 +119,9 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isPlayableAgainst(?User $user, ?GameOptions $options = null): bool
     {
-        $allowFuzzyPrivate = $options && $options->allowFuzzyPrivateElements;
         $isGameStart = $options && $options->isGameStart;
 
         return $this->isVisibleFor($user)
-            && ($this->isFuzzyPublic() || $allowFuzzyPrivate || $this->isUsedBy($user))
             && ($this->isNeutral() || !$isGameStart)
             && !$this->isDislikedBy($user);
     }
@@ -170,11 +168,11 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
     }
 
     /**
-     * Is the scope one of the (fuzzy) private ones.
+     * Is the scope one of the (fuzzy) disabled ones.
      */
-    public function isFuzzyPrivate(): bool
+    public function isFuzzyDisabled(): bool
     {
-        return Scope::isFuzzyPrivate($this->scope);
+        return Scope::isFuzzyDisabled($this->scope);
     }
 
     /**
@@ -267,6 +265,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
             'language' => $this->language()->serialize(),
             'creator' => $this->creator()->serialize(),
             'created_at' => $this->createdAtIso(),
+            'updated_at' => $this->updatedAtIso(),
         ];
     }
 }
