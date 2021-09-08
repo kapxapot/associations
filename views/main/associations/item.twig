@@ -23,7 +23,7 @@
                 {% elseif association.isInactive %}
                     <span class="label label-warning">{{ scopeLock|raw }}неактивная</span>
                 {% elseif association.isPublic %}
-                    <span class="label label-primary"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичная</span>
+                    <span class="label label-success"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичная</span>
                 {% elseif association.isCommon %}
                     <span class="label label-success"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общая</span>
                 {% else %}

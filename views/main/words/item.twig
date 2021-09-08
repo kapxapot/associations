@@ -36,7 +36,7 @@
                 {% elseif word.isInactive %}
                     <span class="label label-warning">{{ scopeLock|raw }}неактивное</span>
                 {% elseif word.isPublic %}
-                    <span class="label label-primary"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичное</span>
+                    <span class="label label-success"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичное</span>
                 {% elseif word.isCommon %}
                     <span class="label label-success"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общее</span>
                 {% else %}
