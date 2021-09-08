@@ -76,7 +76,7 @@ class AssociationRecountService
         return $association;
     }
 
-    public function recountSeverity(
+    private function recountSeverity(
         Association $association,
         ?Event $sourceEvent = null
     ): Association

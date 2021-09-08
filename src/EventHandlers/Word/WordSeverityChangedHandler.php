@@ -34,13 +34,13 @@ class WordSeverityChangedHandler
             ->associations()
             ->apply(
                 fn (Association $a) =>
-                    $this->associationRecountService->recountSeverity($a, $event)
+                    $this->associationRecountService->recountAll($a, $event)
             );
 
         $word
             ->dependents()
             ->apply(
-                fn (Word $w) => $this->wordRecountService->recountSeverity($w, $event)
+                fn (Word $w) => $this->wordRecountService->recountAll($w, $event)
             );
     }
 }

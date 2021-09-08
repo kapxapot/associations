@@ -87,7 +87,7 @@ class WordRecountService
         return $word;
     }
 
-    public function recountSeverity(Word $word, ?Event $sourceEvent = null): Word
+    private function recountSeverity(Word $word, ?Event $sourceEvent = null): Word
     {
         $now = Date::dbNow();
         $changed = false;
