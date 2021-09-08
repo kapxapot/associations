@@ -54,6 +54,10 @@ class AssociationSpecification
 
     private function isPublic(Association $association): bool
     {
+        if (!$association->hasAllGoodPartsOfSpeech()) {
+            return false;
+        }
+
         return $this->isApprovedByUsage($association);
     }
 

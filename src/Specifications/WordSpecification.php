@@ -60,6 +60,10 @@ class WordSpecification
 
     private function isPublic(Word $word): bool
     {
+        if (!$word->isGoodPartOfSpeech()) {
+            return false;
+        }
+
         return $this->isPublicByDictWord($word)
             || $this->isPublicByDefinition($word)
             || $this->isPublicByAssociations($word);
@@ -73,10 +77,7 @@ class WordSpecification
             return false;
         }
 
-        $partsOfSpeech = $word->partsOfSpeechOverride()
-            ?? $dictWord->partsOfSpeech();
-
-        return $partsOfSpeech->isAnyGood();
+        return $word->isGoodPartOfSpeech();
     }
 
     private function isPublicByDefinition(Word $word): bool
@@ -87,12 +88,7 @@ class WordSpecification
             return false;
         }
 
-        $parsedDefinition = $this->wordService->getParsedDefinition($word);
-
-        $partsOfSpeech = $word->partsOfSpeechOverride()
-            ?? $parsedDefinition->partsOfSpeech();
-
-        return $partsOfSpeech->isAnyGood();
+        return $word->isGoodPartOfSpeech();
     }
 
     private function isPublicByAssociations(Word $word): bool
@@ -111,7 +107,8 @@ class WordSpecification
 
     private function isCommon(Word $word): bool
     {
-        return !$word->hasMain()
+        return $this->isPublic($word)
+            && !$word->hasMain()
             && $word->isNeutral()
             && $this->isCommonByAssociations($word);
     }

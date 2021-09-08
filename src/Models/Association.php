@@ -188,6 +188,12 @@ class Association extends LanguageElement implements AssociationInterface
             ->max();
     }
 
+    public function hasAllGoodPartsOfSpeech(): bool
+    {
+        return $this->firstWord()->isGoodPartOfSpeech()
+            && $this->secondWord()->isGoodPartOfSpeech();
+    }
+
     // AssociationInterface
 
     public function getFirstWord(): Word

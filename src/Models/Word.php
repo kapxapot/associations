@@ -325,6 +325,11 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $name;
     }
 
+    public function isGoodPartOfSpeech(): bool
+    {
+        return $this->partsOfSpeech()->isAnyGood();
+    }
+
     public function partsOfSpeech(): PartOfSpeechCollection
     {
         if ($this->hasPartsOfSpeechOverride()) {
