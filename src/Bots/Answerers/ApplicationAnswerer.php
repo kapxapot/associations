@@ -8,6 +8,7 @@ use App\Bots\Command;
 use App\Models\DTO\PseudoTurn;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\AssociationService;
 use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
@@ -18,11 +19,13 @@ class ApplicationAnswerer extends AbstractAnswerer
 
     private WordRepositoryInterface $wordRepository;
 
+    private AssociationService $associationService;
     private GameService $gameService;
     private TurnService $turnService;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
+        AssociationService $associationService,
         GameService $gameService,
         TurnService $turnService,
         LanguageService $languageService
@@ -32,6 +35,7 @@ class ApplicationAnswerer extends AbstractAnswerer
 
         $this->wordRepository = $wordRepository;
 
+        $this->associationService = $associationService;
         $this->gameService = $gameService;
         $this->turnService = $turnService;
     }
