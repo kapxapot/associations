@@ -27,7 +27,7 @@
                 {% elseif association.isCommon %}
                     <span class="label label-success"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общая</span>
                 {% else %}
-                    <span class="label label-info">{{ scopeLock|raw }}личная</span>
+                    <span class="label label-primary">{{ scopeLock|raw }}личная</span>
                 {% endif %}
 
                 {% set severityLock = association.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}

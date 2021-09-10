@@ -40,7 +40,7 @@
                 {% elseif word.isCommon %}
                     <span class="label label-success"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общее</span>
                 {% else %}
-                    <span class="label label-info">{{ scopeLock|raw }}личное</span>
+                    <span class="label label-primary">{{ scopeLock|raw }}личное</span>
                 {% endif %}
 
                 {% set severityLock = word.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}
