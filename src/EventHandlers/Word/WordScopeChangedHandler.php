@@ -3,7 +3,6 @@
 namespace App\EventHandlers\Word;
 
 use App\Events\Word\WordScopeChangedEvent;
-use App\Models\Association;
 use App\Services\AssociationRecountService;
 
 /**
@@ -20,12 +19,8 @@ class WordScopeChangedHandler
 
     public function __invoke(WordScopeChangedEvent $event) : void
     {
-        $event
-            ->getWord()
-            ->associations()
-            ->apply(
-                fn (Association $a) =>
-                    $this->associationRecountService->recountAll($a, $event)
-            );
+        $word = $event->getWord();
+
+        $this->associationRecountService->recountByWord($word, $event);
     }
 }

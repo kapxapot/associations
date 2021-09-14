@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Events\Word\WordCorrectedEvent;
 use App\Events\Word\WordScopeChangedEvent;
 use App\Events\Word\WordSeverityChangedEvent;
+use App\Models\Association;
 use App\Models\Word;
 use App\Models\WordRelation;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
@@ -58,6 +59,18 @@ class WordRecountService
         $word = $this->recountCorrectedWord($word, $sourceEvent);
 
         return $word;
+    }
+
+    /**
+     * Recounts all dependent words of the word.
+     */
+    public function recountDependents(Word $word, ?Event $sourceEvent = null): void
+    {
+        $word
+            ->dependents()
+            ->apply(
+                fn (Word $w) => $this->recountAll($w, $sourceEvent)
+            );
     }
 
     public function recountScope(Word $word, ?Event $sourceEvent = null): Word

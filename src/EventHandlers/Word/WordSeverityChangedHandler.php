@@ -3,8 +3,6 @@
 namespace App\EventHandlers\Word;
 
 use App\Events\Word\WordSeverityChangedEvent;
-use App\Models\Association;
-use App\Models\Word;
 use App\Services\AssociationRecountService;
 use App\Services\WordRecountService;
 
@@ -30,17 +28,7 @@ class WordSeverityChangedHandler
     {
         $word = $event->getWord();
 
-        $word
-            ->associations()
-            ->apply(
-                fn (Association $a) =>
-                    $this->associationRecountService->recountAll($a, $event)
-            );
-
-        $word
-            ->dependents()
-            ->apply(
-                fn (Word $w) => $this->wordRecountService->recountAll($w, $event)
-            );
+        $this->associationRecountService->recountByWord($word, $event);
+        $this->wordRecountService->recountDependents($word, $event);
     }
 }

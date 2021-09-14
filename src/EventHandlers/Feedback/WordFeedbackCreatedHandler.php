@@ -3,7 +3,6 @@
 namespace App\EventHandlers\Feedback;
 
 use App\Events\Feedback\WordFeedbackCreatedEvent;
-use App\Models\Word;
 use App\Services\WordRecountService;
 
 /**
@@ -23,11 +22,5 @@ class WordFeedbackCreatedHandler
         $word = $event->getFeedback()->word();
 
         $this->wordRecountService->recountAll($word, $event);
-
-        $word
-            ->dependents()
-            ->apply(
-                fn (Word $w) => $this->wordRecountService->recountAll($w, $event)
-            );
     }
 }

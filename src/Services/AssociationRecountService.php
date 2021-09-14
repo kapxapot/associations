@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Events\Association\AssociationScopeChangedEvent;
 use App\Events\Association\AssociationSeverityChangedEvent;
 use App\Models\Association;
+use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Specifications\AssociationSpecification;
 use Plasticode\Events\Event;
@@ -44,6 +45,18 @@ class AssociationRecountService
         $assoc = $this->recountScope($association, $sourceEvent);
 
         return $assoc;
+    }
+
+    /**
+     * Recounts all associations of the word.
+     */
+    public function recountByWord(Word $word, ?Event $sourceEvent = null): void
+    {
+        $word
+            ->associations()
+            ->apply(
+                fn (Association $a) => $this->recountAll($a, $sourceEvent)
+            );
     }
 
     public function recountScope(

@@ -3,7 +3,6 @@
 namespace App\EventHandlers\Override;
 
 use App\Events\Override\WordOverrideCreatedEvent;
-use App\Models\Association;
 use App\Services\AssociationRecountService;
 use App\Services\WordRecountService;
 
@@ -29,12 +28,7 @@ class WordOverrideCreatedHandler
         $word = $event->getWordOverride()->word();
 
         $this->wordRecountService->recountAll($word, $event);
-
-        $word
-            ->associations()
-            ->apply(
-                fn (Association $a) =>
-                    $this->associationRecountService->recountAll($a, $event)
-            );
+        $this->associationRecountService->recountByWord($word, $event);
+        $this->wordRecountService->recountDependents($word, $event);
     }
 }

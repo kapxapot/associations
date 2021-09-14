@@ -3,7 +3,6 @@
 namespace App\EventHandlers\Word;
 
 use App\Events\Word\WordRelationsChangedEvent;
-use App\Models\Association;
 use App\Services\AssociationRecountService;
 use App\Services\WordRecountService;
 
@@ -29,12 +28,6 @@ class WordRelationsChangedHandler
         $word = $event->getWord();
 
         $this->wordRecountService->recountAll($word, $event);
-
-        $word
-            ->associations()
-            ->apply(
-                fn (Association $a) =>
-                    $this->associationRecountService->recountAll($a, $event)
-            );
+        $this->associationRecountService->recountByWord($word, $event);
     }
 }
