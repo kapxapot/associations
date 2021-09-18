@@ -49,6 +49,8 @@ class LocalizationConfig extends BaseConfig
                 'Phonetic typo' => 'Фонетическая опечатка',
                 'Translation' => 'Перевод',
                 'Localization' => 'Локализация',
+                'Duplicate' => 'Дубль',
+                'Prepositional phrase' => 'Предложная фраза',
 
                 'Word:disabled' => 'отключено',
                 'Word:inactive' => 'неактивное',
