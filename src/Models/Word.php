@@ -576,7 +576,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      */
     public function relatedCanonicalWords(): WordCollection
     {
-        return $this->relatedWords()->canonical();
+        return $this->relatedWords()->canonical()->distinct();
     }
 
     /**
@@ -584,7 +584,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      */
     public function allRelatedCanonicalWords(): WordCollection
     {
-        return $this->allRelatedWords()->canonical();
+        return $this->allRelatedWords()->canonical()->distinct();
     }
 
     public function wordUpdatedAtIso(): ?string
