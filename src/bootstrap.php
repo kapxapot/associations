@@ -85,7 +85,7 @@ $app->add(new SlashMiddleware());
 $app->add(
     new CookieAuthMiddleware(
         $container->get(AuthService::class),
-        $settings['auth_token_key']
+        $settings['auth_token_key'] ?? null
     )
 );
 
