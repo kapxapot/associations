@@ -30,6 +30,13 @@ a.assoc-arrow {
     text-decoration: none;
 }
 
+span.inactive,
+a.inactive,
+a.inactive:hover,
+a.inactive:focus {
+    color: var(--gray-9);
+}
+
 /* words index */
 
 #words-table_wrapper .dataTables_paginate {

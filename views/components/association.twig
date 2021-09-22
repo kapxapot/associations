@@ -15,6 +15,18 @@
             {% set second = association.getSecondWord %}
         {% endif %}
 
-        {% if not no_link and association.isReal %}<a href="{{ association.url }}"{% if short %} class="assoc-arrow"{% endif %}>{% endif %}{% if not short %}{{ association.isReal ? first.display_name : lm.word(first) }} {% endif %}{{ sign }}{% if not short %} {{ association.isReal ? second.display_name : lm.word(second) }}{% endif %}{% if not no_link %}</a>{% endif %}
+        {% set linkClasses = [] %}
+        {% set textClasses = [] %}
+
+        {% if short %}
+            {% set linkClasses = linkClasses|merge(['assoc-arrow']) %}
+        {% endif %}
+
+        {% if no_link or association.isDisabled %}
+            {% set linkClasses = linkClasses|merge(['inactive']) %}
+            {% set textClasses = textClasses|merge(['inactive']) %}
+        {% endif %}
+
+        {% if not no_link and association.isReal %}<a href="{{ association.url }}"{% if linkClasses|length > 0 %} class="{{ linkClasses|join(' ') }}"{% endif %}>{% else %}<span{% if textClasses|length > 0 %} class="{{ textClasses|join(' ') }}"{% endif %}>{% endif %}{% if not short %}{{ association.isReal ? first.display_name : lm.word(first) }} {% endif %}{{ sign }}{% if not short %} {{ association.isReal ? second.display_name : lm.word(second) }}{% endif %}{% if not no_link and association.isReal %}</a>{% else %}</span>{% endif %}
     {% else %}{{ sign }}{% endif %}
 {% endspaceless %}

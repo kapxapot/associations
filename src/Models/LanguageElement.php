@@ -93,7 +93,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isVisibleFor(?User $user): bool
     {
-        // 1. for fuzzy disabled:
+        // 1. for disabled:
         // 1.1. visible only for those who used them
         // 2. for enabled:
         // 2.1. not mature elements are visible for everyone
@@ -101,7 +101,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
         // 2.3. mature elements are visible for mature users
         // 2.4. mature elements are visible for not mature users only if they used them
 
-        if ($this->isFuzzyDisabled()) {
+        if ($this->isDisabled()) {
             return $this->isUsedBy($user);
         }
 
