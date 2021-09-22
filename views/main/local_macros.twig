@@ -1,4 +1,4 @@
-{% macro association(assoc, by_word = null, no_link = false) %}{% include 'components/association.twig' with { 'association': assoc, 'by_word': by_word, 'no_link': no_link } only %}{% endmacro %}
+{% macro association(assoc, by_word = null, no_link = false, just_text = false) %}{% include 'components/association.twig' with { 'association': assoc, 'by_word': by_word, 'no_link': no_link, 'just_text': just_text } only %}{% endmacro %}
 
 {% macro word(word) %}{% if word.is_visible_for_me %}{% include 'components/word.twig' with { 'word': word } only %}{% else %}слово скрыто{% endif %}{% endmacro %}
 

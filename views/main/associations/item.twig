@@ -6,7 +6,7 @@
 {% set can_see_all_games = can('games', 'read') %}
 {% set is_moderator = can('associations', 'read') %}
 
-{% set title = lm.association(association, null, true)|upper %}
+{% set title = lm.association(association, null, true, true)|upper %}
 
 {% block content %}
     <div class="panel panel-primary">
