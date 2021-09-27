@@ -142,6 +142,11 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     abstract public function feedbackByMe(): ?Feedback;
 
+    public function isDisabledByOverride(): bool
+    {
+        return $this->isDisabled() && $this->hasScopeOverride();
+    }
+
     public function isDisabled(): bool
     {
         return $this->scope == Scope::DISABLED;

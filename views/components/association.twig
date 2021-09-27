@@ -22,7 +22,7 @@
             {% set linkClasses = linkClasses|merge(['assoc-arrow']) %}
         {% endif %}
 
-        {% if no_link or association.isDisabled %}
+        {% if no_link or association.isDisabledByOverride %}
             {% set linkClasses = linkClasses|merge(['inactive']) %}
             {% set textClasses = textClasses|merge(['inactive']) %}
         {% endif %}
