@@ -109,6 +109,14 @@ class Association extends LanguageElement implements AssociationInterface
             : null;
     }
 
+    public function isDisabledByOverride(): bool
+    {
+        return parent::isDisabledByOverride()
+            || $this->words()->any(
+                fn (Word $w) => $w->isDisabledByOverride()
+            );
+    }
+
     public function override(): ?AssociationOverride
     {
         return $this->overrides()->latest();
