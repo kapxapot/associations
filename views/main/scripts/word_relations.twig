@@ -19,7 +19,7 @@ $scope.relationData = {
                 type_id: {{ relation.typeId }},
                 localized_type: "{{ translate(relation.type.name) }}",
                 main_word_id: {{ relation.mainWordId }},
-                main_word: "{{ relation.mainWord.word }}",
+                main_word: "{{ relation.mainWord.word|e('js') }}",
                 primary: {{ relation.isPrimary ? 'true' : 'false' }},
                 updated_at: "{{ relation.updatedAt }}",
                 state: {
