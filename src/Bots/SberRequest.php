@@ -86,6 +86,14 @@ class SberRequest extends AbstractBotRequest
         }
     }
 
+    protected function getTrashTokens(): array
+    {
+        return array_merge(
+            parent::getTrashTokens(),
+            ['салют', 'salute', 'сбер', 'sber']
+        );
+    }
+
     /**
      * @return string[]
      */

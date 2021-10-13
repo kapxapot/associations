@@ -1,7 +1,12 @@
-<div class="sidebar-links flex-wrapper flex-gap-1 mb-3">
-    <div class="flex flex-align-center"><a href="https://t.me/{{ telegram_bot_name }}" class="mr-1"><i class="fab fa-telegram-plane fa-2x"></i></a><a href="https://t.me/{{ telegram_bot_name }}">Играть в Telegram</a></div>
-    <div class="flex flex-align-center"><a href="{{ alice_url }}" class="mr-1">{% include 'svg/alice.twig' %}</a><a href="{{ alice_url }}">Играть в Яндекс.Алисе</a></div>
-    <div class="flex flex-align-center"><a href="{{ sber_url }}" class="mr-1">{% include 'svg/sber.twig' %}</a><a href="{{ sber_url }}">Играть в SmartMarket (Сбер)</a></div>
+<div class="panel panel-secondary">
+    <div class="panel-body center">
+        <div class="mb-2">Играть с ботами:</div>
+        <div class="sidebar-links flex-container flex-jc-center flex-gap-2">
+            <a href="https://t.me/{{ telegram_bot_name }}" class="mr-1" title="Играть в Telegram"><i class="fab fa-telegram-plane fa-2x"></i></a>
+            <a href="{{ alice_url }}" class="mr-1" title="Играть в Яндекс.Алисе">{% include 'svg/alice.twig' %}</a>
+            <a href="{{ sber_url }}" class="mr-1" title="Играть в SmartMarket (Сбер)">{% include 'svg/sber.twig' %}</a>
+        </div>
+    </div>
 </div>
 
 {% include 'main/includes/sidebar/language.twig' %}
