@@ -144,7 +144,8 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isDisabledByOverride(): bool
     {
-        return $this->isDisabled() && $this->hasScopeOverride();
+        return $this->isDisabled()
+            && $this->hasScopeOverride();
     }
 
     public function isDisabled(): bool
