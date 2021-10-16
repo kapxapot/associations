@@ -51,6 +51,8 @@ class LocalizationConfig extends BaseConfig
                 'Localization' => 'Локализация',
                 'Duplicate' => 'Дубль',
                 'Prepositional phrase' => 'Предложная фраза',
+                'Acronym' => 'Сокращение',
+                'Augmentative form' => 'Увеличительное',
 
                 'Word:disabled' => 'отключено',
                 'Word:inactive' => 'неактивное',
