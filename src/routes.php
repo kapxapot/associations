@@ -3,6 +3,7 @@
 use App\Controllers\AliceBotController;
 use App\Controllers\AssociationController;
 use App\Controllers\AssociationOverrideController;
+use App\Controllers\AssociationRecountController;
 use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
 use App\Controllers\IndexController;
@@ -17,6 +18,7 @@ use App\Controllers\TelegramBotController;
 use App\Controllers\TurnController;
 use App\Controllers\WordController;
 use App\Controllers\WordOverrideController;
+use App\Controllers\WordRecountController;
 use Brightwood\Controllers\BrightwoodBotController;
 use Brightwood\Controllers\CardsTestController;
 use Brightwood\Controllers\EightsTestController;
@@ -154,39 +156,49 @@ $app->group(
             '/actions',
             function () {
                 $this->post(
-                    '/game/start',
+                    '/games/start',
                     GameController::class . ':start'
                 )->setName('actions.game.start');
 
                 $this->post(
-                    '/game/finish',
+                    '/games/finish',
                     GameController::class . ':finish'
                 )->setName('actions.game.finish');
 
                 $this->post(
-                    '/turn/create',
+                    '/turns/create',
                     TurnController::class . ':create'
                 )->setName('actions.turn.create');
 
                 $this->post(
-                    '/turn/skip',
+                    '/turns/skip',
                     TurnController::class . ':skip'
                 )->setName('actions.turn.skip');
 
                 $this->post(
-                    '/feedback',
+                    '/feedbacks',
                     FeedbackController::class
                 )->setName('actions.feedback');
 
                 $this->post(
-                    '/association/override',
+                    '/associations/override',
                     AssociationOverrideController::class
                 )->setName('actions.association.override');
 
                 $this->post(
-                    '/word/override',
+                    '/associations/{id:\d+}/recount',
+                    AssociationRecountController::class
+                )->setName('actions.association.recount');
+
+                $this->post(
+                    '/words/override',
                     WordOverrideController::class
                 )->setName('actions.word.override');
+
+                $this->post(
+                    '/words/{id:\d+}/recount',
+                    WordRecountController::class
+                )->setName('actions.word.recount');
             }
         )->add(
             new TokenAuthMiddleware(

@@ -167,6 +167,8 @@
                         <button ng-click="overrideDialog()" class="btn btn-default ml-2"><i class="fas fa-wrench mr-1"></i> Исправить</button>
 
                         <button ng-click="relationsDialog()" class="btn btn-default ml-2"><i class="fas fa-link action-color mr-1"></i> Связи</button>
+
+                        <button ng-click="recount()" class="btn btn-default ml-2"><i class="fas fa-sync-alt dendro-color mr-1"></i> Пересчитать</button>
                     {% endif %}
                 </div>
             {% endif %}
@@ -381,6 +383,14 @@
         {% if is_moderator %}
             {% include 'main/scripts/word_override.twig' %}
             {% include 'main/scripts/word_relations.twig' %}
+
+            $scope.recount = () => {
+                $scope.ajax({
+                    url: '{{ path_for('actions.word.recount', { 'id': word.id }) }}',
+                    onSuccess: $scope.postSuccess,
+                    noSuccessMessage: true
+                });
+            };
         {% endif %}
     {% endset %}
 {% endif %}
