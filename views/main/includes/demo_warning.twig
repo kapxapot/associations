@@ -1,25 +1,33 @@
-<p><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Игра идет в <strong>демо-режиме</strong>.</p>
+<p><i class="fas fa-exclamation-triangle danger-color mr-0-5"></i> Игра идет в <strong>демо-режиме</strong>.</p>
 
 <p>Полная версия <strong>Ассоциаций</strong> доступна после <a href="javascript:void(0);" ng-click="signUp()">регистрации</a> на сайте или при игре с 🤖 ботами:</p>
-<ul>
-    <li><a href="https://t.me/{{ telegram_bot_name }}" class="nowrap"><i class="fab fa-telegram-plane telegram-color"></i> Telegram</a></li>
-    <li><a href="{{ alice_url }}" class="alice-inline nowrap">{% include 'svg/alice.twig' %} Яндекс.Алиса</a></li>
-    <li><a href="{{ sber_url }}" class="sber-inline nowrap">{% include 'svg/sber.twig' %} SmartMarket (Сбер)</a></li>
-</ul>
+
+<div class="large-inline flex flex-jc-center flex-gap-4 mt-3 mb-3">
+    <div class="flex flex-v flex-jc-between flex-ai-center">
+        <a href="https://t.me/{{ telegram_bot_name }}" class="no-under"><i class="fab fa-telegram-plane fa-2x"></i></a>
+        <a href="https://t.me/{{ telegram_bot_name }}">Telegram</a>
+    </div>
+    <div class="flex flex-v flex-jc-between flex-ai-center">
+        <a href="{{ alice_url }}" class="no-under">{% include 'svg/alice.twig' %}</a>
+        <a href="{{ alice_url }}">Яндекс.Алиса</a>
+    </div>
+    <div class="flex flex-v flex-jc-between flex-ai-center">
+        <a href="{{ sber_url }}" class="no-under">{% include 'svg/sber.twig' %}</a>
+        <a href="{{ sber_url }}">SmartMarket (Сбер)</a>
+    </div>
+</div>
 
 {% set c_id = 'collapse-why-register' %}
 
-<a role="button" data-toggle="collapse" href="#{{ c_id }}" aria-expanded="false" aria-controls="{{ c_id }}">
-    В чем разница?
-</a>
+<i class="fas fa-info-circle mr-0-5"></i> <a role="button" data-toggle="collapse" href="#{{ c_id }}" aria-expanded="false" aria-controls="{{ c_id }}">В чем разница?</a>
+
 <div class="collapse mt-2" id="{{ c_id }}">
-    <p>После регистрации вы получите следующие преимущества:</p>
+    <p>Полная версия игры имеет следующие отличия:</p>
 
     <div class="ml-3 mb-2">
         <p><i class="fas fa-check success-color mr-1"></i> Состояние вашей игры, ее ход и история всех игр будут храниться на сервере.</p>
         <p><i class="fas fa-check success-color mr-1"></i> Система будет учиться на ваших играх и будет использовать ваши слова и ассоциации (<a href="{{ path_for('main.page', { 'slug': 'mechanics' }) }}">как это работает</a>).</p>
         <p><i class="fas fa-check success-color mr-1"></i> Вы сможете выражать свое мнение о конкретных словах и ассоциациях, например, отмечать, какие из них вам не нравятся.</p>
+        <p><i class="fas fa-exclamation-triangle danger-color mr-1"></i> При игре на сайте и в Telegram используется также и <strong>взрослая лексика</strong> (для взрослых игроков).</p>
     </div>
-
-    <div><i class="fas fa-exclamation-triangle danger-color mr-1"></i> При игре на сайте и в Telegram используется также и <strong>взрослая лексика</strong> (для взрослых игроков).</div>
 </div>

@@ -1,12 +1,4 @@
-<div class="panel panel-secondary">
-    <div class="panel-body center">
-        <div class="mb-2">Играть с 🤖 ботами:</div>
-        <div class="sidebar-links flex-container flex-jc-center flex-gap-2">
-            <a href="https://t.me/{{ telegram_bot_name }}" class="mr-1" title="Играть в Telegram"><i class="fab fa-telegram-plane fa-2x"></i></a>
-            <a href="{{ alice_url }}" class="mr-1" title="Играть в Яндекс.Алисе">{% include 'svg/alice.twig' %}</a>
-            <a href="{{ sber_url }}" class="mr-1" title="Играть в SmartMarket (Сбер)">{% include 'svg/sber.twig' %}</a>
-        </div>
-    </div>
-</div>
-
+{% if not index or auth.user %}
+    {% include 'main/includes/sidebar/bots.twig' %}
+{% endif %}
 {% include 'main/includes/sidebar/language.twig' %}

@@ -176,12 +176,17 @@ a.inactive:focus {
     margin-bottom: -6px;
 }
 
-/* sidebar */
+/* img/svg */
 
+.large-inline svg,
 .sidebar-links img,
 .sidebar-links svg {
     width: 32px;
     height: 32px;
+}
+
+.sidebar-links img,
+.sidebar-links svg {
     vertical-align: middle;
 }
 
