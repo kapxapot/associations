@@ -303,7 +303,7 @@ class UserAnswerer extends AbstractAnswerer
 
         return $this->currentGameResponse(
             $botUser,
-            Sentence::tailPeriod($definition),
+            Sentence::terminate($definition),
             'Итак, я говорю:'
         );
     }

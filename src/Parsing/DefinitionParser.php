@@ -136,7 +136,7 @@ class DefinitionParser
             $def
         );
 
-        return Sentence::tailPeriod($def);
+        return Sentence::terminate($def);
     }
 
     private function parsePartOfSpeech(Language $language, ?string $posText): ?PartOfSpeech
