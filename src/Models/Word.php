@@ -330,7 +330,11 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         }
 
         // dirty hack!
-        if ($this->me()->policy()->canSeeAllGames() && $this->hasDifferentOriginalUtterance()) {
+        $policy = $this->me()
+            ? $this->me()->policy()
+            : null;
+
+        if ($policy && $policy->canSeeAllGames() && $this->hasDifferentOriginalUtterance()) {
             $name .= ' {' . $this->originalUtterance . '}';
         }
 
