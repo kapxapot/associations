@@ -2,6 +2,7 @@
 
 namespace App\Models\DTO;
 
+use App\Models\Association;
 use App\Models\Interfaces\AssociationInterface;
 use App\Models\Word;
 
@@ -32,5 +33,10 @@ class EtherealAssociation implements AssociationInterface
     public function isReal(): bool
     {
         return false;
+    }
+
+    public function toReal(): ?Association
+    {
+        return null;
     }
 }

@@ -219,6 +219,11 @@ class Association extends LanguageElement implements AssociationInterface
         return $this->isPersisted();
     }
 
+    public function toReal(): ?Association
+    {
+        return $this;
+    }
+
     // serialization
 
     public function serialize(): array

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Semantics;
+namespace App\Semantics\Word;
 
 class Tokenizer
 {

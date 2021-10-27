@@ -68,4 +68,9 @@ class TurnCollection extends DbModelCollection
                 fn (Turn $t) => $t->user()->getId()
             );
     }
+
+    public function firstAiTurn(): ?Turn
+    {
+        return $this->skip(1)->first();
+    }
 }

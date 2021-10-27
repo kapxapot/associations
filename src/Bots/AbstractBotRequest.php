@@ -2,7 +2,7 @@
 
 namespace App\Bots;
 
-use App\Semantics\Tokenizer;
+use App\Semantics\Word\Tokenizer;
 use Plasticode\Semantics\Attitude;
 use Plasticode\Semantics\Gender;
 
@@ -16,6 +16,8 @@ abstract class AbstractBotRequest
     protected ?string $userId;
 
     protected bool $isNewSession;
+
+    protected ?string $originalUtterance;
 
     protected ?string $originalCommand;
 
@@ -66,6 +68,11 @@ abstract class AbstractBotRequest
     public function isNewSession(): bool
     {
         return $this->isNewSession;
+    }
+
+    public function originalUtterance(): ?string
+    {
+        return $this->originalUtterance;
     }
 
     /**

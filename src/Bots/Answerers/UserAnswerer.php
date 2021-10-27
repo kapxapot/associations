@@ -10,7 +10,8 @@ use App\Models\AbstractBotUser;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\Word;
-use App\Semantics\Tokenizer;
+use App\Semantics\Word\Tokenizer;
+use App\Semantics\Word\WordCleaner;
 use App\Services\AssociationFeedbackService;
 use App\Services\GameService;
 use App\Services\LanguageService;
@@ -30,7 +31,7 @@ class UserAnswerer extends AbstractAnswerer
     use LoggerAwareTrait;
 
     private const MAX_TOKENS = 3;
-    public const WORD_LIMIT = 'трёх слов';
+    public const WORD_LIMIT = 'трёх слов'; // todo: refactor this
 
     private AssociationFeedbackService $associationFeedbackService;
     private GameService $gameService;
@@ -38,8 +39,7 @@ class UserAnswerer extends AbstractAnswerer
     private WordFeedbackService $wordFeedbackService;
 
     private TranslatorInterface $translator;
-
-    private Tokenizer $tokenizer;
+    private WordCleaner $wordCleaner;
 
     public function __construct(
         AssociationFeedbackService $associationFeedbackService,
@@ -48,7 +48,8 @@ class UserAnswerer extends AbstractAnswerer
         TurnService $turnService,
         WordFeedbackService $wordFeedbackService,
         TranslatorInterface $translator,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        WordCleaner $wordCleaner
     )
     {
         parent::__construct($languageService);
@@ -59,10 +60,9 @@ class UserAnswerer extends AbstractAnswerer
         $this->wordFeedbackService = $wordFeedbackService;
 
         $this->translator = $translator;
+        $this->wordCleaner = $wordCleaner;
 
         $this->logger = $logger;
-
-        $this->tokenizer = new Tokenizer();
     }
 
     public function getResponse(
@@ -173,7 +173,7 @@ class UserAnswerer extends AbstractAnswerer
             return $this->tooManyWords($botUser);
         }
 
-        return $this->sayWord($botUser, $command);
+        return $this->sayWord($botUser, $command, $request->originalUtterance());
     }
 
     private function startCommand(
@@ -228,7 +228,7 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         if ($this->isPlayCommand($request)) {
-            return $this->sayWord($botUser, $commandToConfirm);
+            return $this->sayWord($botUser, $commandToConfirm, $request->originalUtterance());
         }
 
         return $this->confirmCommand($commandToConfirm, self::MESSAGE_CLUELESS);
@@ -396,21 +396,19 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function sayWord(AbstractBotUser $botUser, string $question): BotResponse
+    private function sayWord(
+        AbstractBotUser $botUser,
+        string $wordStr,
+        string $originalUtterance
+    ): BotResponse
     {
         $user = $botUser->user();
         $game = $this->getGame($botUser);
 
-        $prevWord = $game->lastTurnWord();
-
-        if ($prevWord !== null) {
-            $question = $this->purgeWord($question, $prevWord->word);
-        }
-
-        $question = $this->deduplicate($question);
+        $wordStr = $this->wordCleaner->clean($wordStr, $game);
 
         try {
-            $turns = $this->gameService->makeTurn($user, $game, $question);
+            $turns = $this->gameService->makeTurn($user, $game, $wordStr, $originalUtterance);
         } catch (ValidationException $vEx) {
             return $this
                 ->buildResponse(
@@ -431,17 +429,16 @@ class UserAnswerer extends AbstractAnswerer
 
         $answerParts = [];
 
-        $questionWord = $this->findWord($question);
+        $word = $this->findWord($wordStr);
 
-        $isMatureQuestion = $questionWord !== null && $questionWord->isMature();
-
-        if ($isMatureQuestion) {
+        if ($word && $word->isMature()) {
             $answerParts[] = $this->matureWordMessage();
         }
 
         if ($turns->count() > 1) {
             // continuing current game
-            $answerParts[] = $this->renderAiTurn($turns->skip(1)->first());
+            $aiTurn = $turns->firstAiTurn();
+            $answerParts[] = $this->renderAiTurn($aiTurn);
 
             return $this
                 ->buildResponse($answerParts)
@@ -458,60 +455,6 @@ class UserAnswerer extends AbstractAnswerer
             $botUser,
             ...$answerParts
         );
-    }
-
-    /**
-     * Removes the previous word from the question if it is contained there.
-     */
-    private function purgeWord(string $question, string $prevWord): string
-    {
-        $tokens = $this->tokenizer->tokenize($question);
-        $prevWordTokens = $this->tokenizer->tokenize($prevWord);
-
-        $filteredTokens = array_filter(
-            $tokens,
-            fn (string $token) => !in_array($token, $prevWordTokens)
-        );
-
-        if (empty($filteredTokens)) {
-            return $question;
-        }
-
-        return $this->tokenizer->join($filteredTokens);
-    }
-
-    /**
-     * Converts 'word word' to 'word' for known words.
-     */
-    private function deduplicate(string $question): string
-    {
-        $tokens = $this->tokenizer->tokenize($question);
-
-        $originalCount = count($tokens);
-
-        if ($originalCount <= 1) {
-            return $question;
-        }
-
-        $deduplicatedTokens = array_unique($tokens);
-
-        if (count($deduplicatedTokens) !== 1) {
-            return $question;
-        }
-
-        $originalWord = $this->findWord($question);
-
-        if ($originalWord !== null) {
-            return $question;
-        }
-
-        $deduplicatedCandidate = $deduplicatedTokens[0];
-
-        $deduplicatedWord = $this->findWord($deduplicatedCandidate);
-
-        return $deduplicatedWord !== null
-            ? $deduplicatedWord->word
-            : $question;
     }
 
     private function finishGameFor(AbstractBotUser $botUser): void

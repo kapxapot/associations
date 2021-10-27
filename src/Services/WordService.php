@@ -72,13 +72,14 @@ class WordService
      * Normalized word string expected.
      */
     public function getOrCreate(
+        User $user,
         Language $language,
         string $wordStr,
-        User $user
+        ?string $originalUtterance = null
     ): Word
     {
         $word = $this->wordRepository->findInLanguage($language, $wordStr)
-            ?? $this->create($language, $wordStr, $user);
+            ?? $this->create($user, $language, $wordStr, $originalUtterance);
 
         if ($word === null) {
             throw new InvalidResultException(
@@ -86,11 +87,7 @@ class WordService
             );
         }
 
-        if ($word->shouldUseCanonical()) {
-            $word = $word->canonical();
-        }
-
-        return $word;
+        return $word->preferCanonical();
     }
 
     public function normalize(?string $word): ?string
@@ -108,7 +105,12 @@ class WordService
      * Two users can add the same word in parallel
      * !!!!!!!!!!!!!!!!!!!
      */
-    public function create(Language $language, string $wordStr, User $user): Word
+    public function create(
+        User $user,
+        Language $language,
+        string $wordStr,
+        ?string $originalUtterance = null
+    ): Word
     {
         Assert::notNull($language, 'Language must be non-null.');
         Assert::notEmpty($wordStr, 'Word can\'t be empty.');
@@ -129,6 +131,7 @@ class WordService
                 [
                     'language_id' => $language->getId(),
                     'word' => $wordStr,
+                    'original_utterance' => $originalUtterance,
                     'created_by' => $user->getId(),
                 ]
             );

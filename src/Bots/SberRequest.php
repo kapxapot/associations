@@ -45,6 +45,7 @@ class SberRequest extends AbstractBotRequest
 
         $this->originalCommand = $message['original_text'] ?? null;
         $this->originalTokens = $this->getOriginalTokens($message);
+        $this->originalUtterance = $this->originalCommand;
 
         $isServerAction = ($messageName === self::SERVER_ACTION);
 

@@ -2,7 +2,7 @@
 
 namespace App\Tests\Semantics;
 
-use App\Semantics\Tokenizer;
+use App\Semantics\Word\Tokenizer;
 use PHPUnit\Framework\TestCase;
 
 class TokenizerTest extends TestCase

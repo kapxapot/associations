@@ -68,22 +68,27 @@ class TurnService
     /**
      * Returns new player turn and AI turn/answer if it happens.
      */
-    public function newPlayerTurn(Game $game, Word $word, User $user): TurnCollection
+    public function newPlayerTurn(
+        User $user,
+        Game $game,
+        Word $word,
+        ?string $originalUtterance = null
+    ): TurnCollection
     {
-        $turn = $this->newTurn($game, $word, $user);
+        $turn = $this->newTurn($game, $word, $user, $originalUtterance);
 
         $event = new TurnCreatedEvent($turn);
         $this->eventDispatcher->dispatch($event);
 
-        $turns = [$turn];
+        $turns = TurnCollection::collect($turn);
 
         $aiTurn = $this->processPlayerTurn($turn);
 
         if ($aiTurn) {
-            $turns[] = $aiTurn;
+            $turns = $turns->add($aiTurn);
         }
 
-        return TurnCollection::make($turns);
+        return $turns;
     }
 
     public function newAiTurn(Game $game, Word $word): Turn
@@ -95,7 +100,12 @@ class TurnService
         return $turn;
     }
 
-    private function newTurn(Game $game, Word $word, ?User $user = null): Turn
+    private function newTurn(
+        Game $game,
+        Word $word,
+        ?User $user = null,
+        ?string $originalUtterance = null
+    ): Turn
     {
         $language = $game->language();
 
@@ -103,6 +113,7 @@ class TurnService
 
         $turn->gameId = $game->getId();
         $turn->languageId = $language->getId();
+        $turn->originalUtterance = $originalUtterance;
 
         if ($user) {
             $turn->userId = $user->getId();
@@ -123,7 +134,9 @@ class TurnService
                 $language
             );
 
-            $turn->associationId = $association->getId();
+            if ($association->isReal()) {
+                $turn->associationId = $association->toReal()->getId();
+            }
         }
 
         $turn = $this->turnRepository->save($turn);

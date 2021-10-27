@@ -2,6 +2,7 @@
 
 namespace App\Models\Interfaces;
 
+use App\Models\Association;
 use App\Models\Word;
 
 interface AssociationInterface
@@ -11,4 +12,6 @@ interface AssociationInterface
     public function getSecondWord(): Word;
 
     public function isReal(): bool;
+
+    public function toReal(): ?Association;
 }

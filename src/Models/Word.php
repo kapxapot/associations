@@ -16,6 +16,7 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
 
 /**
  * @property integer|null $mainId
+ * @property string|null $originalUtterance
  * @property string|null $originalWord
  * @property string $word
  * @property string|null $wordUpdatedAt
@@ -388,6 +389,16 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
+     * Returns canonical if the word is "bad", otherwise returns the word itself.
+     */
+    public function preferCanonical(): self
+    {
+        return $this->shouldUseCanonical()
+            ? $this->canonical()
+            : $this;
+    }
+
+    /**
      * Checks if the word is "bad" and the canonical word must be used instead.
      */
     public function shouldUseCanonical(): bool
@@ -399,7 +410,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Checks if the words have the same canonical word.
      */
-    public function canonicalEquals(Word $word): bool
+    public function canonicalEquals(self $word): bool
     {
         return $this->canonical()->equals(
             $word->canonical()

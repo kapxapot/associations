@@ -7,12 +7,13 @@ use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Traits\CreatedAt;
 
 /**
+ * @property integer|null $associationId
  * @property integer $gameId
  * @property integer $languageId
- * @property integer $wordId
- * @property integer|null $userId
- * @property integer|null $associationId
+ * @property string|null $originalUtterance
  * @property integer|null $prevTurnId
+ * @property integer|null $userId
+ * @property integer $wordId
  * @method Association|null association()
  * @method Game game()
  * @method static|null prev()

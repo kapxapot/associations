@@ -5,6 +5,8 @@ namespace App\Services;
 use App\Collections\WordCollection;
 use App\Events\Association\AssociationCreatedEvent;
 use App\Models\Association;
+use App\Models\DTO\EtherealAssociation;
+use App\Models\Interfaces\AssociationInterface;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
@@ -36,17 +38,19 @@ class AssociationService
     public function getOrCreate(
         Word $first,
         Word $second,
-        User $user = null,
-        Language $language = null
-    ): Association
+        ?User $user = null,
+        ?Language $language = null
+    ): AssociationInterface
     {
-        $association =
-            $this->getByPair($first, $second, $language)
-            ?? $this->create($first, $second, $user, $language);
+        $association = $this->getByPair($first, $second, $language)
+            ?? ($user !== null
+                ? $this->create($first, $second, $user, $language)
+                : new EtherealAssociation($first, $second)
+            );
 
-        if (is_null($association)) {
+        if ($association === null) {
             throw new InvalidResultException(
-                'Association can\'t be found or added.'
+                'Association can\'t be found or created.'
             );
         }
 
@@ -54,8 +58,8 @@ class AssociationService
     }
 
     /**
-     * Creates association
-     * 
+     * Creates association.
+     *
      * !!!!!!!!!!!!!!!!!!!!!!!
      * Potential problem here:
      *  association can be created by another user
@@ -81,14 +85,12 @@ class AssociationService
 
         $association = $this
             ->associationRepository
-            ->store(
-                [
-                    'first_word_id' => $first->getId(),
-                    'second_word_id' => $second->getId(),
-                    'created_by' => $user->getId(),
-                    'language_id' => $language ? $language->getId() : null
-                ]
-            );
+            ->store([
+                'first_word_id' => $first->getId(),
+                'second_word_id' => $second->getId(),
+                'created_by' => $user->getId(),
+                'language_id' => $language ? $language->getId() : null
+            ]);
 
         $this->eventDispatcher->dispatch(
             new AssociationCreatedEvent($association)

@@ -102,11 +102,16 @@ class GameService
     /**
      * User says a word in the game (makes a turn).
      * The result is the user's turn and AI's turn (if the AI has something to say).
-     * 
+     *
      * @throws ValidationException
      * @throws TurnException
      */
-    public function makeTurn(User $user, Game $game, ?string $wordStr): TurnCollection
+    public function makeTurn(
+        User $user,
+        Game $game,
+        ?string $wordStr,
+        ?string $originalUtterance = null
+    ): TurnCollection
     {
         $language = $game->language();
 
@@ -116,10 +121,10 @@ class GameService
         $this->turnService->validatePlayerTurn($game, $wordStr);
 
         // get or CREATE word
-        $word = $this->wordService->getOrCreate($language, $wordStr, $user);
+        $word = $this->wordService->getOrCreate($user, $language, $wordStr, $originalUtterance);
 
         // new turn (+ AI's potential answer)
-        $turns = $this->turnService->newPlayerTurn($game, $word, $user);
+        $turns = $this->turnService->newPlayerTurn($user, $game, $word, $originalUtterance);
 
         Assert::minCount($turns, 1);
 
