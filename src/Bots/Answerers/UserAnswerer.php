@@ -10,7 +10,6 @@ use App\Models\AbstractBotUser;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\Word;
-use App\Semantics\Word\Tokenizer;
 use App\Semantics\Word\WordCleaner;
 use App\Services\AssociationFeedbackService;
 use App\Services\GameService;
@@ -405,7 +404,16 @@ class UserAnswerer extends AbstractAnswerer
         $user = $botUser->user();
         $game = $this->getGame($botUser);
 
-        $wordStr = $this->wordCleaner->clean($wordStr, $game);
+        // 1. try to find a word by original utterance
+        // 2. otherwise look for a word by word string
+        $word = $this->findWord($originalUtterance);
+
+        if ($word) {
+            $wordStr = $originalUtterance;
+        } else {
+            $wordStr = $this->wordCleaner->clean($wordStr, $game);
+            $word = $this->findWord($wordStr);
+        }
 
         try {
             $turns = $this->gameService->makeTurn($user, $game, $wordStr, $originalUtterance);
@@ -428,8 +436,6 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         $answerParts = [];
-
-        $word = $this->findWord($wordStr);
 
         if ($word && $word->isMature()) {
             $answerParts[] = $this->matureWordMessage();

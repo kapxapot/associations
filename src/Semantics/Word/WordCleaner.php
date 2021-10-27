@@ -21,6 +21,9 @@ class WordCleaner
         $this->tokenizer = $tokenizer;
     }
 
+    /**
+     * Purges the prev word and deduplicates the word.
+     */
     public function clean(string $wordStr, Game $game): string
     {
         $prevWord = $game->lastTurnWord();

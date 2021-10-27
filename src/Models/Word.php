@@ -329,6 +329,11 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             $name .= ' (' . $this->word . ')';
         }
 
+        // dirty hack!
+        if ($this->me()->policy()->canSeeAllGames() && $this->hasDifferentOriginalUtterance()) {
+            $name .= ' {' . $this->originalUtterance . '}';
+        }
+
         return $name;
     }
 
@@ -607,6 +612,12 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     public function wordUpdatedAtIso(): ?string
     {
         return self::toIso($this->wordUpdatedAt);
+    }
+
+    public function hasDifferentOriginalUtterance(): bool
+    {
+        return $this->originalUtterance !== null
+            && $this->originalUtterance !== $this->word;
     }
 
     // serialization

@@ -6,5 +6,5 @@
     {% if not loop.first %}
         {% include 'components/association.twig' with { 'association': turn.association, 'short': true } only %}
     {% endif %}
-    {% include 'components/turn_word.twig' with { 'turn': turn } only %}
+    {% include 'components/turn_word.twig' with { 'turn': turn, 'show_utterance': show_utterance } only %}
 {% endfor %}

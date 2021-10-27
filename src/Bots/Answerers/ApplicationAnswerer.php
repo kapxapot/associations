@@ -84,7 +84,7 @@ class ApplicationAnswerer extends AbstractAnswerer
             );
         }
 
-        $turn = $this->getWordFor($question, $prevWord);
+        $turn = $this->getWordFor($request, $prevWord);
 
         return $this->turnToAnswer($request, $turn);
     }
@@ -151,17 +151,18 @@ class ApplicationAnswerer extends AbstractAnswerer
         return $response;
     }
 
-    private function getWordFor(?string $question, ?Word $prevWord): PseudoTurn
+    private function getWordFor(AbstractBotRequest $request, ?Word $prevWord): PseudoTurn
     {
-        $word = $this->findWord($question);
+        $word = $this->findWord($request->originalUtterance())
+            ?? $this->findWord($request->command());
 
         $game = $this->gameService->buildEtherealGame($prevWord, $word);
 
-        $answer = $word !== null
+        $answer = $word
             ? $this->turnService->findAnswer($game, $word)
             : null;
 
-        $answerAssociation = $answer !== null
+        $answerAssociation = $answer
             ? $this->associationService->getByPair($word, $answer)
             : null;
 

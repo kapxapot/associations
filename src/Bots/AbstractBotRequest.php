@@ -107,7 +107,7 @@ abstract class AbstractBotRequest
         $tokens = $this->filterTokens($tokens, $trashTokens);
 
         // filter semi-trash tokens (but only if there isn't just one semi-trash token)
-        if (count($tokens) == 1 && in_array($tokens[0], $semiTrashTokens)) {
+        if (count($tokens) === 1 && in_array($tokens[0], $semiTrashTokens)) {
             return $tokens;
         }
 

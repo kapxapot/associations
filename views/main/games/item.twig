@@ -3,6 +3,8 @@
 {% import 'macros.twig' as gm %}
 {% import 'main/local_macros.twig' as lm %}
 
+{% set is_moderator = can('games', 'read') %}
+
 {% block content %}
     <div class="panel panel-primary">
         <div class="panel-heading panel-title">
@@ -32,7 +34,7 @@
 
             <p><strong>Ход игры:</strong></p>
 
-            {% include 'components/game_log_inline.twig' with { 'game': game, 'no_game_link': true } only %}
+            {% include 'components/game_log_inline.twig' with { 'game': game, 'no_game_link': true, 'show_utterance': is_moderator } only %}
         </div>
     </div>
 {% endblock %}
