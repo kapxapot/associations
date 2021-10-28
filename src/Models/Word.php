@@ -624,6 +624,11 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             && $this->originalUtterance !== $this->word;
     }
 
+    public function hasDifferentOriginalWord(): bool
+    {
+        return $this->originalWord !== $this->word;
+    }
+
     // serialization
 
     public function serialize(): array

@@ -247,8 +247,14 @@
         <div class="panel-body">
             <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user(word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
 
-            {% if is_moderator and word.hasDifferentOriginalUtterance %}
-                <p>Оригинальное произношение: <strong>{{ word.originalUtterance }}</strong></p>
+            {% if is_moderator %}
+                {% if word.hasDifferentOriginalUtterance %}
+                    <p>Оригинальное произношение: <strong>{{ word.originalUtterance }}</strong></p>
+                {% endif %}
+
+                {% if word.hasDifferentOriginalWord %}
+                    <p>Оригинальное слово: <strong>{{ word.originalWord }}</strong></p>
+                {% endif %}
             {% endif %}
 
             {% if word.origin_chain.any %}
