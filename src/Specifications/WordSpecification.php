@@ -5,22 +5,19 @@ namespace App\Specifications;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Word;
 use App\Models\WordRelation;
+use App\Semantics\PartOfSpeech;
 use App\Semantics\Scope;
 use App\Semantics\Severity;
-use App\Services\WordService;
 
 class WordSpecification
 {
     private WordConfigInterface $config;
-    private WordService $wordService;
 
     public function __construct(
-        WordConfigInterface $config,
-        WordService $wordService
+        WordConfigInterface $config
     )
     {
         $this->config = $config;
-        $this->wordService = $wordService;
     }
 
     public function countScope(Word $word): int
@@ -41,6 +38,36 @@ class WordSpecification
             return Scope::PUBLIC;
         }
 
+        $maxScope = $this->maxScopeByPartsOfSpeech($word);
+
+        return min(Scope::PRIVATE, $maxScope);
+    }
+
+    private function maxScopeByPartsOfSpeech(Word $word): int
+    {
+        $bestPosQuality = $word->partsOfSpeech()->bestQuality();
+
+        return $this->mapPosQualityToMaxScope($bestPosQuality);
+    }
+
+    /**
+     * Maps part of speech quality to max scope it can have.
+     */
+    private function mapPosQualityToMaxScope(?int $quality): int
+    {
+        switch ($quality) {
+            case PartOfSpeech::GOOD:
+                return Scope::COMMON;
+
+            case PartOfSpeech::BAD:
+                return Scope::PRIVATE;
+
+            case PartOfSpeech::UGLY:
+                return Scope::INACTIVE;
+        }
+
+        // if there are no parts of speech (quality is null),
+        // max scope is private
         return Scope::PRIVATE;
     }
 

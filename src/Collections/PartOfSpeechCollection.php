@@ -29,4 +29,13 @@ class PartOfSpeechCollection extends TypedCollection
             fn (PartOfSpeech $p) => $p->isGood()
         );
     }
+
+    public function bestQuality(): ?int
+    {
+        return $this
+            ->numerize(
+                fn (PartOfSpeech $p) => $p->quality()
+            )
+            ->min();
+    }
 }

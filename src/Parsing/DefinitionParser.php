@@ -155,7 +155,7 @@ class DefinitionParser
                 'женский род' => PartOfSpeech::NOUN,
                 'средний род' => PartOfSpeech::NOUN,
                 'междометие' => PartOfSpeech::INTERJECTION,
-                'частица' => PartOfSpeech::PREDICATIVE,
+                'частица' => PartOfSpeech::PARTICLE,
             ],
             'en' => [
                 'noun' => PartOfSpeech::NOUN,
