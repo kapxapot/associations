@@ -33,9 +33,17 @@ class WordRelation extends DbModel implements CreatedInterface, UpdatedAtInterfa
         ];
     }
 
-    public function isDisabling(): bool
+    /**
+     * Type has scope override that equals to `$scope`.
+     */
+    public function isScopedTo(int $scope): bool
     {
-        return $this->type()->isDisabling() && $this->isPrimary();
+        return $this->type()->isScopedTo($scope);
+    }
+
+    public function isSharingPosDown(): bool
+    {
+        return $this->type()->isSharingPosDown();
     }
 
     public function isPrimary(): bool

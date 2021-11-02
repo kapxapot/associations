@@ -121,6 +121,6 @@ word_relations_admin:
   generator: App\Generators\WordRelationAdminGenerator
 
 word_relation_types:
-  api: read
+  api: full
   sort: name
   generator: App\Generators\WordRelationTypeGenerator

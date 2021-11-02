@@ -26,8 +26,12 @@ class WordSpecification
             return $word->scopeOverride();
         }
 
-        if ($this->isDisabled($word)) {
-            return Scope::DISABLED;
+        $relationScopes = [Scope::DISABLED, Scope::INACTIVE];
+
+        foreach ($relationScopes as $scope) {
+            if ($this->isScopedByRelations($word, $scope)) {
+                return $scope;
+            }
         }
 
         if ($this->isCommon($word)) {
@@ -71,18 +75,13 @@ class WordSpecification
         return Scope::PRIVATE;
     }
 
-    private function isDisabled(Word $word): bool
+    private function isScopedByRelations(Word $word, int $scope): bool
     {
-        return $this->isDisabledByRelations($word);
-    }
+        $primary = $word->primaryRelation();
 
-    private function isDisabledByRelations(Word $word): bool
-    {
-        return $word
-            ->relations()
-            ->any(
-                fn (WordRelation $wr) => $wr->isDisabling()
-            );
+        return $primary
+            ? $primary->isScopedTo($scope)
+            : false;
     }
 
     private function isPublic(Word $word): bool

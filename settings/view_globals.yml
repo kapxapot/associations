@@ -40,7 +40,6 @@ word_min_length: 1
 word_max_length: 100
 
 admin_menu:
-  - languages
   - games
   - group:
       title: Слова
@@ -66,3 +65,5 @@ admin_menu:
         - users
         - roles
         - menus
+        - languages
+        - word_relation_types

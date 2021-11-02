@@ -101,7 +101,9 @@ rights:
     template: strict_read
 
   word_relation_types:
-    template: api_read
+    admin: [edit]
+    editor: [api_read]
+    author: [api_read]
 
   words:
     template: strict_read

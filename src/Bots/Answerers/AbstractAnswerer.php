@@ -222,6 +222,7 @@ abstract class AbstractAnswerer
     {
         return $request->hasAny(
             'включи',
+            'включите',
             'включить',
             'выйди',
             'выйти',

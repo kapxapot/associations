@@ -645,3 +645,34 @@ word_relations_admin:
       name: Автор
       template: row.creator.name
       attributes: [readonly, searchable, no_sort]
+
+word_relation_types:
+  name_gen: типа связей
+  name_accus: тип связей
+  title: Типы связей
+
+  columns:
+    id:
+      name: id
+      attributes: [readonly]
+
+    name:
+      name: Название
+
+    tag:
+      name: Тег
+
+    scope_override:
+      name: Видимость
+      type: number
+      attributes: [nullable]
+
+    sharing_pos_down:
+      name: Части речи 🔻
+      form_name: Шарит части речи вниз
+      type: bool
+
+    sharing_associations_down:
+      name: Ассоциации 🔻
+      form_name: Шарит ассоциации вниз
+      type: bool
