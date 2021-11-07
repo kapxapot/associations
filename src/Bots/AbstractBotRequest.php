@@ -142,7 +142,7 @@ abstract class AbstractBotRequest
     protected function getSemiTrashTokens(): array
     {
         return [
-            'сейчас', 'блядь', 'блин'
+            'сейчас', 'хорошо', 'блядь', 'блин'
         ];
     }
 
@@ -156,7 +156,7 @@ abstract class AbstractBotRequest
     protected function getTrashTokens(): array
     {
         return [
-            'говорю', 'сказал', 'сказала', 'сама', 'этот', 'это', 'эта', 'так', 'ты', 'ой', 'да', 'ну', 'я', 'э', 'а', '-', '=', '?'
+            'сказала', 'сказал', 'говорю', 'ладно', 'давай', 'тоже', 'сама', 'этот', 'это', 'эта', 'так', 'вот', 'ты', 'ой', 'да', 'ну', 'я', 'э', 'а', '-', '=', '?'
         ];
     }
 
