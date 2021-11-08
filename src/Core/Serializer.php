@@ -10,7 +10,7 @@ class Serializer
 {
     public function serializeTurn(?Turn $turn) : ?array
     {
-        if (is_null($turn)) {
+        if ($turn === null) {
             return null;
         }
 
@@ -22,7 +22,8 @@ class Serializer
                 ],
                 'turn_id' => $turn->getId(),
                 'word' => $turn->word()->word,
-                'is_ai' => $turn->isAiTurn()
+                'is_ai' => $turn->isAiTurn(),
+                'is_native' => $turn->isNative()
             ],
             $turn->word(),
             $turn->association()

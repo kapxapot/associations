@@ -55,4 +55,17 @@ class Turn extends DbModel implements CreatedAtInterface
     {
         return !is_null($this->finishedAt);
     }
+
+    public function isNative(): bool
+    {
+        $prevTurn = $this->prev();
+
+        if ($prevTurn === null) {
+            return true;
+        }
+
+        $prevWord = $prevTurn->word();
+
+        return $this->association()->hasWord($prevWord);
+    }
 }

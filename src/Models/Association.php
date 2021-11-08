@@ -61,6 +61,11 @@ class Association extends LanguageElement implements AssociationInterface
             && $this->secondWord()->isCanonical();
     }
 
+    public function hasWord(Word $word): bool
+    {
+        return $this->words()->contains($word);
+    }
+
     public function hasWords(Word $first, Word $second): bool
     {
         // the same word is NO

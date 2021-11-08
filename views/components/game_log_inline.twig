@@ -4,7 +4,8 @@
 
 {% for turn in game.turns.reverse %}
     {% if not loop.first %}
-        {% include 'components/association.twig' with { 'association': turn.association, 'short': true } only %}
+        {% include 'components/association.twig' with { 'association': turn.association, 'short': true, 'is_not_native': not turn.isNative } only %}
     {% endif %}
+
     {% include 'components/turn_word.twig' with { 'turn': turn, 'show_utterance': show_utterance } only %}
 {% endfor %}

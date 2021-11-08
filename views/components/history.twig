@@ -1,5 +1,5 @@
 <span ng-repeat="word in {{ history }}">
-    <span ng-if="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.url}}'}}">{{'{{word.association.is_public ? "&#x21C9;" : "&#x2192;"}}'}}</a></span>
+    <span ng-if="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.url}}'}}">{{'{{word.is_native ? (word.association.is_public ? "&#x21C9;" : "&#x2192;") : "&#8605;"}}'}}</a></span>
 
     <span ng-if="!$first && !word.is_ai && !word.association && {{ history }}[$index - 1].is_ai" class="assoc-arrow--dimmed">&#x21E2;</span>
 
