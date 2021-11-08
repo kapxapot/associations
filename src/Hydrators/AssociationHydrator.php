@@ -68,7 +68,7 @@ class AssociationHydrator extends Hydrator
             ->withCanonical(
                 function () use ($entity) {
                     if ($entity->isCanonical()) {
-                        return $this;
+                        return $entity;
                     }
 
                     [$w1, $w2] = $entity->words()->canonical()->order();

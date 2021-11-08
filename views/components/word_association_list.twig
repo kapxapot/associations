@@ -1,0 +1,13 @@
+{% import 'main/local_macros.twig' as lm %}
+
+<ul class="vgap-2 br-word">
+    {% for assoc in associations %}
+        <li>
+            {{ lm.association(assoc, assoc.anchor ?? word) }}
+
+            {% for user in assoc.extendedUsers %}
+                {{ lm.user(user) }}
+            {% endfor %}
+        </li>
+    {% endfor %}
+</ul>

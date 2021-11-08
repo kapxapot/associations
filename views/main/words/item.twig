@@ -175,6 +175,31 @@
         </div>
     </div>
 
+    {% if is_moderator and word.hasPrimaryRelation %}
+        <div class="panel-secondary-heading">Агрегированные ассоциации</div>
+        <div class="panel panel-secondary">
+            <div class="panel-body">
+                {% if word.approvedAggregatedAssociations.any %}
+                    <p class="b">Общие ({{ word.approvedAggregatedAssociations.count }}):</p>
+
+                    {% include 'components/word_association_list.twig' with { 'associations': word.approvedAggregatedAssociations, 'word': word } only %}
+                {% endif %}
+
+                {% if word.notApprovedAggregatedAssociations.any %}
+                    <p class="b mt-3">Личные ({{ word.notApprovedAggregatedAssociations.count }}):</p>
+
+                    {% include 'components/word_association_list.twig' with { 'associations': word.notApprovedAggregatedAssociations, 'word': word } only %}
+                {% endif %}
+
+                {% if word.disabledAggregatedAssociations.any %}
+                    <p class="b mt-3">Отключенные ({{ word.disabledAggregatedAssociations.count }}):</p>
+
+                    {% include 'components/word_association_list.twig' with { 'associations': word.disabledAggregatedAssociations, 'word': word } only %}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
     <div class="panel-secondary-heading">Что это?</div>
     <div class="panel panel-secondary">
         <div class="panel-body">

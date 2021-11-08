@@ -3,6 +3,7 @@
 namespace App\Collections;
 
 use App\Models\Association;
+use App\Models\Word;
 use Plasticode\Util\Sort;
 
 class AssociationCollection extends LanguageElementCollection
@@ -17,5 +18,12 @@ class AssociationCollection extends LanguageElementCollection
                 Sort::DATE
             )
             ->first();
+    }
+
+    public function sortByOtherThan(Word $word): self
+    {
+        return $this->ascStr(
+            fn (Association $a) => $a->otherWord($word)->word
+        );
     }
 }

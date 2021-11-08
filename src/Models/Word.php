@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Collections\AggregatedAssociationCollection;
 use App\Collections\AssociationCollection;
 use App\Collections\MetaAssociationCollection;
 use App\Collections\PartOfSpeechCollection;
@@ -23,7 +24,7 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
  * @method AssociationCollection associations()
  * @method WordRelationCollection counterRelations()
  * @method Definition|null definition()
- * @method WordCollection dependents()
+ * @method WordCollection dependents() All words having this word as a main.
  * @method DictWordInterface|null dictWord()
  * @method Word|null main()
  * @method DefinitionAggregate|null parsedDefinition()
@@ -41,6 +42,8 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
  */
 class Word extends LanguageElement implements PartOfSpeechableInterface
 {
+    private ?AssociationCollection $aggregatedAssociations = null;
+
     protected function requiredWiths(): array
     {
         return [
@@ -178,9 +181,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this
             ->associations()
             ->fuzzyPublic()
-            ->ascStr(
-                fn (Association $a) => $a->otherWord($this)->word
-            );
+            ->sortByOtherThan($this);
     }
 
     public function notApprovedAssociations(): AssociationCollection
@@ -188,9 +189,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this
             ->associations()
             ->private()
-            ->ascStr(
-                fn (Association $a) => $a->otherWord($this)->word
-            );
+            ->sortByOtherThan($this);
     }
 
     public function disabledAssociations(): AssociationCollection
@@ -198,9 +197,31 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this
             ->associations()
             ->fuzzyDisabled()
-            ->ascStr(
-                fn (Association $a) => $a->otherWord($this)->word
-            );
+            ->sortByOtherThan($this);
+    }
+
+    public function approvedAggregatedAssociations(): AssociationCollection
+    {
+        return $this
+            ->aggregatedAssociations()
+            ->fuzzyPublic()
+            ->sortByOtherThan($this);
+    }
+
+    public function notApprovedAggregatedAssociations(): AssociationCollection
+    {
+        return $this
+            ->aggregatedAssociations()
+            ->private()
+            ->sortByOtherThan($this);
+    }
+
+    public function disabledAggregatedAssociations(): AssociationCollection
+    {
+        return $this
+            ->aggregatedAssociations()
+            ->fuzzyDisabled()
+            ->sortByOtherThan($this);
     }
 
     /**
@@ -641,6 +662,71 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     public function hasDifferentOriginalWord(): bool
     {
         return $this->originalWord !== $this->word;
+    }
+
+    public function hasPrimaryRelation(): bool
+    {
+        return $this->allRelations()->filterPrimary()->any();
+    }
+
+    /**
+     * Gathers and aggregates associations from 3 sources:
+     * 
+     * - Own associations.
+     * - Aggregated associations from dependent words.
+     * - Aggregated associations from main word (if relation type allows it).
+     */
+    public function aggregatedAssociations(
+        ?Word $exceptWord = null
+    ): AggregatedAssociationCollection
+    {
+        if ($this->aggregatedAssociations !== null) {
+            return $this->aggregatedAssociations;
+        }
+
+        // get own associations
+        $col = AggregatedAssociationCollection::from(
+            $this->associations()->map(
+                fn (Association $a) => new AggregatedAssociation($a, $this)
+            )
+        );
+
+        // add dependent words aggregated associations
+        /** @var Word $word */
+        foreach ($this->dependents() as $word) {
+            if ($word->equals($exceptWord)) {
+                continue;
+            }
+
+            $associations = $word
+                ->aggregatedAssociations($this)
+                ->map(
+                    fn (AggregatedAssociation $a) => $a->withSoftAnchor($word)
+                );
+
+            $col = $col->add(...$associations);
+        }
+
+        // add main word asociations
+        $primaryRelation = $this->primaryRelation();
+
+        if ($primaryRelation && $primaryRelation->isSharingAssociationsDown()) {
+            $mainWord = $primaryRelation->mainWord();
+
+            if (!$mainWord->equals($exceptWord)) {
+                $associations = $mainWord
+                    ->aggregatedAssociations($this)
+                    ->map(
+                        fn (AggregatedAssociation $a) => $a->withSoftAnchor($mainWord)
+                    );
+    
+                $col = $col->add(...$associations);
+            }
+        }
+
+        $this->aggregatedAssociations = $col;
+
+        return $this->aggregatedAssociations;
     }
 
     // serialization

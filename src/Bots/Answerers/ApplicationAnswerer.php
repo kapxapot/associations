@@ -101,13 +101,13 @@ class ApplicationAnswerer extends AbstractAnswerer
 
         $answerParts = [];
 
-        $isMatureQuestion = $questionWord !== null && $questionWord->isMature();
+        $isMatureQuestion = $questionWord && $questionWord->isMature();
 
         if ($isMatureQuestion) {
             $answerParts[] = $this->matureWordMessage();
         }
 
-        if ($answerWord !== null) {
+        if ($answerWord) {
             return $this->answerWithWord($answerWord, ...$answerParts);
         }
 
@@ -158,15 +158,8 @@ class ApplicationAnswerer extends AbstractAnswerer
 
         $game = $this->gameService->buildEtherealGame($prevWord, $word);
 
-        $answer = $word
-            ? $this->turnService->findAnswer($game, $word)
-            : null;
-
-        $answerAssociation = $answer
-            ? $this->associationService->getByPair($word, $answer)
-            : null;
-
-        return new PseudoTurn($answerAssociation, $answer, $word);
+        return $this->turnService->findAnswer($game, $word)
+            ?? PseudoTurn::empty($word);
     }
 
     private function getAnyWord(?AbstractBotRequest $request = null): ?Word

@@ -159,7 +159,7 @@ class WordService
     }
 
     /**
-     * Returns true if the word is valid.
+     * Returns `true` if the word is valid.
      */
     public function isWordValid(?string $wordStr): bool
     {

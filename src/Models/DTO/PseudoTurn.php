@@ -22,6 +22,11 @@ class PseudoTurn
         $this->prevWord = $prevWord;
     }
 
+    public static function empty(?Word $prevWord = null): self
+    {
+        return new self(null, null, $prevWord);
+    }
+
     public function association(): ?Association
     {
         return $this->association;

@@ -3,13 +3,14 @@
 namespace App\Services;
 
 use App\Collections\TurnCollection;
-use App\Collections\WordCollection;
 use App\Events\Turn\TurnCreatedEvent;
 use App\Exceptions\DuplicateWordException;
 use App\Exceptions\RecentRelatedWordException;
 use App\Exceptions\StronglyRelatedWordException;
 use App\Exceptions\TurnException;
+use App\Models\AggregatedAssociation;
 use App\Models\Association;
+use App\Models\DTO\PseudoTurn;
 use App\Models\Game;
 use App\Models\Turn;
 use App\Models\User;
@@ -17,11 +18,11 @@ use App\Models\Word;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Semantics\Scope;
 use Exception;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Date;
+use Webmozart\Assert\Assert;
 
 class TurnService
 {
@@ -75,7 +76,7 @@ class TurnService
         ?string $originalUtterance = null
     ): TurnCollection
     {
-        $turn = $this->newTurn($game, $word, $user, $originalUtterance);
+        $turn = $this->newTurn($game, $word, null, $user, $originalUtterance);
 
         $event = new TurnCreatedEvent($turn);
         $this->eventDispatcher->dispatch($event);
@@ -91,9 +92,9 @@ class TurnService
         return $turns;
     }
 
-    public function newAiTurn(Game $game, Word $word): Turn
+    public function newAiTurn(Game $game, Word $word, ?Association $association = null): Turn
     {
-        $turn = $this->newTurn($game, $word);
+        $turn = $this->newTurn($game, $word, $association);
 
         $this->processAiTurn($turn);
 
@@ -103,6 +104,7 @@ class TurnService
     private function newTurn(
         Game $game,
         Word $word,
+        ?Association $association = null,
         ?User $user = null,
         ?string $originalUtterance = null
     ): Turn
@@ -122,12 +124,12 @@ class TurnService
         $turn->wordId = $word->getId();
         $prevTurn = $game->lastTurn();
 
-        if ($prevTurn !== null) {
+        if ($prevTurn) {
             $turn->prevTurnId = $prevTurn->getId();
 
             $prevWord = $prevTurn->word();
 
-            $association = $this->associationService->getOrCreate(
+            $association ??= $this->associationService->getOrCreate(
                 $prevWord,
                 $word,
                 $user,
@@ -176,10 +178,16 @@ class TurnService
     {
         $game = $turn->game();
 
-        $word = $this->findAnswer($game, $turn->word(), $turn->user());
+        $pseudoTurn = $this->findAnswer($game, $turn->word(), $turn->user());
 
-        if ($word) {
-            return $this->newAiTurn($game, $word);
+        if ($pseudoTurn) {
+            $word = $pseudoTurn->word();
+            $association = $pseudoTurn->association();
+
+            // if pseudo turn is not null, word must be not null
+            Assert::notNull($word);
+
+            return $this->newAiTurn($game, $word, $association);
         }
 
         $this->finishGame($game);
@@ -235,7 +243,7 @@ class TurnService
         $this->throwIfCantBePlayed($game, $word);
     }
 
-    public function findAnswer(Game $game, Word $word, ?User $user = null): ?Word
+    public function findAnswer(Game $game, Word $word, ?User $user = null): ?PseudoTurn
     {
         // 1. looking in fuzzy public associations
         // 2. looking in private associations
@@ -246,22 +254,27 @@ class TurnService
         ];
 
         foreach ($selectors as $selector) {
-            $answer = $word
-                ->associations()
+            /** @var AggregatedAssociation $answerAssociation */
+            $answerAssociation = $word
+                ->aggregatedAssociations()
                 ->where($selector)
                 ->where(
                     fn (Association $a) => $a->isPlayableAgainst($user)
                 )
-                ->map(
-                    fn (Association $a) => $a->otherWord($word)
-                )
                 ->shuffle()
                 ->first(
-                    fn (Word $w) => $this->canBePlayed($game, $w)
+                    fn (AggregatedAssociation $a) => $this->canBePlayed(
+                        $game,
+                        $a->otherThanAnchor()
+                    )
                 );
 
-            if ($answer !== null) {
-                return $answer;
+            if ($answerAssociation !== null) {
+                return new PseudoTurn(
+                    $answerAssociation,
+                    $answerAssociation->otherThanAnchor(),
+                    $word
+                );
             }
         }
 

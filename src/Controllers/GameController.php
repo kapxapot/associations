@@ -121,7 +121,7 @@ class GameController extends Controller
         if (strlen($langCode) > 0) {
             $language = $this->languageRepository->getByCode($langCode);
 
-            if (is_null($language)) {
+            if ($language === null) {
                 throw new BadRequestException('Unknown language code.');
             }
         }
@@ -144,24 +144,22 @@ class GameController extends Controller
 
         $game = $this->gameService->buildEtherealGame($prevWord, $word);
 
-        $answer = $word !== null
+        $answerTurn = $word
             ? $this->turnService->findAnswer($game, $word)
             : null;
 
-        /** @var Association|null $answerAssociation */
-        $answerAssociation = null;
+        $answer = $answerTurn
+            ? $answerTurn->word()
+            : $this->languageService->getRandomStartingWord($language);
 
-        if ($answer !== null) {
-            $answerAssociation = $this->associationService->getByPair($word, $answer);
-        } else {
-            $answer = $this->languageService->getRandomStartingWord($language);
-        }
+        $answerAssociation = $answerTurn
+            ? $answerTurn->association()
+            : null;
 
-        $wordResponse = ['word' => $wordStr];
-
-        if (strlen($wordStr) > 0) {
-            $wordResponse['is_valid'] = $this->wordService->isWordValid($wordStr);
-        }
+        $wordResponse = [
+            'word' => $wordStr,
+            'is_valid' => $this->wordService->isWordValid($wordStr)
+        ];
 
         if ($word) {
             $wordResponse = $this->serializer->serializeRaw(
@@ -174,7 +172,7 @@ class GameController extends Controller
         /** @var array|null */
         $answerResponse = null;
 
-        if ($answer) {
+        if ($answerTurn) {
             $answerResponse = $this->serializer->serializeRaw(
                 ['word' => $answer->word],
                 $answer,
@@ -187,7 +185,7 @@ class GameController extends Controller
             'answer' => $answerAssociation ? $answerResponse : null,
         ];
 
-        if (is_null($answerAssociation)) {
+        if ($answerAssociation === null) {
             $result['new'] = $answerResponse;
         }
 
