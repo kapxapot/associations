@@ -172,9 +172,14 @@ class GameController extends Controller
         /** @var array|null */
         $answerResponse = null;
 
-        if ($answerTurn) {
+        if ($answer) {
             $answerResponse = $this->serializer->serializeRaw(
-                ['word' => $answer->word],
+                [
+                    'word' => $answer->word,
+                    'is_not_native' => $answerAssociation
+                        && $word
+                        && !$answerAssociation->hasWord($word),
+                ],
                 $answer,
                 $answerAssociation
             );
