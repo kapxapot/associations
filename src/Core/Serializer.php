@@ -61,6 +61,7 @@ class Serializer
                 'scope' => $association->scope,
                 'severity' => $association->severity,
                 'url' => $association->url(),
+                'display_name' => $association->fullName(),
             ];
 
             $associationFeedback = $association->feedbackByMe();

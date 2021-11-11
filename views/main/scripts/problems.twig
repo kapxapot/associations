@@ -46,12 +46,7 @@ $scope.problems = {
                 association_id: turn.association.id,
                 dislike: af && af.dislike == 1,
                 mature: af && af.mature == 1,
-                label:
-                    prevTurn.display_name +
-                    ' ' +
-                    (turn.association.is_public ? '\u21C9' : '\u2192') +
-                    ' ' +
-                    turn.display_name
+                label: turn.association.display_name
             };
         }
 
