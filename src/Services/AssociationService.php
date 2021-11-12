@@ -149,8 +149,14 @@ class AssociationService
 
     public function getCanonical(Association $association): AssociationInterface
     {
-        return $this->getCanonicalPlayableAgainst($association, null)
-            ?? $association;
+        if ($association->isCanonical()) {
+            return $association;
+        }
+
+        [$w1, $w2] = $association->words()->canonical()->order();
+
+        return $this->associationRepository->getByOrderedPair($w1, $w2)
+            ?? new EtherealAssociation($w1, $w2);
     }
 
     public function getCanonicalPlayableAgainst(
