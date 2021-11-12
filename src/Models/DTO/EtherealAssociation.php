@@ -39,4 +39,9 @@ class EtherealAssociation implements AssociationInterface
     {
         return null;
     }
+
+    public function key(): string
+    {
+        return $this->firstWord->getId() . ':' . $this->secondWord->getId();
+    }
 }

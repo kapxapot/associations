@@ -14,6 +14,8 @@ use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Interfaces\PartOfSpeechableInterface;
+use Plasticode\Util\Sort;
+use Plasticode\Util\SortStep;
 
 /**
  * @property integer|null $mainId
@@ -196,30 +198,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     {
         return $this
             ->associations()
-            ->fuzzyDisabled()
-            ->sortByOtherThan($this);
-    }
-
-    public function approvedAggregatedAssociations(): AssociationCollection
-    {
-        return $this
-            ->aggregatedAssociations()
-            ->fuzzyPublic()
-            ->sortByOtherThan($this);
-    }
-
-    public function notApprovedAggregatedAssociations(): AssociationCollection
-    {
-        return $this
-            ->aggregatedAssociations()
-            ->private()
-            ->sortByOtherThan($this);
-    }
-
-    public function disabledAggregatedAssociations(): AssociationCollection
-    {
-        return $this
-            ->aggregatedAssociations()
             ->fuzzyDisabled()
             ->sortByOtherThan($this);
     }
@@ -479,6 +457,34 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $mainPlayable ?? $this;
     }
 
+    public function distanceFromCanonical(): int
+    {
+        return $this->distanceFromAncestor($this->canonical());
+    }
+
+    /**
+     * Distance from a word from transitive main chain.
+     *
+     * @param Word $ancestor
+     * @return integer|null Returns `null` in case of invalid ancestor (not an ancestor).
+     */
+    public function distanceFromAncestor(Word $ancestor): ?int
+    {
+        if ($this->equals($ancestor)) {
+            return 0;
+        }
+
+        if (!$this->hasMain()) {
+            return null;
+        }
+
+        $mainDistance = $this->main()->distanceFromAncestor($ancestor);
+
+        return $mainDistance === null
+            ? null
+            : $mainDistance + 1;
+    }
+
     /**
      * Duplicate of `main()` for Twig.
      */
@@ -509,12 +515,20 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     }
 
     /**
-     * Checks if the current word belongs to transitive main words of
-     * the `$other` word.
-     * 
+     * Checks if the current word belongs to transitive mains of the `$word`.
+     */
+    public function isAncestorOf(Word $word): bool
+    {
+        return !$this->equals($word)
+            && $this->isTransitiveMainOf($word);
+    }
+
+    /**
+     * Checks if the word belongs to transitive main words of the `$other` word.
+     *
      * If it belongs, the `$other` can't be added as a main word for the current word,
      * because it will create a cycle.
-     * 
+     *
      * In case when `$this === $other`, returns `true` as well, because a word
      * mustn't be main to itself.
      */
@@ -556,7 +570,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     /**
      * Checks if the words are related to one another by any third word.
-     * 
+     *
      * A relates to B, C relates to B => A remotely relates to C.
      */
     public function isRemotelyRelatedTo(Word $word): bool
@@ -569,7 +583,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     /**
      * Checks if `$word`'s canonical word is one of the canonical related words.
-     * 
+     *
      * Gets canonical words for all related words and looks for `$word`'s
      * canonical word in them.
      */
@@ -669,9 +683,14 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this->allRelations()->filterPrimary()->any();
     }
 
+    public function congregatedAssociations(): AggregatedAssociationCollection
+    {
+        return $this->aggregatedAssociations()->notJunky();
+    }
+
     /**
      * Gathers and aggregates associations from 3 sources:
-     * 
+     *
      * - Own associations.
      * - Aggregated associations from dependent words.
      * - Aggregated associations from main word (if relation type allows it).
@@ -723,6 +742,30 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
                 $col = $col->add(...$associations);
             }
         }
+
+        // congregate & mark as junky
+        $congregated = $col->congregateFor($this);
+
+        $col->apply(
+            function (AggregatedAssociation $a) use ($congregated) {
+                if (!$congregated->contains($a)) {
+                    $a->markAsJunky();
+                }
+            }
+        );
+
+        // order by `other than anchor`
+        $col = $col->sortBy(
+            SortStep::byFunc(
+                fn (AggregatedAssociation $a) => $a->otherThanAnchor()->word,
+                Sort::STRING
+            ),
+            SortStep::byFunc(
+                fn (AggregatedAssociation $a) => $a->anchor()->distanceFromAncestor(
+                    $a->anchor()->canonical()
+                )
+            )
+        );
 
         $this->aggregatedAssociations = $col;
 

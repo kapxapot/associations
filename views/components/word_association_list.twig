@@ -3,7 +3,7 @@
 <ul class="vgap-2 br-word">
     {% for assoc in associations %}
         <li>
-            {{ lm.association(assoc, assoc.anchor ?? word) }}
+            {% if assoc.isJunky %}<s>{% endif %}{{ lm.association(assoc, assoc.anchor ?? word) }}{% if assoc.isJunky %}</s>{% endif %}
 
             {% for user in assoc.extendedUsers %}
                 {{ lm.user(user) }}

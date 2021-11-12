@@ -14,4 +14,9 @@ interface AssociationInterface
     public function isReal(): bool;
 
     public function toReal(): ?Association;
+
+    /**
+     * Returns unique association key in format '[first word id]:[second word id]'.
+     */
+    public function key(): string;
 }

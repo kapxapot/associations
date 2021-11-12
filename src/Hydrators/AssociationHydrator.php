@@ -5,20 +5,18 @@ namespace App\Hydrators;
 use App\Auth\Interfaces\AuthInterface;
 use App\Core\Interfaces\LinkerInterface;
 use App\Models\Association;
-use App\Models\DTO\EtherealAssociation;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
-use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Services\AssociationService;
 use Plasticode\Hydrators\Generic\Hydrator;
 use Plasticode\Models\Generic\DbModel;
 
 class AssociationHydrator extends Hydrator
 {
-    private AssociationRepositoryInterface $associationRepository;
     private AssociationFeedbackRepositoryInterface $associationFeedbackRepository;
     private AssociationOverrideRepositoryInterface $associationOverrideRepository;
     private LanguageRepositoryInterface $languageRepository;
@@ -26,28 +24,31 @@ class AssociationHydrator extends Hydrator
     private UserRepositoryInterface $userRepository;
     private WordRepositoryInterface $wordRepository;
 
+    private AssociationService $associationService;
+
     private AuthInterface $auth;
     private LinkerInterface $linker;
 
     public function __construct(
-        AssociationRepositoryInterface $associationRepository,
         AssociationFeedbackRepositoryInterface $associationFeedbackRepository,
         AssociationOverrideRepositoryInterface $associationOverrideRepository,
         LanguageRepositoryInterface $languageRepository,
         TurnRepositoryInterface $turnRepository,
         UserRepositoryInterface $userRepository,
         WordRepositoryInterface $wordRepository,
+        AssociationService $associationService,
         AuthInterface $auth,
         LinkerInterface $linker
     )
     {
-        $this->associationRepository = $associationRepository;
         $this->associationFeedbackRepository = $associationFeedbackRepository;
         $this->associationOverrideRepository = $associationOverrideRepository;
         $this->languageRepository = $languageRepository;
         $this->turnRepository = $turnRepository;
         $this->userRepository = $userRepository;
         $this->wordRepository = $wordRepository;
+
+        $this->associationService = $associationService;
 
         $this->auth = $auth;
         $this->linker = $linker;
@@ -66,16 +67,13 @@ class AssociationHydrator extends Hydrator
                 fn () => $this->wordRepository->get($entity->secondWordId)
             )
             ->withCanonical(
-                function () use ($entity) {
-                    if ($entity->isCanonical()) {
-                        return $entity;
-                    }
-
-                    [$w1, $w2] = $entity->words()->canonical()->order();
-
-                    return $this->associationRepository->getByOrderedPair($w1, $w2)
-                        ?? new EtherealAssociation($w1, $w2);
-                }
+                fn () => $this->associationService->getCanonical($entity)
+            )
+            ->withCanonicalForMe(
+                fn () => $this->associationService->getCanonicalPlayableAgainst(
+                    $entity,
+                    $entity->me()
+                )
             )
             ->withFeedbacks(
                 fn () => $this

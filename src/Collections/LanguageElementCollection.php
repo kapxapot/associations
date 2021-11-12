@@ -4,11 +4,26 @@ namespace App\Collections;
 
 use App\Models\LanguageElement;
 use App\Models\User;
+use Plasticode\Collections\Generic\Collection;
 use Plasticode\Collections\Generic\DbModelCollection;
 
 class LanguageElementCollection extends DbModelCollection
 {
     protected string $class = LanguageElement::class;
+
+    /**
+     * Segregates associations by scope groups.
+     *
+     * @return Collection Collection of {@see LanguageElementCollection}s.
+     */
+    public function segregateByScope(): Collection
+    {
+        return Collection::collect(
+            $this->fuzzyPublic(),
+            $this->private(),
+            $this->fuzzyDisabled(),
+        );
+    }
 
     /**
      * Filters fuzzy public elements.

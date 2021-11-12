@@ -9,6 +9,8 @@ class AggregatedAssociation extends Association
 {
     private ?Word $anchor = null;
 
+    private bool $junky = false;
+
     public function __construct(Association $association, ?Word $anchor = null)
     {
         parent::__construct($association->toArray());
@@ -76,5 +78,15 @@ class AggregatedAssociation extends Association
         return $this->firstWord()->equals($this->anchor)
             ? $this->secondWord()
             : $this->firstWord();
+    }
+
+    public function isJunky(): bool
+    {
+        return $this->junky;
+    }
+
+    public function markAsJunky(): void
+    {
+        $this->junky = true;
     }
 }

@@ -12,9 +12,11 @@ use App\Models\Interfaces\AssociationInterface;
  * @property integer $firstWordId
  * @property integer $secondWordId
  * @method AssociationInterface canonical()
+ * @method AssociationInterface|null canonicalForMe()
  * @method Word firstWord()
  * @method Word secondWord()
- * @method static withCanonical(AssociationInterface $canonical)
+ * @method static withCanonical(AssociationInterface|callable $canonical)
+ * @method static withCanonicalForMe(AssociationInterface|callable|null $canonicalForMe)
  * @method static withFeedbacks(AssociationFeedbackCollection|callable $feedbacks)
  * @method static withFirstWord(Word|callable $firstWord)
  * @method static withOverrides(AssociationOverrideCollection|callable $overrides)
@@ -32,6 +34,7 @@ class Association extends LanguageElement implements AssociationInterface
         return [
             ...parent::requiredWiths(),
             $this->canonicalPropertyName,
+            'canonicalForMe',
             'firstWord',
             'secondWord',
         ];
@@ -205,6 +208,14 @@ class Association extends LanguageElement implements AssociationInterface
     {
         return $this->firstWord()->isGoodPartOfSpeech()
             && $this->secondWord()->isGoodPartOfSpeech();
+    }
+
+    /**
+     * Returns unique association key in format '[first word id]:[second word id]'.
+     */
+    public function key(): string
+    {
+        return $this->firstWordId . ':' . $this->secondWordId;
     }
 
     // AssociationInterface

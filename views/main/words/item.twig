@@ -179,22 +179,22 @@
         <div class="panel-secondary-heading">Агрегированные ассоциации</div>
         <div class="panel panel-secondary">
             <div class="panel-body">
-                {% if word.approvedAggregatedAssociations.any %}
-                    <p class="b">Общие ({{ word.approvedAggregatedAssociations.count }}):</p>
+                {% if word.aggregatedAssociations.fuzzyPublic.any %}
+                    <p class="b">Общие ({{ word.aggregatedAssociations.fuzzyPublic.count }}):</p>
 
-                    {% include 'components/word_association_list.twig' with { 'associations': word.approvedAggregatedAssociations, 'word': word } only %}
+                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyPublic, 'word': word } only %}
                 {% endif %}
 
-                {% if word.notApprovedAggregatedAssociations.any %}
-                    <p class="b mt-3">Личные ({{ word.notApprovedAggregatedAssociations.count }}):</p>
+                {% if word.aggregatedAssociations.private.any %}
+                    <p class="b mt-3">Личные ({{ word.aggregatedAssociations.private.count }}):</p>
 
-                    {% include 'components/word_association_list.twig' with { 'associations': word.notApprovedAggregatedAssociations, 'word': word } only %}
+                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.private, 'word': word } only %}
                 {% endif %}
 
-                {% if word.disabledAggregatedAssociations.any %}
-                    <p class="b mt-3">Отключенные ({{ word.disabledAggregatedAssociations.count }}):</p>
+                {% if word.aggregatedAssociations.fuzzyDisabled.any %}
+                    <p class="b mt-3">Отключенные ({{ word.aggregatedAssociations.fuzzyDisabled.count }}):</p>
 
-                    {% include 'components/word_association_list.twig' with { 'associations': word.disabledAggregatedAssociations, 'word': word } only %}
+                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyDisabled, 'word': word } only %}
                 {% endif %}
             </div>
         </div>

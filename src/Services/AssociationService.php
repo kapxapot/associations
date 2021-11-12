@@ -146,4 +146,33 @@ class AssociationService
 
         return $this->associationRepository->getByOrderedPair($first, $second);
     }
+
+    public function getCanonical(Association $association): AssociationInterface
+    {
+        return $this->getCanonicalPlayableAgainst($association, null)
+            ?? $association;
+    }
+
+    public function getCanonicalPlayableAgainst(
+        Association $association,
+        ?User $user = null
+    ): ?AssociationInterface
+    {
+        $w1 = $association->firstWord()->canonicalPlayableAgainst($user);
+        $w2 = $association->secondWord()->canonicalPlayableAgainst($user);
+
+        if ($w1 === null || $w2 === null) {
+            return null;
+        }
+
+        $canonical = $this->getByPair($w1, $w2);
+
+        if ($canonical) {
+            return $canonical;
+        }
+
+        [$first, $second] = $this->orderPair($w1, $w2);
+
+        return new EtherealAssociation($first, $second);
+    }
 }

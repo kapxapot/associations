@@ -257,6 +257,7 @@ class TurnService
             /** @var AggregatedAssociation $answerAssociation */
             $answerAssociation = $word
                 ->aggregatedAssociations()
+                ->notJunky()
                 ->where($selector)
                 ->where(
                     fn (Association $a) => $a->isPlayableAgainst($user)
