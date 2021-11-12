@@ -165,6 +165,10 @@ class AssociationService
             return null;
         }
 
+        if ($w1->equals($w2)) {
+            return new EtherealAssociation($w1, $w2);
+        }
+
         $canonical = $this->getByPair($w1, $w2);
 
         if ($canonical) {
