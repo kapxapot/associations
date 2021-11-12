@@ -62,6 +62,7 @@ class AggregatedAssociationCollection extends AssociationCollection
 
             if ($associations->count() === 1) {
                 $result = $result->concat($associations);
+                continue;
             }
 
             // choose the best association in group
