@@ -19,13 +19,13 @@ class AggregatedAssociationCollection extends AssociationCollection
      * @param User|null $user The user to congregate against.
      * @return static
      */
-    public function congregateFor(Word $originalWord, ?User $user = null): self
+    public function congregate(Word $originalWord): self
     {
         return static::from(
             $this
                 ->segregateByScope()
                 ->flatMap(
-                    fn (self $g) => $g->tidyFor($originalWord, $user)
+                    fn (self $g) => $g->tidy($originalWord)
                 )
         );
     }
@@ -37,15 +37,14 @@ class AggregatedAssociationCollection extends AssociationCollection
      * 2. Semantically duplicate associations are like: [any word -> word2], [any word -> word2's main word]. In this case the second association stays, the first goes away.
      *
      * @param Word $originalWord The word based on which the associations are aggregated.
-     * @param User|null $user Should the canonicals be calculated against a specific user.
      * @return static
      */
-    public function tidyFor(Word $originalWord, ?User $user = null): self
+    public function tidy(Word $originalWord): self
     {
         $canonicalGroups = $this->group(
-            function (AggregatedAssociation $a) use ($user) {
+            function (AggregatedAssociation $a) {
                 $word = $a->otherThanAnchor();
-                $canonical = $word->canonicalPlayableAgainst($user);
+                $canonical = $word->canonical();
 
                 return $canonical
                     ? $canonical->getId()

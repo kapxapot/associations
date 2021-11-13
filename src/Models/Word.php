@@ -744,7 +744,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         }
 
         // congregate & mark as junky
-        $congregated = $col->congregateFor($this);
+        $congregated = $col->congregate($this);
 
         $col->apply(
             function (AggregatedAssociation $a) use ($congregated) {
