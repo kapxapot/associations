@@ -83,6 +83,7 @@ class AggregatedAssociationCollection extends AssociationCollection
                 }
             }
 
+            // this shouldn't be, but...
             if ($minAssociations->isEmpty()) {
                 continue;
             }
@@ -94,6 +95,15 @@ class AggregatedAssociationCollection extends AssociationCollection
             $best = $original ?? $minAssociations->first();
 
             $result = $result->add($best);
+
+            /** @var AggregatedAssociation $association */
+            foreach ($associations as $association) {
+                if ($association->equals($best)) {
+                    continue;
+                }
+
+                $association->addToJunkyLog('Because [' . $best->getId() . '] ' . $best->fullName() . ' is the best');
+            }
         }
 
         return $result;

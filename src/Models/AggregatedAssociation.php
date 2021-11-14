@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use InvalidArgumentException;
+use Plasticode\Util\Text;
 use Webmozart\Assert\Assert;
 
 class AggregatedAssociation extends Association
@@ -10,6 +11,9 @@ class AggregatedAssociation extends Association
     private ?Word $anchor = null;
 
     private bool $junky = false;
+
+    /** @var string[] $junkyLog */
+    private array $junkyLog = [];
 
     public function __construct(Association $association, ?Word $anchor = null)
     {
@@ -88,5 +92,15 @@ class AggregatedAssociation extends Association
     public function markAsJunky(): void
     {
         $this->junky = true;
+    }
+
+    public function junkyLog(): string
+    {
+        return Text::join($this->junkyLog, ', ');
+    }
+
+    public function addToJunkyLog(string $message): void
+    {
+        $this->junkyLog[] = $message;
     }
 }
