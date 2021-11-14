@@ -240,6 +240,11 @@ class Association extends LanguageElement implements AssociationInterface
         return $this;
     }
 
+    public function isValid(): bool
+    {
+        return true;
+    }
+
     // serialization
 
     public function serialize(): array

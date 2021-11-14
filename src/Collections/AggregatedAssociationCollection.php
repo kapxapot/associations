@@ -41,35 +41,22 @@ class AggregatedAssociationCollection extends AssociationCollection
      */
     public function tidy(Word $originalWord): self
     {
+        // group by other than anchor canonical word id
         $canonicalGroups = $this->group(
-            function (AggregatedAssociation $a) {
-                $word = $a->otherThanAnchor();
-                $canonical = $word->canonical();
-
-                return $canonical
-                    ? $canonical->getId()
-                    : 0;
-            }
+            fn (AggregatedAssociation $a) =>
+                $a->otherThanAnchor()->canonical()->getId()
         );
 
         $result = static::make();
 
-        foreach ($canonicalGroups as $key => $associations) {
-            if ($key === 0) {
-                continue;
-            }
-
+        foreach ($canonicalGroups as $associations) {
+            // no need to choose in case of one association
             if ($associations->count() === 1) {
                 $result = $result->concat($associations);
                 continue;
             }
 
             // choose the best association in group
-            //
-            // плавник - рыба <- the best
-            // плавник - рыбы
-            // плавники - рыба
-            // плавники - рыбы
             //
             // 1. choose by other than anchor word closest to canonical
             // 2. if there's an original association, prefer it, otherwise doesn't matter
@@ -78,7 +65,7 @@ class AggregatedAssociationCollection extends AssociationCollection
 
             /** @var integer|null $minDistance */
             $minDistance = null;
-            $minDistanceAssociations = null;
+            $minAssociations = static::empty();
 
             /** @var AggregatedAssociation $association */
             foreach ($associations as $association) {
@@ -86,32 +73,26 @@ class AggregatedAssociationCollection extends AssociationCollection
                     ->otherThanAnchor()
                     ->distanceFromCanonical();
 
-                // invalid ancestor
-                if ($distance === null) {
-                    continue;
-                }
-
                 if ($minDistance === null || $distance < $minDistance) {
                     $minDistance = $distance;
-                    $minDistanceAssociations = static::collect($association);
+                    $minAssociations = static::collect($association);
                 }
 
                 if ($distance === $minDistance) {
-                    $minDistanceAssociations = $minDistanceAssociations->add($association);
+                    $minAssociations = $minAssociations->add($association);
                 }
             }
 
-            if ($minDistanceAssociations === null || $minDistanceAssociations->isEmpty()) {
+            if ($minAssociations->isEmpty()) {
                 continue;
             }
 
-            $original = $minDistanceAssociations->first(
+            $original = $minAssociations->first(
                 fn (AggregatedAssociation $a) => $a->anchor()->equals($originalWord)
             );
 
-            $best = $original ?? $minDistanceAssociations->first();
+            $best = $original ?? $minAssociations->first();
 
-            // add the best association
             $result = $result->add($best);
         }
 

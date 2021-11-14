@@ -19,4 +19,6 @@ interface AssociationInterface
      * Returns unique association key in format '[first word id]:[second word id]'.
      */
     public function key(): string;
+
+    public function isValid(): bool;
 }

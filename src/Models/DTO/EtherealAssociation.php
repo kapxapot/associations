@@ -44,4 +44,9 @@ class EtherealAssociation implements AssociationInterface
     {
         return $this->firstWord->getId() . ':' . $this->secondWord->getId();
     }
+
+    public function isValid(): bool
+    {
+        return !$this->firstWord->equals($this->secondWord);
+    }
 }
