@@ -723,7 +723,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
                     fn (AggregatedAssociation $a) => $a->withSoftAnchor($word)
                 );
 
-            $col = $col->add(...$associations);
+            $col = $col->concat($associations);
         }
 
         // add main word asociations
@@ -738,21 +738,25 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
                     ->map(
                         fn (AggregatedAssociation $a) => $a->withSoftAnchor($mainWord)
                     );
-    
-                $col = $col->add(...$associations);
+
+                $col = $col->concat($associations);
             }
         }
 
         // congregate & mark as junky
-        $congregated = $col->congregate($this);
+        // we need to do this only for the original word, when `$exceptWord` is `null`
+        // todo: this doesn't prevent the associations from overlapping for different words and must be mitigated further (mark them as junky for a specific word)
+        if ($exceptWord === null) {
+            $congregated = $col->congregate($this);
 
-        $col->apply(
-            function (AggregatedAssociation $a) use ($congregated) {
-                if (!$congregated->contains($a)) {
-                    $a->markAsJunky();
+            $col->apply(
+                function (AggregatedAssociation $a) use ($congregated) {
+                    if (!$congregated->contains($a)) {
+                        $a->markAsJunky();
+                    }
                 }
-            }
-        );
+            );
+        }
 
         // order by `other than anchor`
         $col = $col->sortBy(

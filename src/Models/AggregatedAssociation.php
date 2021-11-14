@@ -12,8 +12,8 @@ class AggregatedAssociation extends Association
 
     private bool $junky = false;
 
-    /** @var string[] $junkyLog */
-    private array $junkyLog = [];
+    /** @var string[] $log */
+    private array $log = [];
 
     public function __construct(Association $association, ?Word $anchor = null)
     {
@@ -94,13 +94,13 @@ class AggregatedAssociation extends Association
         $this->junky = true;
     }
 
-    public function junkyLog(): string
+    public function log(): string
     {
-        return Text::join($this->junkyLog, ', ');
+        return Text::join($this->log, ', ');
     }
 
-    public function addToJunkyLog(string $message): void
+    public function addToLog(string $message): void
     {
-        $this->junkyLog[] = $message;
+        $this->log[] = $message;
     }
 }

@@ -44,12 +44,16 @@ class AggregatedAssociationCollection extends AssociationCollection
         // group by other than anchor canonical word id
         $canonicalGroups = $this->group(
             fn (AggregatedAssociation $a) =>
-                $a->otherThanAnchor()->canonical()->getId()
+                '[' . $a->otherThanAnchor()->canonical()->getId() . '] ' . $a->otherThanAnchor()->canonical()->word
         );
 
         $result = static::make();
 
-        foreach ($canonicalGroups as $associations) {
+        foreach ($canonicalGroups as $key => $associations) {
+            foreach ($associations as $association) {
+                $association->addToLog('Canonical key is ' . $key);
+            }
+
             // no need to choose in case of one association
             if ($associations->count() === 1) {
                 $result = $result->concat($associations);
@@ -102,7 +106,7 @@ class AggregatedAssociationCollection extends AssociationCollection
                     continue;
                 }
 
-                $association->addToJunkyLog('Because [' . $best->getId() . '] ' . $best->fullName() . ' is the best');
+                $association->addToLog('Because [' . $best->getId() . '] ' . $best->fullName() . ' is the best');
             }
         }
 
