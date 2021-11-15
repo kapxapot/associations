@@ -51,12 +51,18 @@ class AggregatedAssociationCollection extends AssociationCollection
 
         foreach ($canonicalGroups as $key => $associations) {
             foreach ($associations as $association) {
-                $association->addToLog('Canonical key is ' . $key);
+                $association->addToLog('Canonical: ' . $key);
             }
 
             // no need to choose in case of one association
             if ($associations->count() === 1) {
-                $result = $result->concat($associations);
+                /** @var AggregatedAssociation $onlyAssociation */
+                $onlyAssociation = $associations->first();
+
+                $onlyAssociation->addToLog('Only');
+
+                $result = $result->add($onlyAssociation);
+
                 continue;
             }
 
@@ -89,6 +95,11 @@ class AggregatedAssociationCollection extends AssociationCollection
 
             // this shouldn't be, but...
             if ($minAssociations->isEmpty()) {
+                /** @var AggregatedAssociation $association */
+                foreach ($associations as $association) {
+                    $association->addToLog('No min distance');
+                }
+
                 continue;
             }
 
@@ -103,10 +114,12 @@ class AggregatedAssociationCollection extends AssociationCollection
             /** @var AggregatedAssociation $association */
             foreach ($associations as $association) {
                 if ($association->equals($best)) {
+                    $association->addToLog('Best');
+
                     continue;
                 }
 
-                $association->addToLog('Because [' . $best->getId() . '] ' . $best->fullName() . ' is the best');
+                $association->addToLog('Best: [' . $best->getId() . '] ' . $best->fullName());
             }
         }
 

@@ -234,9 +234,7 @@
                     <div class="vgap-3">
                         <p><strong>Главное слово:</strong> {{ lm.word(word.mainWord) }}</p>
 
-                        <p><strong>Каноническое слово:</strong> {{ lm.word(word.canonical) }}</p>
-
-                        <p><strong>Расстояние от канонического слова:</strong> {{ word.distanceFromCanonical }}</p>
+                        <p><strong>Каноническое слово:</strong> {{ lm.word(word.canonical) }} (расстояние: {{ word.distanceFromCanonical }})</p>
                     </div>
                 {% endif %}
 
