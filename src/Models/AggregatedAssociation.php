@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use InvalidArgumentException;
+use Plasticode\Models\Interfaces\EquatableInterface;
 use Plasticode\Util\Text;
 use Webmozart\Assert\Assert;
 
@@ -34,6 +35,18 @@ class AggregatedAssociation extends Association
         if ($anchor !== null) {
             $this->withAnchor($anchor);
         }
+    }
+
+    /**
+     * `equals()` override that takes anchor into account.
+     *
+     * @param self|null $obj
+     */
+    public function equals(?EquatableInterface $obj): bool
+    {
+        return parent::equals($obj)
+            && (!$this->hasAnchor() && !$obj->hasAnchor()
+                || $this->anchor->equals($obj->anchor()));
     }
 
     public function hasAnchor(): bool
