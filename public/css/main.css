@@ -117,14 +117,14 @@ a.inactive:focus {
 /* alice & sber */
 
 :root {
-    --color-alice-start: #C926FF;
-    --color-alice-end: #4A26FF;
-    --color-alice-inner: white;
+    --color-alice-start: #c926ff;
+    --color-alice-end: #4a26ff;
+    --color-alice-inner: #ffffff;
 
-    --color-sber-1: #F2E913;
-    --color-sber-1-1: #A3CD39;
-    --color-sber-2: #0C8ACB;
-    --color-sber-2-1: #21A038;
+    --color-sber-1: #f2e913;
+    --color-sber-1-1: #a3cd39;
+    --color-sber-2: #0c8acb;
+    --color-sber-2-1: #21a038;
 }
 
 .alice-start {
@@ -163,24 +163,37 @@ a.inactive:focus {
 }
 
 .alice-inline svg,
-.sber-inline svg {
+.alice-inline img,
+.sber-inline svg,
+.sber-inline img {
     width: 16px;
     height: 16px;
+}
+
+.alice-inline svg,
+.sber-inline svg {
     margin-bottom: -2px;
 }
 
 .alice-avatar svg,
-.sber-avatar svg {
+.alice-avatar img,
+.sber-avatar svg,
+.sber-avatar img {
     width: 22px;
     height: 22px;
+}
+
+.alice-avatar svg,
+.sber-avatar svg {
     margin-bottom: -6px;
 }
 
 /* img/svg */
 
 .large-inline svg,
-.sidebar-links img,
-.sidebar-links svg {
+.large-inline img,
+.sidebar-links svg,
+.sidebar-links img {
     width: 32px;
     height: 32px;
 }

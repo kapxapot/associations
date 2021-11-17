@@ -5,6 +5,7 @@ namespace App\Collections;
 use App\Models\AggregatedAssociation;
 use App\Models\User;
 use App\Models\Word;
+use Webmozart\Assert\Assert;
 
 class AggregatedAssociationCollection extends AssociationCollection
 {
@@ -93,21 +94,13 @@ class AggregatedAssociationCollection extends AssociationCollection
                 }
             }
 
-            // this shouldn't be, but...
-            if ($minAssociations->isEmpty()) {
-                /** @var AggregatedAssociation $association */
-                foreach ($associations as $association) {
-                    $association->addToLog('No min distance');
-                }
-
-                continue;
-            }
-
             $original = $minAssociations->first(
                 fn (AggregatedAssociation $a) => $a->anchor()->equals($originalWord)
             );
 
             $best = $original ?? $minAssociations->first();
+
+            Assert::notNull($best);
 
             $result = $result->add($best);
 

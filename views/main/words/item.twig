@@ -100,7 +100,7 @@
                             {{ lm.association(assoc, word) }}
 
                             {% for user in assoc.extended_users %}
-                                {{ lm.user(user) }}
+                                {% include 'components/user.twig' with { 'user': user } %}
                             {% endfor %}
                         </li>
                     {% endfor %}
@@ -124,7 +124,7 @@
                             {{ lm.association(assoc, word) }}
 
                             {% for user in assoc.extended_users %}
-                                {{ lm.user(user) }}
+                                {% include 'components/user.twig' with { 'user': user } %}
                             {% endfor %}
                         </li>
                     {% endfor %}
@@ -148,7 +148,7 @@
                             {{ lm.association(assoc, word) }}
 
                             {% for user in assoc.extended_users %}
-                                {{ lm.user(user) }}
+                                {% include 'components/user.twig' with { 'user': user } %}
                             {% endfor %}
                         </li>
                     {% endfor %}
@@ -175,26 +175,26 @@
         </div>
     </div>
 
-    {% if is_moderator and word.hasPrimaryRelation %}
+    {% if is_moderator %}
         <div class="panel-secondary-heading">Агрегированные ассоциации</div>
         <div class="panel panel-secondary">
             <div class="panel-body">
                 {% if word.aggregatedAssociations.fuzzyPublic.any %}
                     <p class="b">Общие ({{ word.aggregatedAssociations.fuzzyPublic.count }}):</p>
 
-                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyPublic, 'word': word } only %}
+                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyPublic, 'word': word } %}
                 {% endif %}
 
                 {% if word.aggregatedAssociations.private.any %}
                     <p class="b mt-3">Личные ({{ word.aggregatedAssociations.private.count }}):</p>
 
-                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.private, 'word': word } only %}
+                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.private, 'word': word } %}
                 {% endif %}
 
                 {% if word.aggregatedAssociations.fuzzyDisabled.any %}
                     <p class="b mt-3">Отключенные ({{ word.aggregatedAssociations.fuzzyDisabled.count }}):</p>
 
-                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyDisabled, 'word': word } only %}
+                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyDisabled, 'word': word } %}
                 {% endif %}
             </div>
         </div>
@@ -268,7 +268,7 @@
     <div class="panel-secondary-heading">Происхождение</div>
     <div class="panel panel-secondary">
         <div class="panel-body">
-            <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {{ lm.user(word.creator, true) }} ({{ gm.moment_local(word.created_at_iso) }})</p>
+            <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {% include 'components/user.twig' with { 'user': word.creator, 'full': true } %} ({{ gm.moment_local(word.created_at_iso) }})</p>
 
             {% if is_moderator %}
                 {% if word.hasDifferentOriginalUtterance %}
@@ -295,7 +295,7 @@
                         } only %}
 
                         {% if meta_assoc.user %}
-                            {{ lm.user(meta_assoc.user) }}
+                            {% include 'components/user.twig' with { 'user': meta_assoc.user } %}
                         {% endif %}
 
                         {{ lm.word(meta_assoc.fromWord) }}
@@ -333,7 +333,7 @@
                                     <td>{% if feedback.hasDuplicate %}{{ lm.word(feedback.duplicate) }}{% endif %}</td>
                                     <td>{% if feedback.isMature %}<i class="fas fa-check"></i>{% endif %}</td>
                                     <td>{{ gm.moment_local(feedback.updated_at_iso) }}</td>
-                                    <td>{{ lm.user(feedback.creator) }}</td>
+                                    <td>{% include 'components/user.twig' with { 'user': feedback.creator } %}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>
@@ -373,7 +373,7 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ gm.moment_local(override.created_at_iso) }}</td>
-                                    <td>{{ lm.user(override.creator) }}</td>
+                                    <td>{% include 'components/user.twig' with { 'user': override.creator } %}</td>
                                 </tr>
                             {% endfor %}
                         </tbody>

@@ -21,7 +21,7 @@
             <p>
                 <strong>Участники:</strong>
                 {% for player in game.extended_players %}
-                    {{ player ? lm.user(player, true) : 'компьютер' }}{% if not loop.last %}, {% endif %}
+                    {% if player %}{% include 'components/user.twig' with { 'user': player, 'full': true } %}{% else %}компьютер{% endif %}{% if not loop.last %}, {% endif %}
                 {% endfor %}
             </p>
 

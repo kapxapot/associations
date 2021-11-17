@@ -3,7 +3,7 @@
 <ul class="mb-0 pl-3">
     {% for assoc in associations %}
         <li>
-            {{ lm.association(assoc) }}{% if assoc.creator %}<span class="ml-1">{{ lm.user(assoc.creator) }}</span>{% endif %}
+            {{ lm.association(assoc) }}{% if assoc.creator %}<span class="ml-1">{% include 'components/user.twig' with { 'user': assoc.creator } %}</span>{% endif %}
         </li>
     {% endfor %}
 </ul>

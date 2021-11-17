@@ -10,7 +10,7 @@
             {% endif %}
 
             {% for user in assoc.extendedUsers %}
-                {{ lm.user(user) }}
+                {% include 'components/user.twig' with { 'user': user } %}
             {% endfor %}
         </li>
     {% endfor %}
