@@ -37,14 +37,14 @@
                 </form>
             </div>
 
-            <div class="col-xs-12 ph-0" ng-show="!demo.loading">
+            <div class="col-xs-12 ph-0" ng-show="!demo.loading && !demo.isBroken">
                 <div class="alert alert-danger alert-dismissable fade in mt-2">
                     <a href="javascript:void(0)" class="close" data-hide="alert" aria-label="close">&times;</a>
                     <div ng-bind-html="demo.alertError|rawHtml"></div>
                 </div>
 
                 <div class="mt-2">
-                    <button ng-click="demo.skip()" class="btn btn-default mr-2" ng-disabled="demo.loading || demo.saving" id="skip"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
+                    <button ng-click="demo.skip()" class="btn btn-default" ng-disabled="demo.loading || demo.saving" id="skip"><i class="fas fa-forward action-color mr-1"></i> Другое слово</button>
                 </div>
             </div>
         </div>

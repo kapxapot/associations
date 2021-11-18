@@ -83,13 +83,13 @@
             {% endif %}
 
             {% if auth.user %}
-                <div class="mt-3">
+                <div class="mt-3 flex flex-wrap flex-gap-2">
                     <button ng-click="problemsDialog()" class="btn btn-default"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</button>
 
                     {% if is_moderator %}
-                        <button ng-click="overrideDialog()" class="btn btn-default ml-2"><i class="fas fa-wrench mr-1"></i> Исправить</button>
+                        <button ng-click="overrideDialog()" class="btn btn-default"><i class="fas fa-wrench mr-1"></i> Исправить</button>
 
-                        <button ng-click="recount()" class="btn btn-default ml-2"><i class="fas fa-sync-alt dendro-color mr-1"></i> Пересчитать</button>
+                        <button ng-click="recount()" class="btn btn-default"><i class="fas fa-sync-alt dendro-color mr-1"></i> Пересчитать</button>
                     {% endif %}
                 </div>
             {% endif %}

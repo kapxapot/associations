@@ -34,7 +34,7 @@ class AggregatedAssociationCollection extends AssociationCollection
     /**
      * Removes semantically duplicate associations.
      *
-     * 1. If there's a original association with the same destination, all the others are removed.
+     * 1. If there's an original association with the same destination, all the others are removed.
      * 2. Semantically duplicate associations are like: [any word -> word2], [any word -> word2's main word]. In this case the second association stays, the first goes away.
      *
      * @param Word $originalWord The word based on which the associations are aggregated.
@@ -42,7 +42,7 @@ class AggregatedAssociationCollection extends AssociationCollection
      */
     public function tidy(Word $originalWord): self
     {
-        // group by other than anchor canonical word id
+        // group by other than anchor canonical word
         $canonicalGroups = $this->group(
             fn (AggregatedAssociation $a) =>
                 '[' . $a->otherThanAnchor()->canonical()->getId() . '] ' . $a->otherThanAnchor()->canonical()->word

@@ -160,15 +160,15 @@
             {% endif %}
 
             {% if auth.user %}
-                <div class="mt-3">
+                <div class="mt-3 flex flex-wrap flex-gap-2">
                     <button ng-click="problemsDialog()" class="btn btn-default"><i class="fas fa-exclamation-triangle danger-color mr-1"></i> Что-то не так!</button>
 
                     {% if is_moderator %}
-                        <button ng-click="overrideDialog()" class="btn btn-default ml-2"><i class="fas fa-wrench mr-1"></i> Исправить</button>
+                        <button ng-click="overrideDialog()" class="btn btn-default"><i class="fas fa-wrench mr-1"></i> Исправить</button>
 
-                        <button ng-click="relationsDialog()" class="btn btn-default ml-2"><i class="fas fa-link action-color mr-1"></i> Связи</button>
+                        <button ng-click="relationsDialog()" class="btn btn-default"><i class="fas fa-link action-color mr-1"></i> Связи</button>
 
-                        <button ng-click="recount()" class="btn btn-default ml-2"><i class="fas fa-sync-alt dendro-color mr-1"></i> Пересчитать</button>
+                        <button ng-click="recount()" class="btn btn-default"><i class="fas fa-sync-alt dendro-color mr-1"></i> Пересчитать</button>
                     {% endif %}
                 </div>
             {% endif %}
@@ -179,23 +179,31 @@
         <div class="panel-secondary-heading">Агрегированные ассоциации</div>
         <div class="panel panel-secondary">
             <div class="panel-body">
-                {% if word.aggregatedAssociations.fuzzyPublic.any %}
-                    <p class="b">Общие ({{ word.aggregatedAssociations.fuzzyPublic.count }}):</p>
+                <div class="flex flex-v flex-gap-2">
+                    {% if word.aggregatedAssociations.fuzzyPublic.any %}
+                        <div>
+                            <p class="b">Общие ({{ word.aggregatedAssociations.fuzzyPublic.count }}):</p>
 
-                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyPublic, 'word': word } %}
-                {% endif %}
+                            {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyPublic, 'word': word } %}
+                        </div>
+                    {% endif %}
 
-                {% if word.aggregatedAssociations.private.any %}
-                    <p class="b mt-3">Личные ({{ word.aggregatedAssociations.private.count }}):</p>
+                    {% if word.aggregatedAssociations.private.any %}
+                        <div>
+                            <p class="b">Личные ({{ word.aggregatedAssociations.private.count }}):</p>
 
-                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.private, 'word': word } %}
-                {% endif %}
+                            {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.private, 'word': word } %}
+                        </div>
+                    {% endif %}
 
-                {% if word.aggregatedAssociations.fuzzyDisabled.any %}
-                    <p class="b mt-3">Отключенные ({{ word.aggregatedAssociations.fuzzyDisabled.count }}):</p>
+                    {% if word.aggregatedAssociations.fuzzyDisabled.any %}
+                        <div>
+                            <p class="b">Отключенные ({{ word.aggregatedAssociations.fuzzyDisabled.count }}):</p>
 
-                    {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyDisabled, 'word': word } %}
-                {% endif %}
+                            {% include 'components/word_association_list.twig' with { 'associations': word.aggregatedAssociations.fuzzyDisabled, 'word': word } %}
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     {% endif %}
