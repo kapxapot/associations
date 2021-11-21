@@ -95,7 +95,7 @@ class AggregatedAssociationCollection extends AssociationCollection
             }
 
             $original = $minAssociations->first(
-                fn (AggregatedAssociation $a) => $a->anchor()->equals($originalWord)
+                fn (AggregatedAssociation $a) => $a->anchorEquals($originalWord)
             );
 
             $best = $original ?? $minAssociations->first();

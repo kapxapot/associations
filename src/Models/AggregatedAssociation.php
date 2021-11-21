@@ -49,6 +49,11 @@ class AggregatedAssociation extends Association
                 || $this->anchor->equals($obj->anchor()));
     }
 
+    public function anchorEquals(Word $word): bool
+    {
+        return $this->hasAnchor() && $this->anchor->equals($word);
+    }
+
     public function hasAnchor(): bool
     {
         return $this->anchor !== null;
