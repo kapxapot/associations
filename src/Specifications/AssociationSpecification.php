@@ -6,9 +6,6 @@ use App\Config\Interfaces\AssociationConfigInterface;
 use App\Models\Association;
 use App\Semantics\Scope;
 use App\Semantics\Severity;
-use App\Specifications\Rules\AbstractRule;
-use App\Specifications\Rules\Association\AssociationDisabledByWordsRelation;
-use Plasticode\Collections\Generic\Collection;
 
 class AssociationSpecification
 {
@@ -43,13 +40,7 @@ class AssociationSpecification
 
     private function isDisabled(Association $association): bool
     {
-        $rules = Collection::collect(
-            new AssociationDisabledByWordsRelation()
-        );
-
-        return $rules->anyFirst(
-            fn (AbstractRule $r) => $r->check($association)
-        );
+        return $association->isSelfRelated();
     }
 
     private function isPublic(Association $association): bool

@@ -120,6 +120,7 @@ class Association extends LanguageElement implements AssociationInterface
     public function isDisabledByOverride(): bool
     {
         return parent::isDisabledByOverride()
+            || $this->isSelfRelated()
             || $this->words()->any(
                 fn (Word $w) => $w->isDisabledByOverride()
             );
@@ -216,6 +217,17 @@ class Association extends LanguageElement implements AssociationInterface
     public function key(): string
     {
         return $this->firstWordId . ':' . $this->secondWordId;
+    }
+
+    /**
+     * Checks if the association's words are related to each other.
+     * Thus making the association invalid.
+     */
+    public function isSelfRelated(): bool
+    {
+        return $this->firstWord()->isCanonicallyRelatedTo(
+            $this->secondWord()
+        );
     }
 
     // AssociationInterface
