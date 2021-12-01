@@ -117,6 +117,11 @@ class GameService
 
         $wordStr = $this->languageService->normalizeWord($language, $wordStr);
 
+        $originalUtterance = $this->languageService->normalizeWord(
+            $language,
+            $originalUtterance
+        );
+
         $this->wordService->validateWord($wordStr);
         $this->turnService->validatePlayerTurn($game, $wordStr);
 
