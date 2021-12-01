@@ -131,7 +131,7 @@ class WordService
                 [
                     'language_id' => $language->getId(),
                     'word' => $wordStr,
-                    'original_utterance' => $originalUtterance,
+                    'original_utterance' => $this->normalize($originalUtterance),
                     'created_by' => $user->getId(),
                 ]
             );
