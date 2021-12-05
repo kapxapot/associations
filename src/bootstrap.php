@@ -30,6 +30,7 @@ if ($debug) {
     error_reporting($errorLevel & ~E_NOTICE & ~E_DEPRECATED);
 }
 
+// container wiring
 
 $slimSettings = [
     'httpVersion' => '1.1',
@@ -41,10 +42,11 @@ $slimSettings = [
     'routerCacheFile' => false,
 ];
 
-$autowirer = (new Autowirer())
-    ->withUntypedParamResolver(
-        new UntypedContainerParamResolver()
-    );
+$autowirer = new Autowirer();
+
+$autowirer = $autowirer->withUntypedParamResolver(
+    new UntypedContainerParamResolver()
+);
 
 $container = new AutowiringContainer($autowirer);
 
@@ -53,6 +55,7 @@ $container['settings'] = fn () => new Slim\Collection($slimSettings);
 $defaultSlimProvider = new Slim\DefaultServicesProvider();
 $defaultSlimProvider->register($container);
 
+// app start
 
 $app = new Slim\App($container);
 
