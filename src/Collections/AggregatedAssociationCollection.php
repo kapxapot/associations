@@ -42,17 +42,18 @@ class AggregatedAssociationCollection extends AssociationCollection
      */
     public function tidy(Word $originalWord): self
     {
-        // group by other than anchor canonical word
         $canonicalGroups = $this->group(
-            fn (AggregatedAssociation $a) =>
-                '[' . $a->otherThanAnchor()->canonical()->getId() . '] ' . $a->otherThanAnchor()->canonical()->word
+            fn (AggregatedAssociation $a) => (string)$a->otherThanAnchor()->canonical()
         );
 
         $result = static::make();
 
         foreach ($canonicalGroups as $key => $associations) {
+            /** @var AggregatedAssociation $association */
             foreach ($associations as $association) {
-                $association->addToLog('Canonical: ' . $key);
+                if (!$association->otherThanAnchor()->isCanonical()) {
+                    $association->addToLog('Canonical: ' . $key);
+                }
             }
 
             // no need to choose in case of one association
@@ -94,10 +95,12 @@ class AggregatedAssociationCollection extends AssociationCollection
                 }
             }
 
+            /** @var AggregatedAssociation $original */
             $original = $minAssociations->first(
                 fn (AggregatedAssociation $a) => $a->anchorEquals($originalWord)
             );
 
+            /** @var AggregatedAssociation $best */
             $best = $original ?? $minAssociations->first();
 
             Assert::notNull($best);
@@ -112,7 +115,7 @@ class AggregatedAssociationCollection extends AssociationCollection
                     continue;
                 }
 
-                $association->addToLog('Best: [' . $best->getId() . '] ' . $best->fullName());
+                $association->addToLog('Best: ' . $best);
             }
         }
 

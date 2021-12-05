@@ -8,10 +8,6 @@
             {% if assoc.hasAnchor %}
                 {{ assoc.log }}
             {% endif %}
-
-            {% for user in assoc.extendedUsers %}
-                {% include 'components/user.twig' with { 'user': user } %}
-            {% endfor %}
         </li>
     {% endfor %}
 </ul>

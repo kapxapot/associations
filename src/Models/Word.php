@@ -678,6 +678,9 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this->originalWord !== $this->word;
     }
 
+    /**
+     * Checks if the word has a primary relation (either out, or in).
+     */
     public function hasPrimaryRelation(): bool
     {
         return $this->allRelations()->filterPrimary()->any();
@@ -745,6 +748,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
         // congregate & mark as junky
         // we need to do this only for the original word, when `$exceptWord` is `null`
+        //
         // todo: this doesn't prevent the associations from overlapping for different words and must be mitigated further (mark them as junky for a specific word)
         if ($exceptWord === null) {
             $congregated = $col->congregate($this);
@@ -758,22 +762,29 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             );
         }
 
-        // order by `other than anchor`
+        // order by `other than anchor` word and by distance of `anchor` from its canonical
         $col = $col->sortBy(
             SortStep::byFunc(
                 fn (AggregatedAssociation $a) => $a->otherThanAnchor()->word,
                 Sort::STRING
             ),
             SortStep::byFunc(
-                fn (AggregatedAssociation $a) => $a->anchor()->distanceFromAncestor(
-                    $a->anchor()->canonical()
-                )
+                fn (AggregatedAssociation $a) => $a->anchor()->distanceFromCanonical()
             )
         );
 
         $this->aggregatedAssociations = $col;
 
         return $this->aggregatedAssociations;
+    }
+
+    public function toString(): string
+    {
+        return sprintf(
+            '[%s] %s',
+            $this->getId(),
+            $this->word
+        );
     }
 
     // serialization

@@ -141,6 +141,11 @@ class Association extends LanguageElement implements AssociationInterface
             : $this->firstWord();
     }
 
+    public function usageCount(): int
+    {
+        return $this->extendedUsers()->count();
+    }
+
     /**
      * Users that used this association.
      */
@@ -227,6 +232,15 @@ class Association extends LanguageElement implements AssociationInterface
     {
         return $this->firstWord()->isCanonicallyRelatedTo(
             $this->secondWord()
+        );
+    }
+
+    public function toString(): string
+    {
+        return sprintf(
+            '[%s] %s',
+            $this->getId(),
+            $this->fullName()
         );
     }
 

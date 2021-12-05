@@ -99,9 +99,9 @@
 
                             {{ lm.association(assoc, word) }}
 
-                            {% for user in assoc.extended_users %}
-                                {% include 'components/user.twig' with { 'user': user } %}
-                            {% endfor %}
+                            {% if assoc.usageCount > 1 %}
+                                ({{ assoc.usageCount }})
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
@@ -123,9 +123,9 @@
 
                             {{ lm.association(assoc, word) }}
 
-                            {% for user in assoc.extended_users %}
-                                {% include 'components/user.twig' with { 'user': user } %}
-                            {% endfor %}
+                            {% if assoc.usageCount > 1 %}
+                                ({{ assoc.usageCount }})
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
@@ -147,9 +147,9 @@
 
                             {{ lm.association(assoc, word) }}
 
-                            {% for user in assoc.extended_users %}
-                                {% include 'components/user.twig' with { 'user': user } %}
-                            {% endfor %}
+                            {% if assoc.usageCount > 1 %}
+                                ({{ assoc.usageCount }})
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
