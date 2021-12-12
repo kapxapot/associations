@@ -90,9 +90,9 @@
             {% if word.approved_associations.any %}
                 <p class="b mt-3">Общие ассоциации ({{ word.approved_associations.count }}):</p>
 
-                <ul class="vgap-2 br-word">
+                <div class="vgap-2 br-word">
                     {% for assoc in word.approved_visible_associations %}
-                        <li>
+                        <span>
                             {% if word.origin_association and word.origin_association.id == assoc.id %}
                                 <i class="fas fa-lightbulb dendro-color" title="Источник" data-toggle="tooltip"></i>
                             {% endif %}
@@ -102,9 +102,9 @@
                             {% if assoc.usageCount > 1 %}
                                 ({{ assoc.usageCount }})
                             {% endif %}
-                        </li>
+                        </span>
                     {% endfor %}
-                </ul>
+                </div>
 
                 {% if approved_invisible_associations_str %}
                     <p>{{ approved_invisible_associations_str }}.</p>

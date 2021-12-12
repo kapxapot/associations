@@ -43,6 +43,7 @@ class AssociationRecountService
     {
         $assoc = $this->recountSeverity($association, $sourceEvent);
         $assoc = $this->recountScope($association, $sourceEvent);
+        $assoc = $this->recountMeta($association);
 
         return $assoc;
     }
@@ -115,6 +116,18 @@ class AssociationRecountService
                 new AssociationSeverityChangedEvent($association, $sourceEvent)
             );
         }
+
+        return $association;
+    }
+
+    public function recountMeta(Association $association): Association
+    {
+        $association->setMetaValue(
+            Association::META_USAGE_COUNT,
+            $association->usageCount(true)
+        );
+
+        $association = $this->associationRepository->save($association);
 
         return $association;
     }

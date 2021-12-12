@@ -26,6 +26,10 @@ class AssociationRepository extends LanguageElementRepository implements Associa
 
     public function save(Association $association): Association
     {
+        $association->meta = empty($association->metaData())
+            ? null
+            : json_encode($association->metaData());
+
         return $this->saveEntity($association);
     }
 
