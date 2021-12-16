@@ -164,7 +164,8 @@
             <div class="panel-body">
                 <strong>Обновлена:</strong> {{ gm.moment_local(association.updated_at_iso) }}<br/>
                 <strong>Видимость:</strong> {{ gm.moment_local(association.scopeUpdatedAtIso, 'никогда') }}<br/>
-                <strong>Жестокость:</strong> {{ gm.moment_local(association.severityUpdatedAtIso, 'никогда') }}
+                <strong>Жестокость:</strong> {{ gm.moment_local(association.severityUpdatedAtIso, 'никогда') }}<br/><br/>
+                <strong>Мета:</strong> {{ association.meta }}
             </div>
         </div>
     {% endif %}
