@@ -13,7 +13,7 @@
         {{ lm.panel_header(_context, title, { 'no_breadcrumbs': true }) }}
 
         <div class="panel-body">
-            <p class="flex flex-wrap flex-h-gap-1">
+            <p class="flex flex-wrap flex-h-gap-2">
                 <span class="label label-default" title="Язык: {{ association.language.name }}" data-toggle="tooltip">{{ association.language.name|lower }}</span>
 
                 {% set scopeLock = association.hasScopeOverride ? '<i class="fas fa-lock"></i> ' : '' %}

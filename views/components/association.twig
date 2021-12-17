@@ -27,6 +27,6 @@
             {% set textClasses = textClasses|merge(['inactive']) %}
         {% endif %}
 
-        {% if not no_link and association.isReal %}<a href="{{ association.url }}"{% if linkClasses|length > 0 %} class="{{ linkClasses|join(' ') }}"{% endif %}>{% elseif not just_text %}<span{% if textClasses|length > 0 %} class="{{ textClasses|join(' ') }}"{% endif %}>{% endif %}{% if not short and not headless %}{{ association.isReal ? first.display_name : lm.word(first) }} {% endif %}{% if not headless %}{{ sign }}{% endif %}{% if not short %} {{ association.isReal ? second.display_name : lm.word(second) }}{% endif %}{% if not no_link and association.isReal %}</a>{% elseif not just_text %}</span>{% endif %}
+        {% if not no_link and association.isReal %}<a href="{{ association.url }}"{% if linkClasses|length > 0 %} class="{{ linkClasses|join(' ') }}"{% endif %}>{% elseif not just_text %}<span{% if textClasses|length > 0 %} class="{{ textClasses|join(' ') }}"{% endif %}>{% endif %}{% if not short and not headless %}{{ association.isReal ? first.display_name : lm.word(first) }} {% endif %}{% if not headless %}{{ sign }}{% endif %}{% if not short %} {{ association.isReal ? second.display_name : lm.word(second) }}{% endif %}{{ addendum }}{% if not no_link and association.isReal %}</a>{% elseif not just_text %}</span>{% endif %}
     {% else %}{{ sign }}{% endif %}
 {% endspaceless %}
