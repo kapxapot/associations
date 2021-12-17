@@ -208,3 +208,17 @@ a.inactive:focus {
 .checkbox + .check-inside {
     margin-top: -5px;
 }
+
+/* misc */
+
+.flex > .label {
+    line-height: 1.2em;
+}
+
+.flex > .label > a {
+    color: white;
+}
+
+.flex > .label > a.inactive {
+    text-decoration: line-through;
+}

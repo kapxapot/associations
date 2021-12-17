@@ -1,6 +1,8 @@
-<div class="vgap-2 br-word flex flex-wrap flex-h-gap-3">
+{% import 'main/local_macros.twig' as lm %}
+
+<div class="vgap-2 br-word flex flex-wrap flex-h-gap-2">
     {% for assoc in associations %}
-        <span>
+        <span class="label {{ lm.scope_class(assoc) }}">
             {% include 'components/association.twig' with { 'association': assoc, 'by_word': word, 'headless': true } only %}
 
             {% if assoc.usageCount > 1 %}

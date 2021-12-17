@@ -44,3 +44,5 @@
     {% set index = gendered.gender ?? 0 %}
     {{ options[index] }}
 {% endmacro %}
+
+{% macro scope_class(element) %}{% if element.isDisabled %}label-danger{% elseif element.isInactive %}label-warning{% elseif element.isFuzzyPublic %}label-success{% else %}label-primary{% endif %}{% endmacro %}

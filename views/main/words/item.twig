@@ -18,7 +18,7 @@
         }) }}
 
         <div class="panel-body">
-            <p>
+            <p class="flex flex-wrap flex-h-gap-1">
                 <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
 
                 {% if word.primaryRelation %}
@@ -31,17 +31,19 @@
 
                 {% set scopeLock = word.hasScopeOverride ? '<i class="fas fa-lock"></i> ' : '' %}
 
-                {% if word.isDisabled %}
-                    <span class="label label-danger">{{ scopeLock|raw }}отключено</span>
-                {% elseif word.isInactive %}
-                    <span class="label label-warning">{{ scopeLock|raw }}неактивное</span>
-                {% elseif word.isPublic %}
-                    <span class="label label-success"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичное</span>
-                {% elseif word.isCommon %}
-                    <span class="label label-success"><i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общее</span>
-                {% else %}
-                    <span class="label label-primary">{{ scopeLock|raw }}личное</span>
-                {% endif %}
+                <span class="label {{ lm.scope_class(word) }}">
+                    {% if word.isDisabled %}
+                        {{ scopeLock|raw }}отключено
+                    {% elseif word.isInactive %}
+                        {{ scopeLock|raw }}неактивное
+                    {% elseif word.isPublic %}
+                        <i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичное
+                    {% elseif word.isCommon %}
+                        <i class="fas {{ word.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общее
+                    {% else %}
+                        {{ scopeLock|raw }}личное
+                    {% endif %}
+                </span>
 
                 {% set severityLock = word.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}
 

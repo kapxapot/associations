@@ -13,22 +13,24 @@
         {{ lm.panel_header(_context, title, { 'no_breadcrumbs': true }) }}
 
         <div class="panel-body">
-            <p>
+            <p class="flex flex-wrap flex-h-gap-1">
                 <span class="label label-default" title="Язык: {{ association.language.name }}" data-toggle="tooltip">{{ association.language.name|lower }}</span>
 
                 {% set scopeLock = association.hasScopeOverride ? '<i class="fas fa-lock"></i> ' : '' %}
 
-                {% if association.isDisabled %}
-                    <span class="label label-danger">{{ scopeLock|raw }}отключена</span>
-                {% elseif association.isInactive %}
-                    <span class="label label-warning">{{ scopeLock|raw }}неактивная</span>
-                {% elseif association.isPublic %}
-                    <span class="label label-success"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичная</span>
-                {% elseif association.isCommon %}
-                    <span class="label label-success"><i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общая</span>
-                {% else %}
-                    <span class="label label-primary">{{ scopeLock|raw }}личная</span>
-                {% endif %}
+                <span class="label {{ lm.scope_class(association) }}">
+                    {% if association.isDisabled %}
+                        {{ scopeLock|raw }}отключена
+                    {% elseif association.isInactive %}
+                        {{ scopeLock|raw }}неактивная
+                    {% elseif association.isPublic %}
+                        <i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check' }}"></i> публичная
+                    {% elseif association.isCommon %}
+                        <i class="fas {{ association.hasScopeOverride ? 'fa-lock' : 'fa-check-double' }}"></i> общая
+                    {% else %}
+                        {{ scopeLock|raw }}личная
+                    {% endif %}
+                </span>
 
                 {% set severityLock = association.hasSeverityOverride ? '<i class="fas fa-lock"></i> ' : '' %}
 
