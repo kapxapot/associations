@@ -18,7 +18,7 @@
         }) }}
 
         <div class="panel-body">
-            <p class="flex flex-wrap flex-h-gap-2">
+            <p class="flex flex-wrap flex-h-gap-2 flex-v-gap-1">
                 <span class="label label-default" title="Язык: {{ word.language.name }}" data-toggle="tooltip">{{ word.language.name|lower }}</span>
 
                 {% if word.primaryRelation %}
@@ -135,7 +135,7 @@
         <div class="panel-secondary-heading">Ассоциации</div>
         <div class="panel panel-secondary">
             <div class="panel-body">
-                <div class="flex flex-v flex-gap-2">
+                <div class="flex flex-v flex-gap-3">
                     {% if word.approved_associations.any %}
                         <div>
                             <p class="b">Общие ({{ word.approved_associations.count }}):</p>
@@ -176,7 +176,7 @@
         <div class="panel-secondary-heading">Агрегированные ассоциации</div>
         <div class="panel panel-secondary">
             <div class="panel-body">
-                <div class="flex flex-v flex-gap-2">
+                <div class="flex flex-v flex-gap-3">
                     {% if word.aggregatedAssociations.fuzzyPublic.any %}
                         <div>
                             <p class="b">Общие ({{ word.aggregatedAssociations.fuzzyPublic.count }}):</p>
