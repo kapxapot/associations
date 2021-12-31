@@ -142,7 +142,7 @@ abstract class AbstractBotRequest
     protected function getSemiTrashTokens(): array
     {
         return [
-            'сейчас', 'хорошо', 'блядь', 'слово', 'блин'
+            'сейчас', 'хорошо', 'блядь', 'слово', 'блин', 'ага'
         ];
     }
 
