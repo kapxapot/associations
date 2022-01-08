@@ -8,7 +8,6 @@ use App\Bots\Command;
 use App\Models\DTO\PseudoTurn;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Services\AssociationService;
 use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
@@ -19,13 +18,11 @@ class ApplicationAnswerer extends AbstractAnswerer
 
     private WordRepositoryInterface $wordRepository;
 
-    private AssociationService $associationService;
     private GameService $gameService;
     private TurnService $turnService;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
-        AssociationService $associationService,
         GameService $gameService,
         TurnService $turnService,
         LanguageService $languageService
@@ -35,7 +32,6 @@ class ApplicationAnswerer extends AbstractAnswerer
 
         $this->wordRepository = $wordRepository;
 
-        $this->associationService = $associationService;
         $this->gameService = $gameService;
         $this->turnService = $turnService;
     }
@@ -156,10 +152,15 @@ class ApplicationAnswerer extends AbstractAnswerer
         $word = $this->findWord($request->originalUtterance())
             ?? $this->findWord($request->command());
 
-        $game = $this->gameService->buildEtherealGame($prevWord, $word);
+        /** @var PseudoTurn|null $turn */
+        $turn = null;
 
-        return $this->turnService->findAnswer($game, $word)
-            ?? PseudoTurn::empty($word);
+        if ($word !== null) {
+            $game = $this->gameService->buildEtherealGame($prevWord, $word);
+            $turn = $this->turnService->findAnswer($game, $word);
+        }
+
+        return $turn ?? PseudoTurn::empty($word);
     }
 
     private function getAnyWord(?AbstractBotRequest $request = null): ?Word
