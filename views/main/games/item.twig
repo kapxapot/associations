@@ -4,6 +4,7 @@
 {% import 'main/local_macros.twig' as lm %}
 
 {% set is_moderator = can('games', 'read') %}
+{% set no_disqus = true %}
 
 {% block content %}
     <div class="panel panel-primary">
