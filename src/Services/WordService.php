@@ -87,7 +87,23 @@ class WordService
             );
         }
 
-        return $word->preferCanonical();
+        return $this->swapWord($word);
+    }
+
+    /**
+     * Swaps the word with another one according to the following logic:
+     *
+     * - If the word is disabled and has a canonical word, use the canonical one.
+     *
+     * Todo: Should be extracted to some external strategy.
+     */
+    private function swapWord(Word $word): Word
+    {
+        if ($word->isFuzzyDisabled() && $word->hasMain()) {
+            return $word->canonical();
+        }
+
+        return $word;
     }
 
     public function normalize(?string $word): ?string
@@ -96,10 +112,10 @@ class WordService
     }
 
     /**
-     * Creates new word.
-     * 
+     * Creates a new word.
+     *
      * Word must be normalized in advance!
-     * 
+     *
      * !!!!!!!!!!!!!!!!!!!
      * Same problem as with duplicate association
      * Two users can add the same word in parallel
