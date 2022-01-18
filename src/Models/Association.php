@@ -165,7 +165,7 @@ class Association extends LanguageElement implements AssociationInterface
     public function isDisabledByOverride(): bool
     {
         return parent::isDisabledByOverride()
-            || $this->isSelfRelated()
+            || ($this->isFuzzyDisabled() && $this->isSelfRelated())
             || $this->words()->any(
                 fn (Word $w) => $w->isDisabledByOverride()
             );
