@@ -4,7 +4,7 @@
     {% for assoc in associations %}
         <span class="label {{ lm.scope_class(assoc) }}">
         {% set addendum = (assoc.usageCount > 1) ? ' (' ~ assoc.usageCount ~ ')' : '' %}
-            {% include 'components/association.twig' with { 'association': assoc, 'by_word': word, 'headless': true, 'addendum': addendum } only %}
+            {% include 'components/association.twig' with { 'association': assoc, 'by_word': word, 'headless': true, 'addendum': addendum, 'show_lock': show_locks } only %}
         </span>
     {% endfor %}
 </div>
