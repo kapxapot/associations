@@ -7,6 +7,7 @@ use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Plasticode\Search\SearchParams;
+use Plasticode\Util\Strings;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -98,22 +99,26 @@ class WordController extends Controller
 
         $parsedDefinition = $this->wordService->getParsedDefinition($word);
 
-        $params = $this->buildParams(
-            [
-                'params' => [
-                    'word' => $word,
-                    'approved_invisible_associations_str' => $approvedStr,
-                    'not_approved_invisible_associations_str' => $notApprovedStr,
-                    'disabled_invisible_associations_str' => $disabledStr,
-                    'definition' => $parsedDefinition,
-                    'word_relation_types' => $this->wordRelationTypeRepository->getAll(),
-                    'disqus_id' => 'word' . $word->getId(),
-                    'debug' => $debug,
-                ],
-            ]
-        );
+        $params = [
+            'word' => $word,
+            'approved_invisible_associations_str' => $approvedStr,
+            'not_approved_invisible_associations_str' => $notApprovedStr,
+            'disabled_invisible_associations_str' => $disabledStr,
+            'definition' => $parsedDefinition,
+            'word_relation_types' => $this->wordRelationTypeRepository->getAll(),
+            'disqus_id' => 'word' . $word->getId(),
+            'debug' => $debug,
+        ];
 
-        return $this->render($response, 'main/words/item.twig', $params);
+        if ($parsedDefinition !== null) {
+            $params['page_description'] =
+                Strings::upperCaseFirst($word->word) . ' — ' .
+                Strings::lowerCaseFirst($parsedDefinition->firstDefinition());
+        }
+
+        $data = $this->buildParams(['params' => $params]);
+
+        return $this->render($response, 'main/words/item.twig', $data);
     }
 
     public function latestChunk(
