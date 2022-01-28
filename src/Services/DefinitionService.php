@@ -46,8 +46,8 @@ class DefinitionService
 
     /**
      * Returns word definition by {@see Word} entity.
-     * 
-     * @param $allowRemoteLoad Set this to `true` if loading from source must
+     *
+     * @param $allowRemoteLoad Set this to `true` if loading from the source must
      * be enabled. By default it's not performed.
      */
     public function getByWord(

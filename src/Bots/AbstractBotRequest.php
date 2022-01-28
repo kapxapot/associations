@@ -5,6 +5,7 @@ namespace App\Bots;
 use App\Semantics\Word\Tokenizer;
 use Plasticode\Semantics\Attitude;
 use Plasticode\Semantics\Gender;
+use Plasticode\Util\Arrays;
 
 abstract class AbstractBotRequest
 {
@@ -106,12 +107,22 @@ abstract class AbstractBotRequest
         // filter trash tokens
         $tokens = $this->filterTokens($tokens, $trashTokens);
 
-        // filter semi-trash tokens (but only if there isn't just one semi-trash token)
-        if (count($tokens) === 1 && in_array($tokens[0], $semiTrashTokens)) {
-            return $tokens;
+        // filter semi-trash tokens in case of more than 1 token
+        if (count($tokens) > 1) {
+            $tokens = $this->filterTokens($tokens, $semiTrashTokens);
         }
 
-        return $this->filterTokens($tokens, $semiTrashTokens);
+        // trimming
+        $trimTokens = $this->getTrimTokens();
+        $tokens = $this->trimTokens($tokens, $trimTokens);
+
+        $startingTrashTokens = $this->getStartingTrashTokens();
+        $tokens = $this->trimStartingTokens($tokens, $startingTrashTokens);
+
+        $endingTrashTokens = $this->getEndingTrashTokens();
+        $tokens = $this->trimEndingTokens($tokens, $endingTrashTokens);
+
+        return $tokens;
     }
 
     /**
@@ -132,6 +143,67 @@ abstract class AbstractBotRequest
     }
 
     /**
+     * Trims tokens from both the start and the end.
+     *
+     * @param string[] $tokens
+     * @param string[] $badTokens
+     * @return string[]
+     */
+    private function trimTokens(array $tokens, array $badTokens): array
+    {
+        $tokens = $this->trimStartingTokens($tokens, $badTokens);
+        $tokens = $this->trimEndingTokens($tokens, $badTokens);
+
+        return $tokens;
+    }
+
+    /**
+     * Trims tokens from the start. At least one token is left.
+     *
+     * @param string[] $tokens
+     * @param string[] $badTokens
+     * @return string[]
+     */
+    private function trimStartingTokens(array $tokens, array $badTokens): array
+    {
+        while (in_array(Arrays::first($tokens), $badTokens)) {
+            $tokens = Arrays::skip($tokens, 1);
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * Trims tokens from the end.
+     *
+     * @param string[] $tokens
+     * @param string[] $badTokens
+     * @return string[]
+     */
+    private function trimEndingTokens(array $tokens, array $badTokens): array
+    {
+        while (in_array(Arrays::last($tokens), $badTokens)) {
+            $tokens = Arrays::trimTail($tokens, 1);
+        }
+
+        return $tokens;
+    }
+
+    /**
+     * Returns trash tokens.
+     *
+     * These tokens are always filtered.
+     *
+     * @return string[]
+     */
+    protected function getTrashTokens(): array
+    {
+        return [
+            'конечно', 'давайте', 'сказала', 'сказал', 'говорю', 'ладно', 'давай', 'снова', 'тоже', 'сама', 'этот', 'нету', 'было', 'была', 'был', 'это', 'эта', 'так', 'как', 'сам', 'вот', 'уже', 'дай', 'мне', 'мой', 'моя', 'мое', 'моё', 'еще', 'ещё', 'нет', 'ты', 'ой', 'ох', 'да', 'ну', 'же', 'хм', '-', '=', '?'
+        ];
+    }
+
+    /**
      * Returns semi-trash tokens.
      *
      * These tokens are allowed to be used in case of just one token,
@@ -147,17 +219,35 @@ abstract class AbstractBotRequest
     }
 
     /**
-     * Returns trash tokens.
-     *
-     * These tokens are always filtered.
+     * Returns tokens that must be removed both from the start and the end.
      *
      * @return string[]
      */
-    protected function getTrashTokens(): array
+    protected function getTrimTokens(): array
     {
         return [
-            'конечно', 'давайте', 'сказала', 'сказал', 'говорю', 'ладно', 'давай', 'снова', 'тоже', 'сама', 'этот', 'нету', 'было', 'была', 'был', 'это', 'эта', 'так', 'как', 'сам', 'вот', 'уже', 'дай', 'мне', 'еще', 'ещё', 'нет', 'ты', 'ой', 'ох', 'да', 'ну', 'же', 'хм', '-', '=', '?'
+            'или', 'и', 'но'
         ];
+    }
+
+    /**
+     * Returns tokens that must be removed from the start.
+     *
+     * @return string[]
+     */
+    protected function getStartingTrashTokens(): array
+    {
+        return [];
+    }
+
+    /**
+     * Returns tokens that must be removed from the end.
+     *
+     * @return string[]
+     */
+    protected function getEndingTrashTokens(): array
+    {
+        return [];
     }
 
     /**
@@ -295,14 +385,15 @@ abstract class AbstractBotRequest
         $matches = [];
 
         for ($i = 0; $i < count($patternTokens); $i++) {
-            $token = $patternTokens[$i];
+            $patternToken = $patternTokens[$i];
+            $token = $tokens[$i];
 
-            if ($token === self::WILDCARD) {
-                $matches[] = $tokens[$i];
+            if ($patternToken === self::WILDCARD) {
+                $matches[] = $token;
                 continue;
             }
 
-            if ($token !== $tokens[$i]) {
+            if ($patternToken !== $token) {
                 return null;
             }
         }
