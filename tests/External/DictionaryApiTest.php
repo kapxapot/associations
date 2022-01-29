@@ -45,7 +45,11 @@ final class DictionaryApiTest extends IntegrationTest
      */
     public function testExistingWords(string $word): void
     {
+        //$this->markTestSkipped('Api is unstable');
+
         $result = $this->dictApi->request($this->language->code, $word);
+
+        $this->assertNotNull($result);
 
         $data = json_decode($result->jsonData(), true);
 
@@ -70,7 +74,11 @@ final class DictionaryApiTest extends IntegrationTest
      */
     public function testNotExistingWords(string $word): void
     {
+        //$this->markTestSkipped('Api is unstable');
+
         $result = $this->dictApi->request($this->language->code, $word);
+
+        $this->assertNotNull($result);
 
         $data = json_decode($result->jsonData(), true);
 
