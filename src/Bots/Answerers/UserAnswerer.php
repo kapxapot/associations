@@ -227,7 +227,7 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         if ($this->isPlayCommand($request)) {
-            return $this->sayWord($botUser, $commandToConfirm, $request->originalUtterance());
+            return $this->sayWord($botUser, $commandToConfirm);
         }
 
         return $this->confirmCommand($commandToConfirm, self::MESSAGE_CLUELESS);
@@ -398,9 +398,11 @@ class UserAnswerer extends AbstractAnswerer
     private function sayWord(
         AbstractBotUser $botUser,
         string $wordStr,
-        string $originalUtterance
+        ?string $originalUtterance = null
     ): BotResponse
     {
+        $originalUtterance ??= $wordStr;
+
         $user = $botUser->user();
         $game = $this->getGame($botUser);
 
