@@ -61,4 +61,9 @@ class Scope
 
         return $name;
     }
+
+    public static function max(): int
+    {
+        return self::COMMON;
+    }
 }

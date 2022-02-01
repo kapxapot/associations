@@ -215,7 +215,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
     }
 
     /**
-     * Returns true if the element has an override AND
+     * Returns `true` if the element has an override AND
      * that override has some actual changes (is not empty).
      */
     public function hasActualOverride(): bool

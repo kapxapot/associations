@@ -4,7 +4,6 @@ namespace App\Specifications;
 
 use App\Config\Interfaces\WordConfigInterface;
 use App\Models\Word;
-use App\Models\WordRelation;
 use App\Semantics\PartOfSpeech;
 use App\Semantics\Scope;
 use App\Semantics\Severity;
@@ -26,12 +25,21 @@ class WordSpecification
             return $word->scopeOverride();
         }
 
-        $relationScopes = [Scope::DISABLED, Scope::INACTIVE];
+        return min(
+            $this->calculateScope($word),
+            $this->maxScope($word)
+        );
+    }
 
-        foreach ($relationScopes as $scope) {
-            if ($this->isScopedByRelations($word, $scope)) {
-                return $scope;
-            }
+    /**
+     * Counts scope without applying the max scope.
+     */
+    private function calculateScope(Word $word): int
+    {
+        $relationsScopeOverride = $this->relationsScopeOverride($word);
+
+        if ($relationsScopeOverride !== null) {
+            return $relationsScopeOverride;
         }
 
         if ($this->isCommon($word)) {
@@ -42,9 +50,23 @@ class WordSpecification
             return Scope::PUBLIC;
         }
 
-        $maxScope = $this->maxScopeByPartsOfSpeech($word);
+        return Scope::PRIVATE;
+    }
 
-        return min(Scope::PRIVATE, $maxScope);
+    /**
+     * Returns max scope for the word, applying all restrictions.
+     */
+    private function maxScope(Word $word): int
+    {
+        return min(
+            $this->maxScopeByMainWord($word) ?? Scope::max(),
+            $this->maxScopeByPartsOfSpeech($word)
+        );
+    }
+
+    private function maxScopeByMainWord(Word $word): ?int
+    {
+        return $word->hasMain() ? $word->main()->scope : null;
     }
 
     private function maxScopeByPartsOfSpeech(Word $word): int
@@ -75,13 +97,16 @@ class WordSpecification
         return Scope::PRIVATE;
     }
 
-    private function isScopedByRelations(Word $word, int $scope): bool
+    /**
+     * Returns any scope override by relations.
+     */
+    private function relationsScopeOverride(Word $word): ?int
     {
-        $primary = $word->primaryRelation();
+        $primaryRelation = $word->primaryRelation();
 
-        return $primary
-            ? $primary->isScopedTo($scope)
-            : false;
+        return $primaryRelation
+            ? $primaryRelation->scopeOverride()
+            : null;
     }
 
     private function isPublic(Word $word): bool

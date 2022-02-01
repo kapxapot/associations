@@ -103,12 +103,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             : null;
     }
 
-    public function isDisabledByOverride(): bool
-    {
-        return parent::isDisabledByOverride()
-            || $this->hasMain() && $this->main()->isDisabledByOverride();
-    }
-
     public function associationByWord(self $word): ?Association
     {
         return $this

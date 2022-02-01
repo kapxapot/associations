@@ -33,12 +33,9 @@ class WordRelation extends DbModel implements CreatedInterface, UpdatedAtInterfa
         ];
     }
 
-    /**
-     * Type has scope override that equals to `$scope`.
-     */
-    public function isScopedTo(int $scope): bool
+    public function scopeOverride(): ?int
     {
-        return $this->type()->isScopedTo($scope);
+        return $this->type()->scopeOverride;
     }
 
     public function isSharingPosDown(): bool
