@@ -55,6 +55,12 @@ class LocalizationConfig extends BaseConfig
                 'Prepositional phrase' => 'Предложная фраза',
                 'Acronym' => 'Сокращение',
                 'Augmentative form' => 'Увеличительное',
+                'Grammatical normal form' => 'Грамматическая нормальная форма',
+                'Synonim' => 'Синоним',
+                'Antonym' => 'Антоним',
+                'Specific meaning' => 'Уточнение',
+                'Negation' => 'Отрицание',
+                'Error' => 'Ошибка',
 
                 'Word:disabled' => 'отключено',
                 'Word:inactive' => 'неактивное',
