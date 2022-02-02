@@ -25,10 +25,13 @@ class WordSpecification
             return $word->scopeOverride();
         }
 
-        return min(
-            $this->calculateScope($word),
-            $this->maxScope($word)
-        );
+        $calculatedScope = $this->calculateScope($word);
+        $maxScope = $this->maxScope($word);
+
+        // restrict scope only if it's limited by a fuzzy disabled scope
+        return Scope::isFuzzyDisabled($maxScope)
+            ? min($calculatedScope, $maxScope)
+            : $calculatedScope;
     }
 
     /**
@@ -66,7 +69,9 @@ class WordSpecification
 
     private function maxScopeByMainWord(Word $word): ?int
     {
-        return $word->hasMain() ? $word->main()->scope : null;
+        return $word->hasMain()
+            ? $this->countScope($word->main())
+            : null;
     }
 
     private function maxScopeByPartsOfSpeech(Word $word): int
