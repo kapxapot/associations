@@ -60,7 +60,7 @@
             <p class="mb-3">{{ lm.genderize(association.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {% include 'components/user.twig' with { 'user': association.creator, 'full': true } %} ({{ gm.moment_local(association.created_at_iso) }})</p>
 
             {% if not association.isCanonical %}
-                <p class="mb-3"><strong>Каноническая ассоциация:</strong> {{ lm.association(association.canonical) }}</p>
+                <p class="mb-3"><strong>Каноническая ассоциация:</strong> {{ lm.association(association.canonical) }}{% if not association.canonical.isValid %} 🤡{% endif %}</p>
             {% endif %}
 
             {% if association.users|length > 0 %}
