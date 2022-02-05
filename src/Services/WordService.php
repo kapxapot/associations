@@ -5,10 +5,12 @@ namespace App\Services;
 use App\Collections\WordCollection;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Events\Word\WordCreatedEvent;
+use App\Models\Definition;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Parsing\DefinitionParser;
+use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Semantics\Definition\DefinitionAggregate;
@@ -30,6 +32,7 @@ use Webmozart\Assert\Assert;
  */
 class WordService
 {
+    private DefinitionRepositoryInterface $definitionRepository;
     private TurnRepositoryInterface $turnRepository;
     private WordRepositoryInterface $wordRepository;
 
@@ -44,6 +47,7 @@ class WordService
     private DefinitionParser $definitionParser;
 
     public function __construct(
+        DefinitionRepositoryInterface $definitionRepository,
         TurnRepositoryInterface $turnRepository,
         WordRepositoryInterface $wordRepository,
         CasesService $casesService,
@@ -54,6 +58,7 @@ class WordService
         DefinitionParser $definitionParser
     )
     {
+        $this->definitionRepository = $definitionRepository;
         $this->turnRepository = $turnRepository;
         $this->wordRepository = $wordRepository;
 
@@ -192,7 +197,7 @@ class WordService
 
     /**
      * Throws exception if the word is not valid.
-     * 
+     *
      * @throws ValidationException
      */
     public function validateWord(?string $wordStr): void
@@ -273,6 +278,28 @@ class WordService
         return ($word && $word->isVisibleFor($user))
             ? $word
             : null;
+    }
+
+    public function getDefinition(Word $word): ?Definition
+    {
+        $definition = $this->definitionRepository->getByWord($word);
+
+        if ($definition !== null && $definition->isValid()) {
+            return $definition;
+        }
+
+        // check main word definition (if relevant)
+        if (!$word->hasMain()) {
+            return null;
+        }
+
+        $primaryRelation = $word->primaryRelation();
+
+        if ($primaryRelation !== null && $primaryRelation->isWordForm()) {
+            return $this->getDefinition($word->main());
+        }
+
+        return null;
     }
 
     public function getParsedDefinition(Word $word): ?DefinitionAggregate

@@ -48,6 +48,16 @@ class WordRelation extends DbModel implements CreatedInterface, UpdatedAtInterfa
         return $this->type()->isSharingAssociationsDown();
     }
 
+    public function isWeak(): bool
+    {
+        return $this->type()->isWeak();
+    }
+
+    public function isWordForm(): bool
+    {
+        return $this->type()->isWordForm();
+    }
+
     public function isPrimary(): bool
     {
         return self::toBool($this->primary);

@@ -22,11 +22,11 @@
                 <tr ng-repeat="(rKey, r) in relationData.relations">
                     <form ng-submit="saveRelation(rKey)" ng-attr-id="relationEditForm{{ '{{rKey}}' }}" name="relationEditForm{{ '{{rKey}}' }}">
                         <td class="vcenter" ng-show="r.state.editing">
-                            <input type="checkbox" ng-model="r.primary">
+                            <input type="checkbox" ng-model="r.primary" ng-disabled="r.type.secondary">
                         </td>
 
                         <td class="vcenter" ng-show="r.state.editing">
-                            <select class="form-control" ng-model="r.type_id" ng-options="value.id as value.name for (key, value) in relationTypes"></select>
+                            <select class="form-control" ng-model="r.type_id" ng-options="value.id as value.name for (key, value) in relationTypes" ng-change="updateRelation(r)"></select>
                         </td>
 
                         <td class="vcenter" ng-show="r.state.editing">
@@ -63,11 +63,11 @@
                 <tr>
                     <form ng-submit="saveNewRelation()">
                         <td class="center vcenter">
-                            <input type="checkbox" ng-disabled="relationData.state.editing" ng-model="newRelation.primary">
+                            <input type="checkbox" ng-disabled="relationData.state.editing || newRelation.type.secondary" ng-model="newRelation.primary">
                         </td>
 
                         <td>
-                            <select class="form-control" ng-disabled="relationData.state.editing" ng-model="newRelation.type_id" ng-options="value.id as value.name for (key, value) in relationTypes"></select>
+                            <select class="form-control" ng-disabled="relationData.state.editing" ng-model="newRelation.type_id" ng-options="value.id as value.name for (key, value) in relationTypes" ng-change="updateRelation(newRelation)"></select>
                         </td>
 
                         <td>

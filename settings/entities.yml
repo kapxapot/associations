@@ -664,6 +664,7 @@ word_relation_types:
 
     scope_override:
       name: Видимость
+      form_name: Переопределение видимости
       type: number
       attributes: [nullable]
 
@@ -675,4 +676,18 @@ word_relation_types:
     sharing_associations_down:
       name: Ассоциации 🔻
       form_name: Распространяет ассоциации вниз
+      type: bool
+
+    word_form:
+      name: Форма слова
+      form_name: Форма того же слова
+      type: bool
+
+    secondary:
+      name: Вторичная
+      form_name: Вторичная (не может быть главной)
+      type: bool
+
+    weak:
+      name: Слабая
       type: bool

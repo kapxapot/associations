@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Collections\LanguageElementCollection;
 use App\Collections\WordCollection;
 use App\Models\Language;
 use App\Models\Word;
@@ -54,11 +53,6 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         );
     }
 
-    /**
-     * Finds the word by string in the specified language strictly by `word_bin` field.
-     * 
-     * Normalized word string expected.
-     */
     public function findInLanguageStrict(
         Language $language,
         ?string $wordStr,
@@ -68,13 +62,6 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         return $this->findInLanguage($language, $wordStr, $exceptId, true);
     }
 
-    /**
-     * Finds the word by string in the specified language.
-     * 
-     * - Searches by `word_bin` and `original_word` fields by default.
-     * - In strict mode (`$strict === true`) searches strictly by `word_bin`.
-     * - Normalized word string expected.
-     */
     public function findInLanguage(
         Language $language,
         ?string $wordStr,
@@ -98,6 +85,11 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             )
             ->one();
     }
+
+    // public function findMany(Language $language, string ...$wordStrs): WordCollection
+    // {
+
+    // }
 
     public function searchAllNotMature(
         SearchParams $searchParams,

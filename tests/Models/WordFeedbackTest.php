@@ -8,6 +8,7 @@ use App\Hydrators\WordFeedbackHydrator;
 use App\Models\Word;
 use App\Models\WordFeedback;
 use App\Parsing\DefinitionParser;
+use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
@@ -23,6 +24,7 @@ use App\Testing\Factories\WordRepositoryFactory;
 use App\Testing\Mocks\Config\WordConfigMock;
 use App\Testing\Mocks\LinkerMock;
 use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
+use App\Testing\Mocks\Repositories\DefinitionRepositoryMock;
 use App\Testing\Mocks\Repositories\GameRepositoryMock;
 use App\Testing\Mocks\Repositories\TurnRepositoryMock;
 use App\Testing\Mocks\Repositories\WordFeedbackRepositoryMock;
@@ -37,6 +39,7 @@ use Plasticode\Validation\Validator;
 
 final class WordFeedbackTest extends IntegrationTest
 {
+    private DefinitionRepositoryInterface $definitionRepository;
     private GameRepositoryInterface $gameRepository;
     private TurnRepositoryInterface $turnRepository;
     private UserRepositoryInterface $userRepository;
@@ -55,6 +58,10 @@ final class WordFeedbackTest extends IntegrationTest
 
         $this->wordRepository = WordRepositoryFactory::make(
             $languageRepository
+        );
+
+        $this->definitionRepository = new DefinitionRepositoryMock(
+            $this->wordRepository
         );
 
         $this->wordFeedbackRepository = new WordFeedbackRepositoryMock(
@@ -99,6 +106,7 @@ final class WordFeedbackTest extends IntegrationTest
         $eventDispatcher = new EventDispatcher();
 
         $wordService = new WordService(
+            $this->definitionRepository,
             $this->turnRepository,
             $this->wordRepository,
             new CasesService(
@@ -136,6 +144,7 @@ final class WordFeedbackTest extends IntegrationTest
         unset($this->gameRepository);
         unset($this->turnRepository);
         unset($this->wordFeedbackRepository);
+        unset($this->definitionRepository);
         unset($this->wordRepository);
         unset($this->userRepository);
 

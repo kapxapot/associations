@@ -55,12 +55,12 @@ class LocalizationConfig extends BaseConfig
                 'Prepositional phrase' => 'Предложная фраза',
                 'Acronym' => 'Сокращение',
                 'Augmentative form' => 'Увеличительное',
-                'Grammatical normal form' => 'Грамматическая нормальная форма',
+                'Grammatical normal form' => 'Гр. норм. форма (откл.)',
                 'Synonim' => 'Синоним',
                 'Antonym' => 'Антоним',
                 'Specific meaning' => 'Уточнение',
                 'Negation' => 'Отрицание',
-                'Error' => 'Ошибка',
+                'Error' => 'Ошибочное использование',
 
                 'Word:disabled' => 'отключено',
                 'Word:inactive' => 'неактивное',
@@ -112,6 +112,8 @@ class LocalizationConfig extends BaseConfig
                 'Related word "%s" is recently used in the game.' => 'Связанное слово «%s» недавно использовано в игре.',
 
                 'Main word creates recursion.' => 'Главное слово создает рекурсию.',
+
+                'Word relation type doesn\'t allow a primary relation.' => 'Выбранный тип связи не допускает сильную связь.',
             ]
         );
     }

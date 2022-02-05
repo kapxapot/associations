@@ -97,7 +97,7 @@
                 <div class="mt-3">
                     <article>
                         {% for def_entry in definition.entries %}
-                            <p class="br-word"><strong>{{ word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}{% if def_entry.partOfSpeech %} <i class="gray-9 ml-1">{% include 'components/part_of_speech.twig' with { 'pos': def_entry.partOfSpeech, 'bare': true, 'short': true, 'lang': definition.language.code } only %}</i>{% endif %}</p>
+                            <p class="br-word"><strong>{{ definition.word.word|upper }}</strong>{% if definition.entries|length > 1 %}<sup>{{ loop.index }}</sup>{% endif %}{% if def_entry.partOfSpeech %} <i class="gray-9 ml-1">{% include 'components/part_of_speech.twig' with { 'pos': def_entry.partOfSpeech, 'bare': true, 'short': true, 'lang': definition.language.code } only %}</i>{% endif %}</p>
 
                             {% if def_entry.definitions|length == 1 %}
                                 <p>{{ def_entry.definitions[0] }}</p>

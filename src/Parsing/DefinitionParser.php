@@ -5,6 +5,7 @@ namespace App\Parsing;
 use App\External\DictionaryApi;
 use App\Models\Definition;
 use App\Models\Language;
+use App\Models\Word;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Definition\DefinitionEntry;
 use App\Semantics\PartOfSpeech;
@@ -18,6 +19,7 @@ class DefinitionParser
             case DictionaryApi::SOURCE:
                 return $this->parseDictionaryApi(
                     $definition->language(),
+                    $definition->word(),
                     $definition->jsonData
                 );
         }
@@ -27,6 +29,7 @@ class DefinitionParser
 
     private function parseDictionaryApi(
         Language $language,
+        Word $word,
         string $jsonData
     ): ?DefinitionAggregate
     {
@@ -36,7 +39,7 @@ class DefinitionParser
             return null;
         }
 
-        $result = new DefinitionAggregate($language);
+        $result = new DefinitionAggregate($language, $word);
 
         foreach ($data as $entry) {
             $defEntry = new DefinitionEntry();

@@ -7,6 +7,7 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Hydrators\GameHydrator;
 use App\Hydrators\TurnHydrator;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
@@ -18,6 +19,7 @@ use App\Testing\Factories\WordRepositoryFactory;
 use App\Testing\Mocks\Config\WordConfigMock;
 use App\Testing\Mocks\LinkerMock;
 use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
+use App\Testing\Mocks\Repositories\DefinitionRepositoryMock;
 use App\Testing\Mocks\Repositories\GameRepositoryMock;
 use App\Testing\Mocks\Repositories\TurnRepositoryMock;
 use PHPUnit\Framework\TestCase;
@@ -52,6 +54,8 @@ abstract class WiredTest extends TestCase
             // repositories
 
             AssociationRepositoryInterface::class => AssociationRepositoryMock::class,
+
+            DefinitionRepositoryInterface::class => DefinitionRepositoryMock::class,
 
             GameRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new GameRepositoryMock(

@@ -5,25 +5,34 @@ namespace App\Semantics\Definition;
 use App\Collections\DefinitionEntryCollection;
 use App\Collections\PartOfSpeechCollection;
 use App\Models\Language;
+use App\Models\Word;
 use App\Semantics\Interfaces\PartOfSpeechableInterface;
 use Plasticode\Collections\Generic\StringCollection;
 
 class DefinitionAggregate implements PartOfSpeechableInterface
 {
     private Language $language;
+    private Word $word;
     private DefinitionEntryCollection $entries;
 
     public function __construct(
-        Language $language
+        Language $language,
+        Word $word
     )
     {
         $this->language = $language;
+        $this->word = $word;
         $this->entries = DefinitionEntryCollection::empty();
     }
 
     public function language(): Language
     {
         return $this->language;
+    }
+
+    public function word(): Word
+    {
+        return $this->word;
     }
 
     public function entries(): DefinitionEntryCollection

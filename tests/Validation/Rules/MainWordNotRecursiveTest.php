@@ -8,9 +8,9 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\LanguageService;
 use App\Tests\WiredTest;
-use App\Validation\Rules\MainWordNonRecursive;
+use App\Validation\Rules\MainWordNotRecursive;
 
-final class MainWordNonRecursiveTest extends WiredTest
+final class MainWordNotRecursiveTest extends WiredTest
 {
     private Language $language;
 
@@ -60,8 +60,8 @@ final class MainWordNonRecursiveTest extends WiredTest
         parent::tearDown();
     }
 
-    /** @dataProvider nonRecursiveProvider */
-    public function testNonRecursive(
+    /** @dataProvider notRecursiveProvider */
+    public function testNotRecursive(
         string $dependentWordStr,
         ?string $mainWordStr,
         bool $expected
@@ -75,12 +75,12 @@ final class MainWordNonRecursiveTest extends WiredTest
             $dependentWordStr
         );
 
-        $rule = new MainWordNonRecursive($languageService, $dependentWord);
+        $rule = new MainWordNotRecursive($languageService, $dependentWord);
 
         $this->assertEquals($expected, $rule->validate($mainWordStr));
     }
 
-    public function nonRecursiveProvider(): array
+    public function notRecursiveProvider(): array
     {
         // ok: word1 +> null
         // ok: word1 +> mainWord

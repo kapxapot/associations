@@ -6,7 +6,7 @@ use App\Models\Word;
 use App\Services\LanguageService;
 use Respect\Validation\Rules\AbstractRule;
 
-class MainWordNonRecursive extends AbstractRule
+class MainWordNotRecursive extends AbstractRule
 {
     private LanguageService $languageService;
 

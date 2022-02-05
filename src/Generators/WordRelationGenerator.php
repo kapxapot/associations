@@ -65,28 +65,39 @@ class WordRelationGenerator extends ChangingEntityGenerator
 
     public function getRules(array $data, $id = null): array
     {
+        $primary = $data['primary'] ?? false;
+
         $rules = array_merge(
             parent::getRules($data, $id),
             [
-                'type_id' => $this
-                    ->rule('posInt')
-                    ->wordRelationTypeExists($this->wordRelationTypeRepository),
                 'word_id' => $this
                     ->rule('posInt')
                     ->wordExists($this->wordRepository),
             ]
         );
 
+        // type rules
+        $typeRules = $this
+            ->rule('posInt')
+            ->wordRelationTypeExists($this->wordRelationTypeRepository);
+
+        if ($primary === true) {
+            $typeRules = $typeRules->wordRelationTypeAllowsPrimaryRelation(
+                $this->wordRelationTypeRepository
+            );
+        }
+
+        $rules['type_id'] = $typeRules;
+
+        // main word rules
         $word = $this->wordRepository->get($data['word_id'] ?? null);
 
         if ($word !== null) {
             $mainWordRules = Validator::mainWordExists($this->languageService, $word);
 
-            $primary = $data['primary'] ?? false;
-
             if ($primary === true) {
                 $mainWordRules = $mainWordRules
-                    ->mainWordNonRecursive($this->languageService, $word);
+                    ->mainWordNotRecursive($this->languageService, $word);
             }
 
             $rules['main_word'] = $mainWordRules;
