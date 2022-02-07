@@ -280,15 +280,18 @@ class WordService
             : null;
     }
 
-    public function getDefinition(Word $word): ?Definition
+    /**
+     * Returns word definition if it's valid, otherwise tried to get main word's definition.
+     */
+    public function getTransitiveDefinition(Word $word): ?Definition
     {
-        $definition = $this->definitionRepository->getByWord($word);
+        $ownDefinition = $this->getDefinition($word);
 
-        if ($definition !== null && $definition->isValid()) {
-            return $definition;
+        if ($ownDefinition !== null && $ownDefinition->isValid()) {
+            return $ownDefinition;
         }
 
-        // check main word definition (if relevant)
+        // check main word definition (if it is the same word form)
         if (!$word->hasMain()) {
             return null;
         }
@@ -296,16 +299,29 @@ class WordService
         $primaryRelation = $word->primaryRelation();
 
         if ($primaryRelation !== null && $primaryRelation->isWordForm()) {
-            return $this->getDefinition($word->main());
+            return $this->getTransitiveDefinition($word->main());
         }
 
         return null;
+
+    }
+
+    public function getDefinition(Word $word): ?Definition
+    {
+        return $this->definitionRepository->getByWord($word);
     }
 
     public function getParsedDefinition(Word $word): ?DefinitionAggregate
     {
-        return $word->definition()
-            ? $this->definitionParser->parse($word->definition())
+        $definition = $word->definition();
+
+        return $definition
+            ? $this->parseDefinition($definition)
             : null;
+    }
+
+    public function parseDefinition(Definition $definition): ?DefinitionAggregate
+    {
+        return $this->definitionParser->parse($definition);
     }
 }
