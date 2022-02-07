@@ -72,7 +72,6 @@ class UserAnswerer extends AbstractAnswerer
         Assert::true($botUser->isValid());
 
         $command = $request->command();
-        $tokens = $request->tokens();
         $isNewSession = $request->isNewSession();
 
         if ($isNewSession) {
@@ -168,7 +167,7 @@ class UserAnswerer extends AbstractAnswerer
             return $this->skipCommand($botUser);
         }
 
-        if (count($tokens) > self::MAX_TOKENS) {
+        if (count($request->originalTokens()) > self::MAX_TOKENS) {
             return $this->tooManyWords($botUser);
         }
 
