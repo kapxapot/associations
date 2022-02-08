@@ -8,12 +8,12 @@ use App\Models\TelegramUser;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Validation\AgeValidation;
-use App\Parsing\DefinitionParser;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Semantics\Definition\DefinitionEntry;
 use App\Services\GameService;
 use App\Services\TelegramUserService;
 use App\Services\TurnService;
+use App\Services\WordService;
 use Exception;
 use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Core\Response;
@@ -38,11 +38,10 @@ class TelegramBotController
     private GameService $gameService;
     private TelegramUserService $telegramUserService;
     private TurnService $turnService;
+    private WordService $wordService;
 
     private ValidatorInterface $validator;
     private AgeValidation $ageValidation;
-
-    private DefinitionParser $definitionParser;
 
     private string $languageCode;
 
@@ -54,9 +53,9 @@ class TelegramBotController
         GameService $gameService,
         TelegramUserService $telegramUserService,
         TurnService $turnService,
+        WordService $wordService,
         ValidatorInterface $validator,
-        AgeValidation $ageValidation,
-        DefinitionParser $definitionParser
+        AgeValidation $ageValidation
     )
     {
         $this->settingsProvider = $settingsProvider;
@@ -68,11 +67,10 @@ class TelegramBotController
         $this->gameService = $gameService;
         $this->telegramUserService = $telegramUserService;
         $this->turnService = $turnService;
+        $this->wordService = $wordService;
 
         $this->validator = $validator;
         $this->ageValidation = $ageValidation;
-
-        $this->definitionParser = $definitionParser;
 
         $this->languageCode = 'ru';
     }
@@ -269,13 +267,7 @@ class TelegramBotController
         $noDefinition = ['Определение отсутствует.'];
 
         $word = $lastTurn->word();
-        $definition = $word->definition();
-
-        if ($definition === null || !$definition->isValid()) {
-            return $noDefinition;
-        }
-
-        $parsedDefinition = $this->definitionParser->parse($definition);
+        $parsedDefinition = $this->wordService->getParsedTransitiveDefinition($word);
 
         if ($parsedDefinition === null) {
             return $noDefinition;
@@ -420,19 +412,20 @@ class TelegramBotController
 
         $commands = [];
 
-        $definition = $answer->word()->definition();
+        $parsedDefinition = $this->wordService->getParsedTransitiveDefinition(
+            $answer->word()
+        );
 
-        if ($definition && $definition->isValid()) {
-            $parsedDefinition = $this->definitionParser->parse($definition);
-
-            if ($parsedDefinition) {
-                $commands[] = '/what Что такое "' . $answer->word()->word . '"?';
-            }
+        if ($parsedDefinition) {
+            $commands[] = sprintf(
+                '/what Что такое "%s"?',
+                $answer->word()->word
+            );
         }
 
         // $commands[] = '/skip Другое слово';
 
-        if (is_null($question)) {
+        if ($question === null) {
             return array_filter(
                 [
                     $noQuestionMessage,

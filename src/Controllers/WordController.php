@@ -97,11 +97,7 @@ class WordController extends Controller
             ->wordService
             ->disabledInvisibleAssociationsStr($word);
 
-        $transitiveDefinition = $this->wordService->getTransitiveDefinition($word);
-
-        $parsedDefinition = $transitiveDefinition
-            ? $this->wordService->parseDefinition($transitiveDefinition)
-            : null;
+        $parsedDefinition = $this->wordService->getParsedTransitiveDefinition($word);
 
         $params = [
             'word' => $word,

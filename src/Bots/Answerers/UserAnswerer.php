@@ -16,6 +16,7 @@ use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TurnService;
 use App\Services\WordFeedbackService;
+use App\Services\WordService;
 use InvalidArgumentException;
 use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Exceptions\ValidationException;
@@ -35,6 +36,7 @@ class UserAnswerer extends AbstractAnswerer
     private AssociationFeedbackService $associationFeedbackService;
     private GameService $gameService;
     private TurnService $turnService;
+    private WordService $wordService;
     private WordFeedbackService $wordFeedbackService;
 
     private TranslatorInterface $translator;
@@ -45,6 +47,7 @@ class UserAnswerer extends AbstractAnswerer
         GameService $gameService,
         LanguageService $languageService,
         TurnService $turnService,
+        WordService $wordService,
         WordFeedbackService $wordFeedbackService,
         TranslatorInterface $translator,
         LoggerInterface $logger,
@@ -56,6 +59,7 @@ class UserAnswerer extends AbstractAnswerer
         $this->associationFeedbackService = $associationFeedbackService;
         $this->gameService = $gameService;
         $this->turnService = $turnService;
+        $this->wordService = $wordService;
         $this->wordFeedbackService = $wordFeedbackService;
 
         $this->translator = $translator;
@@ -313,13 +317,16 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         $wordStr = $word->word;
-        $parsedDefinition = $word->parsedDefinition();
+
+        $parsedDefinition = $this->wordService->getParsedTransitiveDefinition($word);
 
         if ($parsedDefinition === null) {
             return 'Я не знаю, что такое {q:' . $wordStr . '}.';
         }
 
-        return Strings::upperCaseFirst($wordStr) . ' — это '
+        $definitionWord = $parsedDefinition->word();
+
+        return Strings::upperCaseFirst($definitionWord->word) . ' — это '
             . Strings::lowerCaseFirst($parsedDefinition->firstDefinition());
     }
 

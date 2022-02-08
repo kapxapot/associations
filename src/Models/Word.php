@@ -561,12 +561,16 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      *
      * Gets canonical words for all related words and looks for `$word`'s
      * canonical word in them.
+     *
+     * @param callable|null $relationFilter Optional relation filter
      */
-    public function isCanonicallyRelatedTo(Word $word): bool
+    public function isCanonicallyRelatedTo(Word $word, callable $relationFilter = null): bool
     {
-        return $this->allRelatedCanonicalWords()->contains(
-            $word->canonical()
-        );
+        return $this
+            ->allRelatedCanonicalWords($relationFilter)
+            ->contains(
+                $word->canonical()
+            );
     }
 
     /**
@@ -583,10 +587,10 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Concats related and counter-related words (distinct).
      */
-    public function allRelatedWords(): WordCollection
+    public function allRelatedWords(callable $relationFilter = null): WordCollection
     {
-        $out = $this->relatedWords();
-        $in = $this->counterRelatedWords();
+        $out = $this->relatedWords($relationFilter);
+        $in = $this->counterRelatedWords($relationFilter);
 
         return WordCollection::merge($out, $in)->distinct();
     }
@@ -597,11 +601,14 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      * this -> A
      * this -> B
      */
-    public function relatedWords(): WordCollection
+    public function relatedWords(callable $relationFilter = null): WordCollection
     {
-        $words = $this->relations()->map(
-            fn (WordRelation $wr) => $wr->mainWord()
-        );
+        $words = $this
+            ->relations()
+            ->where($relationFilter)
+            ->map(
+                fn (WordRelation $wr) => $wr->mainWord()
+            );
 
         return WordCollection::fromDistinct($words);
     }
@@ -612,11 +619,14 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      * A -> this
      * B -> this
      */
-    public function counterRelatedWords(): WordCollection
+    public function counterRelatedWords(callable $relationFilter = null): WordCollection
     {
-        $words = $this->counterRelations()->map(
-            fn (WordRelation $wr) => $wr->word()
-        );
+        $words = $this
+            ->counterRelations()
+            ->where($relationFilter)
+            ->map(
+                fn (WordRelation $wr) => $wr->word()
+            );
 
         return WordCollection::fromDistinct($words);
     }
@@ -632,9 +642,9 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Returns distinct canonical words for duplex related words.
      */
-    public function allRelatedCanonicalWords(): WordCollection
+    public function allRelatedCanonicalWords(callable $relationFilter = null): WordCollection
     {
-        return $this->allRelatedWords()->canonical()->distinct();
+        return $this->allRelatedWords($relationFilter)->canonical()->distinct();
     }
 
     public function wordUpdatedAtIso(): ?string

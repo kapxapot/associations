@@ -280,7 +280,8 @@ class Association extends LanguageElement implements AssociationInterface
     public function isSelfRelated(): bool
     {
         return $this->firstWord()->isCanonicallyRelatedTo(
-            $this->secondWord()
+            $this->secondWord(),
+            fn (WordRelation $relation) => !$relation->isWeak()
         );
     }
 

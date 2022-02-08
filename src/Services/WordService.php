@@ -280,8 +280,19 @@ class WordService
             : null;
     }
 
+    public function getParsedTransitiveDefinition(Word $word): ?DefinitionAggregate
+    {
+        $definition = $this->getTransitiveDefinition($word);
+
+        return $definition
+            ? $this->parseDefinition($definition)
+            : null;
+    }
+
     /**
-     * Returns word definition if it's valid, otherwise tried to get main word's definition.
+     * Returns word definition if it's valid, otherwise tries to get the main word's definition.
+     *
+     * ✔ Can't return an invalid definition.
      */
     public function getTransitiveDefinition(Word $word): ?Definition
     {
@@ -303,9 +314,13 @@ class WordService
         }
 
         return null;
-
     }
 
+    /**
+     * Just looks for a definition of the word in the repository.
+     *
+     * ⚠ Can return an invalid definition.
+     */
     public function getDefinition(Word $word): ?Definition
     {
         return $this->definitionRepository->getByWord($word);
