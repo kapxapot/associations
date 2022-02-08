@@ -281,7 +281,7 @@ class TelegramBotController
             /** @var DefinitionEntry $defEntry */
             $defEntry = $defEntries[$index];
 
-            $defTitle = '<b>' . mb_strtoupper($word->word) . '</b>';
+            $defTitle = '<b>' . mb_strtoupper($parsedDefinition->word()->word) . '</b>';
 
             if ($defEntries->count() > 1) {
                 $defTitle .= ' (' . ($index + 1) . ')';
