@@ -1,7 +1,7 @@
 <div class="panel" ng-cloak>
     <div class="panel-body">
         <div class="mb-0">
-            <div ng-if="demo.history.length > 1" class="br-word mb-2">
+            <div ng-if="demo.history.length > 1" class="br-word mb-2 flex flex-wrap flex-h-gap-1 flex-v-gap-1 flex-ai-center">
                 {% include 'components/history.twig' with { 'history': 'demo.history'} only %}
             </div>
 

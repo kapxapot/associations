@@ -22,7 +22,6 @@ use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Semantics\Sentence;
 use Plasticode\Traits\LoggerAwareTrait;
-use Plasticode\Util\Strings;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
@@ -326,8 +325,11 @@ class UserAnswerer extends AbstractAnswerer
 
         $definitionWord = $parsedDefinition->word();
 
-        return Strings::upperCaseFirst($definitionWord->word) . ' — это '
-            . Strings::lowerCaseFirst($parsedDefinition->firstDefinition());
+        return Sentence::buildCased([
+            $definitionWord->word,
+            ' — это ',
+            $parsedDefinition->firstDefinition(),
+        ]);
     }
 
     private function tooManyWords(AbstractBotUser $botUser): BotResponse

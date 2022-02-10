@@ -5,12 +5,12 @@
                 Загрузка игры...
             </div>
 
-            <div ng-if="play.games.length > 1 || play.currentGame().history.length > 1" class="br-word mb-2">
-                <span ng-repeat="game in play.games" ng-class="[{true:'ml-1'}[!$first]]">
-                    <a ng-href="{{'{{game.url}}'}}" data-toggle="tooltip" ng-attr-title="{{'{{\'Игра #\' + game.id}}'}}" data-placement="bottom">#</a>
+            <div ng-if="play.games.length > 1 || play.currentGame().history.length > 1" class="br-word mb-2 flex flex-wrap flex-h-gap-1 flex-v-gap-1 flex-ai-center">
+                <a ng-repeat-start="game in play.games" ng-href="{{'{{game.url}}'}}" data-toggle="tooltip" ng-attr-title="{{'{{\'Игра #\' + game.id}}'}}" data-placement="bottom" ng-class="[{true:'ml-1'}[!$first]]">#</a>
 
-                    {% include 'components/history.twig' with { 'history': 'game.history'} only %}
-                </span>
+                {% include 'components/history.twig' with { 'history': 'game.history'} only %}
+
+                <span ng-repeat-end class="hidden"></span>
             </div>
 
             <div ng-if="play.turn()">

@@ -7,7 +7,7 @@ use App\Services\WordService;
 use Plasticode\Core\Response;
 use Plasticode\Handlers\Interfaces\NotFoundHandlerInterface;
 use Plasticode\Search\SearchParams;
-use Plasticode\Util\Strings;
+use Plasticode\Semantics\Sentence;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -111,9 +111,11 @@ class WordController extends Controller
         ];
 
         if ($parsedDefinition !== null) {
-            $params['page_description'] =
-                Strings::upperCaseFirst($word->word) . ' — ' .
-                Strings::lowerCaseFirst($parsedDefinition->firstDefinition());
+            $params['page_description'] = Sentence::buildCased([
+                $parsedDefinition->word()->word,
+                ' — ',
+                $parsedDefinition->firstDefinition(),
+            ]);
         }
 
         $data = $this->buildParams(['params' => $params]);
@@ -141,13 +143,9 @@ class WordController extends Controller
             ? $this->render(
                 $response,
                 'components/word_list.twig',
-                $this->buildParams(
-                    [
-                        'params' => [
-                            'words' => $words,
-                        ],
-                    ]
-                )
+                $this->buildParams([
+                    'params' => ['words' => $words],
+                ])
             )
             : Response::text($response, $this->translate('No words yet. :('));
     }

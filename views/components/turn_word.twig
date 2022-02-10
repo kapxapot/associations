@@ -1,3 +1,0 @@
-{% spaceless %}
-    <span class="label br-word {% if turn.is_ai_turn %}label-info{% else %}label-success{% endif %} turn-label">{% include "components/word.twig" with { 'word': turn.word, 'show_utterance': show_utterance, 'utterance': turn.originalUtterance } only %}</span>
-{% endspaceless %}
