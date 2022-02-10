@@ -35,7 +35,7 @@
 
             <p><strong>Ход игры:</strong></p>
 
-            <div class="br-word flex flex-wrap flex-h-gap-1 flex-v-gap-1">
+            <div class="br-word flex flex-wrap flex-h-gap-1 flex-v-gap-1 flex-ai-center">
                 {% for turn in game.turns.reverse %}
                     {% if not loop.first %}
                         {% include 'components/association.twig' with { 'association': turn.association, 'short': true, 'is_not_native': not turn.isNative } only %}
