@@ -58,18 +58,21 @@ class TurnCollection extends DbModelCollection
     {
         return $this
             ->where(
-                fn (Turn $t) => !is_null($t->user())
+                fn (Turn $t) => $t->isPlayerTurn()
+            )
+            ->distinctBy(
+                fn (Turn $t) => $t->gameId
             )
             ->asc(
                 fn (Turn $t) => $t->createdAt,
                 Sort::DATE
             )
             ->group(
-                fn (Turn $t) => $t->user()->getId()
+                fn (Turn $t) => $t->userId
             );
     }
 
-    public function firstAiTurn(): ?Turn
+    public function second(): ?Turn
     {
         return $this->skip(1)->first();
     }

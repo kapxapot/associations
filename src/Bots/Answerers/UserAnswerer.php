@@ -453,7 +453,7 @@ class UserAnswerer extends AbstractAnswerer
 
         if ($turns->count() > 1) {
             // continuing current game
-            $aiTurn = $turns->firstAiTurn();
+            $aiTurn = $turns->second();
             $answerParts[] = $this->renderAiTurn($aiTurn);
 
             return $this

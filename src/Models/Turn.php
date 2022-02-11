@@ -43,7 +43,7 @@ class Turn extends DbModel implements CreatedAtInterface
 
     public function isPlayerTurn(): bool
     {
-        return !is_null($this->user());
+        return $this->user() !== null;
     }
 
     public function isAiTurn(): bool
@@ -53,7 +53,7 @@ class Turn extends DbModel implements CreatedAtInterface
 
     public function isFinished(): bool
     {
-        return !is_null($this->finishedAt);
+        return $this->finishedAt !== null;
     }
 
     public function isNative(): bool

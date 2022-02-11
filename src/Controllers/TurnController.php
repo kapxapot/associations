@@ -85,8 +85,7 @@ class TurnController extends Controller
 
         /** @var Turn */
         $question = $turns->first();
-
-        $answer = $turns->firstAiTurn();
+        $answer = $turns->second();
 
         $result = [
             'question' => $this->serializer->serializeTurn($question),

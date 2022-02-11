@@ -345,7 +345,7 @@ class TelegramBotController
             // continuing current game
             return $this->turnsToParts(
                 $turns->first(),
-                $turns->firstAiTurn()
+                $turns->second()
             );
         }
 
