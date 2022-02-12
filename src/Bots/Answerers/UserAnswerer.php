@@ -141,7 +141,6 @@ class UserAnswerer extends AbstractAnswerer
             $request->isAny(
                 Command::WORD_DISLIKE,
                 'не нравится',
-                'не нравится слово',
                 'плохой слово'
             )
             || $request->hasAnySet(
@@ -155,12 +154,12 @@ class UserAnswerer extends AbstractAnswerer
         if (
             $request->isAny(
                 Command::ASSOCIATION_DISLIKE,
-                'плохой ассоциация',
-                'не нравится ассоциация'
+                'плохой ассоциация'
             )
             || $request->hasAnySet(
                 ['плохая', 'ассоциация'],
-                ['не', 'нравится', 'ассоциация']
+                ['не', 'нравится', 'ассоциация'],
+                ['неправильная', 'ассоциация']
             )
         ) {
             return $this->associationDislikeFeedback($botUser);
