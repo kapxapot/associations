@@ -217,6 +217,7 @@ a.inactive:focus {
 
 .flex > .label > a {
     color: var(--white);
+    text-decoration: none;
 }
 
 .flex > .label > a.inactive {
