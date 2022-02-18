@@ -154,7 +154,8 @@ class UserAnswerer extends AbstractAnswerer
         if (
             $request->isAny(
                 Command::ASSOCIATION_DISLIKE,
-                'плохой ассоциация'
+                'плохой ассоциация',
+                'плохое ассоциация'
             )
             || $request->hasAnySet(
                 ['плохая', 'ассоциация'],
