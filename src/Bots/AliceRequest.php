@@ -13,7 +13,7 @@ class AliceRequest extends AbstractBotRequest
         $request = $data['request'] ?? [];
 
         $this->originalCommand = $request['command'] ?? null;
-        $this->originalTokens = $request['nlu']['tokens'] ?? [];
+        $this->originalTokens = $this->cleanTokens($request['nlu']['tokens']);
         $this->originalUtterance = $request['original_utterance'];
 
         $command = $this->originalUtterance ?? $request['payload'] ?? null;
@@ -54,6 +54,26 @@ class AliceRequest extends AbstractBotRequest
         return array_merge(
             parent::getTrashTokens(),
             ['алиса', 'алис']
+        );
+    }
+
+    /**
+     * Cleans Alice tokens such as "*".
+     *
+     * @param string[] $tokens
+     * @return string[]
+     */
+    private function cleanTokens(array $tokens): array
+    {
+        if ($tokens === null) {
+            return [];
+        }
+
+        $badTokens = ['*'];
+
+        return array_filter(
+            $tokens,
+            fn ($token) => !in_array($token, $badTokens)
         );
     }
 }
