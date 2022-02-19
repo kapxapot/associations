@@ -525,9 +525,9 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Checks if `$word` is one of directly related words (both ways).
      */
-    public function isRelatedTo(Word $word): bool
+    public function isRelatedTo(Word $word, ?callable $relationFilter = null): bool
     {
-        return $this->allRelatedWords()->contains($word);
+        return $this->allRelatedWords($relationFilter)->contains($word);
     }
 
     /**
@@ -535,11 +535,11 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      *
      * A relates to B, C relates to B => A remotely relates to C.
      */
-    public function isRemotelyRelatedTo(Word $word): bool
+    public function isRemotelyRelatedTo(Word $word, ?callable $relationFilter = null): bool
     {
         return $this
-            ->relatedCanonicalWords()
-            ->intersect($word->relatedCanonicalWords())
+            ->relatedCanonicalWords($relationFilter)
+            ->intersect($word->relatedCanonicalWords($relationFilter))
             ->any();
     }
 
@@ -621,9 +621,9 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Returns distinct canonical words for related words.
      */
-    public function relatedCanonicalWords(): WordCollection
+    public function relatedCanonicalWords(?callable $relationFilter = null): WordCollection
     {
-        return $this->relatedWords()->canonical()->distinct();
+        return $this->relatedWords($relationFilter)->canonical()->distinct();
     }
 
     /**

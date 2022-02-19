@@ -157,10 +157,7 @@ class TurnService
     private function finishPrevTurn(Turn $turn): void
     {
         if ($turn->prev()) {
-            $this->finishTurn(
-                $turn->prev(),
-                $turn->createdAt
-            );
+            $this->finishTurn($turn->prev(), $turn->createdAt);
         }
     }
 

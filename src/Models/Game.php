@@ -75,6 +75,9 @@ class Game extends DbModel implements CreatedInterface
             : null;
     }
 
+    /**
+     * Returns last `Game::RECENT` turns.
+     */
     private function recentTurns(): TurnCollection
     {
         return $this->turns()->take(self::RECENT);
@@ -145,9 +148,7 @@ class Game extends DbModel implements CreatedInterface
 
     public function containsWord(Word $word): bool
     {
-        return $this
-            ->words()
-            ->any('id', $word->getId());
+        return $this->words()->contains($word);
     }
 
     public function getCanonicalEqualWordFor(Word $word): ?Word
@@ -161,11 +162,14 @@ class Game extends DbModel implements CreatedInterface
 
     public function getRecentRelatedWordFor(Word $word): ?Word
     {
+        $relationFilter = fn (WordRelation $relation) => !$relation->isWeak();
+
         return $this
             ->recentTurns()
             ->words()
             ->first(
-                fn (Word $w) => $word->isRelatedTo($w) || $word->isRemotelyRelatedTo($w)
+                fn (Word $w) => $word->isRelatedTo($w, $relationFilter)
+                    || $word->isRemotelyRelatedTo($w, $relationFilter)
             );
     }
 
