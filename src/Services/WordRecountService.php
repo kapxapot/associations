@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Events\Word\WordCorrectedEvent;
 use App\Events\Word\WordScopeChangedEvent;
 use App\Events\Word\WordSeverityChangedEvent;
-use App\Models\Association;
 use App\Models\Word;
 use App\Models\WordRelation;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
