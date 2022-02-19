@@ -213,9 +213,16 @@
             <div class="panel-body">
                 {% if word.mainWord %}
                     <div class="vgap-3">
-                        <p><strong>Главное слово:</strong> {{ lm.word(word.mainWord) }}</p>
+                        <p>
+                            <strong>Цепь главных слов:</strong>
 
-                        <p><strong>Каноническое слово:</strong> {{ lm.word(word.canonical) }} (расстояние: {{ word.distanceFromCanonical }})</p>
+                            {{ word.word }} &#x2192;
+
+                            {% for mainWord in word.mainChain %}
+                                {% if not loop.first %}&#x2192;{% endif %}
+                                {{ lm.word(mainWord) }} ({{ loop.index }})
+                            {% endfor %}
+                        </p>
                     </div>
                 {% endif %}
 
@@ -262,7 +269,7 @@
             {% endif %}
 
             {% if word.origin_chain.any %}
-                <p>Цепочка ассоциаций, которая привела к добавлению:</p>
+                <p>Цепь ассоциаций, которая привела к добавлению:</p>
                 <p class="br-word">
                     {% for meta_assoc in word.origin_chain %}
                         {% if loop.first %}
