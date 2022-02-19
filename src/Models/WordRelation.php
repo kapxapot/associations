@@ -38,11 +38,6 @@ class WordRelation extends DbModel implements CreatedInterface, UpdatedAtInterfa
         return $this->type()->scopeOverride;
     }
 
-    public function isSharingPosDown(): bool
-    {
-        return $this->type()->isSharingPosDown();
-    }
-
     public function isSharingAssociationsDown(): bool
     {
         return $this->type()->isSharingAssociationsDown();

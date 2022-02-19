@@ -7,7 +7,6 @@ use Plasticode\Models\Generic\DbModel;
 /**
  * @property string $name
  * @property integer|null $scopeOverride
- * @property integer $sharingPosDown
  * @property integer $sharingAssociationsDown
  * @property integer $secondary
  * @property string $tag
@@ -16,11 +15,6 @@ use Plasticode\Models\Generic\DbModel;
  */
 class WordRelationType extends DbModel
 {
-    public function isSharingPosDown(): bool
-    {
-        return self::toBool($this->sharingPosDown);
-    }
-
     public function isSharingAssociationsDown(): bool
     {
         return self::toBool($this->sharingAssociationsDown);

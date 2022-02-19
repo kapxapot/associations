@@ -361,25 +361,12 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             );
         }
 
-        if ($poses->isEmpty() && $this->isSharingPosFromMain()) {
+        if ($poses->isEmpty() && $this->hasMain()) {
 
             $poses = $this->main()->partsOfSpeech();
         }
 
         return $poses->distinct();
-    }
-
-    private function isSharingPosFromMain(): bool
-    {
-        if (!$this->hasMain()) {
-            return false;
-        }
-
-        $primaryRelation = $this->primaryRelation();
-
-        return $primaryRelation
-            ? $primaryRelation->isSharingPosDown()
-            : false;
     }
 
     public function override(): ?WordOverride
