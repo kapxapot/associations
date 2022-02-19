@@ -252,19 +252,27 @@ class WordService
             ->words();
     }
 
-    public function searchAllNotMature(
+    /**
+     * Searches for all words visible to *all* players.
+     *
+     * This excludes:
+     *
+     * - Mature words.
+     * - Fuzzy disabled words.
+     */
+    public function searchAllPublic(
         SearchParams $searchParams,
         ?Language $language = null
     ): SearchResult
     {
         $data = $this
             ->wordRepository
-            ->searchAllNotMature($searchParams, $language);
+            ->searchAllPublic($searchParams, $language);
 
-        $totalCount = $this->wordRepository->getNotMatureCount($language);
+        $totalCount = $this->wordRepository->getPublicCount($language);
 
         $filteredCount = $searchParams->hasFilter()
-            ? $this->wordRepository->getNotMatureCount($language, $searchParams->filter())
+            ? $this->wordRepository->getPublicCount($language, $searchParams->filter())
             : $totalCount;
 
         return new SearchResult($data, $totalCount, $filteredCount);

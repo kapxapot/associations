@@ -91,13 +91,13 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 
     // }
 
-    public function searchAllNotMature(
+    public function searchAllPublic(
         SearchParams $searchParams,
         ?Language $language = null
     ): WordCollection
     {
         $query = $this
-            ->notMatureQuery($language)
+            ->publicQuery($language)
             ->apply(
                 fn (Query $q) => $this->applySearchParams($q, $searchParams)
             );
@@ -105,13 +105,13 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         return WordCollection::from($query);
     }
 
-    public function getNotMatureCount(
+    public function getPublicCount(
         ?Language $language = null,
         ?string $filter = null
     ): int
     {
         return $this
-            ->notMatureQuery($language)
+            ->publicQuery($language)
             ->applyIf(
                 strlen($filter) > 0,
                 fn (Query $q) => $this->applyFilter($q, $filter)
@@ -235,10 +235,15 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     /**
      * Filters not mature & enabled words.
      */
-    protected function notMatureQuery(?Language $language = null): Query
+    protected function publicQuery(?Language $language = null): Query
     {
-        return parent::notMatureQuery($language)->apply(
-            fn (Query $q) => $this->filterByScopeNot($q, Scope::DISABLED)
-        );
+        return $this
+            ->byLanguageQuery($language)
+            ->apply(
+                fn (Query $q) => $this->filterNotMature($q)
+            )
+            ->apply(
+                fn (Query $q) => $this->filterByScopeNot($q, ...Scope::allFuzzyDisabled())
+            );
     }
 }

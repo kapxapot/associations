@@ -43,12 +43,23 @@ interface WordRepositoryInterface extends FilteringRepositoryInterface, Language
         bool $strict = false
     ): ?Word;
 
-    public function searchAllNotMature(
+    /**
+     * Searches for all words visible to *all* players.
+     *
+     * This excludes:
+     *
+     * - Mature words.
+     * - Fuzzy disabled words.
+     */
+    public function searchAllPublic(
         SearchParams $searchParams,
         ?Language $language = null
     ): WordCollection;
 
-    public function getNotMatureCount(
+    /**
+     * Returns the count of words returned by `searchAllPublic`.
+     */
+    public function getPublicCount(
         ?Language $language = null,
         ?string $substr = null
     ): int;

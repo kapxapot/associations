@@ -126,15 +126,6 @@ class AssociationRepositoryMock extends RepositoryMock implements AssociationRep
         return LanguageElementCollection::empty();
     }
 
-    public function getAllNotMature(?Language $language = null): LanguageElementCollection
-    {
-        return $this
-            ->getAllByLanguageConditional($language)
-            ->where(
-                fn (Association $a) => !$a->isMature()
-            );
-    }
-
     public function getAllByScope(
         int $scope,
         ?Language $language = null

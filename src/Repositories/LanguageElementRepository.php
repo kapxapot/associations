@@ -50,23 +50,10 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         );
     }
 
-    public function getAllNotMature(
-        ?Language $language = null
-    ): LanguageElementCollection
-    {
-        return LanguageElementCollection::from(
-            $this
-                ->byLanguageQuery($language)
-                ->apply(
-                    fn (Query $q) => $this->filterNotMature($q)
-                )
-        );
-    }
-
     /**
      * Returns out of date language elements.
      *
-     * @param integer $ttlMin Time to live in minutes
+     * @param integer $ttlMin Time to live in minutes.
      */
     public function getAllOutOfDate(
         int $ttlMin,
@@ -126,18 +113,6 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     // queries
 
-    /**
-     * Filters not mature elements.
-     */
-    protected function notMatureQuery(?Language $language = null): Query
-    {
-        return $this
-            ->byLanguageQuery($language)
-            ->apply(
-                fn (Query $q) => $this->filterNotMature($q)
-            );
-    }
-
     protected function byScopeQuery(int $scope, ?Language $language = null): Query
     {
         return $this
@@ -158,12 +133,12 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     // filters
 
+    /**
+     * Filters by fuzzy public scopes.
+     */
     protected function filterApproved(Query $query): Query
     {
-        return $query->whereIn(
-            $this->scopeField,
-            Scope::allFuzzyPublic()
-        );
+        return $this->filterByScope($query, ...Scope::allFuzzyPublic());
     }
 
     protected function filterNotMature(Query $query): Query
@@ -173,23 +148,23 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     // generic filters
 
-    protected function filterByScope(Query $query, int $scope): Query
+    protected function filterByScope(Query $query, int ...$scopes): Query
     {
-        return $query->where($this->scopeField, $scope);
+        return $query->whereIn($this->scopeField, $scopes);
     }
 
-    protected function filterByScopeNot(Query $query, int $scope): Query
+    protected function filterByScopeNot(Query $query, int ...$scopes): Query
     {
-        return $query->whereNotEqual($this->scopeField, $scope);
+        return $query->whereNotIn($this->scopeField, $scopes);
     }
 
-    protected function filterBySeverity(Query $query, int $severity): Query
+    protected function filterBySeverity(Query $query, int ...$severities): Query
     {
-        return $query->where($this->severityField, $severity);
+        return $query->whereIn($this->severityField, $severities);
     }
 
-    protected function filterBySeverityNot(Query $query, int $severity): Query
+    protected function filterBySeverityNot(Query $query, int ...$severities): Query
     {
-        return $query->whereNotEqual($this->severityField, $severity);
+        return $query->whereNotIn($this->severityField, $severities);
     }
 }

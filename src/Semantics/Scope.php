@@ -17,7 +17,7 @@ class Scope
      */
     public static function isFuzzyDisabled(int $scope): bool
     {
-        return in_array($scope, [self::DISABLED, self::INACTIVE]);
+        return in_array($scope, self::allFuzzyDisabled());
     }
 
     /**
@@ -29,7 +29,17 @@ class Scope
     }
 
     /**
-     * Returns scopes that are Scope::PUBLIC or Scope::COMMON.
+     * Returns scopes that are disabled or semi-disabled.
+     *
+     * @return integer[]
+     */
+    public static function allFuzzyDisabled(): array
+    {
+        return [self::DISABLED, self::INACTIVE];
+    }
+
+    /**
+     * Returns scopes that are public or semi-public.
      *
      * @return integer[]
      */

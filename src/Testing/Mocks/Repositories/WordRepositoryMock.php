@@ -91,12 +91,12 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             );
     }
 
-    public function searchAllNotMature(
+    public function searchAllPublic(
         SearchParams $searchParams,
         ?Language $language = null
     ): WordCollection
     {
-        $public = $this->getAllNotMature($language);
+        $public = $this->getAllPublic($language);
 
         // todo: add filter & sort
 
@@ -105,13 +105,13 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             : $public;
     }
 
-    public function getNotMatureCount(
+    public function getPublicCount(
         ?Language $language = null,
         ?string $substr = null
     ): int
     {
         // todo: add filtering by substr
-        return $this->getAllNotMature($language)->count();
+        return $this->getAllPublic($language)->count();
     }
 
     public function getAllOutOfDate(
@@ -190,12 +190,15 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
         return WordCollection::empty();
     }
 
-    public function getAllNotMature(?Language $language = null): WordCollection
+    /**
+     * Returns all words not mature & enabled.
+     */
+    private function getAllPublic(?Language $language = null): WordCollection
     {
         return $this
             ->getAllByLanguageConditional($language)
             ->where(
-                fn (Word $w) => !$w->isMature()
+                fn (Word $w) => !$w->isMature() && !$w->isFuzzyDisabled()
             );
     }
 

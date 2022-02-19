@@ -19,8 +19,6 @@ interface LanguageElementRepositoryInterface extends ChangingRepositoryInterface
         ?Language $language = null
     ): LanguageElementCollection;
 
-    public function getAllNotMature(?Language $language = null): LanguageElementCollection;
-
     /**
      * Returns out of date language elements.
      *
