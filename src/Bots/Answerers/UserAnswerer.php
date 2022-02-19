@@ -171,7 +171,7 @@ class UserAnswerer extends AbstractAnswerer
             return $this->skipCommand($botUser);
         }
 
-        if (count($request->originalTokens()) > self::MAX_TOKENS) {
+        if (count($request->dirtyTokens()) > self::MAX_TOKENS) {
             return $this->tooManyWords($botUser);
         }
 

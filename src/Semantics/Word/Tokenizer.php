@@ -6,6 +6,9 @@ class Tokenizer
 {
     const DELIMITER = ' ';
 
+    /**
+     * @return string[]
+     */
     public function tokenize(?string $str, ?string $delimiter = null): array
     {
         $delimiter ??= self::DELIMITER;

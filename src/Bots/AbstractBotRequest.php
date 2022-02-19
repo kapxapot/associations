@@ -22,12 +22,15 @@ abstract class AbstractBotRequest
 
     protected ?string $originalCommand;
 
-    /** @var string[] */
+    /** @var string[] Tokens as they come from a request. */
     protected array $originalTokens;
 
     protected ?string $command;
 
-    /** @var string[] */
+    /** @var string[] Tokens build based on the command. */
+    protected array $dirtyTokens;
+
+    /** @var string[] Clean tokens based on the command. */
     protected array $tokens;
 
     protected ?array $userState;
@@ -93,6 +96,16 @@ abstract class AbstractBotRequest
     }
 
     /**
+     * Dirty (unsanitized) tokens.
+     *
+     * @return string[]
+     */
+    public function dirtyTokens(): array
+    {
+        return $this->dirtyTokens;
+    }
+
+    /**
      * Sanitized tokens.
      *
      * @return string[]
@@ -107,8 +120,17 @@ abstract class AbstractBotRequest
      */
     protected function parseTokens(?string $command): array
     {
-        $tokens = $this->tokenizer->tokenize($command);
+        return $this->tokenizer->tokenize($command);
+    }
 
+    /**
+     * Filters trash tokens and trims tokens.
+     *
+     * @param string[] $tokens
+     * @return string[]
+     */
+    protected function cleanTokens(array $tokens): array
+    {
         $trashTokens = $this->getTrashTokens();
         $semiTrashTokens = $this->getSemiTrashTokens();
 
@@ -323,8 +345,7 @@ abstract class AbstractBotRequest
      */
     public function isAny(string ...$commands): bool
     {
-        return in_array($this->originalCommand, $commands)
-            || in_array($this->command, $commands);
+        return in_array($this->command, $commands);
     }
 
     /**
@@ -333,7 +354,7 @@ abstract class AbstractBotRequest
     public function hasAny(string ...$tokens): bool
     {
         foreach ($tokens as $token) {
-            if (in_array($token, $this->originalTokens)) {
+            if (in_array($token, $this->tokens)) {
                 return true;
             }
         }
@@ -363,7 +384,7 @@ abstract class AbstractBotRequest
     public function has(string ...$tokens): bool
     {
         foreach ($tokens as $token) {
-            if (!in_array($token, $this->originalTokens)) {
+            if (!in_array($token, $this->tokens)) {
                 return false;
             }
         }
@@ -379,8 +400,7 @@ abstract class AbstractBotRequest
      */
     public function matches(string $pattern): ?array
     {
-        return $this->matchesTokens($pattern, $this->tokens)
-            ?? $this->matchesTokens($pattern, $this->originalTokens);
+        return $this->matchesTokens($pattern, $this->tokens);
     }
 
     /**

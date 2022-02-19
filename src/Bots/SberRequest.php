@@ -59,7 +59,8 @@ class SberRequest extends AbstractBotRequest
             $this->originalCommand = mb_strtolower($this->originalCommand);
         }
 
-        $this->tokens = $this->parseTokens($this->originalCommand);
+        $this->dirtyTokens = $this->parseTokens($this->originalCommand);
+        $this->tokens = $this->cleanTokens($this->dirtyTokens);
         $this->command = $this->rebuildFrom($this->tokens);
 
         // in case of server action token list is empty

@@ -13,7 +13,7 @@ class AliceRequest extends AbstractBotRequest
         $request = $data['request'] ?? [];
 
         $this->originalCommand = $request['command'] ?? null;
-        $this->originalTokens = $this->cleanTokens($request['nlu']['tokens']);
+        $this->originalTokens = $this->cleanAliceTokens($request['nlu']['tokens'] ?? []);
         $this->originalUtterance = $request['original_utterance'];
 
         $command = $this->originalUtterance ?? $request['payload'] ?? null;
@@ -22,7 +22,8 @@ class AliceRequest extends AbstractBotRequest
             $command = mb_strtolower($command);
         }
 
-        $this->tokens = $this->parseTokens($command);
+        $this->dirtyTokens = $this->parseTokens($command);
+        $this->tokens = $this->cleanTokens($this->dirtyTokens);
         $this->command = $this->rebuildFrom($this->tokens);
 
         // in case of server action token list *can* be empty
@@ -63,7 +64,7 @@ class AliceRequest extends AbstractBotRequest
      * @param string[] $tokens
      * @return string[]
      */
-    private function cleanTokens(array $tokens): array
+    private function cleanAliceTokens(array $tokens): array
     {
         if ($tokens === null) {
             return [];
