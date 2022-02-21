@@ -221,6 +221,7 @@ abstract class AbstractAnswerer
     protected function isNativeBotCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
+            'включай',
             'включи',
             'включите',
             'включить',
@@ -311,6 +312,7 @@ abstract class AbstractAnswerer
     protected function isRepeatCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAny(
+            'включись',
             'играем',
             'играть',
             'повтори',
