@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Events\Feedback\WordFeedbackCreatedEvent;
 use App\Models\User;
+use App\Models\Word;
 use App\Models\WordFeedback;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
@@ -47,6 +48,20 @@ class WordFeedbackService
         $this->validationRules = $validationRules;
 
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * Mark the word as disliked by the user.
+     */
+    public function dislike(Word $word, User $user): WordFeedback
+    {
+        return $this->save(
+            [
+                'word_id' => $word->getId(),
+                'dislike' => true,
+            ],
+            $user
+        );
     }
 
     public function save(array $data, User $user): WordFeedback

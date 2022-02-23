@@ -137,34 +137,12 @@ class UserAnswerer extends AbstractAnswerer
             return $this->repeatCommand($botUser);
         }
 
-        if (
-            $request->isAny(
-                Command::WORD_DISLIKE,
-                'не нравится',
-                'плохой слово'
-            )
-            || $request->hasAnySet(
-                ['плохое', 'слово'],
-                ['не', 'нравится', 'слово']
-            )
-        ) {
-            return $this->wordDislikeFeedback($botUser);
+        if ($this->isBadWordCommand($request)) {
+            return $this->badWordCommand($botUser);
         }
 
-        if (
-            $request->isAny(
-                Command::ASSOCIATION_DISLIKE,
-                'плохой ассоциация',
-                'плохое ассоциация',
-                'плохие ассоциации'
-            )
-            || $request->hasAnySet(
-                ['плохая', 'ассоциация'],
-                ['не', 'нравится', 'ассоциация'],
-                ['неправильная', 'ассоциация']
-            )
-        ) {
-            return $this->associationDislikeFeedback($botUser);
+        if ($this->isBadAssociationCommand($request)) {
+            return $this->badAssociationCommand($botUser);
         }
 
         if ($this->isSkipCommand($request)) {
@@ -176,6 +154,33 @@ class UserAnswerer extends AbstractAnswerer
         }
 
         return $this->sayWord($botUser, $command, $request->originalUtterance());
+    }
+
+    private function isBadWordCommand(AbstractBotRequest $request)
+    {
+        return $request->isAny(
+            Command::WORD_DISLIKE,
+            'не нравится',
+            'плохоеслово',
+            'плохой слово'
+        ) || $request->hasAnySet(
+            ['плохое', 'слово'],
+            ['не', 'нравится', 'слово']
+        );
+    }
+
+    private function isBadAssociationCommand(AbstractBotRequest $request)
+    {
+        return $request->isAny(
+            Command::ASSOCIATION_DISLIKE,
+            'плохие ассоциации',
+            'плохое ассоциация',
+            'плохой ассоциация'
+        ) || $request->hasAnySet(
+            ['не', 'нравится', 'ассоциация'],
+            ['неправильная', 'ассоциация'],
+            ['плохая', 'ассоциация']
+        );
     }
 
     private function startCommand(
@@ -341,14 +346,11 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function wordDislikeFeedback(AbstractBotUser $botUser): BotResponse
+    private function badWordCommand(AbstractBotUser $botUser): BotResponse
     {
         $word = $this->getLastTurn($botUser)->word();
 
-        $this->wordFeedbackService->save(
-            ['word_id' => $word->getId(), 'dislike' => true],
-            $botUser->user()
-        );
+        $this->wordFeedbackService->dislike($word, $botUser->user());
 
         $this->finishGameFor($botUser);
 
@@ -359,7 +361,7 @@ class UserAnswerer extends AbstractAnswerer
         );
     }
 
-    private function associationDislikeFeedback(AbstractBotUser $botUser): BotResponse
+    private function badAssociationCommand(AbstractBotUser $botUser): BotResponse
     {
         $association = $this->getLastTurn($botUser)->association();
 
@@ -371,10 +373,7 @@ class UserAnswerer extends AbstractAnswerer
             );
         }
 
-        $this->associationFeedbackService->save(
-            ['association_id' => $association->getId(), 'dislike' => true],
-            $botUser->user()
-        );
+        $this->associationFeedbackService->dislike($association, $botUser->user());
 
         $this->finishGameFor($botUser);
 

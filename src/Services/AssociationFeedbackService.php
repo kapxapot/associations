@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Events\Feedback\AssociationFeedbackCreatedEvent;
+use App\Models\Association;
 use App\Models\AssociationFeedback;
 use App\Models\User;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
@@ -38,6 +39,20 @@ class AssociationFeedbackService
         $this->validationRules = $validationRules;
 
         $this->eventDispatcher = $eventDispatcher;
+    }
+
+    /**
+     * Mark the association as disliked by the user.
+     */
+    public function dislike(Association $association, User $user): AssociationFeedback
+    {
+        return $this->save(
+            [
+                'association_id' => $association->getId(),
+                'dislike' => true,
+            ],
+            $user
+        );
     }
 
     public function save(array $data, User $user): AssociationFeedback
