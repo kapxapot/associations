@@ -21,7 +21,7 @@ class LanguageElementCollection extends DbModelCollection
         return Collection::collect(
             $this->fuzzyPublic(),
             $this->private(),
-            $this->fuzzyDisabled(),
+            $this->fuzzyDisabled()
         );
     }
 

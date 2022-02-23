@@ -9,6 +9,9 @@ use Webmozart\Assert\Assert;
 
 class AggregatedAssociation extends Association
 {
+    /**
+     * Anchor is the "left" word in the association.
+     */
     private ?Word $anchor = null;
 
     private bool $junky = false;

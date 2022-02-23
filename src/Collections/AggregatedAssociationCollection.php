@@ -16,17 +16,16 @@ class AggregatedAssociationCollection extends AssociationCollection
      *
      * Works with every scope group separately.
      *
-     * @param Word $originalWord The word based on which the associations are aggregated.
-     * @param User|null $user The user to congregate against.
+     * @param Word $rootWord The word based on which the associations are aggregated.
      * @return static
      */
-    public function congregate(Word $originalWord): self
+    public function congregate(Word $rootWord): self
     {
         return static::from(
             $this
                 ->segregateByScope()
                 ->flatMap(
-                    fn (self $g) => $g->tidy($originalWord)
+                    fn (self $g) => $g->tidy($rootWord)
                 )
         );
     }
@@ -37,10 +36,10 @@ class AggregatedAssociationCollection extends AssociationCollection
      * 1. If there's an original association with the same destination, all the others are removed.
      * 2. Semantically duplicate associations are like: [any word -> word2], [any word -> word2's main word]. In this case the second association stays, the first goes away.
      *
-     * @param Word $originalWord The word based on which the associations are aggregated.
+     * @param Word $rootWord The word based on which the associations are aggregated.
      * @return static
      */
-    public function tidy(Word $originalWord): self
+    public function tidy(Word $rootWord): self
     {
         $canonicalGroups = $this->group(
             fn (AggregatedAssociation $a) => (string)$a->otherThanAnchor()->canonical()
@@ -58,12 +57,7 @@ class AggregatedAssociationCollection extends AssociationCollection
 
             // no need to choose in case of one association
             if ($associations->count() === 1) {
-                /** @var AggregatedAssociation $onlyAssociation */
-                $onlyAssociation = $associations->first();
-
-                $onlyAssociation->addToLog('Only');
-
-                $result = $result->add($onlyAssociation);
+                $result = $result->add($associations->first());
 
                 continue;
             }
@@ -72,10 +66,8 @@ class AggregatedAssociationCollection extends AssociationCollection
             //
             // 1. choose by other than anchor word closest to canonical
             // 2. if there's an original association, prefer it, otherwise doesn't matter
-            //
-            // todo: use the closest to canonical
 
-            /** @var integer|null $minDistance */
+            /** @var int|null $minDistance */
             $minDistance = null;
             $minAssociations = static::empty();
 
@@ -88,6 +80,8 @@ class AggregatedAssociationCollection extends AssociationCollection
                 if ($minDistance === null || $distance < $minDistance) {
                     $minDistance = $distance;
                     $minAssociations = static::collect($association);
+
+                    continue;
                 }
 
                 if ($distance === $minDistance) {
@@ -95,13 +89,13 @@ class AggregatedAssociationCollection extends AssociationCollection
                 }
             }
 
-            /** @var AggregatedAssociation $original */
-            $original = $minAssociations->first(
-                fn (AggregatedAssociation $a) => $a->anchorEquals($originalWord)
+            /** @var AggregatedAssociation $rootAssociation */
+            $rootAssociation = $minAssociations->first(
+                fn (AggregatedAssociation $a) => $a->anchorEquals($rootWord)
             );
 
             /** @var AggregatedAssociation $best */
-            $best = $original ?? $minAssociations->first();
+            $best = $rootAssociation ?? $minAssociations->first();
 
             Assert::notNull($best);
 
