@@ -45,6 +45,8 @@ final class DictionaryApiTest extends IntegrationTest
      */
     public function testExistingWords(string $word): void
     {
+        $this->markTestSkipped('Dictionary Api is unstable');
+
         $result = $this->dictApi->request($this->language->code, $word);
 
         $this->assertNotNull($result);
@@ -72,6 +74,8 @@ final class DictionaryApiTest extends IntegrationTest
      */
     public function testNotExistingWords(string $word): void
     {
+        $this->markTestSkipped('Dictionary Api is unstable');
+
         $result = $this->dictApi->request($this->language->code, $word);
 
         $this->assertNotNull($result);

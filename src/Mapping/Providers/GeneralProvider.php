@@ -20,6 +20,8 @@ use App\Models\News;
 use App\Models\Page;
 use App\Models\Validation\Factories\UserValidationFactory;
 use App\Parsing\Factories\DoubleBracketsConfigFactory;
+use App\Semantics\Association\AssociationAggregator;
+use App\Semantics\Interfaces\AssociationAggregatorInterface;
 use App\Services\Factories\NewsAggregatorServiceFactory;
 use App\Services\Interfaces\ExternalDictServiceInterface;
 use App\Services\YandexDictService;
@@ -78,6 +80,10 @@ class GeneralProvider extends MappingProvider
             // parsing / rendering
 
             DoubleBracketsConfig::class => DoubleBracketsConfigFactory::class,
+
+            // semantics
+
+            AssociationAggregatorInterface::class => AssociationAggregator::class,
 
             // slim
 

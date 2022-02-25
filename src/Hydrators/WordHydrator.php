@@ -13,6 +13,7 @@ use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Interfaces\AssociationAggregatorInterface;
 use App\Services\DictionaryService;
 use App\Services\WordService;
 use Plasticode\Hydrators\Generic\Hydrator;
@@ -35,6 +36,8 @@ class WordHydrator extends Hydrator
     private DictionaryService $dictionaryService;
     private WordService $wordService;
 
+    private AssociationAggregatorInterface $associationAggregator;
+
     public function __construct(
         AssociationRepositoryInterface $associationRepository,
         LanguageRepositoryInterface $languageRepository,
@@ -47,7 +50,8 @@ class WordHydrator extends Hydrator
         AuthInterface $auth,
         LinkerInterface $linker,
         DictionaryService $dictionaryService,
-        WordService $wordService
+        WordService $wordService,
+        AssociationAggregatorInterface $associationAggregator
     )
     {
         $this->associationRepository = $associationRepository;
@@ -64,6 +68,8 @@ class WordHydrator extends Hydrator
 
         $this->dictionaryService = $dictionaryService;
         $this->wordService = $wordService;
+
+        $this->associationAggregator = $associationAggregator;
     }
 
     /**
@@ -72,6 +78,9 @@ class WordHydrator extends Hydrator
     public function hydrate(DbModel $entity): Word
     {
         return $entity
+            ->withAggregatedAssociations(
+                fn () => $this->associationAggregator->aggregateForWord($entity)
+            )
             ->withAssociations(
                 fn () => $this->associationRepository->getAllByWord($entity)
             )

@@ -60,6 +60,7 @@ use App\Repositories\WordRelationRepository;
 use App\Repositories\WordRelationTypeRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
+use App\Semantics\Interfaces\AssociationAggregatorInterface;
 use App\Services\DictionaryService;
 use App\Services\UserService;
 use App\Services\WordService;
@@ -95,6 +96,8 @@ final class RepositoryProviderTest extends AbstractProviderTest
             DictionaryService::class,
             UserService::class,
             WordService::class,
+
+            AssociationAggregatorInterface::class,
         ];
     }
 

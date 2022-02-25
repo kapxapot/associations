@@ -38,6 +38,7 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Association\AssociationAggregator;
 use App\Services\AliceUserService;
 use App\Services\AnniversaryService;
 use App\Services\AssociationFeedbackService;
@@ -200,6 +201,10 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(NewsLinkMapper::class);
         $this->check(PageLinkMapper::class);
         $this->check(TagLinkMapper::class);
+
+        // semantics
+
+        $this->check(AssociationAggregator::class);
 
         // slim
 
