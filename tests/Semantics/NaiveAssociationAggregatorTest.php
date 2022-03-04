@@ -18,7 +18,7 @@ use App\Semantics\Scope;
 use App\Testing\Factories\WordRepositoryFactory;
 use PHPUnit\Framework\TestCase;
 
-class AssociationAggregatorTest extends TestCase
+class NaiveAssociationAggregatorTest extends TestCase
 {
     private WordRepositoryInterface $wordRepository;
 
