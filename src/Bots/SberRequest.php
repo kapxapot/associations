@@ -92,7 +92,7 @@ class SberRequest extends AbstractBotRequest
     {
         return array_merge(
             parent::getTrashTokens(),
-            ['салют', 'salute', 'сбер', 'sber', 'джой', 'joy']
+            ['салют', 'salute', 'сбер', 'sber', 'джой', 'joy', 'афина']
         );
     }
 

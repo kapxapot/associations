@@ -52,6 +52,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             'associations',
             'counterRelations',
             'definition',
+            'dependents',
             'dictWord',
             'main',
             'parsedDefinition',

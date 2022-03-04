@@ -35,11 +35,9 @@ final class DefinitionParserTest extends TestCase
         );
 
         $definition->withWord(
-            (Word::create(
-                [
-                    'word' => 'нежить'
-                ]
-            ))->withLanguage($this->getLanguage())
+            (Word::create([
+                'word' => 'нежить'
+            ]))->withLanguage($this->getLanguage())
         );
 
         $parsed = (new DefinitionParser())->parse($definition);

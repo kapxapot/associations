@@ -79,7 +79,7 @@ class WordHydrator extends Hydrator
     {
         return $entity
             ->withAggregatedAssociations(
-                fn () => $this->associationAggregator->aggregateForWord($entity)
+                fn () => $this->associationAggregator->aggregateFor($entity)
             )
             ->withAssociations(
                 fn () => $this->associationRepository->getAllByWord($entity)

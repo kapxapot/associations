@@ -14,5 +14,5 @@ interface AssociationAggregatorInterface
      * - Aggregated associations from dependent words.
      * - Aggregated associations from main word (if relation type allows it).
      */
-    public function aggregateForWord(Word $word): AggregatedAssociationCollection;
+    public function aggregateFor(Word $word): AggregatedAssociationCollection;
 }

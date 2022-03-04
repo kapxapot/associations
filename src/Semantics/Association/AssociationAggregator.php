@@ -24,7 +24,7 @@ class AssociationAggregator implements AssociationAggregatorInterface
         $this->congregator = $congregator;
     }
 
-    public function aggregateForWord(Word $word): AggregatedAssociationCollection
+    public function aggregateFor(Word $word): AggregatedAssociationCollection
     {
         $col = $this->aggregateAssociations($word);
 
