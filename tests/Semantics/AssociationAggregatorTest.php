@@ -7,14 +7,13 @@ use App\Collections\AssociationFeedbackCollection;
 use App\Collections\AssociationOverrideCollection;
 use App\Collections\WordCollection;
 use App\Collections\WordRelationCollection;
-use App\Models\AggregatedAssociation;
 use App\Models\Association;
 use App\Models\Word;
 use App\Models\WordRelation;
 use App\Models\WordRelationType;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Semantics\Association\AssociationAggregator;
 use App\Semantics\Association\AssociationCongregator;
+use App\Semantics\Association\NaiveAssociationAggregator;
 use App\Semantics\Scope;
 use App\Testing\Factories\WordRepositoryFactory;
 use PHPUnit\Framework\TestCase;
@@ -114,7 +113,7 @@ class AssociationAggregatorTest extends TestCase
         $this->associate($w6, $w16);
 
         // assert
-        $aggregator = new AssociationAggregator(
+        $aggregator = new NaiveAssociationAggregator(
             new AssociationCongregator()
         );
 

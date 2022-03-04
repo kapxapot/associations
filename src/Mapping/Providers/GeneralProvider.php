@@ -20,7 +20,7 @@ use App\Models\News;
 use App\Models\Page;
 use App\Models\Validation\Factories\UserValidationFactory;
 use App\Parsing\Factories\DoubleBracketsConfigFactory;
-use App\Semantics\Association\AssociationAggregator;
+use App\Semantics\Association\NaiveAssociationAggregator;
 use App\Semantics\Interfaces\AssociationAggregatorInterface;
 use App\Services\Factories\NewsAggregatorServiceFactory;
 use App\Services\Interfaces\ExternalDictServiceInterface;
@@ -83,7 +83,7 @@ class GeneralProvider extends MappingProvider
 
             // semantics
 
-            AssociationAggregatorInterface::class => AssociationAggregator::class,
+            AssociationAggregatorInterface::class => NaiveAssociationAggregator::class,
 
             // slim
 

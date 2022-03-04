@@ -13,7 +13,7 @@ use Plasticode\Util\SortStep;
 /**
  * Aggregates word's associations "on the fly" without any pre-calculations.
  */
-class AssociationAggregator implements AssociationAggregatorInterface
+class NaiveAssociationAggregator implements AssociationAggregatorInterface
 {
     private AssociationCongregator $congregator;
 
