@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Collections\WordRelationCollection;
 use App\Models\Word;
 use App\Models\WordRelation;
+use App\Models\WordRelationType;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Data\Query;
@@ -58,6 +59,20 @@ class WordRelationRepository extends IdiormRepository implements WordRelationRep
         return WordRelationCollection::from(
             $this->query()->where('main_word_id', $mainWord->getId())
         );
+    }
+
+    public function find(Word $word, WordRelationType $type, Word $mainWord, ?int $exceptId = null)
+    {
+        return $this
+            ->query()
+            ->where('word_id', $word->getId())
+            ->where('type_id', $type->getId())
+            ->where('main_word_id', $mainWord->getId())
+            ->applyIf(
+                $exceptId > 0,
+                fn (Query $q) => $q->whereNotEqual('id', $exceptId)
+            )
+            ->one();
     }
 
     // SearchRepository

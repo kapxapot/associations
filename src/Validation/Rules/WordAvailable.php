@@ -6,6 +6,9 @@ use App\Models\Language;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use Respect\Validation\Rules\AbstractRule;
 
+/**
+ * Tries to find a word with the same `word` string but not equal to the current word.
+ */
 class WordAvailable extends AbstractRule
 {
     private WordRepositoryInterface $wordRepository;

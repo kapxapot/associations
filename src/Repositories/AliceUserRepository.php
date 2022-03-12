@@ -21,7 +21,10 @@ class AliceUserRepository extends IdiormRepository implements AliceUserRepositor
 
     public function getByAliceId(string $id): ?AliceUser
     {
-        return $this->query()->where('alice_id', $id)->one();
+        return $this
+            ->query()
+            ->where('alice_id', $id)
+            ->one();
     }
 
     public function getByUser(User $user): ?AliceUser

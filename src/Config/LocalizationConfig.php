@@ -114,6 +114,7 @@ class LocalizationConfig extends BaseConfig
                 'Main word creates recursion.' => 'Главное слово создает рекурсию.',
 
                 'Word relation type doesn\'t allow a primary relation.' => 'Выбранный тип связи не допускает сильную связь.',
+                'A word relation with this type and main word already exists.' => 'Связь с таким типом и главным словом уже существует.',
             ]
         );
     }
