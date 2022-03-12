@@ -149,16 +149,9 @@ class WordSpecification
 
     private function isPublicByAssociations(Word $word): bool
     {
-        $assocCoeff = $this->config->wordApprovedAssociationCoeff();
-        $dislikeCoeff = $this->config->wordDislikeCoeff();
         $threshold = $this->config->wordApprovalThreshold();
 
-        $approvedAssocs = $word->approvedAssociations()->count();
-        $dislikes = $word->dislikes()->count();
-
-        $score = $approvedAssocs * $assocCoeff - $dislikes * $dislikeCoeff;
-
-        return $score >= $threshold;
+        return $this->exceedsAssociationThreshold($word, $threshold);
     }
 
     private function isCommon(Word $word): bool
@@ -171,11 +164,17 @@ class WordSpecification
 
     private function isCommonByAssociations(Word $word): bool
     {
-        $assocCoeff = $this->config->wordApprovedAssociationCoeff();
-        $dislikeCoeff = $this->config->wordDislikeCoeff();
         $threshold = $this->config->wordCommonThreshold();
 
-        $approvedAssocs = $word->approvedAssociations()->count();
+        return $this->exceedsAssociationThreshold($word, $threshold);
+    }
+
+    private function exceedsAssociationThreshold(Word $word, float $threshold)
+    {
+        $assocCoeff = $this->config->wordApprovedAssociationCoeff();
+        $dislikeCoeff = $this->config->wordDislikeCoeff();
+
+        $approvedAssocs = $word->congregatedAssociations()->fuzzyPublic()->count();
         $dislikes = $word->dislikes()->count();
 
         $score = $approvedAssocs * $assocCoeff - $dislikes * $dislikeCoeff;
