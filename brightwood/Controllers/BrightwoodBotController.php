@@ -71,7 +71,7 @@ class BrightwoodBotController
             ? $this->processIncomingMessage($message)
             : null;
 
-        if ($answers->any()) {
+        if ($answers && $answers->any()) {
             foreach ($answers as $answer) {
                 if ($logLevel >= self::LOG_FULL) {
                     $this->logger->info('Trying to send message', $answer);
