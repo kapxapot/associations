@@ -8,7 +8,7 @@ use Plasticode\Semantics\Gender;
 
 /**
  * Renders the following constructs:
- * 
+ *
  * - {one|two|three} - based on genders (1, 2, 3)
  * - {var_name} - renders var value
  * - {handler:text} - applies handler to text

@@ -9,6 +9,7 @@ use App\Bots\Command;
 use App\Bots\Factories\BotMessageRendererFactory;
 use App\Bots\Interfaces\MessageRendererInterface;
 use App\Bots\SberRequest;
+use App\Semantics\SentenceCleaner;
 use App\Services\SberUserService;
 use Exception;
 use Plasticode\Core\Response;
@@ -32,6 +33,8 @@ class SberBotController
 
     private MessageRendererInterface $messageRenderer;
 
+    private SentenceCleaner $sentenceCleaner;
+
     private bool $logEnabled;
 
     public function __construct(
@@ -40,7 +43,8 @@ class SberBotController
         SberUserService $sberUserService,
         SettingsProviderInterface $settingsProvider,
         BotMessageRendererFactory $messageRendererFactory,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        SentenceCleaner $sentenceCleaner
     )
     {
         $this->applicationAnswerer = $applicationAnswerer;
@@ -54,6 +58,8 @@ class SberBotController
 
         $this->logger = $logger;
         $this->logEnabled = $this->settingsProvider->get('sber.bot_log', false) === true;
+
+        $this->sentenceCleaner = $sentenceCleaner;
     }
 
     public function __invoke(
@@ -113,6 +119,9 @@ class SberBotController
                 'word_limit' => UserAnswerer::WORD_LIMIT,
             ])
             ->render($response->text());
+
+        // special trailing dor trimming for Sber
+        $text = $this->sentenceCleaner->trimTrailingDot($text);
 
         $data = [
             'messageName' => 'ANSWER_TO_USER',
