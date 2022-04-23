@@ -7,6 +7,7 @@ use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Semantics\Scope;
+use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Search\SearchParams;
@@ -34,6 +35,10 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         if (!$word->isPersisted()) {
             $word->originalWord = $word->word;
         }
+
+        $word->meta = empty($word->metaData())
+            ? null
+            : json_encode($word->metaData());
 
         return $this->saveEntity($word);
     }
@@ -90,6 +95,15 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     // {
 
     // }
+
+    public function getAllByIds(NumericCollection $ids): WordCollection
+    {
+        return WordCollection::from(
+            $this
+                ->query()
+                ->whereIn($this->idField(), $ids)
+        );
+    }
 
     public function searchAllPublic(
         SearchParams $searchParams,

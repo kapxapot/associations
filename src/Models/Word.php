@@ -12,8 +12,10 @@ use App\Collections\WordOverrideCollection;
 use App\Collections\WordRelationCollection;
 use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
+use App\Models\Traits\Meta;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Interfaces\PartOfSpeechableInterface;
+use Plasticode\Collections\Generic\NumericCollection;
 
 /**
  * @property integer|null $mainId
@@ -44,6 +46,10 @@ use App\Semantics\Interfaces\PartOfSpeechableInterface;
  */
 class Word extends LanguageElement implements PartOfSpeechableInterface
 {
+    use Meta;
+
+    const META_AGGREGATED_WORDS = 'aggregated_words';
+
     protected function requiredWiths(): array
     {
         return [
@@ -584,7 +590,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     /**
      * Returns distinct words that the current word is related to.
-     * 
+     *
      * this -> A
      * this -> B
      */
@@ -602,7 +608,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     /**
      * Returns distinct words that are related to the current word.
-     * 
+     *
      * A -> this
      * B -> this
      */
@@ -664,6 +670,47 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     public function congregatedAssociations(): AggregatedAssociationCollection
     {
         return $this->aggregatedAssociations()->notJunky();
+    }
+
+    public function aggregatedWordIds(bool $suppressMeta = false): NumericCollection
+    {
+        $ids = $suppressMeta
+            ? null
+            : $this->getMetaValue(self::META_AGGREGATED_WORDS);
+
+        return $ids
+            ? NumericCollection::make($ids)
+            : $this->aggregatedWords()->ids();
+    }
+
+    public function aggregatedWords(?self $exceptWord = null): WordCollection
+    {
+        // add dependent words
+        $aggregatedWords = $this->dependents();
+
+        if ($exceptWord !== null) {
+            $aggregatedWords = $aggregatedWords->except($exceptWord);
+        }
+
+        // add main word
+        $primaryRelation = $this->primaryRelation();
+
+        if ($primaryRelation && $primaryRelation->isSharingAssociationsDown()) {
+            $mainWord = $primaryRelation->mainWord();
+
+            if (!$mainWord->equals($exceptWord)) {
+                $aggregatedWords = $aggregatedWords->add($mainWord);
+            }
+        }
+
+        // aggregate associations
+        $col = $aggregatedWords
+            ->flatMap(
+                fn (Word $w) => $w->aggregatedWords($this)
+            )
+            ->add($this);
+
+        return WordCollection::from($col);
     }
 
     public function toString(): string

@@ -7,10 +7,10 @@ use App\Collections\AssociationOverrideCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
 use App\Models\Interfaces\AssociationInterface;
+use App\Models\Traits\Meta;
 
 /**
  * @property integer $firstWordId
- * @property string|null $meta
  * @property integer $secondWordId
  * @method AssociationInterface canonical()
  * @method AssociationInterface|null canonicalForMe()
@@ -25,15 +25,14 @@ use App\Models\Interfaces\AssociationInterface;
  */
 class Association extends LanguageElement implements AssociationInterface
 {
+    use Meta;
+
     const DEFAULT_SIGN = '→';
     const APPROVED_SIGN = '⇉';
 
     const META_USAGE_COUNT = 'usage_count';
 
     private string $canonicalPropertyName = 'canonical';
-
-    private ?array $metaData = null;
-    private bool $metaInitialized = false;
 
     protected function requiredWiths(): array
     {
@@ -44,45 +43,6 @@ class Association extends LanguageElement implements AssociationInterface
             'firstWord',
             'secondWord',
         ];
-    }
-
-    public function metaData(): array
-    {
-        $this->initMeta();
-
-        return $this->metaData;
-    }
-
-    /**
-     * @return mixed Returns `$default` (`null` by default) value if the value is not set.
-     */
-    public function getMetaValue(string $field, $default = null)
-    {
-        $this->initMeta();
-
-        return $this->metaData[$field] ?? $default;
-    }
-
-    public function setMetaValue(string $field, $value): void
-    {
-        $this->initData();
-
-        $this->metaData[$field] = $value;
-    }
-
-    private function initMeta(): void
-    {
-        if ($this->metaInitialized) {
-            return;
-        }
-
-        if (empty($this->metaData) && strlen($this->meta) > 0) {
-            $this->metaData = json_decode($this->meta, true);
-        }
-
-        $this->metaData ??= [];
-
-        $this->metaInitialized = true;
     }
 
     public function isVisibleFor(?User $user): bool

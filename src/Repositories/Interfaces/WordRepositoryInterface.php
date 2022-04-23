@@ -5,6 +5,7 @@ namespace App\Repositories\Interfaces;
 use App\Collections\WordCollection;
 use App\Models\Language;
 use App\Models\Word;
+use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 use Plasticode\Search\SearchParams;
 
@@ -42,6 +43,11 @@ interface WordRepositoryInterface extends FilteringRepositoryInterface, Language
         ?int $exceptId = null,
         bool $strict = false
     ): ?Word;
+
+    /**
+     * Loads several words by their ids.
+     */
+    public function getAllByIds(NumericCollection $ids): WordCollection;
 
     /**
      * Searches for all words visible to *all* players.

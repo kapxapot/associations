@@ -4,6 +4,7 @@ namespace App\Testing\Mocks\Repositories;
 
 use App\Collections\AssociationCollection;
 use App\Collections\LanguageElementCollection;
+use App\Collections\WordCollection;
 use App\Models\Association;
 use App\Models\Language;
 use App\Models\User;
@@ -74,6 +75,15 @@ class AssociationRepositoryMock extends RepositoryMock implements AssociationRep
                     $a->firstWord()->equals($word)
                     || $a->secondWord()->equals($word)
             );
+    }
+
+    public function getAllByWords(WordCollection $words): AssociationCollection
+    {
+        return $this->associations->where(
+            fn (Association $a) =>
+                $words->contains($a->firstWord())
+                || $words->contains($a->secondWord())
+        );
     }
 
     public function getByOrderedPair(Word $first, Word $second): ?Association

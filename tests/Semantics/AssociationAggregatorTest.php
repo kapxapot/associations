@@ -11,38 +11,66 @@ use App\Models\Association;
 use App\Models\Word;
 use App\Models\WordRelation;
 use App\Models\WordRelationType;
+use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Semantics\Association\AssociationCongregator;
+use App\Semantics\Association\CachingAssociationAggregator;
 use App\Semantics\Association\NaiveAssociationAggregator;
+use App\Semantics\Interfaces\AssociationAggregatorInterface;
 use App\Semantics\Scope;
 use App\Testing\Factories\WordRepositoryFactory;
+use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
 use PHPUnit\Framework\TestCase;
 
-class NaiveAssociationAggregatorTest extends TestCase
+class AssociationAggregatorTest extends TestCase
 {
+    private AssociationRepositoryInterface $associationRepository;
     private WordRepositoryInterface $wordRepository;
 
     private WordRelationType $relationType;
+
+    // aggregators
+    private NaiveAssociationAggregator $naiveAggregator;
+    private CachingAssociationAggregator $cachingAggregator;
 
     public function setUp(): void
     {
         parent::setUp();
 
+        $this->associationRepository = new AssociationRepositoryMock();
         $this->wordRepository = WordRepositoryFactory::make();
 
         $this->relationType = new WordRelationType();
         $this->relationType->sharingAssociationsDown = 1;
+
+        // aggregators
+        $congregator = new AssociationCongregator();
+
+        $this->naiveAggregator = new NaiveAssociationAggregator($congregator);
+
+        $this->cachingAggregator = new CachingAssociationAggregator(
+            $this->associationRepository,
+            $this->wordRepository,
+            $congregator
+        );
     }
 
     public function tearDown(): void
     {
+        unset($this->cachingAggregator);
+        unset($this->naiveAggregator);
+
         unset($this->relationType);
         unset($this->wordRepository);
+        unset($this->associationRepository);
 
         parent::tearDown();
     }
 
-    public function testAggregate(): void
+    /**
+     * @dataProvider aggregateProvider
+     */
+    public function testAggregate(string $aggregatorClass): void
     {
         // Main word tree:
         //
@@ -113,13 +141,31 @@ class NaiveAssociationAggregatorTest extends TestCase
         $this->associate($w6, $w16);
 
         // assert
-        $aggregator = new NaiveAssociationAggregator(
-            new AssociationCongregator()
-        );
-
+        $aggregator = $this->makeAggregator($aggregatorClass);
         $aggregated = $aggregator->aggregateFor($w2);
 
         $this->assertCount(6, $aggregated);
+    }
+
+    public function aggregateProvider(): array
+    {
+        return [
+            'naive' => [NaiveAssociationAggregator::class],
+            'caching' => [CachingAssociationAggregator::class],
+        ];
+    }
+
+    private function makeAggregator(string $aggregatorClass): ?AssociationAggregatorInterface
+    {
+        switch ($aggregatorClass) {
+            case NaiveAssociationAggregator::class:
+                return $this->naiveAggregator;
+
+            case CachingAssociationAggregator::class:
+                return $this->cachingAggregator;
+        }
+
+        return null;
     }
 
     private function addMain(Word $first, ?Word $second): Word
@@ -162,6 +208,8 @@ class NaiveAssociationAggregatorTest extends TestCase
             ->withSecondWord($second);
 
         $association->withCanonical($association);
+
+        $association = $this->associationRepository->save($association);
 
         return $first->withAssociations(
             AssociationCollection::collect($association)

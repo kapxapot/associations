@@ -3,6 +3,7 @@
 namespace App\Repositories\Interfaces;
 
 use App\Collections\AssociationCollection;
+use App\Collections\WordCollection;
 use App\Models\Association;
 use App\Models\Language;
 use App\Models\Word;
@@ -19,6 +20,8 @@ interface AssociationRepositoryInterface extends FilteringRepositoryInterface, L
     public function getAllByLanguage(Language $language): AssociationCollection;
 
     public function getAllByWord(Word $word): AssociationCollection;
+
+    public function getAllByWords(WordCollection $words): AssociationCollection;
 
     /**
      * Looks for an association by ordered pair of words.

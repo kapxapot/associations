@@ -7,6 +7,7 @@ use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Search\SearchParams;
 use Plasticode\Search\SearchResult;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
@@ -89,6 +90,11 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             ->first(
                 fn (Word $w) => $w->word == $wordStr
             );
+    }
+
+    public function getAllByIds(NumericCollection $ids): WordCollection
+    {
+        return $this->words->whereIn('id', $ids);
     }
 
     public function searchAllPublic(

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Collections\AssociationCollection;
+use App\Collections\WordCollection;
 use App\Models\Association;
 use App\Models\Language;
 use App\Models\Word;
@@ -55,6 +56,20 @@ class AssociationRepository extends LanguageElementRepository implements Associa
                         ['first_word_id' => $word->getId()],
                         ['second_word_id' => $word->getId()],
                     ]
+                )
+        );
+    }
+
+    public function getAllByWords(WordCollection $words): AssociationCollection
+    {
+        $ids = $words->ids();
+
+        return AssociationCollection::from(
+            $this
+                ->query()
+                ->whereRaw(
+                    'first_word_id in ? or second_word_id in ?',
+                    [$ids, $ids]
                 )
         );
     }

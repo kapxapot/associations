@@ -376,13 +376,14 @@
                 <strong>Обновлено:</strong> {{ gm.moment_local(word.updated_at_iso) }}<br/>
                 <strong>Видимость:</strong> {{ gm.moment_local(word.scopeUpdatedAtIso, 'никогда') }}<br/>
                 <strong>Жестокость:</strong> {{ gm.moment_local(word.severityUpdatedAtIso, 'никогда') }}<br/>
-                <strong>Корректировка слова:</strong> {{ gm.moment_local(word.word_updated_at_iso, 'никогда') }}
+                <strong>Корректировка слова:</strong> {{ gm.moment_local(word.word_updated_at_iso, 'никогда') }}<br/>
                 {% if word.dict_word %}
-                    <br/><strong>Проверено в словаре:</strong> {{ gm.moment_local(word.dict_word.updated_at_iso) }}
+                    <strong>Проверено в словаре:</strong> {{ gm.moment_local(word.dict_word.updated_at_iso) }}<br/>
                 {% endif %}
                 {% if word.definition %}
-                    <br/><strong>Проверено определение:</strong> {{ gm.moment_local(word.definition.updated_at_iso) }}
+                    <strong>Проверено определение:</strong> {{ gm.moment_local(word.definition.updated_at_iso) }}<br/>
                 {% endif %}
+                <strong>Мета:</strong> {{ word.meta }}
             </div>
         </div>
     {% endif %}

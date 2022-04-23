@@ -56,6 +56,7 @@ class WordRecountService
         $word = $this->recountSeverity($word, $sourceEvent);
         $word = $this->recountScope($word, $sourceEvent);
         $word = $this->recountCorrectedWord($word, $sourceEvent);
+        $word = $this->recountMeta($word);
 
         return $word;
     }
@@ -205,5 +206,15 @@ class WordRecountService
         }
 
         return $primary;
+    }
+
+    public function recountMeta(Word $word): Word
+    {
+        $word->setMetaValue(
+            Word::META_AGGREGATED_WORDS,
+            $word->aggregatedWordIds(true)
+        );
+
+        return $this->wordRepository->save($word);
     }
 }
