@@ -224,6 +224,12 @@ class TelegramBotController
 
         if (strpos($text, '/say') === 0) {
             $text = $this->extractCommandText($text);
+
+            if (strlen($text) === 0) {
+                return [
+                    'При использовании команды "say" напишите слово через пробел.'
+                ];
+            }
         }
 
         return $this->sayWord($tgUser, $text);
@@ -245,18 +251,27 @@ class TelegramBotController
     {
         $user = $tgUser->user();
 
-        $greeting = $tgUser->isNew() ? 'Добро пожаловать' : 'С возвращением';
-        $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
+        $greetings = [];
+
+        if ($tgUser->isChat()) {
+            $greetings[] = 'Здравствуйте, люди! Спасибо, что добавили меня в свой чат. 🤖';
+            $greetings[] = 'Чтобы сказать слово, ответьте на мое сообщение или используйте команду "say".';
+        } else {
+            $greeting = $tgUser->isNew() ? 'Добро пожаловать' : 'С возвращением';
+            $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
+
+            $greetings[] = $greeting;
+        }
 
         if (!$user->hasAge()) {
             return [
-                $greeting,
+                ...$greetings,
                 ...$this->askAge()
             ];
         }
 
         return [
-            $greeting,
+            ...$greetings,
             ...$this->startGame($tgUser)
         ];
     }
