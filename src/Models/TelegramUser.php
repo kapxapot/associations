@@ -41,19 +41,29 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
         return $this->isValid() && $this->user()->lastGame() === null;
     }
 
+    /**
+     * Is this a fake user made for chat?
+     *
+     * Telegram chats have negative ids.
+     */
+    public function isChat(): bool
+    {
+        return $this->telegramId < 0;
+    }
+
     public function privateName(): string
     {
-        return $this->firstName ?? $this->lastName ?? $this->username ?? self::noName();
+        return $this->firstName ?? $this->lastName ?? $this->username ?? $this->noName();
     }
 
     public function publicName(): string
     {
-        return $this->username ?? $this->fullName() ?? self::noName();
+        return $this->username ?? $this->fullName() ?? $this->noName();
     }
 
-    public static function noName(): string
+    public function noName(): string
     {
-        return 'инкогнито';
+        return $this->isChat() ? 'инкогнито чат' : 'инкогнито';
     }
 
     public function fullName(): ?string

@@ -11,6 +11,7 @@ use App\Models\Validation\AgeValidation;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Semantics\Definition\DefinitionEntry;
 use App\Services\GameService;
+use App\Services\LanguageService;
 use App\Services\TelegramUserService;
 use App\Services\TurnService;
 use App\Services\WordService;
@@ -28,6 +29,8 @@ use Webmozart\Assert\Assert;
 
 class TelegramBotController
 {
+    const COMMAND_START = '/start';
+
     private SettingsProviderInterface $settingsProvider;
     private LoggerInterface $logger;
     private TranslatorInterface $translator;
@@ -35,6 +38,7 @@ class TelegramBotController
     private UserRepositoryInterface $userRepository;
 
     private GameService $gameService;
+    private LanguageService $languageService;
     private TelegramUserService $telegramUserService;
     private TurnService $turnService;
     private WordService $wordService;
@@ -50,6 +54,7 @@ class TelegramBotController
         TranslatorInterface $translator,
         UserRepositoryInterface $userRepository,
         GameService $gameService,
+        LanguageService $languageService,
         TelegramUserService $telegramUserService,
         TurnService $turnService,
         WordService $wordService,
@@ -64,6 +69,7 @@ class TelegramBotController
         $this->userRepository = $userRepository;
 
         $this->gameService = $gameService;
+        $this->languageService = $languageService;
         $this->telegramUserService = $telegramUserService;
         $this->turnService = $turnService;
         $this->wordService = $wordService;
@@ -91,25 +97,74 @@ class TelegramBotController
 
         $message = $data['message'] ?? null;
 
-        $processed = $message
-            ? $this->processMessage($message, $response)
-            : null;
+        if ($this->isValidMessage($message)) {
+            $processed = $this->processMessage($message, $response);
 
-        if ($processed) {
+            return Response::json($response, $processed);
+        } elseif ($this->isAddedToChat($data)) {
+            $processed = $this->processAddedToChat($data, $response);
+
             return Response::json($response, $processed);
         }
 
         return $response;
     }
 
-    private function processMessage(array $message): ?array
+    private function isAddedToChat(array $data): bool
+    {
+        $chatId = $data['my_chat_member']['chat']['id'] ?? null;
+
+        return $chatId !== null;
+    }
+
+    private function processAddedToChat(array $data): array
+    {
+        $chat = $data['my_chat_member']['chat'];
+
+        Assert::notNull($chat);
+
+        $chatId = $chat['id'] ?? null;
+        $chatTitle = $chat['title'] ?? null;
+
+        Assert::notNull($chatId);
+
+        $result = [
+            'method' => 'sendMessage',
+            'chat_id' => $chatId,
+            'parse_mode' => 'html',
+        ];
+
+        $tgUser = $this->telegramUserService->getOrCreateTelegramUser([
+            'id' => $chatId,
+            'first_name' => $chatTitle,
+        ]);
+
+        Assert::true($tgUser->isValid());
+
+        $answerParts = $this->getAnswer($tgUser, self::COMMAND_START);
+
+        $result['text'] = $this->buildAnswerFromParts($answerParts);
+
+        return $result;
+    }
+
+    private function isValidMessage(?array $message): bool
+    {
+        $text = $message['text'] ?? null;
+
+        return $text !== null;
+    }
+
+    private function processMessage(array $message): array
     {
         $result = [];
 
         $chatId = $message['chat']['id'];
         $text = $message['text'] ?? null;
 
-        $tgUser = $this->telegramUserService->getOrCreateTelegramUser($message['from']);
+        Assert::notNull($text);
+
+        $tgUser = $this->telegramUserService->getOrCreateTelegramUser($message['chat']);
 
         Assert::true($tgUser->isValid());
 
@@ -121,12 +176,12 @@ class TelegramBotController
 
         $text = trim($text);
 
-        if (strlen($text) == 0) {
+        if (strlen($text) === 0) {
             $answer = '🧾 Я понимаю только сообщения с текстом.';
         } else {
             try {
                 $answerParts = $this->getAnswer($tgUser, $text);
-                $answer = implode(PHP_EOL . PHP_EOL, $answerParts);
+                $answer = $this->buildAnswerFromParts($answerParts);
             } catch (Exception $ex) {
                 $this->logger->error($ex->getMessage());
                 $answer = 'Что-то пошло не так. 😐';
@@ -138,12 +193,17 @@ class TelegramBotController
         return $result;
     }
 
+    private function buildAnswerFromParts(array $parts): string
+    {
+        return implode(PHP_EOL . PHP_EOL, $parts);
+    }
+
     /**
      * @return string[]
      */
     private function getAnswer(TelegramUser $tgUser, string $text): array
     {
-        if (strpos($text, '/start') === 0) {
+        if (strpos($text, self::COMMAND_START) === 0) {
             return $this->startCommand($tgUser);
         }
 
@@ -158,10 +218,24 @@ class TelegramBotController
         }
 
         if (strpos($text, '/what') === 0) {
-            return $this->whatCommand($tgUser);
+            $commandText = $this->extractCommandText($text);
+            return $this->whatCommand($tgUser, $commandText);
+        }
+
+        if (strpos($text, '/say') === 0) {
+            $text = $this->extractCommandText($text);
         }
 
         return $this->sayWord($tgUser, $text);
+    }
+
+    private function extractCommandText(string $command): string
+    {
+        $chunks = explode(' ', $command);
+
+        array_shift($chunks);
+
+        return implode(' ', $chunks);
     }
 
     /**
@@ -249,24 +323,43 @@ class TelegramBotController
     /**
      * @return string[]
      */
-    private function whatCommand(TelegramUser $tgUser): array
+    private function whatCommand(TelegramUser $tgUser, string $text): array
     {
         $user = $tgUser->user();
         $game = $user->currentGame();
 
         Assert::notNull($game);
 
-        /** @var Turn $lastTurn */
-        $lastTurn = $game->turns()->first();
+        /** @var Word|null $word */
+        $word = null;
 
-        if ($lastTurn === null) {
-            return ['Вы о чем?'];
+        if (strlen($text) > 0) {
+            // find word
+            $language = $this->languageService->getCurrentLanguageFor($user);
+
+            $word = $this->languageService->findWord($language, $text);
+
+            if ($word === null) {
+                return [
+                    sprintf('Я не знаю, что такое <b>%s</b>.', $text),
+                ];
+            }
+        } else {
+            /** @var Turn $lastTurn */
+            $lastTurn = $game->turns()->first();
+
+            if ($lastTurn === null) {
+                return ['Вы о чем?'];
+            }
+
+            $word = $lastTurn->word();
         }
 
-        $noDefinition = ['Определение отсутствует.'];
+        Assert::notNull($word);
 
-        $word = $lastTurn->word();
         $parsedDefinition = $this->wordService->getParsedTransitiveDefinition($word);
+
+        $noDefinition = ['Определение отсутствует.'];
 
         if ($parsedDefinition === null) {
             return $noDefinition;
