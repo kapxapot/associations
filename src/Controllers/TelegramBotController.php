@@ -17,7 +17,6 @@ use App\Services\WordService;
 use Exception;
 use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Core\Response;
-use Plasticode\Exceptions\Http\BadRequestException;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Text;
@@ -100,7 +99,7 @@ class TelegramBotController
             return Response::json($response, $processed);
         }
 
-        throw new BadRequestException();
+        return $response;
     }
 
     private function processMessage(array $message): ?array
