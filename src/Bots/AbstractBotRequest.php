@@ -27,10 +27,10 @@ abstract class AbstractBotRequest
 
     protected ?string $command;
 
-    /** @var string[] Tokens build based on the command. */
+    /** @var string[] Tokens built based on the command. */
     protected array $dirtyTokens;
 
-    /** @var string[] Clean tokens based on the command. */
+    /** @var string[] Sanitized tokens based on the command. */
     protected array $tokens;
 
     protected ?array $userState;
@@ -229,7 +229,7 @@ abstract class AbstractBotRequest
     protected function getTrashTokens(): array
     {
         return [
-            'проиграла', 'проиграл', 'повторяю', 'говоришь', 'говорила', 'говорил', 'конечно', 'давайте', 'сказала', 'сказал', 'говорю', 'говори', 'твоего', 'почему', 'кстати', 'точнее', 'какой', 'какая', 'какие', 'какое', 'такой', 'такая', 'такие', 'такое', 'ладно', 'давай', 'тогда', 'вдруг', 'зачем', 'очень', 'опять', 'снова', 'разве', 'нужно', 'твоих', 'твои', 'твоё', 'твое', 'твой', 'твоя', 'тебе', 'тебя', 'себе', 'себя', 'меня', 'тоже', 'сама', 'этот', 'хочу', 'нету', 'епта', 'ёпта', 'надо', 'всем', 'всех', 'было', 'была', 'алло', 'был', 'эти', 'это', 'эта', 'так', 'как', 'сам', 'вот', 'уже', 'дай', 'мне', 'мои', 'мой', 'моя', 'мое', 'моё', 'еще', 'ещё', 'нет', 'бля', 'епт', 'ёпт', 'все', 'всё', 'там', 'где', 'ней', 'нем', 'нём', 'них', 'тот', 'но', 'он', 'мы', 'вы', 'то', 'та', 'те', 'ты', 'их', 'ой', 'ох', 'ок', 'ай', 'да', 'ну', 'же', 'ее', 'её', 'хм', 'ха', 'ах', 'эй', 'я', 'э', 'а', '-', '=', '?'
+            'проиграла', 'проиграл', 'повторяю', 'например', 'говоришь', 'говорила', 'говорил', 'начинаю', 'конечно', 'давайте', 'скажите', 'сказала', 'сказал', 'говорю', 'говори', 'твоего', 'почему', 'кстати', 'точнее', 'какой', 'какая', 'какие', 'какое', 'такой', 'такая', 'такую', 'такие', 'такое', 'ладно', 'давай', 'тогда', 'вдруг', 'зачем', 'очень', 'опять', 'снова', 'разве', 'скажу', 'нужно', 'можно', 'твоих', 'твои', 'твоё', 'твое', 'твой', 'твоя', 'тебе', 'тебя', 'себе', 'себя', 'меня', 'туда', 'куда', 'тоже', 'сама', 'этот', 'хочу', 'нету', 'епта', 'ёпта', 'надо', 'всем', 'всех', 'было', 'была', 'алло', 'тут', 'был', 'эти', 'это', 'эта', 'так', 'как', 'сам', 'вот', 'уже', 'дай', 'мне', 'мои', 'мой', 'моя', 'мое', 'моё', 'еще', 'ещё', 'нет', 'бля', 'епт', 'ёпт', 'все', 'всё', 'наш', 'там', 'где', 'ней', 'нем', 'нём', 'них', 'тот', 'они', 'но', 'он', 'мы', 'вы', 'то', 'та', 'те', 'ты', 'их', 'ой', 'ох', 'ок', 'ай', 'да', 'ну', 'же', 'ее', 'её', 'ей', 'хм', 'ха', 'ах', 'эх', 'эй', 'я', 'э', 'а', '-', '=', '?'
         ];
     }
 
@@ -244,7 +244,7 @@ abstract class AbstractBotRequest
     protected function getSemiTrashTokens(): array
     {
         return [
-            'неправильно', 'пожалуйста', 'немножко', 'немного', 'который', 'которая', 'которое', 'которые', 'проверь', 'сейчас', 'запиши', 'нельзя', 'хорошо', 'потише', 'нахрен', 'теперь', 'пиздец', 'лучше', 'пусть', 'потом', 'точно', 'играю', 'пошли', 'блядь', 'слово', 'тупая', 'шлюха', 'дурак', 'дура', 'даже', 'тише', 'блин', 'есть', 'ага', 'оно', 'она'
+            'здравствуйте', 'неправильно', 'естественно', 'здравствуй', 'пожалуйста', 'погромче', 'немножко', 'немного', 'чуточку', 'который', 'которая', 'которое', 'которые', 'проверь', 'пойдем', 'пойдём', 'сейчас', 'запиши', 'нельзя', 'хорошо', 'громче', 'потише', 'нахрен', 'теперь', 'помоги', 'пиздец', 'лучше', 'пусть', 'потом', 'точно', 'играю', 'пошли', 'блядь', 'слово', 'тупой', 'тупая', 'шлюха', 'дурак', 'дура', 'даже', 'тише', 'блин', 'есть', 'ага', 'оно', 'она'
         ];
     }
 
@@ -281,7 +281,7 @@ abstract class AbstractBotRequest
     {
         // all prepositions should be here
         return [
-            'в', 'на'
+            'на', 'в', 'о'
         ];
     }
 
@@ -345,7 +345,8 @@ abstract class AbstractBotRequest
      */
     public function isAny(string ...$commands): bool
     {
-        return in_array($this->command, $commands);
+        return in_array($this->originalCommand, $commands)
+            || in_array($this->command, $commands);
     }
 
     /**
@@ -354,7 +355,7 @@ abstract class AbstractBotRequest
     public function hasAny(string ...$tokens): bool
     {
         foreach ($tokens as $token) {
-            if (in_array($token, $this->tokens)) {
+            if (in_array($token, $this->dirtyTokens)) {
                 return true;
             }
         }
@@ -364,7 +365,7 @@ abstract class AbstractBotRequest
 
     /**
      * Checks if the request has all the tokens in any of the token sets.
-     * 
+     *
      * @param string[] $tokenSets
      */
     public function hasAnySet(array ...$tokenSets): bool
@@ -384,7 +385,7 @@ abstract class AbstractBotRequest
     public function has(string ...$tokens): bool
     {
         foreach ($tokens as $token) {
-            if (!in_array($token, $this->tokens)) {
+            if (!in_array($token, $this->dirtyTokens)) {
                 return false;
             }
         }
@@ -400,7 +401,8 @@ abstract class AbstractBotRequest
      */
     public function matches(string $pattern): ?array
     {
-        return $this->matchesTokens($pattern, $this->tokens);
+        return $this->matchesTokens($pattern, $this->dirtyTokens)
+            ?? $this->matchesTokens($pattern, $this->tokens);
     }
 
     /**
