@@ -23,7 +23,7 @@ class UserService
 
     public function isMature(User $user): bool
     {
-        return $user->ageNow() >= $this->config->userMatureAge();
+        return !$user->isGroup() && $user->ageNow() >= $this->config->userMatureAge();
     }
 
     public function getUserPolicy(User $user): UserPolicy

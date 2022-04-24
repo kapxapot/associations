@@ -101,6 +101,13 @@ class User extends UserBase implements GenderedInterface
         return $this->sberUser() !== null;
     }
 
+    public function isGroup(): bool
+    {
+        $tgUser = $this->telegramUser();
+
+        return $tgUser && $tgUser->isChat();
+    }
+
     // GenderedInterface
 
     public function gender(): ?int
