@@ -4,8 +4,11 @@ namespace App\Mapping\Providers;
 
 use App\Auth\Auth;
 use App\Auth\Interfaces\AuthInterface;
+use App\Chunks\Core\Factories\ChunkConfigFactory;
+use App\Chunks\Core\Interfaces\ChunkConfigInterface;
 use App\Config\CaptchaConfig;
 use App\Config\Config;
+use App\Config\Factories\TagsConfigFactory;
 use App\Config\Interfaces\AssociationConfigInterface;
 use App\Config\Interfaces\NewsConfigInterface;
 use App\Config\Interfaces\UserConfigInterface;
@@ -16,8 +19,6 @@ use App\Core\Linker;
 use App\External\DictionaryApi;
 use App\External\Interfaces\DefinitionSourceInterface;
 use App\Handlers\NotFoundHandler;
-use App\Models\News;
-use App\Models\Page;
 use App\Models\Validation\Factories\UserValidationFactory;
 use App\Parsing\Factories\DoubleBracketsConfigFactory;
 use App\Semantics\Association\NaiveAssociationAggregator;
@@ -39,17 +40,12 @@ class GeneralProvider extends MappingProvider
     public function getMappings(): array
     {
         return [
+            // core
+
             AuthInterface::class => Auth::class,
             LinkerInterface::class => Linker::class,
 
-            ConfigCore\TagsConfigInterface::class =>
-                fn () => new \Plasticode\Config\TagsConfig(
-                    [
-                        News::class => 'news',
-                        Page::class => 'pages',
-                    ]
-                ),
-
+            ConfigCore\TagsConfigInterface::class => TagsConfigFactory::class,
             ConfigCore\CaptchaConfigInterface::class => CaptchaConfig::class,
             ConfigCore\LocalizationConfigInterface::class => LocalizationConfig::class,
 
@@ -63,6 +59,10 @@ class GeneralProvider extends MappingProvider
             NewsConfigInterface::class => Config::class,
             UserConfigInterface::class => Config::class,
             WordConfigInterface::class => Config::class,
+
+            // configs
+
+            ChunkConfigInterface::class => ChunkConfigFactory::class,
 
             // validation
 

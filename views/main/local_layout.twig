@@ -29,7 +29,7 @@
                 $scope.updateUi();
             },
             onError: () => {
-                console.log('Failed to reload \'' + id + '\' element, url = ' + url + '.');
+                $('#' + id).html('Failed to reload \'' + id + '\' element, url = ' + url + '.');
             }
         });
     };
@@ -65,16 +65,15 @@
 
     // load auto chunks
     $('.deferred-load.auto-chunk').each((index, element) => {
-        const id = element.id;
-        const queryStr = objParamsToString(element.dataset);
+        let url = '{{ path_for('main.chunks.generic') }}';
 
-        let url = '{{ root }}/chunks/' + id;
+        const queryStr = paramsToString(objToArray(element.dataset));
 
         if (queryStr.length > 0) {
             url += '?' + queryStr;
         }
 
-        $scope.reloadElement(url, id);
+        $scope.reloadElement(url, element.id);
     });
 
     {{ even_more_angular }}

@@ -255,8 +255,7 @@
 
     <div class="panel-secondary-heading">Происхождение</div>
     <div class="panel panel-secondary">
-        <div class="panel-body deferred-load auto-chunk" id="word-origin" data-id="{{ word.id }}">
-        </div>
+        <div class="panel-body deferred-load auto-chunk" id="word-origin-{{ word.id }}" data-chunk="word-origin" data-id="{{ word.id }}"></div>
     </div>
 
     {% if is_moderator %}

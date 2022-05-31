@@ -46,7 +46,7 @@ class EventProvider extends MappingProvider
             WordOverrideCreatedHandler::class,
             WordRelationsChangedHandler::class,
             WordScopeChangedHandler::class,
-            WordSeverityChangedHandler::class,
+            WordSeverityChangedHandler::class
         );
 
         $handlers = $classes->map(

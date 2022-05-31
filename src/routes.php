@@ -243,9 +243,9 @@ $app->group(
         )->setName('main.chunks.latest.associations');
 
         $this->get(
-            '/chunks/{chunk}',
+            '/chunks/generic',
             ChunkController::class . ':get'
-        )->setName('main.chunk');
+        )->setName('main.chunks.generic');
 
         /** @var Env $env */
         $env = $container->get(Env::class);

@@ -130,4 +130,17 @@ class Controller extends BaseController
 
         return $render;
     }
+
+    /**
+     * @param mixed $default
+     * @return mixed
+     */
+    protected function getQueryParam(
+        ServerRequestInterface $request,
+        string $param,
+        $default = null
+    )
+    {
+        return $request->getQueryParams()[$param] ?? $default;
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Chunks\Core\ChunkSource;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
 use Psr\Container\ContainerInterface;
@@ -10,58 +11,39 @@ use Psr\Http\Message\ServerRequestInterface;
 
 class ChunkController extends Controller
 {
+    private ChunkSource $chunkSource;
+
     public function __construct(ContainerInterface $container)
     {
         parent::__construct($container);
+
+        $this->chunkSource = $container->get(ChunkSource::class);
     }
 
     public function get(
         ServerRequestInterface $request,
-        ResponseInterface $response,
-        array $args
+        ResponseInterface $response
     ) : ResponseInterface
     {
-        $chunk = $args['chunk'];
+        $params = $request->getQueryParams();
+        $chunkName = $params['chunk'] ?? null;
 
-        if ($chunk === 'word-origin') {
-            return $this->wordOrigin($request, $response);
+        if (!$chunkName) {
+            throw new BadRequestException('Chunk name is missing.');
         }
 
-        throw new BadRequestException();
-    }
+        $chunk = $this->chunkSource->get($chunkName);
 
-    private function wordOrigin(
-        ServerRequestInterface $request,
-        ResponseInterface $response
-    ): ResponseInterface
-    {
-        $wordId = $request->getQueryParams()['id'] ?? null;
-
-        $word = $this->wordRepository->get($wordId);
-        $user = $this->auth->getUser();
-
-        if (!$word || !$word->isVisibleFor($user)) {
-            throw new BadRequestException();
+        if (!$chunk) {
+            throw new BadRequestException('Unknown chunk.');
         }
 
-        return $this->renderChunk(
-            $response,
-            'word_origin',
-            [
-                'word' => $word,
-            ]
-        );
-    }
+        // can throw exceptions as a bad result / no result
+        $chunkResult = $chunk->process($params);
 
-    private function renderChunk(
-        ResponseInterface $response,
-        string $chunk,
-        array $data
-    ): ResponseInterface
-    {
         $result = $this->view->fetch(
-            sprintf('chunks/%s.twig', $chunk),
-            $data
+            sprintf('chunks/%s.twig', $chunkResult->template),
+            $chunkResult->data
         );
 
         return Response::text($response, $result);
