@@ -2,10 +2,8 @@
 
 namespace App\Controllers;
 
-use App\Models\Word;
 use Plasticode\Core\Response;
 use Plasticode\Exceptions\Http\BadRequestException;
-use Plasticode\Util\Strings;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,23 +24,33 @@ class ChunkController extends Controller
         $chunk = $args['chunk'];
 
         if ($chunk === 'word-origin') {
-            $wordId = $request->getQueryParams()['id'] ?? null;
-
-            $word = $this->wordRepository->get($wordId);
-            $user = $this->auth->getUser();
-
-            if ($word && $word->isVisibleFor($user)) {
-                return $this->renderChunk(
-                    $response,
-                    'word_origin',
-                    [
-                        'word' => $word,
-                    ]
-                );
-            }
+            return $this->wordOrigin($request, $response);
         }
 
         throw new BadRequestException();
+    }
+
+    private function wordOrigin(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    ): ResponseInterface
+    {
+        $wordId = $request->getQueryParams()['id'] ?? null;
+
+        $word = $this->wordRepository->get($wordId);
+        $user = $this->auth->getUser();
+
+        if (!$word || !$word->isVisibleFor($user)) {
+            throw new BadRequestException();
+        }
+
+        return $this->renderChunk(
+            $response,
+            'word_origin',
+            [
+                'word' => $word,
+            ]
+        );
     }
 
     private function renderChunk(

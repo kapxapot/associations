@@ -7,6 +7,7 @@ use App\Config\Interfaces\AssociationConfigInterface;
 use App\Config\Interfaces\WordConfigInterface;
 use App\Core\Interfaces\LinkerInterface;
 use App\Core\Serializer;
+use App\Data\QueryReportBuilder;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Semantics\PartOfSpeech;
@@ -17,8 +18,10 @@ use App\Services\LanguageService;
 use Plasticode\Controllers\Controller as BaseController;
 use Plasticode\Core\AppContext;
 use Plasticode\Core\Interfaces\RendererInterface;
+use Plasticode\Core\Response;
 use Plasticode\Events\EventDispatcher;
 use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 
 class Controller extends BaseController
@@ -103,5 +106,28 @@ class Controller extends BaseController
         $debug = $request->getQueryParams()['debug'] ?? null;
 
         return $debug !== null;
+    }
+
+    protected function renderOrShowQueries(
+        ServerRequestInterface $request,
+        ResponseInterface $response,
+        string $template,
+        array $data = []
+    ): ResponseInterface
+    {
+        $render = $this->render($response, $template, $data);
+
+        $showQueries = array_key_exists('show_queries', $request->getQueryParams());
+
+        $user = $this->auth->getUser();
+
+        if ($showQueries && $user && $user->isAdmin()) {
+            $reportBuilder = new QueryReportBuilder();
+            $report = $reportBuilder->buildReport();
+
+            return Response::json($response, $report);
+        }
+
+        return $render;
     }
 }

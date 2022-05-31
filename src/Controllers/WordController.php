@@ -2,7 +2,6 @@
 
 namespace App\Controllers;
 
-use App\Data\QueryReportBuilder;
 use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
 use App\Services\WordService;
 use Plasticode\Core\Response;
@@ -123,18 +122,7 @@ class WordController extends Controller
 
         $data = $this->buildParams(['params' => $params]);
 
-        $render = $this->render($response, 'main/words/item.twig', $data);
-
-        $showQueries = array_key_exists('show_queries', $request->getQueryParams());
-
-        if ($showQueries && $user && $user->isAdmin()) {
-            $reportBuilder = new QueryReportBuilder();
-            $report = $reportBuilder->buildReport();
-
-            return Response::json($response, $report);
-        }
-
-        return $render;
+        return $this->renderOrShowQueries($request, $response, 'main/words/item.twig', $data);
     }
 
     public function latestChunk(
