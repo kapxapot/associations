@@ -36,7 +36,6 @@ class WordService
     private TurnRepositoryInterface $turnRepository;
     private WordRepositoryInterface $wordRepository;
 
-    private CasesService $casesService;
     private ValidatorInterface $validator;
     private ValidationRules $validationRules;
 
@@ -50,7 +49,6 @@ class WordService
         DefinitionRepositoryInterface $definitionRepository,
         TurnRepositoryInterface $turnRepository,
         WordRepositoryInterface $wordRepository,
-        CasesService $casesService,
         ValidatorInterface $validator,
         ValidationRules $validationRules,
         WordConfigInterface $config,
@@ -62,7 +60,6 @@ class WordService
         $this->turnRepository = $turnRepository;
         $this->wordRepository = $wordRepository;
 
-        $this->casesService = $casesService;
         $this->validator = $validator;
         $this->validationRules = $validationRules;
 
@@ -148,14 +145,12 @@ class WordService
 
         $word = $this
             ->wordRepository
-            ->store(
-                [
-                    'language_id' => $language->getId(),
-                    'word' => $wordStr,
-                    'original_utterance' => $originalUtterance,
-                    'created_by' => $user->getId(),
-                ]
-            );
+            ->store([
+                'language_id' => $language->getId(),
+                'word' => $wordStr,
+                'original_utterance' => $originalUtterance,
+                'created_by' => $user->getId(),
+            ]);
 
         $this->eventDispatcher->dispatch(
             new WordCreatedEvent($word)
@@ -209,33 +204,6 @@ class WordService
                 ['word' => $this->getRule()]
             )
             ->throwOnFail();
-    }
-
-    public function approvedInvisibleAssociationsStr(Word $word): ?string
-    {
-        $count = $word->approvedInvisibleAssociations()->count();
-
-        return $this
-            ->casesService
-            ->invisibleAssociationCountStr($count);
-    }
-
-    public function notApprovedInvisibleAssociationsStr(Word $word): ?string
-    {
-        $count = $word->notApprovedInvisibleAssociations()->count();
-
-        return $this
-            ->casesService
-            ->invisibleAssociationCountStr($count);
-    }
-
-    public function disabledInvisibleAssociationsStr(Word $word): ?string
-    {
-        $count = $word->disabledInvisibleAssociations()->count();
-
-        return $this
-            ->casesService
-            ->invisibleAssociationCountStr($count);
     }
 
     /**
@@ -304,7 +272,7 @@ class WordService
      */
     public function getTransitiveDefinition(Word $word): ?Definition
     {
-        $ownDefinition = $this->getDefinition($word);
+        $ownDefinition = $word->definition();
 
         if ($ownDefinition !== null && $ownDefinition->isValid()) {
             return $ownDefinition;

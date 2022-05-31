@@ -30,12 +30,15 @@ class WordRecountService
     private WordRepositoryInterface $wordRepository;
     private WordRelationRepositoryInterface $wordRelationRepository;
 
+    private AssociationService $associationService;
+
     private WordSpecification $wordSpecification;
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
         WordRepositoryInterface $wordRepository,
         WordRelationRepositoryInterface $wordRelationRepository,
+        AssociationService $associationService,
         WordSpecification $wordSpecification,
         EventDispatcher $eventDispatcher,
         LoggerInterface $logger
@@ -43,6 +46,8 @@ class WordRecountService
     {
         $this->wordRepository = $wordRepository;
         $this->wordRelationRepository = $wordRelationRepository;
+
+        $this->associationService = $associationService;
 
         $this->wordSpecification = $wordSpecification;
         $this->eventDispatcher = $eventDispatcher;
@@ -213,6 +218,16 @@ class WordRecountService
         $word->setMetaValue(
             Word::META_AGGREGATED_WORDS,
             $word->aggregatedWordIds(true)
+        );
+
+        $word->setMetaValue(
+            Word::META_AGGREGATED_ASSOCIATIONS,
+            $this->associationService->getAggregatedAssociationsFor($word, true)
+        );
+
+        $word->setMetaValue(
+            Word::META_HAS_ACTUAL_OVERRIDE,
+            $word->hasActualOverride(true)
         );
 
         return $this->wordRepository->save($word);

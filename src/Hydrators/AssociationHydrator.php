@@ -61,13 +61,19 @@ class AssociationHydrator extends Hydrator
     {
         return $entity
             ->withFirstWord(
-                fn () => $this->wordRepository->get($entity->firstWordId)
+                $this->frozen(
+                    fn () => $this->wordRepository->get($entity->firstWordId)
+                )
             )
             ->withSecondWord(
-                fn () => $this->wordRepository->get($entity->secondWordId)
+                $this->frozen(
+                    fn () => $this->wordRepository->get($entity->secondWordId)
+                )
             )
             ->withCanonical(
-                fn () => $this->associationService->getCanonical($entity)
+                $this->frozen(
+                    fn () => $this->associationService->getCanonical($entity)
+                )
             )
             ->withCanonicalForMe(
                 fn () => $this->associationService->getCanonicalPlayableAgainst(
@@ -76,9 +82,11 @@ class AssociationHydrator extends Hydrator
                 )
             )
             ->withFeedbacks(
-                fn () => $this
-                    ->associationFeedbackRepository
-                    ->getAllByAssociation($entity)
+                $this->frozen(
+                    fn () => $this
+                        ->associationFeedbackRepository
+                        ->getAllByAssociation($entity)
+                )
             )
             ->withUrl(
                 fn () => $this->linker->association($entity)
@@ -87,13 +95,17 @@ class AssociationHydrator extends Hydrator
                 fn () => $this->languageRepository->get($entity->languageId)
             )
             ->withTurns(
-                fn () => $this->turnRepository->getAllByAssociation($entity)
+                $this->frozen(
+                    fn () => $this->turnRepository->getAllByAssociation($entity)
+                )
             )
             ->withMe(
                 fn () => $this->auth->getUser()
             )
             ->withOverrides(
-                fn () => $this->associationOverrideRepository->getAllByAssociation($entity)
+                $this->frozen(
+                    fn () => $this->associationOverrideRepository->getAllByAssociation($entity)
+                )
             )
             ->withCreator(
                 fn () => $this->userRepository->get($entity->createdBy)

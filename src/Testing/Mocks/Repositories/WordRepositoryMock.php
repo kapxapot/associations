@@ -67,6 +67,11 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             );
     }
 
+    public function getAllByIds(NumericCollection $ids): WordCollection
+    {
+        return $this->words->whereIn('id', $ids);
+    }
+
     public function findInLanguageStrict(
         Language $language,
         ?string $wordStr,
@@ -90,11 +95,6 @@ class WordRepositoryMock extends RepositoryMock implements WordRepositoryInterfa
             ->first(
                 fn (Word $w) => $w->word == $wordStr
             );
-    }
-
-    public function getAllByIds(NumericCollection $ids): WordCollection
-    {
-        return $this->words->whereIn('id', $ids);
     }
 
     public function searchAllPublic(

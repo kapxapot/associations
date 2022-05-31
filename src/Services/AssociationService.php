@@ -2,15 +2,22 @@
 
 namespace App\Services;
 
+use App\Collections\AggregatedAssociationCollection;
 use App\Collections\WordCollection;
 use App\Events\Association\AssociationCreatedEvent;
+use App\Models\AggregatedAssociation;
 use App\Models\Association;
+use App\Models\DTO\AggregatedAssociationDto;
 use App\Models\DTO\EtherealAssociation;
 use App\Models\Interfaces\AssociationInterface;
 use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Interfaces\AssociationAggregatorInterface;
+use Plasticode\Collections\Generic\Collection;
+use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\InvalidOperationException;
 use Plasticode\Exceptions\InvalidResultException;
@@ -22,15 +29,23 @@ use Webmozart\Assert\Assert;
 class AssociationService
 {
     private AssociationRepositoryInterface $associationRepository;
+    private WordRepositoryInterface $wordRepository;
+
+    private AssociationAggregatorInterface $associationAggregator;
 
     private EventDispatcher $eventDispatcher;
 
     public function __construct(
         AssociationRepositoryInterface $associationRepository,
+        WordRepositoryInterface $wordRepository,
+        AssociationAggregatorInterface $associationAggregator,
         EventDispatcher $eventDispatcher
     )
     {
         $this->associationRepository = $associationRepository;
+        $this->wordRepository = $wordRepository;
+
+        $this->associationAggregator = $associationAggregator;
 
         $this->eventDispatcher = $eventDispatcher;
     }
@@ -184,5 +199,77 @@ class AssociationService
         [$first, $second] = $this->orderPair($w1, $w2);
 
         return new EtherealAssociation($first, $second);
+    }
+
+    public function getAggregatedAssociationsFor(
+        Word $word,
+        bool $suppressMeta = false
+    ): AggregatedAssociationCollection
+    {
+        $data = $word->aggregatedAssociationsData();
+
+        if ($data !== null && !$suppressMeta) {
+            return $this->deserializeAggregatedAssociations($data);
+        }
+
+        // no data or need to recount
+        return $this->associationAggregator->aggregateFor($word);
+    }
+
+    public function deserializeAggregatedAssociations(
+        Collection $data
+    ): AggregatedAssociationCollection
+    {
+        $dtos = $data
+            ->map(
+                fn (array $item) => AggregatedAssociationDto::fromArray($item)
+            )
+            ->group(
+                fn (AggregatedAssociationDto $dto) => $dto->associationId()
+            );
+
+        // get all association ids
+        $associationIds = NumericCollection::make(
+            array_keys($dtos)
+        );
+
+        // load all associations by ids
+        $associations = $this->associationRepository->getAllByIds($associationIds);
+
+        // get all word ids
+        $wordIds = $associations
+            ->flatMap(
+                fn (Association $association) => $association->wordIds()
+            )
+            ->numerize()
+            ->distinct();
+
+        // load all words by ids
+        $this->wordRepository->getAllByIds($wordIds);
+
+        // create aggregated associations
+        return AggregatedAssociationCollection::from(
+            $associations->map(
+                function (Association $association) use ($dtos) {
+                    $id = $association->getId();
+
+                    /** @var AggregatedAssociationDto */
+                    $dto = $dtos[$id]->first();
+
+                    $anchor = $this->wordRepository->get($dto->anchorId());
+                    $junky = $dto->junky();
+                    $log = $dto->log();
+
+                    $aa = new AggregatedAssociation($association, $anchor);
+                    $aa = $aa->withJunky($junky);
+
+                    if ($log) {
+                        $aa->addToLog($log);
+                    }
+
+                    return $aa;
+                }
+            )
+        );
     }
 }

@@ -41,7 +41,7 @@
                         {% include 'components/association.twig' with { 'association': turn.association, 'short': true, 'is_not_native': not turn.isNative } only %}
                     {% endif %}
 
-                    <span class="label {% if turn.is_ai_turn %}label-info{% else %}label-success{% endif %}">{% include "components/word.twig" with { 'word': turn.word, 'show_utterance': is_moderator, 'utterance': turn.originalUtterance } only %}</span>
+                    <span class="label {% if turn.is_ai_turn %}label-info{% else %}label-success{% endif %}">{% include "components/word.twig" with { 'word': turn.word, 'show_typo': true, 'show_utterance': is_moderator, 'utterance': turn.originalUtterance } only %}</span>
                 {% endfor %}
             </div>
         </div>

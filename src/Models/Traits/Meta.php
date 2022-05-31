@@ -43,12 +43,21 @@ trait Meta
             return;
         }
 
-        if ($this->metaData === null && strlen($this->meta) > 0) {
-            $this->metaData = json_decode($this->meta, true);
-        }
-
-        $this->metaData ??= [];
-
+        $this->metaData = $this->decodeMeta() ?? [];
         $this->metaInitialized = true;
+    }
+
+    private function decodeMeta(): ?array
+    {
+        return $this->metaData === null && strlen($this->meta) > 0
+            ? json_decode($this->meta, true)
+            : null;
+    }
+
+    public function encodeMeta(): ?string
+    {
+        return empty($this->metaData)
+            ? null
+            : json_encode($this->metaData(), JSON_UNESCAPED_UNICODE);
     }
 }

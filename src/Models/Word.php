@@ -12,9 +12,9 @@ use App\Collections\WordOverrideCollection;
 use App\Collections\WordRelationCollection;
 use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
-use App\Models\Traits\Meta;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Interfaces\PartOfSpeechableInterface;
+use Plasticode\Collections\Generic\Collection;
 use Plasticode\Collections\Generic\NumericCollection;
 
 /**
@@ -46,8 +46,7 @@ use Plasticode\Collections\Generic\NumericCollection;
  */
 class Word extends LanguageElement implements PartOfSpeechableInterface
 {
-    use Meta;
-
+    const META_AGGREGATED_ASSOCIATIONS = 'aggregated_associations';
     const META_AGGREGATED_WORDS = 'aggregated_words';
 
     protected function requiredWiths(): array
@@ -109,6 +108,9 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             : null;
     }
 
+    /**
+     * Tries to find an association by this word and the provided one.
+     */
     public function associationByWord(self $word): ?Association
     {
         return $this
@@ -205,17 +207,17 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Returns the origin association for this word
      * (if the word originates from an association).
-     * 
+     *
      * - The oldest association is used as a starting point.
      * - If the other word in the association is older than this one,
-     * it is considered as an origin association.
+     *   it is considered as an origin association.
      * - Otherwise, there is no origin association.
      */
     public function originAssociation(): ?Association
     {
         $oldest = $this->associations()->oldest();
 
-        if (is_null($oldest)) {
+        if ($oldest === null) {
             return null;
         }
 
@@ -289,8 +291,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      */
     public function isRealTypo(?string $typo): bool
     {
-        return strlen($typo) > 0
-            && $this->word !== $typo;
+        return strlen($typo) > 0 && $this->word !== $typo;
     }
 
     /**
@@ -308,13 +309,18 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Returns word or typo by the current user with '*' (if any).
      */
-    public function displayName(): string
+    public function personalizedName(): string
     {
         $typo = $this->typoByMe();
 
-        return is_null($typo)
-            ? $this->word
-            : $typo . '*';
+        return $typo
+            ? $typo . '*'
+            : $this->displayName();
+    }
+
+    public function displayName(): string
+    {
+        return $this->word;
     }
 
     /**
@@ -322,7 +328,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      */
     public function fullDisplayName(): string
     {
-        $name = $this->displayName();
+        $name = $this->personalizedName();
 
         if ($this->typoByMe() !== null) {
             $name .= ' (' . $this->word . ')';
@@ -368,7 +374,6 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         }
 
         if ($poses->isEmpty() && $this->hasMain()) {
-
             $poses = $this->main()->partsOfSpeech();
         }
 
@@ -516,10 +521,10 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     public function mainChain(?Word $stopper = null): WordCollection
     {
         return ($this->hasMain() && !$this->equals($stopper))
-            ? WordCollection::collect($this->main())
-                ->concat(
-                    $this->main()->mainChain($stopper ?? $this)
-                )
+            ? WordCollection::collect(
+                $this->main(),
+                ...$this->main()->mainChain($stopper ?? $this)
+            )
             : WordCollection::empty();
     }
 
@@ -711,6 +716,18 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             ->add($this);
 
         return WordCollection::from($col);
+    }
+
+    /**
+     * Returns aggregated associations serialized data (if present).
+     */
+    public function aggregatedAssociationsData(): ?Collection
+    {
+        $value = $this->getMetaValue(self::META_AGGREGATED_ASSOCIATIONS);
+
+        return $value
+            ? Collection::make($value)
+            : null;
     }
 
     public function toString(): string

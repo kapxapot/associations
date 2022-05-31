@@ -34,9 +34,11 @@ class CasesService
 
         $isPlural = ($this->cases->numberForNumber($count) == Cases::PLURAL);
 
-        return
-            $this->associationCount($count) .
-            ' ' . ($isPlural ? 'скрыто' : 'скрыта');
+        return sprintf(
+            '%s %s.',
+            $this->associationCount($count),
+            $isPlural ? 'скрыто' : 'скрыта'
+        );
     }
 
     /**

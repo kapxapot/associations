@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Data\QueryReportBuilder;
 use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
 use App\Services\WordService;
 use Plasticode\Core\Response;
@@ -39,14 +40,12 @@ class WordController extends Controller
     {
         $debug = $this->isDebug($request);
 
-        $params = $this->buildParams(
-            [
-                'params' => [
-                    'title' => 'Слова',
-                    'debug' => $debug,
-                ],
-            ]
-        );
+        $params = $this->buildParams([
+            'params' => [
+                'title' => 'Слова',
+                'debug' => $debug,
+            ],
+        ]);
 
         return $this->render($response, 'main/words/index.twig', $params);
     }
@@ -78,32 +77,36 @@ class WordController extends Controller
         $word = $this->wordRepository->get($id);
         $user = $this->auth->getUser();
 
-        if (
-            is_null($word)
-            || !$word->isVisibleFor($user)
-        ) {
+        if ($word === null || !$word->isVisibleFor($user)) {
             return ($this->notFoundHandler)($request, $response);
         }
 
-        $approvedStr = $this
-            ->wordService
-            ->approvedInvisibleAssociationsStr($word);
+        // preload
+        $word->aggregatedAssociations();
 
-        $notApprovedStr = $this
-            ->wordService
-            ->notApprovedInvisibleAssociationsStr($word);
+        $approvedInvis = $word->approvedInvisibleAssociations();
+        $notApprovedInvis = $word->notApprovedInvisibleAssociations();
 
-        $disabledStr = $this
-            ->wordService
-            ->disabledInvisibleAssociationsStr($word);
+        $approvedInvisStr = $this
+            ->casesService
+            ->invisibleAssociationCountStr(
+                $approvedInvis->count()
+            );
 
-        $parsedDefinition = $this->wordService->getParsedTransitiveDefinition($word);
+        $notApprovedInvisStr = $this
+            ->casesService
+            ->invisibleAssociationCountStr(
+                $notApprovedInvis->count()
+            );
+
+        $parsedDefinition = $this
+            ->wordService
+            ->getParsedTransitiveDefinition($word);
 
         $params = [
             'word' => $word,
-            'approved_invisible_associations_str' => $approvedStr,
-            'not_approved_invisible_associations_str' => $notApprovedStr,
-            'disabled_invisible_associations_str' => $disabledStr,
+            'approved_invisible_associations_str' => $approvedInvisStr,
+            'not_approved_invisible_associations_str' => $notApprovedInvisStr,
             'definition' => $parsedDefinition,
             'word_relation_types' => $this->wordRelationTypeRepository->getAll(),
             'disqus_id' => 'word' . $word->getId(),
@@ -120,7 +123,18 @@ class WordController extends Controller
 
         $data = $this->buildParams(['params' => $params]);
 
-        return $this->render($response, 'main/words/item.twig', $data);
+        $render = $this->render($response, 'main/words/item.twig', $data);
+
+        $showQueries = array_key_exists('show_queries', $request->getQueryParams());
+
+        if ($showQueries && $user && $user->isAdmin()) {
+            $reportBuilder = new QueryReportBuilder();
+            $report = $reportBuilder->buildReport();
+
+            return Response::json($response, $report);
+        }
+
+        return $render;
     }
 
     public function latestChunk(

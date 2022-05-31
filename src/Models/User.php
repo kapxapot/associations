@@ -108,6 +108,11 @@ class User extends UserBase implements GenderedInterface
         return $tgUser && $tgUser->isChat();
     }
 
+    public function isAdmin(): bool
+    {
+        return $this->role()->tag == 'admin';
+    }
+
     // GenderedInterface
 
     public function gender(): ?int

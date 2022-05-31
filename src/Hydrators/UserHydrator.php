@@ -62,13 +62,19 @@ class UserHydrator extends BaseUserHydrator
                 fn () => $this->gameRepository->getLastByUser($entity)
             )
             ->withTelegramUser(
-                fn () => $this->telegramUserRepository->getByUser($entity)
+                $this->frozen(
+                    fn () => $this->telegramUserRepository->getByUser($entity)
+                )
             )
             ->withAliceUser(
-                fn () => $this->aliceUserRepository->getByUser($entity)
+                $this->frozen(
+                    fn () => $this->aliceUserRepository->getByUser($entity)
+                )
             )
             ->withSberUser(
-                fn () => $this->sberUserRepository->getByUser($entity)
+                $this->frozen(
+                    fn () => $this->sberUserRepository->getByUser($entity)
+                )
             )
             ->withPolicy(
                 fn () => $this->userService->getUserPolicy($entity)

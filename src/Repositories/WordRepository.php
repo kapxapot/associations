@@ -9,6 +9,7 @@ use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Semantics\Scope;
 use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Data\Query;
+use Plasticode\Interfaces\ArrayableInterface;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Search\SearchParams;
 
@@ -21,6 +22,11 @@ class WordRepository extends LanguageElementRepository implements WordRepository
     protected function entityClass(): string
     {
         return Word::class;
+    }
+
+    protected function collect(ArrayableInterface $arrayable): WordCollection
+    {
+        return WordCollection::from($arrayable);
     }
 
     public function get(?int $id): ?Word
@@ -36,9 +42,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             $word->originalWord = $word->word;
         }
 
-        $word->meta = empty($word->metaData())
-            ? null
-            : json_encode($word->metaData());
+        $word->meta = $word->encodeMeta();
 
         return $this->saveEntity($word);
     }
@@ -53,9 +57,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 
     public function getAllByLanguage(Language $language): WordCollection
     {
-        return WordCollection::from(
-            parent::getAllByLanguage($language)
-        );
+        return parent::getAllByLanguage($language);
     }
 
     public function findInLanguageStrict(
@@ -98,11 +100,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 
     public function getAllByIds(NumericCollection $ids): WordCollection
     {
-        return WordCollection::from(
-            $this
-                ->query()
-                ->whereIn($this->idField(), $ids)
-        );
+        return parent::getAllByIds($ids);
     }
 
     public function searchAllPublic(
@@ -116,7 +114,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
                 fn (Query $q) => $this->applySearchParams($q, $searchParams)
             );
 
-        return WordCollection::from($query);
+        return $this->collect($query);
     }
 
     public function getPublicCount(
@@ -138,23 +136,17 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         int $limit = 0
     ): WordCollection
     {
-        return WordCollection::from(
-            parent::getAllOutOfDate($ttlMin, $limit)
-        );
+        return parent::getAllOutOfDate($ttlMin, $limit);
     }
 
     public function getAllByScope(int $scope, ?Language $language = null): WordCollection
     {
-        return WordCollection::from(
-            parent::getAllByScope($scope, $language)
-        );
+        return parent::getAllByScope($scope, $language);
     }
 
     public function getAllApproved(?Language $language = null): WordCollection
     {
-        return WordCollection::from(
-            parent::getAllApproved($language)
-        );
+        return parent::getAllApproved($language);
     }
 
     public function getLastAddedByLanguage(
@@ -162,9 +154,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         int $limit = 0
     ): WordCollection
     {
-        return WordCollection::from(
-            parent::getLastAddedByLanguage($language, $limit)
-        );
+        return parent::getLastAddedByLanguage($language, $limit);
     }
 
     public function getAllUnchecked(int $limit = 0): WordCollection
@@ -173,22 +163,22 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         $dictWordTable = 'yandex_dict_words';
         $dwAlias = 'dw';
 
-        return WordCollection::from(
-            $this
-                ->query()
-                ->select($this->getTable() . '.*')
-                ->leftOuterJoin(
-                    $dictWordTable,
-                    [
-                        $this->getTable() . '.' . $this->idField(),
-                        '=',
-                        $dwAlias . '.word_id'
-                    ],
-                    $dwAlias
-                )
-                ->whereNull($dwAlias . '.id')
-                ->limit($limit)
-        );
+        $query = $this
+            ->query()
+            ->select($this->getTable() . '.*')
+            ->leftOuterJoin(
+                $dictWordTable,
+                [
+                    $this->getTable() . '.' . $this->idField(),
+                    '=',
+                    $dwAlias . '.word_id'
+                ],
+                $dwAlias
+            )
+            ->whereNull($dwAlias . '.id')
+            ->limit($limit);
+
+        return $this->collect($query);
     }
 
     public function getAllUndefined(int $limit = 0): WordCollection
@@ -197,28 +187,30 @@ class WordRepository extends LanguageElementRepository implements WordRepository
         $definitionTable = 'definitions';
         $defAlias = 'def';
 
-        return WordCollection::from(
-            $this
-                ->query()
-                ->select($this->getTable() . '.*')
-                ->leftOuterJoin(
-                    $definitionTable,
-                    [
-                        $this->getTable() . '.' . $this->idField(),
-                        '=',
-                        $defAlias . '.word_id'
-                    ],
-                    $defAlias
-                )
-                ->whereNull($defAlias . '.id')
-                ->limit($limit)
-        );
+        $query = $this
+            ->query()
+            ->select($this->getTable() . '.*')
+            ->leftOuterJoin(
+                $definitionTable,
+                [
+                    $this->getTable() . '.' . $this->idField(),
+                    '=',
+                    $defAlias . '.word_id'
+                ],
+                $defAlias
+            )
+            ->whereNull($defAlias . '.id')
+            ->limit($limit);
+
+        return $this->collect($query);
     }
 
     public function getAllByMain(Word $word): WordCollection
     {
-        return WordCollection::from(
-            $this->query()->where('main_id', $word->getId())
+        return $this->collect(
+            $this
+                ->query()
+                ->where('main_id', $word->getId())
         );
     }
 

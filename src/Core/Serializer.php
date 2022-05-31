@@ -40,7 +40,7 @@ class Serializer
                 'scope' => $word->scope,
                 'severity' => $word->severity,
                 'url' => $word->url(),
-                'display_name' => $word->displayName(),
+                'display_name' => $word->personalizedName(),
             ]
         );
 

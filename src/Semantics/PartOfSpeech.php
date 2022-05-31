@@ -124,7 +124,7 @@ class PartOfSpeech
             new self(self::NOUN, 'n.', self::GOOD),
             new self(self::ADJECTIVE, 'adj.', self::BAD),
             new self(self::PARTICIPLE, 'partic.', self::BAD),
-            new self(self::NUMERAL, 'num.', self::BAD),
+            new self(self::NUMERAL, 'num.', self::UGLY),
             new self(self::VERB, 'v.', self::BAD),
             new self(self::PRONOUN, 'pron.', self::UGLY),
             new self(self::ADVERB, 'adv.', self::UGLY),

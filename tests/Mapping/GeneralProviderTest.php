@@ -72,7 +72,7 @@ use Plasticode\Parsing\LinkMappers\NewsLinkMapper;
 use Plasticode\Parsing\LinkMappers\PageLinkMapper;
 use Plasticode\Parsing\LinkMappers\TagLinkMapper;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
-use Plasticode\Services\NewsAggregatorService;
+use Plasticode\Repositories\Interfaces\MenuItemRepositoryInterface;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Testing\AbstractProviderTest;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
@@ -106,6 +106,7 @@ final class GeneralProviderTest extends AbstractProviderTest
             DictWordRepositoryInterface::class,
             GameRepositoryInterface::class,
             LanguageRepositoryInterface::class,
+            MenuItemRepositoryInterface::class,
             NewsRepositoryInterface::class,
             PageRepositoryInterface::class,
             SberUserRepositoryInterface::class,
@@ -184,7 +185,6 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(ExternalDictServiceInterface::class);
         $this->check(GameService::class);
         $this->check(LanguageService::class);
-        $this->check(NewsAggregatorService::class);
         $this->check(SearchService::class);
         $this->check(SberUserService::class);
         $this->check(TagPartsProviderService::class);

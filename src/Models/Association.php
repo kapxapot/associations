@@ -7,7 +7,7 @@ use App\Collections\AssociationOverrideCollection;
 use App\Collections\UserCollection;
 use App\Collections\WordCollection;
 use App\Models\Interfaces\AssociationInterface;
-use App\Models\Traits\Meta;
+use Plasticode\Collections\Generic\NumericCollection;
 
 /**
  * @property integer $firstWordId
@@ -25,8 +25,6 @@ use App\Models\Traits\Meta;
  */
 class Association extends LanguageElement implements AssociationInterface
 {
-    use Meta;
-
     const DEFAULT_SIGN = '→';
     const APPROVED_SIGN = '⇉';
 
@@ -50,6 +48,14 @@ class Association extends LanguageElement implements AssociationInterface
         return ($user && $user->policy()->canSeeAllAssociations())
             ? true
             : parent::isVisibleFor($user);
+    }
+
+    public function wordIds(): NumericCollection
+    {
+        return NumericCollection::collect(
+            $this->firstWordId,
+            $this->secondWordId
+        );
     }
 
     public function words(): WordCollection

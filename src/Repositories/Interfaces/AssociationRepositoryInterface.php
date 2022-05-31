@@ -7,6 +7,7 @@ use App\Collections\WordCollection;
 use App\Models\Association;
 use App\Models\Language;
 use App\Models\Word;
+use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 
 interface AssociationRepositoryInterface extends FilteringRepositoryInterface, LanguageElementRepositoryInterface
@@ -18,6 +19,11 @@ interface AssociationRepositoryInterface extends FilteringRepositoryInterface, L
     public function store(array $data): Association;
 
     public function getAllByLanguage(Language $language): AssociationCollection;
+
+    /**
+     * Loads several associations by their ids.
+     */
+    public function getAllByIds(NumericCollection $ids): AssociationCollection;
 
     public function getAllByWord(Word $word): AssociationCollection;
 

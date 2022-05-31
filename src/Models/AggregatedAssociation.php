@@ -3,12 +3,15 @@
 namespace App\Models;
 
 use InvalidArgumentException;
+use JsonSerializable;
 use Plasticode\Models\Interfaces\EquatableInterface;
 use Plasticode\Util\Text;
 use Webmozart\Assert\Assert;
 
-class AggregatedAssociation extends Association
+class AggregatedAssociation extends Association implements JsonSerializable
 {
+    private Association $association;
+
     /**
      * Anchor is the "left" word in the association.
      */
@@ -23,21 +26,28 @@ class AggregatedAssociation extends Association
     {
         parent::__construct($association->toArray());
 
+        $this->association = $association;
+
         $this
-            ->withUrl($association->url())
-            ->withCreator($association->creator())
-            ->withLanguage($association->language())
-            ->withMe($association->me())
-            ->withTurns($association->turns())
-            ->withCanonical($association->canonical())
-            ->withFeedbacks($association->feedbacks())
-            ->withFirstWord($association->firstWord())
-            ->withOverrides($association->overrides())
-            ->withSecondWord($association->secondWord());
+            ->withUrl(fn() => $association->url())
+            ->withCreator(fn() => $association->creator())
+            ->withLanguage(fn() => $association->language())
+            ->withMe(fn() => $association->me())
+            ->withTurns(fn() => $association->turns())
+            ->withCanonical(fn() => $association->canonical())
+            ->withFeedbacks(fn() => $association->feedbacks())
+            ->withFirstWord(fn() => $association->firstWord())
+            ->withOverrides(fn() => $association->overrides())
+            ->withSecondWord(fn() => $association->secondWord());
 
         if ($anchor !== null) {
             $this->withAnchor($anchor);
         }
+    }
+
+    public function association(): Association
+    {
+        return $this->association;
     }
 
     /**
@@ -90,6 +100,16 @@ class AggregatedAssociation extends Association
     }
 
     /**
+     * @return $this
+     */
+    public function withJunky(bool $junky): self
+    {
+        $this->junky = $junky;
+
+        return $this;
+    }
+
+    /**
      * Returns other than anchor word.
      *
      * In case of no anchor throws an {@see InvalidArgumentException}
@@ -123,5 +143,17 @@ class AggregatedAssociation extends Association
     public function addToLog(string $message): void
     {
         $this->log[] = $message;
+    }
+
+    // JsonSerializable
+
+    public function jsonSerialize()
+    {
+        return [
+            $this->getId(),
+            $this->anchor()->getId(),
+            $this->isJunky(),
+            $this->log(),
+        ];
     }
 }

@@ -10,6 +10,7 @@ use App\Models\Language;
 use App\Models\User;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Search\SearchParams;
 use Plasticode\Search\SearchResult;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
@@ -64,6 +65,11 @@ class AssociationRepositoryMock extends RepositoryMock implements AssociationRep
             ->where(
                 fn (Association $a) => $a->language()->equals($language)
             );
+    }
+
+    public function getAllByIds(NumericCollection $ids): AssociationCollection
+    {
+        return $this->associations->whereIn('id', $ids);
     }
 
     public function getAllByWord(Word $word): AssociationCollection

@@ -148,8 +148,6 @@ final class EightsDataTest extends SerializationTestCase
 
         $jsonStr = json_encode($data);
 
-        //var_dump($jsonStr);
-
         $this->assertIsString($jsonStr);
 
         $expectedJsonStr = file_get_contents('brightwood_tests/Files/eights_data.json');

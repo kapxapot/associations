@@ -7,16 +7,20 @@ use App\Models\Language;
 use App\Models\LanguageElement;
 use App\Models\User;
 use App\Repositories\Interfaces\LanguageElementRepositoryInterface;
+use App\Repositories\Traits\CollectingRepository;
 use App\Repositories\Traits\WithLanguageRepository;
 use App\Semantics\Scope;
 use App\Semantics\Severity;
+use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Data\Query;
+use Plasticode\Interfaces\ArrayableInterface;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
 use Plasticode\Traits\Convert\ToBit;
 
 abstract class LanguageElementRepository extends IdiormRepository implements LanguageElementRepositoryInterface
 {
+    use CollectingRepository;
     use CreatedRepository;
     use ToBit;
     use WithLanguageRepository;
@@ -26,6 +30,11 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     protected string $updatedAtField = 'updated_at';
     protected string $scopeUpdatedAtField = 'scope_updated_at';
 
+    protected function collect(ArrayableInterface $arrayable): LanguageElementCollection
+    {
+        return LanguageElementCollection::from($arrayable);
+    }
+
     public function get(?int $id): ?LanguageElement
     {
         return $this->getEntity($id);
@@ -33,8 +42,17 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
 
     public function getAllByLanguage(Language $language): LanguageElementCollection
     {
-        return LanguageElementCollection::from(
+        return $this->collect(
             $this->byLanguageQuery($language)
+        );
+    }
+
+    public function getAllByIds(NumericCollection $ids): LanguageElementCollection
+    {
+        return $this->collect(
+            $this
+                ->query()
+                ->whereIn($this->idField(), $ids)
         );
     }
 
@@ -45,7 +63,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
     {
         $query = $this->byLanguageQuery($language);
 
-        return LanguageElementCollection::from(
+        return $this->collect(
             $this->filterByCreator($query, $user)
         );
     }
@@ -60,17 +78,17 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         int $limit = 0
     ): LanguageElementCollection
     {
-        return LanguageElementCollection::from(
-            $this
-                ->query()
-                ->whereRaw(sprintf(
-                    '(%s < date_sub(now(), interval %d minute))',
-                    $this->updatedAtField,
-                    $ttlMin
-                ))
-                ->limit($limit)
-                ->orderByAsc($this->updatedAtField)
-        );
+        $query = $this
+            ->query()
+            ->whereRaw(sprintf(
+                '(%s < date_sub(now(), interval %d minute))',
+                $this->updatedAtField,
+                $ttlMin
+            ))
+            ->limit($limit)
+            ->orderByAsc($this->updatedAtField);
+
+        return $this->collect($query);
     }
 
     public function getAllByScope(
@@ -78,7 +96,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         ?Language $language = null
     ): LanguageElementCollection
     {
-        return LanguageElementCollection::from(
+        return $this->collect(
             $this->byScopeQuery($scope, $language)
         );
     }
@@ -87,7 +105,7 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         ?Language $language = null
     ): LanguageElementCollection
     {
-        return LanguageElementCollection::from(
+        return $this->collect(
             $this->approvedQuery($language)
         );
     }
@@ -100,15 +118,15 @@ abstract class LanguageElementRepository extends IdiormRepository implements Lan
         int $limit = 0
     ): LanguageElementCollection
     {
-        return LanguageElementCollection::from(
-            $this
-                ->approvedQuery($language)
-                ->apply(
-                    fn (Query $q) => $this->filterNotMature($q)
-                )
-                ->limit($limit)
-                ->orderByDesc($this->scopeUpdatedAtField)
-        );
+        $query = $this
+            ->approvedQuery($language)
+            ->apply(
+                fn (Query $q) => $this->filterNotMature($q)
+            )
+            ->limit($limit)
+            ->orderByDesc($this->scopeUpdatedAtField);
+
+        return $this->collect($query);
     }
 
     // queries

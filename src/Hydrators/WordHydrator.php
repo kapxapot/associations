@@ -3,7 +3,10 @@
 namespace App\Hydrators;
 
 use App\Auth\Interfaces\AuthInterface;
+use App\Collections\AssociationCollection;
 use App\Core\Interfaces\LinkerInterface;
+use App\Models\AggregatedAssociation;
+use App\Models\Association;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
@@ -13,7 +16,7 @@ use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Semantics\Interfaces\AssociationAggregatorInterface;
+use App\Services\AssociationService;
 use App\Services\DictionaryService;
 use App\Services\WordService;
 use Plasticode\Hydrators\Generic\Hydrator;
@@ -33,10 +36,9 @@ class WordHydrator extends Hydrator
     private AuthInterface $auth;
     private LinkerInterface $linker;
 
+    private AssociationService $associationService;
     private DictionaryService $dictionaryService;
     private WordService $wordService;
-
-    private AssociationAggregatorInterface $associationAggregator;
 
     public function __construct(
         AssociationRepositoryInterface $associationRepository,
@@ -49,9 +51,9 @@ class WordHydrator extends Hydrator
         WordRelationRepositoryInterface $wordRelationRepository,
         AuthInterface $auth,
         LinkerInterface $linker,
+        AssociationService $associationService,
         DictionaryService $dictionaryService,
-        WordService $wordService,
-        AssociationAggregatorInterface $associationAggregator
+        WordService $wordService
     )
     {
         $this->associationRepository = $associationRepository;
@@ -66,10 +68,9 @@ class WordHydrator extends Hydrator
         $this->auth = $auth;
         $this->linker = $linker;
 
+        $this->associationService = $associationService;
         $this->dictionaryService = $dictionaryService;
         $this->wordService = $wordService;
-
-        $this->associationAggregator = $associationAggregator;
     }
 
     /**
@@ -79,19 +80,40 @@ class WordHydrator extends Hydrator
     {
         return $entity
             ->withAggregatedAssociations(
-                fn () => $this->associationAggregator->aggregateFor($entity)
+                $this->frozen(
+                    function () use ($entity) {
+                        $aggregatedAssociations = $this
+                            ->associationService
+                            ->getAggregatedAssociationsFor($entity);
+
+                        // init associations so the are not loaded again
+                        // this will word only if the aggregated associations
+                        // are loaded first
+                        $entity->withAssociations(
+                            $aggregatedAssociations->distillByWord($entity)
+                        );
+
+                        return $aggregatedAssociations;
+                    }
+                )
             )
             ->withAssociations(
-                fn () => $this->associationRepository->getAllByWord($entity)
+                $this->frozen(
+                    fn () => $this->associationRepository->getAllByWord($entity)
+                )
             )
             ->withDefinition(
-                fn () => $this->wordService->getDefinition($entity)
+                $this->frozen(
+                    fn () => $this->wordService->getDefinition($entity)
+                )
             )
             ->withParsedDefinition(
                 fn () => $this->wordService->getParsedDefinition($entity)
             )
             ->withFeedbacks(
-                fn () => $this->wordFeedbackRepository->getAllByWord($entity)
+                $this->frozen(
+                    fn () => $this->wordFeedbackRepository->getAllByWord($entity)
+                )
             )
             ->withUrl(
                 fn () => $this->linker->word($entity)
@@ -106,7 +128,9 @@ class WordHydrator extends Hydrator
                 fn () => $this->auth->getUser()
             )
             ->withDictWord(
-                fn () => $this->dictionaryService->getByWord($entity)
+                $this->frozen(
+                    fn () => $this->dictionaryService->getByWord($entity)
+                )
             )
             ->withMain(
                 fn () => $this->wordRepository->get($entity->mainId)
@@ -115,13 +139,19 @@ class WordHydrator extends Hydrator
                 fn () => $this->wordRepository->getAllByMain($entity)
             )
             ->withOverrides(
-                fn () => $this->wordOverrideRepository->getAllByWord($entity)
+                $this->frozen(
+                    fn () => $this->wordOverrideRepository->getAllByWord($entity)
+                )
             )
             ->withRelations(
-                fn () => $this->wordRelationRepository->getAllByWord($entity)
+                $this->frozen(
+                    fn () => $this->wordRelationRepository->getAllByWord($entity)
+                )
             )
             ->withCounterRelations(
-                fn () => $this->wordRelationRepository->getAllByMainWord($entity)
+                $this->frozen(
+                    fn () => $this->wordRelationRepository->getAllByMainWord($entity)
+                )
             )
             ->withCreator(
                 fn () => $this->userRepository->get($entity->createdBy)

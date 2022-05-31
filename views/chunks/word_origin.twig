@@ -1,0 +1,41 @@
+{% import 'macros.twig' as gm %}
+{% import 'main/local_macros.twig' as lm %}
+
+{% set is_moderator = can('words', 'read') %}
+
+<p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {% include 'components/user.twig' with { 'user': word.creator, 'full': true } %} ({{ gm.moment_local(word.created_at_iso) }})</p>
+
+{% if is_moderator %}
+    {% if word.hasDifferentOriginalUtterance %}
+        <p>Оригинальное произношение: <strong>{{ word.originalUtterance }}</strong></p>
+    {% endif %}
+
+    {% if word.hasDifferentOriginalWord %}
+        <p>Оригинальное слово: <strong>{{ word.originalWord }}</strong></p>
+    {% endif %}
+{% endif %}
+
+{% if word.origin_chain.any %}
+    <p>Цепь ассоциаций, которая привела к добавлению:</p>
+    <p class="br-word">
+        {% for meta_assoc in word.origin_chain %}
+            {% if loop.first %}
+                {{ lm.word(meta_assoc.toWord) }}
+            {% endif %}
+
+            {% include 'components/association.twig' with {
+                'association': meta_assoc.association,
+                'short': true,
+                'reversed': true
+            } only %}
+
+            {% if meta_assoc.user %}
+                {% include 'components/user.twig' with { 'user': meta_assoc.user } %}
+            {% endif %}
+
+            {{ lm.word(meta_assoc.fromWord) }}
+        {% endfor %}
+    </p>
+{% else %}
+    <p class="i">Неизвестно, как возникло это слово.</p>
+{% endif %}

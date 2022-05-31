@@ -6,6 +6,7 @@ use App\Collections\LanguageElementCollection;
 use App\Models\Language;
 use App\Models\LanguageElement;
 use App\Models\User;
+use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
 
 interface LanguageElementRepositoryInterface extends ChangingRepositoryInterface, WithLanguageRepositoryInterface
@@ -13,6 +14,11 @@ interface LanguageElementRepositoryInterface extends ChangingRepositoryInterface
     public function get(?int $id): ?LanguageElement;
 
     public function getAllByLanguage(Language $language): LanguageElementCollection;
+
+    /**
+     * Loads several elements by their ids.
+     */
+    public function getAllByIds(NumericCollection $ids): LanguageElementCollection;
 
     public function getAllCreatedByUser(
         User $user,

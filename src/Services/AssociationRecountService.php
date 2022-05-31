@@ -127,6 +127,11 @@ class AssociationRecountService
             $association->usageCount(true)
         );
 
+        $association->setMetaValue(
+            Association::META_HAS_ACTUAL_OVERRIDE,
+            $association->hasActualOverride(true)
+        );
+
         return $this->associationRepository->save($association);
     }
 }

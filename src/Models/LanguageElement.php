@@ -7,6 +7,7 @@ use App\Collections\OverrideCollection;
 use App\Collections\TurnCollection;
 use App\Models\DTO\GameOptions;
 use App\Models\Traits\Created;
+use App\Models\Traits\Meta;
 use App\Semantics\Scope;
 use App\Semantics\Severity;
 use Plasticode\Models\Generic\DbModel;
@@ -33,7 +34,10 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 {
     use Created;
     use Linkable;
+    use Meta;
     use UpdatedAt;
+
+    const META_HAS_ACTUAL_OVERRIDE = 'has_actual_override';
 
     protected string $feedbacksPropertyName = 'feedbacks';
     protected string $overridesPropertyName = 'overrides';
@@ -218,9 +222,13 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
      * Returns `true` if the element has an override AND
      * that override has some actual changes (is not empty).
      */
-    public function hasActualOverride(): bool
+    public function hasActualOverride(bool $suppressMeta = false): bool
     {
-        return $this->hasOverride() && $this->override()->isNotEmpty();
+        $has = $suppressMeta
+            ? null
+            : $this->getMetaValue(self::META_HAS_ACTUAL_OVERRIDE);
+
+        return $has ?? ($this->hasOverride() && $this->override()->isNotEmpty());
     }
 
     public function hasScopeOverride(): bool

@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Models\Word;
 
 /**
- * DTO for {@see \App\Models\Word} origin chain.
+ * DTO for {@see Word} origin chain.
  */
 class MetaAssociation
 {

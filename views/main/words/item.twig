@@ -4,7 +4,7 @@
 {% import 'main/macros.twig' as m %}
 {% import 'main/local_macros.twig' as lm %}
 
-{% set is_moderator = can('associations', 'read') %}
+{% set is_moderator = can('words', 'read') %}
 
 {% set word_upper = word.full_display_name|upper %}
 {% set title = word_upper ~ ' - Слова' %}
@@ -145,7 +145,7 @@
                             {% include 'components/flat_association_list.twig' with { 'associations': word.approved_visible_associations, 'word': word, 'headless': true, 'show_locks': is_moderator } %}
 
                             {% if approved_invisible_associations_str %}
-                                <p>{{ approved_invisible_associations_str }}.</p>
+                                <p>{{ approved_invisible_associations_str }}</p>
                             {% endif %}
                         </div>
                     {% endif %}
@@ -157,7 +157,7 @@
                             {% include 'components/flat_association_list.twig' with { 'associations': word.not_approved_visible_associations, 'word': word, 'headless': true, 'show_locks': is_moderator } %}
 
                             {% if not_approved_invisible_associations_str %}
-                                <p>{{ not_approved_invisible_associations_str }}.</p>
+                                <p>{{ not_approved_invisible_associations_str }}</p>
                             {% endif %}
                         </div>
                     {% endif %}
@@ -255,43 +255,7 @@
 
     <div class="panel-secondary-heading">Происхождение</div>
     <div class="panel panel-secondary">
-        <div class="panel-body">
-            <p>{{ lm.genderize(word.creator, ['Добавил/а', 'Добавил', 'Добавила']) }} {% include 'components/user.twig' with { 'user': word.creator, 'full': true } %} ({{ gm.moment_local(word.created_at_iso) }})</p>
-
-            {% if is_moderator %}
-                {% if word.hasDifferentOriginalUtterance %}
-                    <p>Оригинальное произношение: <strong>{{ word.originalUtterance }}</strong></p>
-                {% endif %}
-
-                {% if word.hasDifferentOriginalWord %}
-                    <p>Оригинальное слово: <strong>{{ word.originalWord }}</strong></p>
-                {% endif %}
-            {% endif %}
-
-            {% if word.origin_chain.any %}
-                <p>Цепь ассоциаций, которая привела к добавлению:</p>
-                <p class="br-word">
-                    {% for meta_assoc in word.origin_chain %}
-                        {% if loop.first %}
-                            {{ lm.word(meta_assoc.toWord) }}
-                        {% endif %}
-
-                        {% include 'components/association.twig' with {
-                            'association': meta_assoc.association,
-                            'short': true,
-                            'reversed': true
-                        } only %}
-
-                        {% if meta_assoc.user %}
-                            {% include 'components/user.twig' with { 'user': meta_assoc.user } %}
-                        {% endif %}
-
-                        {{ lm.word(meta_assoc.fromWord) }}
-                    {% endfor %}
-                </p>
-            {% else %}
-                <p class="i">Неизвестно, как возникло это слово.</p>
-            {% endif %}
+        <div class="panel-body deferred-load auto-chunk" id="word-origin" data-id="{{ word.id }}">
         </div>
     </div>
 
@@ -383,7 +347,10 @@
                 {% if word.definition %}
                     <strong>Проверено определение:</strong> {{ gm.moment_local(word.definition.updated_at_iso) }}<br/>
                 {% endif %}
-                <strong>Мета:</strong> {{ word.meta }}
+                {% if word.meta %}
+                    <br/>
+                    <strong>Мета:</strong> {{ word.meta }}
+                {% endif %}
             </div>
         </div>
     {% endif %}

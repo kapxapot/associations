@@ -3,6 +3,8 @@
 namespace App\Collections;
 
 use App\Models\AggregatedAssociation;
+use App\Models\Association;
+use App\Models\Word;
 
 class AggregatedAssociationCollection extends AssociationCollection
 {
@@ -16,5 +18,29 @@ class AggregatedAssociationCollection extends AssociationCollection
         return $this->where(
             fn (AggregatedAssociation $a) => !$a->isJunky()
         );
+    }
+
+    /**
+     * Returns the embedded associations.
+     */
+    public function associations(): AssociationCollection
+    {
+        return AssociationCollection::from(
+            $this->map(
+                fn (AggregatedAssociation $aa) => $aa->association()
+            )
+        );
+    }
+
+    /**
+     * Returns the embedded associations having the provided word.
+     */
+    public function distillByWord(Word $word): AssociationCollection
+    {
+        return $this
+            ->associations()
+            ->where(
+                fn (Association $a) => $a->hasWord($word)
+            );
     }
 }

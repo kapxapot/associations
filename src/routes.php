@@ -4,6 +4,7 @@ use App\Controllers\AliceBotController;
 use App\Controllers\AssociationController;
 use App\Controllers\AssociationOverrideController;
 use App\Controllers\AssociationRecountController;
+use App\Controllers\ChunkController;
 use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
 use App\Controllers\IndexController;
@@ -241,7 +242,12 @@ $app->group(
             AssociationController::class . ':latestChunk'
         )->setName('main.chunks.latest.associations');
 
-        /** @var Env */
+        $this->get(
+            '/chunks/{chunk}',
+            ChunkController::class . ':get'
+        )->setName('main.chunk');
+
+        /** @var Env $env */
         $env = $container->get(Env::class);
 
         if ($env->isDev()) {

@@ -63,7 +63,15 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
 
     public function noName(): string
     {
-        return $this->isChat() ? 'инкогнито чат' : 'инкогнито';
+        $name = 'инкогнито';
+
+        if ($this->isChat()) {
+            $name .= ' чат';
+        }
+
+        $name .= ' ' . $this->getId();
+
+        return $name;
     }
 
     public function fullName(): ?string

@@ -1,6 +1,6 @@
 {% extends 'main/layout.twig' %}
 
-{% set no_admin_link = (auth.role.tag != 'admin') %}
+{% set no_admin_link = not auth.user.isAdmin %}
 
 {% set no_social = true %}
 {% set sidebar = true %}
@@ -23,7 +23,9 @@
             url: url,
             noSuccessMessage: true,
             onSuccess: (data) => {
-                $('#' + id).html(data);
+                let compiled = $scope.compile(data);
+
+                $('#' + id).html(compiled);
                 $scope.updateUi();
             },
             onError: () => {
@@ -61,5 +63,25 @@
 
     $scope.reloadSidebar();
 
+    // load auto chunks
+    $('.deferred-load.auto-chunk').each((index, element) => {
+        const id = element.id;
+        const queryStr = objParamsToString(element.dataset);
+
+        let url = '{{ root }}/chunks/' + id;
+
+        if (queryStr.length > 0) {
+            url += '?' + queryStr;
+        }
+
+        $scope.reloadElement(url, id);
+    });
+
     {{ even_more_angular }}
 {% endset %}
+
+{% block more_js %}
+    <script src="{{ folders.local }}js/main.js"></script>
+
+    {{ even_more_js }}
+{% endblock %}

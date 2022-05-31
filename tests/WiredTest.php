@@ -13,6 +13,8 @@ use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
+use App\Semantics\Association\NaiveAssociationAggregator;
+use App\Semantics\Interfaces\AssociationAggregatorInterface;
 use App\Testing\Factories\LanguageRepositoryFactory;
 use App\Testing\Factories\UserRepositoryFactory;
 use App\Testing\Factories\WordRepositoryFactory;
@@ -76,6 +78,9 @@ abstract class WiredTest extends TestCase
             UserRepositoryInterface::class => UserRepositoryFactory::class,
 
             WordRepositoryInterface::class => WordRepositoryFactory::class,
+
+            // semantics
+            AssociationAggregatorInterface::class => NaiveAssociationAggregator::class,
         ];
 
         $this->container = new AutowiringContainer(new Autowirer(), $map);

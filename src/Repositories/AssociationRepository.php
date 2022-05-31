@@ -8,7 +8,10 @@ use App\Models\Association;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
+use Exception;
+use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Data\Query;
+use Plasticode\Interfaces\ArrayableInterface;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 
 class AssociationRepository extends LanguageElementRepository implements AssociationRepositoryInterface
@@ -20,6 +23,11 @@ class AssociationRepository extends LanguageElementRepository implements Associa
         return Association::class;
     }
 
+    protected function collect(ArrayableInterface $arrayable): AssociationCollection
+    {
+        return AssociationCollection::from($arrayable);
+    }
+
     public function get(?int $id): ?Association
     {
         return $this->getEntity($id);
@@ -27,9 +35,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
 
     public function save(Association $association): Association
     {
-        $association->meta = empty($association->metaData())
-            ? null
-            : json_encode($association->metaData());
+        $association->meta = $association->encodeMeta();
 
         return $this->saveEntity($association);
     }
@@ -41,37 +47,40 @@ class AssociationRepository extends LanguageElementRepository implements Associa
 
     public function getAllByLanguage(Language $language): AssociationCollection
     {
-        return AssociationCollection::from(
-            parent::getAllByLanguage($language)
-        );
+        return parent::getAllByLanguage($language);
+    }
+
+    public function getAllByIds(NumericCollection $ids): AssociationCollection
+    {
+        return parent::getAllByIds($ids);
     }
 
     public function getAllByWord(Word $word): AssociationCollection
     {
-        return AssociationCollection::from(
-            $this
-                ->query()
-                ->whereAnyIs(
-                    [
-                        ['first_word_id' => $word->getId()],
-                        ['second_word_id' => $word->getId()],
-                    ]
-                )
-        );
+        $query = $this
+            ->query()
+            ->whereAnyIs(
+                [
+                    ['first_word_id' => $word->getId()],
+                    ['second_word_id' => $word->getId()],
+                ]
+            );
+
+        return $this->collect($query);
     }
 
     public function getAllByWords(WordCollection $words): AssociationCollection
     {
         $ids = $words->ids();
 
-        return AssociationCollection::from(
-            $this
-                ->query()
-                ->whereRaw(
-                    'first_word_id in ? or second_word_id in ?',
-                    [$ids, $ids]
-                )
-        );
+        $query = $this
+            ->query()
+            ->whereRaw(
+                'first_word_id in ? or second_word_id in ?',
+                [$ids, $ids]
+            );
+
+        return $this->collect($query);
     }
 
     public function getByOrderedPair(Word $first, Word $second): ?Association
@@ -83,19 +92,12 @@ class AssociationRepository extends LanguageElementRepository implements Associa
             ->one();
     }
 
-    /**
-     * Returns out of date language elements.
-     *
-     * @param integer $ttlMin Time to live in minutes
-     */
     public function getAllOutOfDate(
         int $ttlMin,
         int $limit = 0
     ): AssociationCollection
     {
-        return AssociationCollection::from(
-            parent::getAllOutOfDate($ttlMin, $limit)
-        );
+        return parent::getAllOutOfDate($ttlMin, $limit);
     }
 
     public function getLastAddedByLanguage(
@@ -103,9 +105,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
         int $limit = 0
     ): AssociationCollection
     {
-        return AssociationCollection::from(
-            parent::getLastAddedByLanguage($language, $limit)
-        );
+        return parent::getLastAddedByLanguage($language, $limit);
     }
 
     // SearchRepository
