@@ -109,9 +109,6 @@ final class WordFeedbackTest extends IntegrationTest
             $this->definitionRepository,
             $this->turnRepository,
             $this->wordRepository,
-            new CasesService(
-                new Cases()
-            ),
             $validator,
             $validationRules,
             new WordConfigMock(),
