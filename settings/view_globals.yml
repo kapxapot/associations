@@ -30,7 +30,7 @@ telegram_bot_name: AssociRuBot
 twitter_alias: AssociRu
 vk_alias: associ_ru
 alice_url: https://dialogs.yandex.ru/store/skills/36d6b4ed-associacii
-sber_url: https://catalog.smartmarket.sber.ru/apps/f04d7fe5-000f-4980-aa0b-dc904f639ed4/
+sber_url: https://apps.sber.ru/salute-apps/f04d7fe5-000f-4980-aa0b-dc904f639ed4/
 
 angular:
   app: bsApp
