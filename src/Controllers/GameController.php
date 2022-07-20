@@ -2,12 +2,12 @@
 
 namespace App\Controllers;
 
+use App\Models\Language;
 use App\Models\Turn;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Services\AssociationService;
 use App\Services\GameService;
-use App\Services\TurnService;
 use App\Services\WordService;
 use Plasticode\Core\Request;
 use Plasticode\Core\Response;
@@ -24,7 +24,6 @@ class GameController extends Controller
 
     private AssociationService $associationService;
     private GameService $gameService;
-    private TurnService $turnService;
     private WordService $wordService;
 
     private NotFoundHandlerInterface $notFoundHandler;
@@ -38,7 +37,6 @@ class GameController extends Controller
 
         $this->associationService = $container->get(AssociationService::class);
         $this->gameService = $container->get(GameService::class);
-        $this->turnService = $container->get(TurnService::class);
         $this->wordService = $container->get(WordService::class);
 
         $this->notFoundHandler = $container->get(NotFoundHandlerInterface::class);
@@ -138,30 +136,16 @@ class GameController extends Controller
         $word = $this->wordService->purgeFor($word, $user);
         $prevWord = $this->wordService->purgeFor($prevWord, $user);
 
-        $wordAssociation = ($word && $prevWord)
-            ? $word->associationByWord($prevWord)
-            : null;
-
-        $game = $this->gameService->buildEtherealGame($prevWord, $word);
-
-        $answerTurn = $word
-            ? $this->turnService->findAnswer($game, $word)
-            : null;
-
-        $answer = $answerTurn
-            ? $answerTurn->word()
-            : $this->languageService->getRandomStartingWord($language);
-
-        $answerAssociation = $answerTurn
-            ? $answerTurn->association()
-            : null;
-
         $wordResponse = [
             'word' => $wordStr,
             'is_valid' => $this->wordService->isWordValid($wordStr)
         ];
 
         if ($word) {
+            $wordAssociation = $prevWord
+                ? $this->associationService->getByPair($prevWord, $word)
+                : null;
+
             $wordResponse = $this->serializer->serializeRaw(
                 $wordResponse,
                 $word,
@@ -169,8 +153,15 @@ class GameController extends Controller
             );
         }
 
+        // getting an answer
+
         /** @var array|null */
         $answerResponse = null;
+
+        $answerTurn = $this->gameService->playPseudoTurn($language, $word, $prevWord);
+
+        $answer = $answerTurn->word();
+        $answerAssociation = $answerTurn->association();
 
         if ($answer) {
             $answerResponse = $this->serializer->serializeRaw(

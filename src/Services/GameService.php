@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Collections\TurnCollection;
 use App\Collections\WordCollection;
 use App\Exceptions\TurnException;
+use App\Models\DTO\PseudoTurn;
 use App\Models\Game;
 use App\Models\Language;
 use App\Models\Turn;
@@ -134,6 +135,31 @@ class GameService
         Assert::minCount($turns, 1);
 
         return $turns;
+    }
+
+    /**
+     * Constructs an ethereal game from the provided words and plays a preudo turn.
+     *
+     * When there is no answer (for some reason), chooses a random starting word.
+     * (Starts a "new game").
+     */
+    public function playPseudoTurn(Language $language, ?Word $word, ?Word $prevWord = null): PseudoTurn
+    {
+        if ($word) {
+            $game = $this->buildEtherealGame($prevWord, $word);
+
+            $answerTurn = $word
+                ? $this->turnService->findAnswer($game, $word)
+                : null;
+
+            if ($answerTurn) {
+                return $answerTurn;
+            }
+        }
+
+        $answer = $this->languageService->getRandomStartingWord($language);
+
+        return PseudoTurn::new($answer);
     }
 
     /**
