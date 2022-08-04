@@ -93,7 +93,7 @@ class TurnController extends Controller
         ];
 
         if ($answer === null) {
-            $newGame = $this->gameService->createGameFor($user);
+            $newGame = $this->gameService->createNewGameFor($user);
 
             $result['new'] = $this->serializer->serializeTurn(
                 $newGame->lastTurn()
@@ -112,20 +112,12 @@ class TurnController extends Controller
 
         Assert::notNull($user);
 
-        $game = $user->currentGame();
+        $this->turnService->finishGameFor($user);
 
-        if ($game !== null) {
-            $this->turnService->finishGame($game);
-        }
+        $newGame = $this->gameService->createNewGameFor($user);
 
-        $language = $game
-            ? $game->language()
-            : $this->languageService->getDefaultLanguage();
-
-        $newGame = $this->gameService->createGameFor($user, $language);
-
-        $firstTurn = $newGame
-            ? $newGame->turns()->first()
+        $lastTurn = $newGame
+            ? $newGame->lastTurn()
             : null;
 
         return Response::json(
@@ -133,7 +125,7 @@ class TurnController extends Controller
             [
                 'question' => null,
                 'answer' => null,
-                'new' => $this->serializer->serializeTurn($firstTurn)
+                'new' => $this->serializer->serializeTurn($lastTurn)
             ]
         );
     }

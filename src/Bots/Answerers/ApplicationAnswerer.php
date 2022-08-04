@@ -121,7 +121,13 @@ class ApplicationAnswerer extends AbstractAnswerer
         string ...$answerParts
     ): BotResponse
     {
-        $word = $this->getAnyWord($request);
+        $language = $this->getLanguage();
+
+        $prevWord = $request
+            ? $this->findWord($request->command())
+            : null;
+
+        $word = $this->languageService->getRandomStartingWord($language, $prevWord);
 
         return $this->answerWithWord($word, ...$answerParts);
     }
@@ -161,16 +167,5 @@ class ApplicationAnswerer extends AbstractAnswerer
         }
 
         return $turn ?? PseudoTurn::empty($word);
-    }
-
-    private function getAnyWord(?AbstractBotRequest $request = null): ?Word
-    {
-        $language = $this->getLanguage();
-
-        $word = ($request !== null)
-            ? $this->findWord($request->command())
-            : null;
-
-        return $this->languageService->getRandomStartingWord($language, $word);
     }
 }

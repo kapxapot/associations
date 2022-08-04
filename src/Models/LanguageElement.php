@@ -123,7 +123,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
 
     public function isPlayableAgainst(?User $user, ?GameOptions $options = null): bool
     {
-        $isGameStart = $options && $options->isGameStart;
+        $isGameStart = $options && $options->isGameStart();
 
         return $this->isVisibleFor($user)
             && ($this->isNeutral() || !$isGameStart)

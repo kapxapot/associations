@@ -29,8 +29,8 @@ class UserAnswerer extends AbstractAnswerer
 {
     use LoggerAwareTrait;
 
-    private const MAX_TOKENS = 3;
-    public const WORD_LIMIT = 'трёх слов'; // todo: refactor this
+    const MAX_TOKENS = 3;
+    const WORD_LIMIT = 'трёх слов'; // todo: refactor this
 
     private AssociationFeedbackService $associationFeedbackService;
     private GameService $gameService;
@@ -464,10 +464,10 @@ class UserAnswerer extends AbstractAnswerer
                 );
         }
 
+        // no answer, starting new game
         $answerParts[] = $this->noAssociationMessage();
         $answerParts[] = self::MESSAGE_START_ANEW;
 
-        // no answer, starting new game
         return $this->newGameResponse(
             $botUser,
             ...$answerParts
@@ -497,7 +497,7 @@ class UserAnswerer extends AbstractAnswerer
     {
         $user = $botUser->user();
 
-        $game = $this->gameService->getOrCreateGameFor($user);
+        $game = $this->gameService->getOrCreateNewGameFor($user);
 
         Assert::notNull($game);
 
@@ -525,7 +525,7 @@ class UserAnswerer extends AbstractAnswerer
     {
         $user = $botUser->user();
 
-        $newGame = $this->gameService->createGameFor($user);
+        $newGame = $this->gameService->createNewGameFor($user);
 
         return $this->buildGameResponse($newGame, ...$parts);
     }

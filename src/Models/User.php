@@ -29,6 +29,8 @@ class User extends UserBase implements GenderedInterface
 {
     use Gendered;
 
+    const NONE = null;
+
     protected function requiredWiths(): array
     {
         return [

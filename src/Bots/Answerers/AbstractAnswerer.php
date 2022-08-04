@@ -51,14 +51,9 @@ abstract class AbstractAnswerer
         $this->languageService = $languageService;
     }
 
-    protected function getLanguage(): Language
-    {
-        return $this->languageService->getDefaultLanguage();
-    }
-
     protected function renderWord(?Word $word): string
     {
-        return $word !== null
+        return $word
             ? mb_strtoupper($word->word)
             : 'У меня нет слов.';
     }
@@ -454,5 +449,10 @@ abstract class AbstractAnswerer
             self::VAR_STATE,
             self::VAR_COMMAND,
         ];
+    }
+
+    protected function getLanguage(): Language
+    {
+        return $this->languageService->getDefaultLanguage();
     }
 }

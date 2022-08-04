@@ -71,4 +71,18 @@ class TelegramUserService
 
         return $this->telegramUserRepository->save($tgUser);
     }
+
+    public function markAsBotAdmin(TelegramUser $tgUser): TelegramUser
+    {
+        $tgUser->withBotAdmin(true);
+
+        return $this->telegramUserRepository->save($tgUser);
+    }
+
+    public function unmarkAsBotAdmin(TelegramUser $tgUser): TelegramUser
+    {
+        $tgUser->withBotAdmin(false);
+
+        return $this->telegramUserRepository->save($tgUser);
+    }
 }

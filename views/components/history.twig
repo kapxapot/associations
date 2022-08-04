@@ -1,4 +1,4 @@
-<span ng-repeat-start="word in {{ history }}" ng-if="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.url}}'}}">{{'{{word.is_not_native ? "&#8605;" : (word.association.is_public ? "&#x21C9;" : "&#x2192;")}}'}}</a></span>
+<span ng-repeat-start="word in {{ history }}" ng-if="word.association"><a class="assoc-arrow" ng-href="{{'{{word.association.url}}'}}">{{'{{word.is_artificial ? "&#8605;" : (word.association.is_public ? "&#x21C9;" : "&#x2192;")}}'}}</a></span>
 
 <span ng-if="!$first && !word.is_ai && !word.association && {{ history }}[$index - 1].is_ai" class="assoc-arrow--dimmed">&#x21E2;</span>
 

@@ -51,22 +51,6 @@ class TurnService
     }
 
     /**
-     * Returns true on success.
-     */
-    public function finishTurn(Turn $turn, ?string $finishDate = null): bool
-    {
-        if ($turn->isFinished()) {
-            return true;
-        }
-
-        $turn->finishedAt = $finishDate ?? Date::dbNow();
-
-        $this->turnRepository->save($turn);
-
-        return true;
-    }
-
-    /**
      * Returns new player turn and AI turn/answer if it happens.
      */
     public function newPlayerTurn(
@@ -193,14 +177,24 @@ class TurnService
     }
 
     /**
-     * Returns true on success.
-     *
+     * Finishes the current game for the user if there is any.
+     */
+    public function finishGameFor(User $user): void
+    {
+        $game = $user->currentGame();
+
+        if ($game) {
+            $this->finishGame($game);
+        }
+    }
+
+    /**
      * Todo: this should belong to GameService, but creates a circular dependency
      */
-    public function finishGame(Game $game): bool
+    public function finishGame(Game $game): void
     {
         if ($game->isFinished()) {
-            return false;
+            return;
         }
 
         $game->finishedAt = Date::dbNow();
@@ -208,13 +202,22 @@ class TurnService
         $this->gameRepository->save($game);
 
         if ($game->lastTurn()) {
-            return $this->finishTurn(
+            $this->finishTurn(
                 $game->lastTurn(),
                 $game->finishedAt
             );
         }
+    }
 
-        return true;
+    public function finishTurn(Turn $turn, ?string $finishDate = null): void
+    {
+        if ($turn->isFinished()) {
+            return;
+        }
+
+        $turn->finishedAt = $finishDate ?? Date::dbNow();
+
+        $this->turnRepository->save($turn);
     }
 
     /**
@@ -251,7 +254,7 @@ class TurnService
         ];
 
         foreach ($selectors as $selector) {
-            /** @var AggregatedAssociation $answerAssociation */
+            /** @var AggregatedAssociation|null $answerAssociation */
             $answerAssociation = $word
                 ->congregatedAssociations()
                 ->where($selector)
@@ -266,7 +269,7 @@ class TurnService
                     )
                 );
 
-            if ($answerAssociation !== null) {
+            if ($answerAssociation) {
                 return new PseudoTurn(
                     $answerAssociation,
                     $answerAssociation->otherThanAnchor(),

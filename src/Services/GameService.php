@@ -41,46 +41,66 @@ class GameService
     /**
      * Returns user's current game or creates and starts a new one for them.
      */
-    public function getOrCreateGameFor(User $user): Game
+    public function getOrCreateNewGameFor(User $user): Game
     {
-        return $user->currentGame() ?? $this->createGameFor($user);
+        return $user->currentGame() ?? $this->createNewGameFor($user);
+    }
+
+    /**
+     * Creates a new game for the user taking into account the last game.
+     *
+     * Makes sure that the last word of the last game is not used
+     * as a starting word in a new game.
+     */
+    public function createNewGameFor(User $user): Game
+    {
+        $lastGame = $user->lastGame();
+
+        $lastWord = $lastGame
+            ? $lastGame->lastTurn()->word()
+            : null;
+
+        return $this->createGameFor(
+            $user,
+            $this->getUserLanguage($user),
+            $lastWord
+        );
     }
 
     /**
      * Creates and starts a new game for the user.
+     *
+     * @param Word|null $exceptWord If provided, the algorithm tries not to start a game from this word.
+     * But if it's the only word in its language, it can be used anyway.
      */
-    public function createGameFor(User $user, ?Language $language = null): Game
+    public function createGameFor(User $user, ?Language $language = null, ?Word $exceptWord = null): Game
     {
-        $language ??= $this->languageService->getCurrentLanguageFor($user);
+        $language ??= $this->getUserLanguage($user);
 
-        $game = $this->gameRepository->store(
-            [
-                'language_id' => $language->getId(),
-                'user_id' => $user->getId(),
-                'created_by' => $user->getId(),
-            ]
-        );
+        $game = $this->gameRepository->store([
+            'language_id' => $language->getId(),
+            'user_id' => $user->getId(),
+            'created_by' => $user->getId(),
+        ]);
 
-        $this->startGame($game);
+        $this->startGame($game, $exceptWord);
 
         return $game;
     }
 
-    public function startGame(Game $game): ?Turn
+    private function getUserLanguage(User $user): Language
     {
-        Assert::notNull($game, 'Game can\'t be null.');
+        return $this->languageService->getCurrentLanguageFor($user);
+    }
 
-        // already started
-        if ($game->isStarted()) {
-            return null;
-        }
-
+    public function startGame(Game $game, ?Word $exceptWord = null): ?Turn
+    {
         $language = $game->language();
         $user = $game->user();
 
         // if language has words, AI goes first
         // otherwise player goes first
-        $word = $this->languageService->getRandomStartingWordFor($user, $language);
+        $word = $this->languageService->getRandomStartingWord($language, $exceptWord, $user);
 
         return $word
             ? $this->turnService->newAiTurn($game, $word)
@@ -157,7 +177,7 @@ class GameService
             }
         }
 
-        $answer = $this->languageService->getRandomStartingWord($language);
+        $answer = $this->languageService->getRandomStartingWord($language, $word);
 
         return PseudoTurn::new($answer);
     }

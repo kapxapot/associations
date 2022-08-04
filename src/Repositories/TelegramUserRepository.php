@@ -34,6 +34,8 @@ class TelegramUserRepository extends IdiormRepository implements TelegramUserRep
 
     public function save(TelegramUser $user): TelegramUser
     {
+        $user->meta = $user->encodeMeta();
+
         return $this->saveEntity($user);
     }
 

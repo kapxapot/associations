@@ -167,7 +167,7 @@ class GameController extends Controller
             $answerResponse = $this->serializer->serializeRaw(
                 [
                     'word' => $answer->word,
-                    'is_not_native' => $answerAssociation
+                    'is_artificial' => $answerAssociation
                         && $word
                         && !$answerAssociation->hasWord($word),
                 ],

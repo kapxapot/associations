@@ -23,7 +23,7 @@ class Serializer
                 'turn_id' => $turn->getId(),
                 'word' => $turn->word()->word,
                 'is_ai' => $turn->isAiTurn(),
-                'is_not_native' => !$turn->isNative()
+                'is_artificial' => !$turn->isOrganic()
             ],
             $turn->word(),
             $turn->association()

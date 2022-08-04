@@ -3,9 +3,10 @@
 namespace App\Models\DTO;
 
 use App\Models\Association;
+use App\Models\Interfaces\TurnInterface;
 use App\Models\Word;
 
-class PseudoTurn
+class PseudoTurn implements TurnInterface
 {
     private ?Association $association;
     private ?Word $word;

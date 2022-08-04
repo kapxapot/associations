@@ -34,7 +34,7 @@ class IndexController extends Controller
         $user = $this->auth->getUser();
 
         $game = $user
-            ? $this->gameService->getOrCreateGameFor($user)
+            ? $this->gameService->getOrCreateNewGameFor($user)
             : null;
 
         $latestNews = $this

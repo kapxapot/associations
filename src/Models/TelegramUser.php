@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Models\Interfaces\GenderedInterface;
 use App\Models\Interfaces\NamedInterface;
+use App\Models\Traits\Meta;
+use Exception;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedAtInterface;
 use Plasticode\Models\Interfaces\UpdatedAtInterface;
@@ -24,6 +26,7 @@ use Plasticode\Models\Traits\UpdatedAt;
 class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterface, NamedInterface, UpdatedAtInterface
 {
     use CreatedAt;
+    use Meta;
     use UpdatedAt;
 
     protected function requiredWiths(): array
@@ -83,6 +86,31 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
         return (strlen($fullName) > 0)
             ? $fullName
             : $this->username;
+    }
+
+    public function lastWord(): ?string
+    {
+        throw new Exception('Not implemented yet.');
+    }
+
+    /**
+     * Is the bot chat administrator for this user's chat?
+     *
+     * Relevant only for group chats (see {@see isChat()}).
+     */
+    public function isBotAdmin(): bool
+    {
+        return $this->getMetaValue('bot_admin', false);
+    }
+
+    /**
+     * @return $this
+     */
+    public function withBotAdmin(bool $botAdmin): self
+    {
+        $this->setMetaValue('bot_admin', $botAdmin);
+
+        return $this;
     }
 
     // GenderedInterface
