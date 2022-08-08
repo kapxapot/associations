@@ -17,7 +17,9 @@ use App\Config\LocalizationConfig;
 use App\Core\Interfaces\LinkerInterface;
 use App\Core\Linker;
 use App\External\DictionaryApi;
+use App\External\Factories\TelegramTransportFactory;
 use App\External\Interfaces\DefinitionSourceInterface;
+use App\External\Interfaces\TelegramTransportInterface;
 use App\Handlers\NotFoundHandler;
 use App\Models\Validation\Factories\UserValidationFactory;
 use App\Parsing\Factories\DoubleBracketsConfigFactory;
@@ -71,6 +73,7 @@ class GeneralProvider extends MappingProvider
             // external
 
             DefinitionSourceInterface::class => DictionaryApi::class,
+            TelegramTransportInterface::class => TelegramTransportFactory::class,
 
             // services
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Models;
+namespace App\Tests\Models\DTO;
 
 use App\Models\DTO\EtherealAssociation;
 use App\Models\Word;

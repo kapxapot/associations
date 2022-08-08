@@ -29,6 +29,8 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
     use Meta;
     use UpdatedAt;
 
+    const META_BOT_ADMIN = 'bot_admin';
+
     protected function requiredWiths(): array
     {
         return ['user'];
@@ -100,7 +102,7 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
      */
     public function isBotAdmin(): bool
     {
-        return $this->getMetaValue('bot_admin', false);
+        return $this->getMetaValue(self::META_BOT_ADMIN, false);
     }
 
     /**
@@ -108,7 +110,7 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
      */
     public function withBotAdmin(bool $botAdmin): self
     {
-        $this->setMetaValue('bot_admin', $botAdmin);
+        $this->setMetaValue(self::META_BOT_ADMIN, $botAdmin);
 
         return $this;
     }

@@ -18,6 +18,8 @@ use App\Core\Linker;
 use App\Core\Serializer;
 use App\External\DictionaryApi;
 use App\External\Interfaces\DefinitionSourceInterface;
+use App\External\Interfaces\TelegramTransportInterface;
+use App\External\TelegramTransport;
 use App\External\YandexDict;
 use App\Handlers\NotFoundHandler;
 use App\Mapping\Providers\GeneralProvider;
@@ -74,6 +76,7 @@ use Plasticode\Parsing\LinkMappers\TagLinkMapper;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
 use Plasticode\Repositories\Interfaces\MenuItemRepositoryInterface;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
+use Plasticode\Settings\SettingsProvider;
 use Plasticode\Testing\AbstractProviderTest;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Psr\Log\LoggerInterface;
@@ -81,6 +84,18 @@ use Slim\Interfaces\RouterInterface;
 
 final class GeneralProviderTest extends AbstractProviderTest
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->container->set(
+            SettingsProviderInterface::class,
+            new SettingsProvider([
+                'telegram' => ['bot_token' => '123:token'],
+            ])
+        );
+    }
+
     protected function getOuterDependencies(): array
     {
         return [
@@ -96,7 +111,6 @@ final class GeneralProviderTest extends AbstractProviderTest
 
             LoggerInterface::class,
             RouterInterface::class,
-            SettingsProviderInterface::class,
             ValidatorInterface::class,
 
             AliceUserRepositoryInterface::class,
@@ -161,6 +175,7 @@ final class GeneralProviderTest extends AbstractProviderTest
 
         $this->check(YandexDict::class);
         $this->check(DefinitionSourceInterface::class, DictionaryApi::class);
+        $this->check(TelegramTransportInterface::class, TelegramTransport::class);
 
         // validation
 

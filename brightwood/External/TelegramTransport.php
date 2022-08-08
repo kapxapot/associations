@@ -16,7 +16,7 @@ class TelegramTransport
     }
 
     /**
-     * @return mixed
+     * @return string|bool
      */
     public function sendMessage(array $message)
     {
@@ -39,7 +39,7 @@ class TelegramTransport
         return $result;
     }
 
-    private function serialize(array $message) : array
+    private function serialize(array $message): array
     {
         return array_map(
             fn ($item) => is_array($item) ? json_encode($item) : $item,

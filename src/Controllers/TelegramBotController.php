@@ -4,6 +4,8 @@ namespace App\Controllers;
 
 use App\Bots\Answerers\UserAnswerer;
 use App\Exceptions\TurnException;
+use App\External\Interfaces\TelegramTransportInterface;
+use App\External\TelegramTransport;
 use App\Models\Association;
 use App\Models\DTO\PseudoTurn;
 use App\Models\Interfaces\TurnInterface;
@@ -42,7 +44,11 @@ class TelegramBotController
     const STATUS_MEMBER = 'member';
     const STATUS_ADMINISTRATOR = 'administrator';
 
+    const MESSAGE_ADMIN_IS_BAD = 'Не надо менять делать админом. 😥 Игра остановлена и будет возобновлена, когда вы уберете меня из админов.';
+
     private SettingsProviderInterface $settingsProvider;
+    private TelegramTransportInterface $telegramTransport;
+    private Tokenizer $tokenizer;
     private TranslatorInterface $translator;
 
     private UserRepositoryInterface $userRepository;
@@ -58,11 +64,11 @@ class TelegramBotController
 
     private string $languageCode;
 
-    private Tokenizer $tokenizer;
-
     public function __construct(
         SettingsProviderInterface $settingsProvider,
         LoggerInterface $logger,
+        TelegramTransportInterface $telegramTransport,
+        Tokenizer $tokenizer,
         TranslatorInterface $translator,
         UserRepositoryInterface $userRepository,
         GameService $gameService,
@@ -78,6 +84,8 @@ class TelegramBotController
 
         $this->withLogger($logger);
 
+        $this->telegramTransport = $telegramTransport;
+        $this->tokenizer = $tokenizer;
         $this->translator = $translator;
 
         $this->userRepository = $userRepository;
@@ -92,8 +100,6 @@ class TelegramBotController
         $this->ageValidation = $ageValidation;
 
         $this->languageCode = 'ru';
-
-        $this->tokenizer = new Tokenizer();
     }
 
     public function __invoke(
@@ -195,7 +201,7 @@ class TelegramBotController
             $answer = $this->joinParts($answerParts);
         } elseif ($oldStatus === self::STATUS_MEMBER && $newStatus === self::STATUS_ADMINISTRATOR) {
             // bot made an admin (bad!)
-            $answer = 'Зря вы меня сделали админом. 😥 Игра остановлена и будет возобновлена, когда вы уберете меня из админов.';
+            $answer = self::MESSAGE_ADMIN_IS_BAD;
         } elseif ($oldStatus === self::STATUS_ADMINISTRATOR && $newStatus === self::STATUS_MEMBER) {
             // bot made a member from an admin
             $greeting = [
@@ -222,6 +228,20 @@ class TelegramBotController
         $tgUser = $this->telegramUserService->getOrCreateTelegramUser($message['chat']);
 
         Assert::true($tgUser->isValid());
+
+        // check if bot is admin, if it was made an admin before the fix
+        $isBotAdmin = $tgUser->getMetaValue(TelegramUser::META_BOT_ADMIN);
+
+        if ($isBotAdmin === null) {
+            $isBotAdmin = $this->isBotChatAdmin($chatId);
+
+            if ($isBotAdmin) {
+                // update meta
+                $this->telegramUserService->markAsBotAdmin($tgUser);
+                // return message about admin
+                return $this->buildTelegramMessage($chatId, self::MESSAGE_ADMIN_IS_BAD);
+            }
+        }
 
         // if bot is made admin, ignore all messages
         if ($tgUser->isBotAdmin()) {
@@ -677,5 +697,26 @@ class TelegramBotController
             'parse_mode' => 'html',
             'text' => $text,
         ];
+    }
+
+    private function isBotChatAdmin(int $chatId): bool
+    {
+        $response = $this->telegramTransport->executeCommand(
+            TelegramTransport::COMMAND_GET_CHAT_MEMBER,
+            [
+                'chat_id' => $chatId,
+                'user_id' => $this->telegramTransport->botInfo()->id(),
+            ]
+        );
+
+        $data = json_decode($response, true);
+
+        if ($data['ok'] !== true) {
+            return false;
+        }
+
+        $status = $data['result']['status'] ?? null;
+
+        return $status === self::STATUS_ADMINISTRATOR;
     }
 }
