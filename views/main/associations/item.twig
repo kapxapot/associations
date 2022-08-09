@@ -66,7 +66,7 @@
             {% if association.users|length > 0 %}
                 <p><strong>Использована игроками:</strong></p>
 
-                <ul class="br-word">
+                <ul class="mb-0 br-word">
                     {% for user in association.users %}
                         {% set turns = turns_by_user[user.id] %}
                         <li class="vgap-1">
@@ -95,6 +95,10 @@
                     {% endif %}
                 </div>
             {% endif %}
+        </div>
+
+        <div class="panel-footer">
+            <i class="fas fa-info-circle mr-0-5"></i> <a href="https://www.google.com/search?q={{ (association.firstWord.word ~ ' ' ~ association.secondWord.word)|url_encode }}">Google</a>
         </div>
     </div>
 
