@@ -2,18 +2,24 @@
 
 <p>Полная версия <strong>Ассоциаций</strong> доступна после <a href="javascript:void(0);" ng-click="signUp()">регистрации</a> на сайте или при игре с 🤖&nbsp;ботами:</p>
 
-<div class="large-inline flex flex-wrap flex-jc-center flex-gap-4 mt-3 mb-3">
+<div class="large-inline flex flex-wrap flex-jc-center flex-gap-4 mt-2 mb-2">
     <div class="flex flex-v flex-jc-between flex-ai-center">
         <a href="https://t.me/{{ telegram_bot_name }}" class="no-under"><i class="fab fa-telegram-plane fa-2x"></i></a>
         <a href="https://t.me/{{ telegram_bot_name }}">Telegram</a>
     </div>
-    <div class="flex flex-v flex-jc-between flex-ai-center">
+    <div class="flex flex-v flex-jc-between flex-ai-center" title="Яндекс.Алиса">
         <a href="{{ alice_url }}" class="no-under"><img src="{{ folders.assets }}images/alice.svg" alt=""></a>
-        <a href="{{ alice_url }}">Яндекс.Алиса</a>
+        <a href="{{ alice_url }}">
+            <span class="hidden-xs">Яндекс.Алиса</span>
+            <span class="visible-xs-inline">Алиса</span>
+        </a>
     </div>
-    <div class="flex flex-v flex-jc-between flex-ai-center">
+    <div class="flex flex-v flex-jc-between flex-ai-center" title="SmartMarket (Сбер)">
         <a href="{{ sber_url }}" class="no-under"><img src="{{ folders.assets }}images/sber.svg" alt=""></a>
-        <a href="{{ sber_url }}">SmartMarket (Сбер)</a>
+        <a href="{{ sber_url }}">
+            <span class="hidden-xs">SmartMarket (Сбер)</span>
+            <span class="visible-xs-inline">Сбер</span>
+        </a>
     </div>
 </div>
 
