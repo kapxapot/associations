@@ -15,7 +15,7 @@ class WordRelationCollection extends DbModelCollection
      */
     public function primary(): ?WordRelation
     {
-        return $this->filterPrimary()->first();
+        return $this->primaries()->first();
     }
 
     /**
@@ -23,10 +23,31 @@ class WordRelationCollection extends DbModelCollection
      *
      * @return static
      */
-    public function filterPrimary(): self
+    public function primaries(): self
     {
         return $this->where(
             fn (WordRelation $wr) => $wr->isPrimary()
+        );
+    }
+
+    /**
+     * Filters word form relations.
+     *
+     * @return static
+     */
+    public function wordForms(): self
+    {
+        return $this->where(
+            fn (WordRelation $wr) => $wr->isWordForm()
+        );
+    }
+
+    public function mainWords(): WordCollection
+    {
+        return WordCollection::from(
+            $this->map(
+                fn (WordRelation $wr) => $wr->mainWord()
+            )
         );
     }
 

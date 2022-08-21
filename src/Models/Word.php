@@ -353,29 +353,49 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     public function partsOfSpeech(): PartOfSpeechCollection
     {
+        // override
         if ($this->hasPartsOfSpeechOverride()) {
             return $this->partsOfSpeechOverride();
         }
 
         $poses = PartOfSpeechCollection::empty();
 
+        // dict word
         $dw = $this->dictWord();
 
-        if ($dw !== null && $dw->partOfSpeech() !== null) {
+        if ($dw && $dw->partOfSpeech()) {
             $poses = $poses->add(
                 $dw->partOfSpeech()
             );
         }
 
-        if ($this->parsedDefinition() !== null) {
+        // definition
+        if ($this->parsedDefinition()) {
             $poses = $poses->concat(
                 $this->parsedDefinition()->partsOfSpeech()
             );
         }
 
-        if ($poses->isEmpty() && $this->hasMain()) {
-            $poses = $this->main()->partsOfSpeech();
+        // if has relations...
+        // - inherit from main word
+        // - inherit from same-word relations
+        if ($this->hasMain()) {
+            $poses = $poses->concat(
+                $this->main()->partsOfSpeech()
+            );
         }
+
+        // related words that the current one is a word form of
+        $wordForms = $this
+            ->relations()
+            ->wordForms()
+            ->mainWords();
+
+        $poses = $poses->concat(
+            $wordForms->flatMap(
+                fn (Word $w) => $w->partsOfSpeech()
+            )
+        );
 
         return $poses->distinct();
     }
@@ -666,7 +686,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
      */
     public function hasPrimaryRelation(): bool
     {
-        return $this->allRelations()->filterPrimary()->any();
+        return $this->allRelations()->primaries()->any();
     }
 
     /**
