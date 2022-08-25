@@ -33,6 +33,7 @@ logger:
   path: {LOG_PATH}
 
 event_logger:
+  enabled: {EVENT_LOG_ENABLED}
   name: pc-event-log
   path: {EVENT_LOG_PATH}
 
