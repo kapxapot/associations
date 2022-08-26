@@ -25,7 +25,7 @@ final class WordPartsOfSpeechTest extends TestCase
         $this->language = new Language(['id' => 1]);
 
         // [1] word1 (noun) -word-form-> word2
-        // [2] word2 (verb) -word-form-> word1
+        // [2] word2 (verb) -word-form/main-> word1
 
         // expected:
         // word1 (noun, verb)
@@ -46,7 +46,7 @@ final class WordPartsOfSpeechTest extends TestCase
             'word' => 'word2',
         ]))
             ->withLanguage($this->language)
-            ->withMain(null)
+            ->withMain($word1)
             ->withOverrides(WordOverrideCollection::empty())
             ->withParsedDefinition(null);
 
@@ -72,6 +72,7 @@ final class WordPartsOfSpeechTest extends TestCase
         $relation21 = (new WordRelation([
             'word_id' => $word2->getId(),
             'main_word_id' => $word1->getId(),
+            'primary' => 1,
         ]))
             ->withType($relationType)
             ->withWord($word2)
