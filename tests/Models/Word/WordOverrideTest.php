@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Models;
+namespace App\Tests\Models\Word;
 
 use App\Models\WordOverride;
 use App\Semantics\PartOfSpeech;

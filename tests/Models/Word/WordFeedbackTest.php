@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Models;
+namespace App\Tests\Models\Word;
 
 use App\Hydrators\GameHydrator;
 use App\Hydrators\TurnHydrator;
@@ -14,7 +14,6 @@ use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
-use App\Services\CasesService;
 use App\Services\LanguageService;
 use App\Services\WordFeedbackService;
 use App\Services\WordService;
@@ -33,7 +32,6 @@ use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\ObjectProxy;
 use Plasticode\Settings\SettingsProvider;
-use Plasticode\Util\Cases;
 use Plasticode\Validation\ValidationRules;
 use Plasticode\Validation\Validator;
 

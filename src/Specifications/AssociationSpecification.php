@@ -30,7 +30,7 @@ class AssociationSpecification
 
         $minScope = min([Scope::PRIVATE, $association->minWordScope()]);
 
-        // don't make association public, if any of it's words have scope less than private
+        // don't make association public, if any of its words have scope less than private
         if ($minScope == Scope::PRIVATE && $this->isPublic($association)) {
             return Scope::PUBLIC;
         }

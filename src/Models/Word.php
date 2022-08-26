@@ -351,7 +351,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         return $this->partsOfSpeech()->isAnyGood();
     }
 
-    public function partsOfSpeech(): PartOfSpeechCollection
+    public function partsOfSpeech(bool $noRelations = false): PartOfSpeechCollection
     {
         // override
         if ($this->hasPartsOfSpeechOverride()) {
@@ -385,17 +385,19 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
             );
         }
 
-        // related words that the current one is a word form of
-        $wordForms = $this
-            ->relations()
-            ->wordForms()
-            ->mainWords();
+        if (!$noRelations) {
+            // related words that the current one is a word form of
+            $wordForms = $this
+                ->relations()
+                ->wordForms()
+                ->mainWords();
 
-        $poses = $poses->concat(
-            $wordForms->flatMap(
-                fn (Word $w) => $w->partsOfSpeech()
-            )
-        );
+            $poses = $poses->concat(
+                $wordForms->flatMap(
+                    fn (Word $w) => $w->partsOfSpeech(true)
+                )
+            );
+        }
 
         return $poses->distinct();
     }
