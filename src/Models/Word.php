@@ -381,7 +381,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
         // - inherit from same-word relations
         if ($this->hasMain()) {
             $poses = $poses->concat(
-                $this->main()->partsOfSpeech()
+                $this->main()->partsOfSpeech(true)
             );
         }
 
