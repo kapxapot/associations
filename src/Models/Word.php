@@ -14,7 +14,7 @@ use App\Models\DTO\MetaAssociation;
 use App\Models\Interfaces\DictWordInterface;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Semantics\Interfaces\PartOfSpeechableInterface;
-use Plasticode\Collections\Generic\Collection;
+use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Collections\Generic\NumericCollection;
 
 /**
@@ -701,6 +701,7 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     public function aggregatedWordIds(bool $suppressMeta = false): NumericCollection
     {
+        /** @var array|null */
         $ids = $suppressMeta
             ? null
             : $this->getMetaValue(self::META_AGGREGATED_WORDS);
@@ -743,13 +744,34 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
     /**
      * Returns aggregated associations serialized data (if present).
      */
-    public function aggregatedAssociationsData(): ?Collection
+    public function aggregatedAssociationsData(): ?ArrayCollection
     {
+        /** @var array|null */
         $value = $this->getMetaValue(self::META_AGGREGATED_ASSOCIATIONS);
 
         return $value
-            ? Collection::make($value)
+            ? ArrayCollection::make($value)
             : null;
+    }
+
+    public function setMetaAggregatedWords(NumericCollection $aggregatedWordIds): void
+    {
+        $this->setMetaValue(
+            self::META_AGGREGATED_WORDS,
+            $aggregatedWordIds->toArray()
+        );
+    }
+
+    public function setMetaAggregatedAssociations(AggregatedAssociationCollection $associations): void
+    {
+        $this->setMetaValue(
+            Word::META_AGGREGATED_ASSOCIATIONS,
+            $associations
+                ->map(
+                    fn (AggregatedAssociation $aa) => $aa->jsonSerialize()
+                )
+                ->toArray()
+        );
     }
 
     public function toString(): string

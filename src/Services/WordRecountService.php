@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Events\Word\WordCorrectedEvent;
 use App\Events\Word\WordScopeChangedEvent;
 use App\Events\Word\WordSeverityChangedEvent;
+use App\Models\AggregatedAssociation;
 use App\Models\Word;
 use App\Models\WordRelation;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
@@ -215,14 +216,14 @@ class WordRecountService
 
     public function recountMeta(Word $word): Word
     {
-        $word->setMetaValue(
-            Word::META_AGGREGATED_WORDS,
+        $word->setMetaAggregatedWords(
             $word->aggregatedWordIds(true)
         );
 
-        $word->setMetaValue(
-            Word::META_AGGREGATED_ASSOCIATIONS,
-            $this->associationService->getAggregatedAssociationsFor($word, true)
+        $word->setMetaAggregatedAssociations(
+            $this
+                ->associationService
+                ->getAggregatedAssociationsFor($word, true)
         );
 
         $word->setMetaValue(

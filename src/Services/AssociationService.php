@@ -16,7 +16,7 @@ use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Semantics\Interfaces\AssociationAggregatorInterface;
-use Plasticode\Collections\Generic\Collection;
+use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Events\EventDispatcher;
 use Plasticode\Exceptions\InvalidOperationException;
@@ -217,7 +217,7 @@ class AssociationService
     }
 
     public function deserializeAggregatedAssociations(
-        Collection $data
+        ArrayCollection $data
     ): AggregatedAssociationCollection
     {
         $dtos = $data
