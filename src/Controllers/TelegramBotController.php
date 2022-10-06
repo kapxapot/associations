@@ -15,7 +15,7 @@ use App\Models\User;
 use App\Models\Validation\AgeValidation;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Semantics\Definition\DefinitionEntry;
-use App\Semantics\Word\Tokenizer;
+use App\Semantics\Tokenizer;
 use App\Services\GameService;
 use App\Services\LanguageService;
 use App\Services\TelegramUserService;
