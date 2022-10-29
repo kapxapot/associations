@@ -185,6 +185,7 @@ abstract class AbstractAnswerer
     protected function isHelpRulesCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAnySet(
+            ['команды'],
             ['правила'],
             ['правила', 'игры'],
             ['смысл', 'игры'],
@@ -252,6 +253,7 @@ abstract class AbstractAnswerer
             'наигралась',
             'наигрался',
             'окончи',
+            'окончить',
             'останови',
             'остановись',
             'отвали',
