@@ -2,6 +2,8 @@
 
 namespace App\Mapping\Providers;
 
+use App\Config\Config;
+use App\Data\MultilingualSearcher;
 use App\Hydrators\AliceUserHydrator;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;
@@ -181,7 +183,9 @@ class RepositoryProvider extends MappingProvider
             WordRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new WordRepository(
                     $c->get(RepositoryContext::class),
-                    $this->proxy($c, WordHydrator::class)
+                    $this->proxy($c, WordHydrator::class),
+                    $c->get(Config::class),
+                    $c->get(MultilingualSearcher::class)
                 ),
         ];
     }

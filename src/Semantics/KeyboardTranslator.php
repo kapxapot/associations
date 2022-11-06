@@ -2,6 +2,7 @@
 
 namespace App\Semantics;
 
+use App\Models\Language;
 use Webmozart\Assert\Assert;
 
 /**
@@ -19,10 +20,14 @@ class KeyboardTranslator
 
     private array $map = [
         self::EN_RU => [
+            'lang_from' => Language::EN,
+            'lang_to' => Language::RU,
             'from' => 'f,dult`;pbqrkvyjghcnea[wxio]m\'.z',
             'to' => 'абвгдеёжзийклмнопрстуфхцчшщъьэюя'
         ],
         self::RU_EN => [
+            'lang_from' => Language::RU,
+            'lang_to' => Language::EN,
             'from' => 'фисвуапршолдьтщзйкыегмцчня',
             'to' => 'abcdefghijklmnopqrstuvwxyz'
         ]
@@ -52,5 +57,19 @@ class KeyboardTranslator
         }
 
         return $result;
+    }
+
+    /**
+     * Returns a translation direction INTO a provided language if there is any.
+     */
+    public function getTranslationDirection(string $langCode): ?string
+    {
+        foreach ($this->map as $dir => $settings) {
+            if ($settings['lang_to'] === $langCode) {
+                return $dir;
+            }
+        }
+
+        return null;
     }
 }

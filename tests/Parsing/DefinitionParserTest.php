@@ -9,6 +9,7 @@ use App\Models\Word;
 use App\Parsing\DefinitionParser;
 use App\Semantics\Definition\DefinitionAggregate;
 use App\Testing\Factories\LanguageRepositoryFactory;
+use App\Testing\Seeders\LanguageSeeder;
 use PHPUnit\Framework\TestCase;
 use Plasticode\IO\File;
 
@@ -19,7 +20,7 @@ final class DefinitionParserTest extends TestCase
         $factory = new LanguageRepositoryFactory();
         $languageRepository = $factory->make();
 
-        return $languageRepository->get(Language::RUSSIAN);
+        return $languageRepository->get(LanguageSeeder::RUSSIAN);
     }
 
     public function testParseDictionaryApi(): void

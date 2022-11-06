@@ -7,6 +7,7 @@ use App\Models\Word;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\LanguageService;
+use App\Testing\Seeders\LanguageSeeder;
 use App\Tests\WiredTest;
 use App\Validation\Rules\MainWordNotRecursive;
 
@@ -29,7 +30,7 @@ final class MainWordNotRecursiveTest extends WiredTest
         /** @var WordRepositoryInterface $wordRepository */
         $wordRepository = $this->get(WordRepositoryInterface::class);
 
-        $this->language = $languageRepository->get(Language::RUSSIAN);
+        $this->language = $languageRepository->get(LanguageSeeder::RUSSIAN);
 
         $this->word1 = $wordRepository->store(['word' => 'word1']);
         $this->word1->withLanguage($this->language);

@@ -3,6 +3,8 @@
 namespace App\Repositories;
 
 use App\Collections\WordCollection;
+use App\Config\Config;
+use App\Data\MultilingualSearcher;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
@@ -10,6 +12,7 @@ use App\Semantics\Scope;
 use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Data\Query;
 use Plasticode\Interfaces\ArrayableInterface;
+use Plasticode\Repositories\Idiorm\Core\RepositoryContext;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Search\SearchParams;
 
@@ -17,7 +20,26 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 {
     use SearchRepository;
 
+    private Config $config;
+    private MultilingualSearcher $searcher;
+
     protected string $sortField = 'word';
+
+    /**
+     * @param HydratorInterface|ObjectProxy|null $hydrator
+     */
+    public function __construct(
+        RepositoryContext $context,
+        $hydrator,
+        Config $config,
+        MultilingualSearcher $searcher
+    )
+    {
+        parent::__construct($context, $hydrator);
+
+        $this->config = $config;
+        $this->searcher = $searcher;
+    }
 
     protected function entityClass(): string
     {
@@ -218,7 +240,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 
     public function applyFilter(Query $query, string $filter): Query
     {
-        return $query
+        $query = $query
             ->select($this->getTable() . '.*')
             ->join(
                 'users',
@@ -228,12 +250,15 @@ class WordRepository extends LanguageElementRepository implements WordRepository
                     'user.id'
                 ],
                 'user'
-            )
-            ->search(
-                mb_strtolower($filter),
-                '(word like ? or user.login like ? or user.name like ?)',
-                3
             );
+
+        return $this->searcher->search(
+            $this->config->langCode(),
+            $query,
+            mb_strtolower($filter),
+            '(word like ? or user.login like ? or user.name like ?)',
+            3
+        );
     }
 
     // queries

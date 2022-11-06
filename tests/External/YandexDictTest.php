@@ -24,7 +24,7 @@ final class YandexDictTest extends IntegrationTest
             new LanguageSeeder()
         );
 
-        $this->language = $this->languageRepository->get(Language::RUSSIAN);
+        $this->language = $this->languageRepository->get(LanguageSeeder::RUSSIAN);
 
         $this->dict = new YandexDict(
             new SettingsProvider($this->settings)

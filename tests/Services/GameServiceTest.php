@@ -3,7 +3,6 @@
 namespace App\Tests\Services;
 
 use App\Collections\WordCollection;
-use App\Models\Language;
 use App\Models\Word;
 use App\Policies\UserPolicy;
 use App\Repositories\Interfaces\GameRepositoryInterface;
@@ -12,6 +11,7 @@ use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\GameService;
+use App\Testing\Seeders\LanguageSeeder;
 use App\Tests\WiredTest;
 
 final class GameServiceTest extends WiredTest
@@ -42,7 +42,7 @@ final class GameServiceTest extends WiredTest
 
         // meat
 
-        $language = $languageRepository->get(Language::RUSSIAN);
+        $language = $languageRepository->get(LanguageSeeder::RUSSIAN);
 
         $user = $userRepository->get(1);
 

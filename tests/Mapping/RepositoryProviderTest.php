@@ -3,6 +3,7 @@
 namespace App\Tests\Mapping;
 
 use App\Auth\Interfaces\AuthInterface;
+use App\Config\Config;
 use App\Core\Interfaces\LinkerInterface;
 use App\Hydrators\AliceUserHydrator;
 use App\Hydrators\AssociationFeedbackHydrator;
@@ -82,6 +83,7 @@ final class RepositoryProviderTest extends AbstractProviderTest
             Access::class,
             AuthCore\AuthInterface::class,
             AuthInterface::class,
+            Config::class,
             Core\CacheInterface::class,
             DbMetadata::class,
             Core\LinkerInterface::class,
