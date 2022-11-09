@@ -5,13 +5,13 @@ namespace App\Repositories;
 use App\Collections\AssociationFeedbackCollection;
 use App\Models\Association;
 use App\Models\AssociationFeedback;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use Plasticode\Data\Query;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 
-class AssociationFeedbackRepository extends IdiormRepository implements AssociationFeedbackRepositoryInterface, FilteringRepositoryInterface
+class AssociationFeedbackRepository extends Repository implements AssociationFeedbackRepositoryInterface, FilteringRepositoryInterface
 {
     use SearchRepository;
 

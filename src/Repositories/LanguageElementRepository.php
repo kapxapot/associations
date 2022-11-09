@@ -6,6 +6,7 @@ use App\Collections\LanguageElementCollection;
 use App\Models\Language;
 use App\Models\LanguageElement;
 use App\Models\User;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\LanguageElementRepositoryInterface;
 use App\Repositories\Traits\CollectingRepository;
 use App\Repositories\Traits\WithLanguageRepository;
@@ -14,11 +15,10 @@ use App\Semantics\Severity;
 use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Data\Query;
 use Plasticode\Interfaces\ArrayableInterface;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
 use Plasticode\Traits\Convert\ToBit;
 
-abstract class LanguageElementRepository extends IdiormRepository implements LanguageElementRepositoryInterface
+abstract class LanguageElementRepository extends Repository implements LanguageElementRepositoryInterface
 {
     use CollectingRepository;
     use CreatedRepository;

@@ -26,6 +26,7 @@ use App\Repositories\AliceUserRepository;
 use App\Repositories\AssociationFeedbackRepository;
 use App\Repositories\AssociationOverrideRepository;
 use App\Repositories\AssociationRepository;
+use App\Repositories\Core\RepositoryContext;
 use App\Repositories\DefinitionRepository;
 use App\Repositories\GameRepository;
 use App\Repositories\Interfaces\AliceUserRepositoryInterface;
@@ -61,7 +62,7 @@ use App\Repositories\WordRelationTypeRepository;
 use App\Repositories\WordRepository;
 use App\Repositories\YandexDictWordRepository;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
-use Plasticode\Repositories\Idiorm\Core\RepositoryContext;
+use Plasticode\Repositories\Idiorm\Core as Core;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
 use Psr\Container\ContainerInterface;
 
@@ -70,6 +71,8 @@ class RepositoryProvider extends MappingProvider
     public function getMappings(): array
     {
         return [
+            Core\RepositoryContext::class => RepositoryContext::class,
+
             AliceUserRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new AliceUserRepository(
                     $c->get(RepositoryContext::class),
@@ -183,9 +186,7 @@ class RepositoryProvider extends MappingProvider
             WordRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new WordRepository(
                     $c->get(RepositoryContext::class),
-                    $this->proxy($c, WordHydrator::class),
-                    $c->get(Config::class),
-                    $c->get(MultilingualSearcher::class)
+                    $this->proxy($c, WordHydrator::class)
                 ),
         ];
     }

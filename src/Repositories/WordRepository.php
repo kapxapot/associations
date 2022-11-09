@@ -20,26 +20,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
 {
     use SearchRepository;
 
-    private Config $config;
-    private MultilingualSearcher $searcher;
-
     protected string $sortField = 'word';
-
-    /**
-     * @param HydratorInterface|ObjectProxy|null $hydrator
-     */
-    public function __construct(
-        RepositoryContext $context,
-        $hydrator,
-        Config $config,
-        MultilingualSearcher $searcher
-    )
-    {
-        parent::__construct($context, $hydrator);
-
-        $this->config = $config;
-        $this->searcher = $searcher;
-    }
 
     protected function entityClass(): string
     {
@@ -153,10 +134,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
             ->count();
     }
 
-    public function getAllOutOfDate(
-        int $ttlMin,
-        int $limit = 0
-    ): WordCollection
+    public function getAllOutOfDate(int $ttlMin, int $limit = 0): WordCollection
     {
         return parent::getAllOutOfDate($ttlMin, $limit);
     }
@@ -252,10 +230,9 @@ class WordRepository extends LanguageElementRepository implements WordRepository
                 'user'
             );
 
-        return $this->searcher->search(
-            $this->config->langCode(),
+        return $this->search(
             $query,
-            mb_strtolower($filter),
+            $filter,
             '(word like ? or user.login like ? or user.name like ?)',
             3
         );
