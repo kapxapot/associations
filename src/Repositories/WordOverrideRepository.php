@@ -5,16 +5,16 @@ namespace App\Repositories;
 use App\Collections\WordOverrideCollection;
 use App\Models\Word;
 use App\Models\WordOverride;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Data\Query;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 use Plasticode\Util\SortStep;
 
-class WordOverrideRepository extends IdiormRepository implements FilteringRepositoryInterface, WordOverrideRepositoryInterface
+class WordOverrideRepository extends Repository implements FilteringRepositoryInterface, WordOverrideRepositoryInterface
 {
     use CreatedRepository;
     use SearchRepository;
@@ -63,7 +63,7 @@ class WordOverrideRepository extends IdiormRepository implements FilteringReposi
 
     public function applyFilter(Query $query, string $filter): Query
     {
-        return $query
+        $query = $query
             ->select($this->getTable() . '.*')
             ->join(
                 'words',
@@ -82,11 +82,13 @@ class WordOverrideRepository extends IdiormRepository implements FilteringReposi
                     'user.id'
                 ],
                 'user'
-            )
-            ->search(
-                mb_strtolower($filter),
-                '(word_correction like ? or word.original_word like ? or user.login like ? or user.name like ?)',
-                4
             );
+
+        return $this->search(
+            $query,
+            $filter,
+            '(word_correction like ? or word.original_word like ? or user.login like ? or user.name like ?)',
+            4
+        );
     }
 }

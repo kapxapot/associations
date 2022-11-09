@@ -6,6 +6,9 @@ use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Repositories\Idiorm\UserRepository as BaseUserRepository;
 
+/**
+ * Note: this repo does not extend the local base Repository.
+ */
 class UserRepository extends BaseUserRepository implements UserRepositoryInterface
 {
     protected function entityClass(): string

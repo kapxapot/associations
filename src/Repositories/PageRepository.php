@@ -9,6 +9,9 @@ use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Generic\NewsSourceRepository;
 use Plasticode\Repositories\Idiorm\Traits\ChildrenRepository;
 
+/**
+ * Note: this repo does not extend the local base Repository.
+ */
 class PageRepository extends NewsSourceRepository implements PageRepositoryInterface
 {
     use ChildrenRepository;

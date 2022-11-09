@@ -6,14 +6,14 @@ use App\Collections\GameCollection;
 use App\Models\Game;
 use App\Models\Language;
 use App\Models\User;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
 use App\Repositories\Traits\WithUserRepository;
 use Plasticode\Data\Query;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 
-class GameRepository extends IdiormRepository implements GameRepositoryInterface
+class GameRepository extends Repository implements GameRepositoryInterface
 {
     use SearchRepository;
     use WithLanguageRepository;
@@ -67,7 +67,7 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
 
     public function applyFilter(Query $query, string $filter): Query
     {
-        return $query
+        $query = $query
             ->select($this->getTable() . '.*')
             ->join(
                 'users',
@@ -77,12 +77,14 @@ class GameRepository extends IdiormRepository implements GameRepositoryInterface
                     'user.id'
                 ],
                 'user'
-            )
-            ->search(
-                mb_strtolower($filter),
-                '(user.login like ? or user.name like ?)',
-                2
             );
+
+        return $this->search(
+            $query,
+            $filter,
+            '(user.login like ? or user.name like ?)',
+            2
+        );
     }
 
     // queries

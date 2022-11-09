@@ -4,10 +4,10 @@ namespace App\Repositories;
 
 use App\Models\AliceUser;
 use App\Models\User;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\AliceUserRepositoryInterface;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
-class AliceUserRepository extends IdiormRepository implements AliceUserRepositoryInterface
+class AliceUserRepository extends Repository implements AliceUserRepositoryInterface
 {
     protected function entityClass(): string
     {

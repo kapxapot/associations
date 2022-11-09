@@ -4,11 +4,11 @@ namespace App\Repositories;
 
 use App\Models\Definition;
 use App\Models\Word;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Traits\WithWordRepository;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
-class DefinitionRepository extends IdiormRepository implements DefinitionRepositoryInterface
+class DefinitionRepository extends Repository implements DefinitionRepositoryInterface
 {
     use WithWordRepository;
 

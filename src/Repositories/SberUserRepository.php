@@ -4,10 +4,10 @@ namespace App\Repositories;
 
 use App\Models\SberUser;
 use App\Models\User;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\SberUserRepositoryInterface;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
-class SberUserRepository extends IdiormRepository implements SberUserRepositoryInterface
+class SberUserRepository extends Repository implements SberUserRepositoryInterface
 {
     protected function entityClass(): string
     {

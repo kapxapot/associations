@@ -3,8 +3,6 @@
 namespace App\Repositories;
 
 use App\Collections\WordCollection;
-use App\Config\Config;
-use App\Data\MultilingualSearcher;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\WordRepositoryInterface;
@@ -12,7 +10,6 @@ use App\Semantics\Scope;
 use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Data\Query;
 use Plasticode\Interfaces\ArrayableInterface;
-use Plasticode\Repositories\Idiorm\Core\RepositoryContext;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Search\SearchParams;
 

@@ -5,13 +5,13 @@ namespace App\Repositories;
 use App\Collections\WordFeedbackCollection;
 use App\Models\Word;
 use App\Models\WordFeedback;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Data\Query;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 
-class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRepositoryInterface
+class WordFeedbackRepository extends Repository implements WordFeedbackRepositoryInterface
 {
     use SearchRepository;
     use WithWordRepository;
@@ -47,7 +47,7 @@ class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRep
 
     public function applyFilter(Query $query, string $filter): Query
     {
-        return $query
+        $query = $query
             ->select($this->getTable() . '.*')
             ->join(
                 'words',
@@ -75,11 +75,13 @@ class WordFeedbackRepository extends IdiormRepository implements WordFeedbackRep
                     'user.id'
                 ],
                 'user'
-            )
-            ->search(
-                mb_strtolower($filter),
-                '(w.word_bin like ? or (duplicate.id is not null and duplicate.word_bin like ?) or typo like ? or user.login like ? or user.name like ?)',
-                5
             );
+
+        return $this->search(
+            $query,
+            $filter,
+            '(w.word_bin like ? or (duplicate.id is not null and duplicate.word_bin like ?) or typo like ? or user.login like ? or user.name like ?)',
+            5
+        );
     }
 }

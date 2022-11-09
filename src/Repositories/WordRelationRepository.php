@@ -6,15 +6,15 @@ use App\Collections\WordRelationCollection;
 use App\Models\Word;
 use App\Models\WordRelation;
 use App\Models\WordRelationType;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\WordRelationRepositoryInterface;
 use App\Repositories\Traits\WithWordRepository;
 use Plasticode\Data\Query;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Util\SortStep;
 
-class WordRelationRepository extends IdiormRepository implements WordRelationRepositoryInterface
+class WordRelationRepository extends Repository implements WordRelationRepositoryInterface
 {
     use CreatedRepository;
     use SearchRepository;
@@ -79,7 +79,7 @@ class WordRelationRepository extends IdiormRepository implements WordRelationRep
 
     public function applyFilter(Query $query, string $filter): Query
     {
-        return $query
+        $query = $query
             ->select($this->getTable() . '.*')
             ->join(
                 'word_relation_types',
@@ -116,11 +116,13 @@ class WordRelationRepository extends IdiormRepository implements WordRelationRep
                     'user.id'
                 ],
                 'user'
-            )
-            ->search(
-                mb_strtolower($filter),
-                '(type.tag like ? or word.word_bin like ? or main_word.word_bin like ? or user.login like ? or user.name like ?)',
-                5
             );
+
+        return $this->search(
+            $query,
+            $filter,
+            '(type.tag like ? or word.word_bin like ? or main_word.word_bin like ? or user.login like ? or user.name like ?)',
+            5
+        );
     }
 }

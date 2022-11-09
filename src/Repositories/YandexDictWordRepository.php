@@ -7,13 +7,13 @@ use App\Models\Interfaces\DictWordInterface;
 use App\Models\Language;
 use App\Models\Word;
 use App\Models\YandexDictWord;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\YandexDictWordRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
 use App\Repositories\Traits\WithWordRepository;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Webmozart\Assert\Assert;
 
-class YandexDictWordRepository extends IdiormRepository implements YandexDictWordRepositoryInterface
+class YandexDictWordRepository extends Repository implements YandexDictWordRepositoryInterface
 {
     use WithLanguageRepository;
     use WithWordRepository;

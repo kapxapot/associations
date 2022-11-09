@@ -5,14 +5,14 @@ namespace App\Repositories;
 use App\Collections\AssociationOverrideCollection;
 use App\Models\Association;
 use App\Models\AssociationOverride;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\AssociationOverrideRepositoryInterface;
 use Plasticode\Data\Query;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
 use Plasticode\Repositories\Idiorm\Traits\SearchRepository;
 use Plasticode\Util\SortStep;
 
-class AssociationOverrideRepository extends IdiormRepository implements AssociationOverrideRepositoryInterface
+class AssociationOverrideRepository extends Repository implements AssociationOverrideRepositoryInterface
 {
     use CreatedRepository;
     use SearchRepository;
@@ -60,7 +60,7 @@ class AssociationOverrideRepository extends IdiormRepository implements Associat
 
     public function applyFilter(Query $query, string $filter): Query
     {
-        return $query
+        $query = $query
             ->select($this->getTable() . '.*')
             ->join(
                 'associations',
@@ -97,12 +97,14 @@ class AssociationOverrideRepository extends IdiormRepository implements Associat
                     'user.id'
                 ],
                 'user'
-            )
-            ->search(
-                mb_strtolower($filter),
-                '(first_word.word_bin like ? or second_word.word_bin like ? or user.login like ? or user.name like ?)',
-                4
             );
+
+        return $this->search(
+            $query,
+            $filter,
+            '(first_word.word_bin like ? or second_word.word_bin like ? or user.login like ? or user.name like ?)',
+            4
+        );
     }
 
     // queries

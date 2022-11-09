@@ -4,10 +4,10 @@ namespace App\Repositories;
 
 use App\Collections\WordRelationTypeCollection;
 use App\Models\WordRelationType;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
-class WordRelationTypeRepository extends IdiormRepository implements WordRelationTypeRepositoryInterface
+class WordRelationTypeRepository extends Repository implements WordRelationTypeRepositoryInterface
 {
     protected function entityClass(): string
     {

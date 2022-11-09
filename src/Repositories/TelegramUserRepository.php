@@ -4,10 +4,10 @@ namespace App\Repositories;
 
 use App\Models\TelegramUser;
 use App\Models\User;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
-class TelegramUserRepository extends IdiormRepository implements TelegramUserRepositoryInterface
+class TelegramUserRepository extends Repository implements TelegramUserRepositoryInterface
 {
     protected function entityClass(): string
     {

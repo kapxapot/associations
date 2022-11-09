@@ -50,7 +50,7 @@ class AssociationFeedbackRepository extends Repository implements AssociationFee
 
     public function applyFilter(Query $query, string $filter): Query
     {
-        return $query
+        $query = $query
             ->select($this->getTable() . '.*')
             ->join(
                 'associations',
@@ -87,11 +87,13 @@ class AssociationFeedbackRepository extends Repository implements AssociationFee
                     'user.id'
                 ],
                 'user'
-            )
-            ->search(
-                mb_strtolower($filter),
-                '(first_word.word_bin like ? or second_word.word_bin like ? or user.login like ? or user.name like ?)',
-                4
             );
+
+        return $this->search(
+            $query,
+            $filter,
+            '(first_word.word_bin like ? or second_word.word_bin like ? or user.login like ? or user.name like ?)',
+            4
+        );
     }
 }

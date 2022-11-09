@@ -7,6 +7,9 @@ use App\Models\News;
 use App\Repositories\Interfaces\NewsRepositoryInterface;
 use Plasticode\Repositories\Idiorm\Generic\NewsSourceRepository;
 
+/**
+ * Note: this repo does not extend the local base Repository.
+ */
 class NewsRepository extends NewsSourceRepository implements NewsRepositoryInterface
 {
     protected function entityClass(): string

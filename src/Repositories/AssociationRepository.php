@@ -8,7 +8,6 @@ use App\Models\Association;
 use App\Models\Language;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
-use Exception;
 use Plasticode\Collections\Generic\NumericCollection;
 use Plasticode\Data\Query;
 use Plasticode\Interfaces\ArrayableInterface;
@@ -112,7 +111,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
 
     public function applyFilter(Query $query, string $filter): Query
     {
-        return $query
+        $query = $query
             ->select($this->getTable() . '.*')
             ->join(
                 'words',
@@ -140,11 +139,13 @@ class AssociationRepository extends LanguageElementRepository implements Associa
                     'user.id'
                 ],
                 'user'
-            )
-            ->search(
-                mb_strtolower($filter),
-                '(first_word.word_bin like ? or second_word.word_bin like ? or user.login like ? or user.name like ?)',
-                4
             );
+
+        return $this->search(
+            $query,
+            $filter,
+            '(first_word.word_bin like ? or second_word.word_bin like ? or user.login like ? or user.name like ?)',
+            4
+        );
     }
 }

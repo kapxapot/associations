@@ -3,10 +3,10 @@
 namespace App\Repositories;
 
 use App\Models\Language;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
-class LanguageRepository extends IdiormRepository implements LanguageRepositoryInterface
+class LanguageRepository extends Repository implements LanguageRepositoryInterface
 {
     protected function entityClass(): string
     {

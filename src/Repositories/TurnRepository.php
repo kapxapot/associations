@@ -9,13 +9,13 @@ use App\Models\Language;
 use App\Models\Turn;
 use App\Models\User;
 use App\Models\Word;
+use App\Repositories\Generic\Repository;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
 use App\Repositories\Traits\WithLanguageRepository;
 use App\Repositories\Traits\WithUserRepository;
 use App\Repositories\Traits\WithWordRepository;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
-class TurnRepository extends IdiormRepository implements TurnRepositoryInterface
+class TurnRepository extends Repository implements TurnRepositoryInterface
 {
     use WithLanguageRepository;
     use WithUserRepository;
