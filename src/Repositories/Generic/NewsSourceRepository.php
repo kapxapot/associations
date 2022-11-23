@@ -6,9 +6,10 @@ use App\Repositories\Core\RepositoryContext;
 use App\Repositories\Traits\MultilingualSearchRepository;
 use Plasticode\Hydrators\Interfaces\HydratorInterface;
 use Plasticode\ObjectProxy;
-use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
+use Plasticode\Repositories\Idiorm\Generic\NewsSourceRepository as BaseNewsSourceRepository;
+use Plasticode\Repositories\Interfaces\TagRepositoryInterface;
 
-abstract class Repository extends IdiormRepository
+abstract class NewsSourceRepository extends BaseNewsSourceRepository
 {
     use MultilingualSearchRepository;
 
@@ -17,10 +18,11 @@ abstract class Repository extends IdiormRepository
      */
     public function __construct(
         RepositoryContext $context,
+        TagRepositoryInterface $tagRepository,
         $hydrator = null
     )
     {
-        parent::__construct($context, $hydrator);
+        parent::__construct($context, $tagRepository, $hydrator);
 
         $this->init($context);
     }

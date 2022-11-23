@@ -227,7 +227,7 @@ class WordRepository extends LanguageElementRepository implements WordRepository
                 'user'
             );
 
-        return $this->search(
+        return $this->multiSearch(
             $query,
             $filter,
             '(word like ? or user.login like ? or user.name like ?)',

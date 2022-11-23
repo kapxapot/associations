@@ -398,34 +398,30 @@ users:
 
     login:
       name: Логин
-      attributes: [hidden]
+      attributes: [hidden, nullable]
       template: >
         row.login + (row.name ? ' (' + row.name + ')' : '')
 
     name:
-      name: Отображаемое имя
-      attributes: [nullable, hidden]
+      name: Имя
+      attributes: [nullable]
+      template: row.display_name
       tooltip: По умолчанию совпадает с логином.
 
-    display_name:
-      name: Имя
-      attributes: [readonly]
-      template: row.display_name
+    type:
+      name: Тип
+      attributes: [readonly, no_sort]
+      template: >
+        (row.is_telegram ? 'Telegram' : '') + (row.is_alice ? 'Alice' : '') + (row.is_sber ? 'Sber' : '')
 
     email:
       name: E-mail
       type: email
-      attributes: [hidden]
-
-    email_or_telegram:
-      name: E-mail / Telegram
-      attributes: [readonly]
-      template: >
-        (row.telegram ? row.telegram + ' <i class="fab fa-telegram-plane telegram-color" title="Telegram" data-toggle="tooltip"></i>' : row.email)
+      attributes: [hidden, nullable]
 
     gender:
       name: Пол
-      attributes: [readonly]
+      attributes: [readonly, no_sort]
       template: >
         (row.gender ? (row.gender == 1 ? 'М' : 'Ж') : '')
 

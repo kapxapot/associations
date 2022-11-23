@@ -7,5 +7,5 @@ use Plasticode\Auth\Interfaces\AuthInterface as BaseAuthInterface;
 
 interface AuthInterface extends BaseAuthInterface
 {
-    function getUser() : ?User;
+    public function getUser() : ?User;
 }

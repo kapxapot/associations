@@ -41,14 +41,6 @@ class User extends UserBase implements GenderedInterface
         ];
     }
 
-    public function serialize(): array
-    {
-        return [
-            'id' => $this->getId(),
-            'name' => $this->displayName(),
-        ];
-    }
-
     public function hasAge(): bool
     {
         return $this->age > 0;
@@ -122,5 +114,34 @@ class User extends UserBase implements GenderedInterface
         return $this->isTelegramUser()
             ? $this->telegramUser()->gender()
             : null;
+    }
+
+    // serialization
+
+    public function serialize(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'login' => $this->login,
+            'name' => $this->name,
+            'email' => $this->email,
+            'gender' => $this->gender(),
+            'age' => $this->age,
+            'role_id' => $this->roleId,
+            'created_at' => $this->createdAtIso(),
+            'updated_at' => $this->updatedAtIso(),
+            'display_name' => $this->displayName(),
+            'is_telegram' => $this->isTelegramUser(),
+            'is_alice' => $this->isAliceUser(),
+            'is_sber' => $this->isSberUser(),
+        ];
+    }
+
+    public function serializePublic(): array
+    {
+        return [
+            'id' => $this->getId(),
+            'name' => $this->displayName(),
+        ];
     }
 }

@@ -141,7 +141,7 @@ class AssociationRepository extends LanguageElementRepository implements Associa
                 'user'
             );
 
-        return $this->search(
+        return $this->multiSearch(
             $query,
             $filter,
             '(first_word.word_bin like ? or second_word.word_bin like ? or user.login like ? or user.name like ?)',

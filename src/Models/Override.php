@@ -65,7 +65,7 @@ abstract class Override extends DbModel implements CreatedInterface
             'severity_name' => $this->severity !== null
                 ? Severity::getName(intval($this->severity))
                 : null,
-            'creator' => $this->creator()->serialize(),
+            'creator' => $this->creator()->serializePublic(),
             'created_at' => $this->createdAtIso(),
         ];
     }

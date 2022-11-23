@@ -43,4 +43,11 @@ class AggregatedAssociationCollection extends AssociationCollection
                 fn (Association $a) => $a->hasWord($word)
             );
     }
+
+    public function sortByOtherThanAnchor(): self
+    {
+        return $this->ascStr(
+            fn (AggregatedAssociation $aa) => $aa->otherThanAnchor()->word
+        );
+    }
 }

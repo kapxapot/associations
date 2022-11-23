@@ -84,7 +84,7 @@ class WordOverrideRepository extends Repository implements FilteringRepositoryIn
                 'user'
             );
 
-        return $this->search(
+        return $this->multiSearch(
             $query,
             $filter,
             '(word_correction like ? or word.original_word like ? or user.login like ? or user.name like ?)',

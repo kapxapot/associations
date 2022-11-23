@@ -182,26 +182,17 @@ class Word extends LanguageElement implements PartOfSpeechableInterface
 
     public function approvedAssociations(): AssociationCollection
     {
-        return $this
-            ->associations()
-            ->fuzzyPublic()
-            ->sortByOtherThan($this);
+        return $this->associations()->fuzzyPublic();
     }
 
     public function notApprovedAssociations(): AssociationCollection
     {
-        return $this
-            ->associations()
-            ->private()
-            ->sortByOtherThan($this);
+        return $this->associations()->private();
     }
 
     public function disabledAssociations(): AssociationCollection
     {
-        return $this
-            ->associations()
-            ->fuzzyDisabled()
-            ->sortByOtherThan($this);
+        return $this->associations()->fuzzyDisabled();
     }
 
     /**

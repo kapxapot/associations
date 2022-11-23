@@ -77,7 +77,7 @@ class WordFeedbackRepository extends Repository implements WordFeedbackRepositor
                 'user'
             );
 
-        return $this->search(
+        return $this->multiSearch(
             $query,
             $filter,
             '(w.word_bin like ? or (duplicate.id is not null and duplicate.word_bin like ?) or typo like ? or user.login like ? or user.name like ?)',

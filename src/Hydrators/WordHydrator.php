@@ -3,10 +3,7 @@
 namespace App\Hydrators;
 
 use App\Auth\Interfaces\AuthInterface;
-use App\Collections\AssociationCollection;
 use App\Core\Interfaces\LinkerInterface;
-use App\Models\AggregatedAssociation;
-use App\Models\Association;
 use App\Models\Word;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
@@ -84,10 +81,11 @@ class WordHydrator extends Hydrator
                     function () use ($entity) {
                         $aggregatedAssociations = $this
                             ->associationService
-                            ->getAggregatedAssociationsFor($entity);
+                            ->getAggregatedAssociationsFor($entity)
+                            ->sortByOtherThanAnchor();
 
-                        // init associations so the are not loaded again
-                        // this will word only if the aggregated associations
+                        // init associations so they are not loaded again
+                        // this will work only if the aggregated associations
                         // are loaded first
                         $entity->withAssociations(
                             $aggregatedAssociations->distillByWord($entity)
@@ -99,7 +97,10 @@ class WordHydrator extends Hydrator
             )
             ->withAssociations(
                 $this->frozen(
-                    fn () => $this->associationRepository->getAllByWord($entity)
+                    fn () => $this
+                        ->associationRepository
+                        ->getAllByWord($entity)
+                        ->sortByOtherThan($entity)
                 )
             )
             ->withDefinition(

@@ -66,7 +66,7 @@ class WordRelation extends DbModel implements CreatedInterface, UpdatedAtInterfa
             'main_word' => $this->mainWord()->serialize(),
             'type' => $this->type()->serialize(),
             'primary' => $this->primary,
-            'creator' => $this->creator()->serialize(),
+            'creator' => $this->creator()->serializePublic(),
             'created_at' => $this->createdAtIso(),
         ];
     }

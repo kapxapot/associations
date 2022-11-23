@@ -10,6 +10,8 @@ use Plasticode\Models\Validation\UserValidation;
 
 class UserGenerator extends BaseUserGenerator
 {
+    private UserRepositoryInterface $userRepository;
+
     public function __construct(
         GeneratorContext $context,
         UserRepositoryInterface $userRepository,
@@ -21,6 +23,8 @@ class UserGenerator extends BaseUserGenerator
             $userRepository,
             $userValidation
         );
+
+        $this->userRepository = $userRepository;
     }
 
     protected function entityClass(): string
@@ -30,27 +34,6 @@ class UserGenerator extends BaseUserGenerator
 
     public function getRepository(): UserRepositoryInterface
     {
-        return parent::getRepository();
-    }
-
-    public function afterLoad(array $item): array
-    {
-        $item = parent::afterLoad($item);
-
-        $id = $item[$this->idField()];
-
-        $user = $this->getRepository()->get($id);
-
-        $item['display_name'] = $user->isTelegramUser()
-            ? $user->telegramUser()->fullName()
-            : $user->displayName();
-
-        $item['telegram'] = $user->isTelegramUser()
-            ? $user->telegramUser()->publicName()
-            : null;
-
-        $item['gender'] = $user->gender();
-
-        return $item;
+        return $this->userRepository;
     }
 }

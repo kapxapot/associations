@@ -56,7 +56,7 @@ class WordFeedback extends Feedback
             'mature' => $this->mature,
             'typo' => $this->typo,
             'duplicate' => $this->duplicate() ? $this->duplicate()->serialize() : null,
-            'creator' => $this->creator()->serialize(),
+            'creator' => $this->creator()->serializePublic(),
             'created_at' => $this->createdAtIso(),
         ];
     }

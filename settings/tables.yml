@@ -76,6 +76,7 @@ roles:
 
 users:
   api: full
+  server_side: true
   name_field: login
   sort: created_at
   reverse: true

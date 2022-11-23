@@ -24,7 +24,7 @@ class AssociationFeedback extends Feedback
             'association' => $this->association()->serialize(),
             'dislike' => $this->dislike,
             'mature' => $this->mature,
-            'creator' => $this->creator()->serialize(),
+            'creator' => $this->creator()->serializePublic(),
             'created_at' => $this->createdAtIso(),
         ];
     }

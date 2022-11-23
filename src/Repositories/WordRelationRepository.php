@@ -118,7 +118,7 @@ class WordRelationRepository extends Repository implements WordRelationRepositor
                 'user'
             );
 
-        return $this->search(
+        return $this->multiSearch(
             $query,
             $filter,
             '(type.tag like ? or word.word_bin like ? or main_word.word_bin like ? or user.login like ? or user.name like ?)',

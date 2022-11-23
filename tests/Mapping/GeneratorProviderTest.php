@@ -22,9 +22,11 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordOverrideRepositoryInterface;
 use App\Repositories\Interfaces\WordRelationTypeRepositoryInterface;
+use Plasticode\Auth\Interfaces\AuthInterface;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Core\Interfaces\TranslatorInterface;
 use Plasticode\Data\Interfaces\ApiInterface;
+use Plasticode\Generators\Core\GeneratorContext;
 use Plasticode\Middleware\Factories\AccessMiddlewareFactory;
 use Plasticode\Repositories\Interfaces as CoreRepositories;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
@@ -39,6 +41,7 @@ final class GeneratorProviderTest extends AbstractProviderTest
         return [
             AccessMiddlewareFactory::class,
             ApiInterface::class,
+            AuthInterface::class,
             RouterInterface::class,
             SettingsProviderInterface::class,
             TranslatorInterface::class,
@@ -62,6 +65,7 @@ final class GeneratorProviderTest extends AbstractProviderTest
 
     public function testWiring(): void
     {
+        $this->check(GeneratorContext::class);
         $this->check(AssociationFeedbackGenerator::class);
         $this->check(AssociationOverrideGenerator::class);
         $this->check(GameGenerator::class);

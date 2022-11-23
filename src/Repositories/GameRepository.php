@@ -79,7 +79,7 @@ class GameRepository extends Repository implements GameRepositoryInterface
                 'user'
             );
 
-        return $this->search(
+        return $this->multiSearch(
             $query,
             $filter,
             '(user.login like ? or user.name like ?)',

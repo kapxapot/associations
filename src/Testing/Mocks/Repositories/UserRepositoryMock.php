@@ -6,6 +6,8 @@ use App\Collections\UserCollection;
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Plasticode\Models\User as BaseUser;
+use Plasticode\Search\SearchParams;
+use Plasticode\Search\SearchResult;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
@@ -74,5 +76,15 @@ class UserRepositoryMock extends RepositoryMock implements UserRepositoryInterfa
             ->where($field, $value)
             ->whereNotIn('id', [$exceptId])
             ->count() == 0;
+    }
+
+    public function getSearchResult(SearchParams $searchParams): SearchResult
+    {
+        // placeholder
+        return new SearchResult(
+            $this->users,
+            $this->users->count(),
+            $this->users->count()
+        );
     }
 }

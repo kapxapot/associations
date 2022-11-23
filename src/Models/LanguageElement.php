@@ -277,7 +277,7 @@ abstract class LanguageElement extends DbModel implements CreatedInterface, Link
             'disabled' => $this->isDisabled(),
             'url' => $this->url(),
             'language' => $this->language()->serialize(),
-            'creator' => $this->creator()->serialize(),
+            'creator' => $this->creator()->serializePublic(),
             'created_at' => $this->createdAtIso(),
             'updated_at' => $this->updatedAtIso(),
         ];

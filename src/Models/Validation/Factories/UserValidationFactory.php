@@ -15,8 +15,10 @@ class UserValidationFactory
         UserRepositoryInterface $userRepository
     ): UserValidation
     {
-        $userValidation = new UserValidation($validationRules, $userRepository);
-
-        return $userValidation->extendWith($ageValidation);
+        return (new UserValidation($validationRules, $userRepository))
+            ->withOptionalLogin()
+            ->withOptionalEmail()
+            ->withOptionalPassword()
+            ->extendWith($ageValidation);
     }
 }
