@@ -139,7 +139,7 @@ games:
 
     user_name:
       name: Игрок
-      template: row.user.name
+      template: row.user.display_name
       attributes: [readonly, no_sort, searchable]
 
     created_at:
