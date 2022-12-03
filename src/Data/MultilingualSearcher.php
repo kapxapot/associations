@@ -53,7 +53,7 @@ class MultilingualSearcher
         }
 
         // do multilanguage search
-        $combinedWhere = $where . ' or ' . $where;
+        $combinedWhere = sprintf('(%s or %s)', $where, $where);
 
         $words = Strings::toWords($searchStr);
 
