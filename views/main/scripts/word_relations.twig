@@ -35,7 +35,7 @@ $scope.relationData = {
                 main_word_id: {{ relation.mainWordId }},
                 main_word: "{{ relation.mainWord.word|e('js') }}",
                 primary: {{ relation.isPrimary ? 'true' : 'false' }},
-                updated_at: "{{ relation.updatedAt }}",
+                updated_at: "{{ relation.updatedAtIso }}",
                 state: {
                     editing: false,
                     saving: false,
@@ -57,7 +57,11 @@ $scope.updateRelation = r => {
     }
 };
 
-$scope.relationData.relations.forEach(r => $scope.updateRelation(r));
+$scope.updateRelations = () => {
+    $scope.relationData.relations.forEach(r => $scope.updateRelation(r));
+};
+
+$scope.updateRelations();
 
 $scope.relationsChanged = false;
 $scope.newRelation = null;
@@ -220,6 +224,8 @@ $scope.reloadRelations = () => {
 
                 return datum;
             });
+
+            $scope.updateRelations();
 
             $scope.modalLoading = false;
         }, function(response) {

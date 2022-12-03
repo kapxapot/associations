@@ -149,6 +149,9 @@ class WordRelationGenerator extends ChangingEntityGenerator
             $item['main_word'] = $relation->mainWord()->word;
         }
 
+        $item['created_at'] = $relation->createdAtIso();
+        $item['updated_at'] = $relation->updatedAtIso();
+
         return $item;
     }
 
