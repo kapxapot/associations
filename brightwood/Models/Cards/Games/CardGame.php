@@ -56,14 +56,14 @@ abstract class CardGame implements SerializableInterface
             ->withPlayers($players);
     }
 
-    public function deck() : Deck
+    public function deck(): Deck
     {
         Assert::notNull($this->deck);
 
         return $this->deck;
     }
 
-    protected function hasDeck() : bool
+    protected function hasDeck(): bool
     {
         return $this->deck !== null;
     }
@@ -71,14 +71,14 @@ abstract class CardGame implements SerializableInterface
     /**
      * @return $this
      */
-    public function withDeck(?Deck $deck) : self
+    public function withDeck(?Deck $deck): self
     {
         $this->deck = $deck;
 
         return $this;
     }
 
-    public function discard() : Pile
+    public function discard(): Pile
     {
         return $this->discard;
     }
@@ -86,14 +86,14 @@ abstract class CardGame implements SerializableInterface
     /**
      * @return $this
      */
-    public function withDiscard(Pile $discard) : self
+    public function withDiscard(Pile $discard): self
     {
         $this->discard = $discard;
 
         return $this;
     }
 
-    public function trash() : Pile
+    public function trash(): Pile
     {
         return $this->trash;
     }
@@ -101,14 +101,14 @@ abstract class CardGame implements SerializableInterface
     /**
      * @return $this
      */
-    public function withTrash(Pile $trash) : self
+    public function withTrash(Pile $trash): self
     {
         $this->trash = $trash;
 
         return $this;
     }
 
-    public function players() : PlayerCollection
+    public function players(): PlayerCollection
     {
         Assert::notEmpty($this->players);
 
@@ -124,7 +124,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * @return $this
      */
-    public function withPlayers(?PlayerCollection $players) : self
+    public function withPlayers(?PlayerCollection $players): self
     {
         $this->players = $players;
 
@@ -139,7 +139,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * Who goes first?
      */
-    protected function starter() : Player
+    protected function starter(): Player
     {
         return $this->starter;
     }
@@ -147,7 +147,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * @return $this
      */
-    public function withStarter(Player $player) : self
+    public function withStarter(Player $player): self
     {
         Assert::true(
             $this->isValidPlayer($player)
@@ -158,7 +158,7 @@ abstract class CardGame implements SerializableInterface
         return $this;
     }
 
-    public function isStarted() : bool
+    public function isStarted(): bool
     {
         return $this->isStarted;
     }
@@ -166,14 +166,14 @@ abstract class CardGame implements SerializableInterface
     /**
      * @return $this
      */
-    public function withIsStarted(bool $isStarted) : self
+    public function withIsStarted(bool $isStarted): self
     {
         $this->isStarted = $isStarted;
 
         return $this;
     }
 
-    protected function observer() : Player
+    protected function observer(): Player
     {
         return $this->observer;
     }
@@ -181,7 +181,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * @return $this
      */
-    public function withObserver(Player $player) : self
+    public function withObserver(Player $player): self
     {
         $this->observer = $player;
 
@@ -191,7 +191,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * Override this if needed.
      */
-    public static function minPlayers() : int
+    public static function minPlayers(): int
     {
         return 2;
     }
@@ -199,18 +199,16 @@ abstract class CardGame implements SerializableInterface
     /**
      * Provide this number in the *real* game.
      */
-    abstract public static function maxPlayers() : int;
+    abstract public static function maxPlayers(): int;
 
-    protected function isValidPlayer(Player $player) : bool
+    protected function isValidPlayer(Player $player): bool
     {
-        return $this->players()->any(
-            fn (Player $p) => $p->equals($player)
-        );
+        return $this->players()->contains($player);
     }
 
-    protected function nextPlayer(Player $player) : Player
+    protected function nextPlayer(Player $player): Player
     {
-        if (is_null($this->nextPlayers)) {
+        if ($this->nextPlayers === null) {
             $this->initNextPlayers();
         }
 
@@ -220,7 +218,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * Builds a support array for quick next player retrieval.
      */
-    private function initNextPlayers() : void
+    private function initNextPlayers(): void
     {
         $this->nextPlayers = [];
 
@@ -241,35 +239,35 @@ abstract class CardGame implements SerializableInterface
     /**
      * Returns top card from discard pile. Null in case of no cards.
      */
-    protected function topDiscard() : ?Card
+    protected function topDiscard(): ?Card
     {
         return $this->discard->top();
     }
 
-    public function deckSize() : int
+    public function deckSize(): int
     {
         return $this->deck->size();
     }
 
-    public function isDeckEmpty() : bool
+    public function isDeckEmpty(): bool
     {
-        return $this->deckSize() == 0;
+        return $this->deck->isEmpty();
     }
 
-    public function discardSize() : int
+    public function discardSize(): int
     {
         return $this->discard->size();
     }
 
-    public function isDiscardEmpty() : bool
+    public function isDiscardEmpty(): bool
     {
-        return $this->discardSize() == 0;
+        return $this->discard->isEmpty();
     }
 
     /**
      * Deals cards and marks the game as started.
      */
-    public function start() : MessageInterface
+    public function start(): MessageInterface
     {
         Assert::false($this->isStarted);
         Assert::notNull($this->starter());
@@ -281,26 +279,27 @@ abstract class CardGame implements SerializableInterface
         return $message;
     }
 
-    abstract protected function dealing() : MessageInterface;
+    abstract protected function dealing(): MessageInterface;
 
     /**
      * Tries to deal $amount cards to every player.
-     * If there is not enough cards in deck or the amount = 0, deals all cards.
-     * 
+     * If there is not enough cards in deck or $amount = 0, deals all cards.
+     *
      * @throws \InvalidArgumentException
      */
-    public function deal(int $amount = 0) : void
+    public function deal(int $amount = 0): void
     {
         Assert::false($this->isDeckEmpty());
         Assert::greaterThanEq($amount, 0);
 
         $dealed = 0;
 
-        while (!$amount || ($dealed < $amount)) {
+        while (!$amount || $dealed < $amount) {
+            /** @var Player */
             foreach ($this->players() as $player) {
-                $drawEvent = $this->drawToHand($player, 1);
+                $drawEvent = $this->drawToHand($player);
 
-                if (is_null($drawEvent)) {
+                if (!$drawEvent) {
                     break;
                 }
             }
@@ -315,15 +314,15 @@ abstract class CardGame implements SerializableInterface
 
     /**
      * Tries to draw cards from the deck.
-     * 
+     *
      * If any cards are drawn, they are added to the player's hand
      * and a {@see DrawEvent} is returned.
-     * 
-     * Otherwise, the null is returned (which means that no cards where drawn).
-     * 
+     *
+     * Otherwise, `null` is returned (which means that no cards where drawn).
+     *
      * @throws \InvalidArgumentException
      */
-    public function drawToHand(Player $player, int $amount = 1) : ?DrawEvent
+    public function drawToHand(Player $player, int $amount = 1): ?DrawEvent
     {
         Assert::true($this->isValidPlayer($player));
         Assert::false($this->isDeckEmpty());
@@ -339,19 +338,15 @@ abstract class CardGame implements SerializableInterface
         return new DrawEvent($player, $drawn);
     }
 
-    public function drawToDiscard(int $amount = 1) : CardCollection
+    public function drawToDiscard(int $amount = 1): CardCollection
     {
         Assert::false($this->isDeckEmpty());
 
         $drawn = $this->deck->drawMany($amount);
 
-        if ($drawn->any()) {
-            $this->discard->addMany($drawn);
-
-            $drawn->apply(
-                fn (Card $c) => $this->onDiscard($c)
-            );
-        }
+        $drawn->apply(
+            fn (Card $c) => $this->putToDiscard($c)
+        );
 
         return $drawn;
     }
@@ -359,7 +354,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * @throws \InvalidArgumentException
      */
-    public function takeFromDiscard(Player $player, int $amount = 1) : CardCollection
+    public function takeFromDiscard(Player $player, int $amount = 1): CardCollection
     {
         Assert::true($this->isValidPlayer($player));
         Assert::false($this->isDiscardEmpty());
@@ -376,12 +371,18 @@ abstract class CardGame implements SerializableInterface
     /**
      * @throws \InvalidArgumentException
      */
-    public function discardFromHand(Player $player, Card $card) : void
+    public function discardFromHand(Player $player, Card $card): void
     {
         Assert::true($this->isValidPlayer($player));
         Assert::true($player->hasCard($card));
 
         $player->removeCard($card);
+
+        $this->putToDiscard($card, $player);
+    }
+
+    protected function putToDiscard(Card $card, ?Player $player = null): void
+    {
         $this->discard->add($card);
 
         $this->onDiscard($card, $player);
@@ -390,7 +391,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * Override this method to apply some logic on every card discard.
      */
-    protected function onDiscard(Card $card, ?Player $player = null) : void
+    protected function onDiscard(Card $card, ?Player $player = null): void
     {
         // nothing here
     }
@@ -398,7 +399,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * @throws \InvalidArgumentException
      */
-    public function trashFromHand(Player $player, Card $card) : void
+    public function trashFromHand(Player $player, Card $card): void
     {
         Assert::true($this->isValidPlayer($player));
         Assert::true($player->hasCard($card));
@@ -417,7 +418,7 @@ abstract class CardGame implements SerializableInterface
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return UniformSerializer::serialize(
             $this,

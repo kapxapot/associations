@@ -13,7 +13,7 @@ use Brightwood\Models\Cards\Players\Player;
 
 class SixGiftAction extends GiftAction implements ApplicableActionInterface, SkipActionInterface
 {
-    public function announcementEvents() : CardEventCollection
+    public function announcementEvents(): CardEventCollection
     {
         return CardEventCollection::collect(
             new PublicEvent('Следующий игрок берет 1 карту и пропускает ход')
@@ -24,7 +24,7 @@ class SixGiftAction extends GiftAction implements ApplicableActionInterface, Ski
     {
         $events = [];
 
-        if ($game->deckSize() > 0) {
+        if (!$game->isDeckEmpty()) {
             $drawEvent = $game->drawToHand($player);
 
             if ($drawEvent) {

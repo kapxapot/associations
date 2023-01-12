@@ -10,6 +10,7 @@ use Brightwood\Models\Cards\Events\Generic\PublicEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Player;
+use Webmozart\Assert\Assert;
 
 class SevenGiftAction extends GiftAction implements ApplicableActionInterface, SkipActionInterface
 {
@@ -29,9 +30,7 @@ class SevenGiftAction extends GiftAction implements ApplicableActionInterface, S
         while ($toDraw > 0) {
             $drawEvent = $game->drawToHand($player);
 
-            if (is_null($drawEvent)) {
-                break;
-            }
+            Assert::notNull($drawEvent);
 
             $events[] = $drawEvent;
 

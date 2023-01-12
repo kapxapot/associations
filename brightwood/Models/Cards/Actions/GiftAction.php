@@ -28,7 +28,7 @@ abstract class GiftAction implements SerializableInterface
             ->withSender($sender);
     }
 
-    public function card() : Card
+    public function card(): Card
     {
         Assert::notNull($this->card);
 
@@ -38,14 +38,14 @@ abstract class GiftAction implements SerializableInterface
     /**
      * @return $this
      */
-    public function withCard(?Card $card) : self
+    public function withCard(?Card $card): self
     {
         $this->card = $card;
 
         return $this;
     }
 
-    public function sender() : ?Player
+    public function sender(): ?Player
     {
         return $this->sender;
     }
@@ -53,7 +53,7 @@ abstract class GiftAction implements SerializableInterface
     /**
      * @return $this
      */
-    public function withSender(?Player $sender) : self
+    public function withSender(?Player $sender): self
     {
         $this->sender = $sender;
 
@@ -63,7 +63,7 @@ abstract class GiftAction implements SerializableInterface
     /**
      * Returns announcement events, that will be consumed on gift creation.
      */
-    abstract public function announcementEvents() : CardEventCollection;
+    abstract public function announcementEvents(): CardEventCollection;
 
     // SerializableInterface
 
@@ -75,7 +75,7 @@ abstract class GiftAction implements SerializableInterface
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return UniformSerializer::serialize(
             $this,

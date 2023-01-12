@@ -32,7 +32,7 @@ abstract class StaticNode extends StoryNode implements MutatorInterface
     /**
      * @return string[]
      */
-    public function text() : array
+    public function text(): array
     {
         return $this->text;
     }
@@ -40,14 +40,14 @@ abstract class StaticNode extends StoryNode implements MutatorInterface
     /**
      * @return static
      */
-    public function withMutator(callable $mutator) : self
+    public function withMutator(callable $mutator): self
     {
         $this->mutator = $mutator;
 
         return $this;
     }
 
-    public function mutate(StoryData $data) : StoryData
+    public function mutate(StoryData $data): StoryData
     {
         return $this->mutator
             ? ($this->mutator)($data)
@@ -56,10 +56,10 @@ abstract class StaticNode extends StoryNode implements MutatorInterface
 
     /**
      * Alias for withMutator().
-     * 
+     *
      * @return static
      */
-    public function do(callable $mutator) : self
+    public function do(callable $mutator): self
     {
         return $this->withMutator($mutator);
     }
@@ -68,7 +68,7 @@ abstract class StaticNode extends StoryNode implements MutatorInterface
         TelegramUser $tgUser,
         StoryData $data,
         ?string $text = null
-    ) : StoryMessageSequence
+    ): StoryMessageSequence
     {
         return new StoryMessageSequence(
             new StoryMessage(

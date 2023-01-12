@@ -8,9 +8,9 @@ use Webmozart\Assert\Assert;
 
 abstract class LinkedNode extends StaticNode
 {
-    abstract public function links() : StoryLinkCollection;
+    abstract public function links(): StoryLinkCollection;
 
-    public function isFinish(?StoryData $data) : bool
+    public function isFinish(?StoryData $data): bool
     {
         return $this->links()->satisfying($data)->isEmpty();
     }
@@ -18,7 +18,7 @@ abstract class LinkedNode extends StaticNode
     /**
      * @throws \InvalidArgumentException
      */
-    public function checkIntegrity() : void
+    public function checkIntegrity(): void
     {
         parent::checkIntegrity();
 

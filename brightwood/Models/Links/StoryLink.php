@@ -23,7 +23,7 @@ abstract class StoryLink implements ConditionalInterface, MutatorInterface
         $this->nodeId = $nodeId;
     }
 
-    public function nodeId() : int
+    public function nodeId(): int
     {
         return $this->nodeId;
     }
@@ -31,13 +31,13 @@ abstract class StoryLink implements ConditionalInterface, MutatorInterface
     /**
      * @return static
      */
-    public function withMutator(callable $func) : self
+    public function withMutator(callable $func): self
     {
         $this->mutator = $func;
         return $this;
     }
 
-    public function mutate(StoryData $data) : StoryData
+    public function mutate(StoryData $data): StoryData
     {
         return $this->mutator
             ? ($this->mutator)($data)
@@ -49,7 +49,7 @@ abstract class StoryLink implements ConditionalInterface, MutatorInterface
      * 
      * @return static
      */
-    public function do(callable $func) : self
+    public function do(callable $func): self
     {
         return $this->withMutator($func);
     }
@@ -57,15 +57,15 @@ abstract class StoryLink implements ConditionalInterface, MutatorInterface
     /**
      * @return static
      */
-    public function withCondition(callable $condition) : self
+    public function withCondition(callable $condition): self
     {
         $this->condition = $condition;
         return $this;
     }
 
-    public function satisfies(?StoryData $data) : bool
+    public function satisfies(?StoryData $data): bool
     {
-        if (is_null($data) || is_null($this->condition)) {
+        if ($data === null || $this->condition === null) {
             return true;
         }
 
@@ -75,7 +75,7 @@ abstract class StoryLink implements ConditionalInterface, MutatorInterface
     /**
      * Alias for withCondition().
      */
-    public function if(callable $condition) : self
+    public function if(callable $condition): self
     {
         return $this->withCondition($condition);
     }

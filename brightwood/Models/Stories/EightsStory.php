@@ -7,6 +7,8 @@ use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Games\EightsGame;
 use Brightwood\Models\Cards\Players\Human;
+use Brightwood\Models\Cards\Rank;
+use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
@@ -35,6 +37,7 @@ class EightsStory extends Story
     private const FINISH_GAME = 7;
     private const AUTO_MOVES = 8;
     private const HUMAN_MOVE = 9;
+    private const SUIT_CHOICE = 10;
 
     private RootDeserializerInterface $rootDeserializer;
 
@@ -48,21 +51,21 @@ class EightsStory extends Story
         $this->rootDeserializer = $rootDeserializer;
     }
 
-    public function makeData(?array $data = null) : EightsData
+    public function makeData(?array $data = null): EightsData
     {
         if ($data !== null) {
             try {
                 return $this->rootDeserializer->deserialize($data);
             } catch (\InvalidArgumentException $ex) {
                 // just ignore it
-                // this is needed for parsing the data without the type
+                // this is needed for parsing the data without a type
             }
         }
 
         return new EightsData($data);
     }
 
-    public function executeCommand(string $command) : StoryMessageSequence
+    public function executeCommand(string $command): StoryMessageSequence
     {
         switch ($command) {
             case self::RULES_COMMAND:
@@ -101,7 +104,7 @@ class EightsStory extends Story
         return parent::executeCommand($command);
     }
 
-    protected function build() : void
+    protected function build(): void
     {
         $this->setStartNode(
             new SkipNode(
@@ -233,10 +236,22 @@ class EightsStory extends Story
 
                         if (!$playableCards->contains($card)) {
                             $sequence->add(
-                                new TextMessage('У вас нет такой карты. Вы что, шуле{р|рка}? 🤔')
+                                new TextMessage('У вас нет такой карты. Вы что, шулер{|ка}? 🤔')
                             );
                         } else {
                             $events = $game->putCard($player, $card);
+
+                            // for eight go to suit choice
+                            if ($card->isRank(Rank::eight())) {
+                                return $sequence->add(
+                                    new StoryMessage(
+                                        self::SUIT_CHOICE,
+                                        ['Выберите масть (следующий игрок должен положить карту этой масти):']
+                                    )
+                                )->withData($data);
+                            }
+
+                            // otherwise go to next player
                             $game->goToNextPlayer();
 
                             return $sequence
@@ -292,7 +307,7 @@ class EightsStory extends Story
                                     0,
                                     ['Ваш ход:'],
                                     [
-                                        ...$playableCards->stringize()->toArray(),
+                                        ...$playableCards->stringize(),
                                         self::QUIT_GAME_COMMAND
                                     ]
                                 )
@@ -308,6 +323,66 @@ class EightsStory extends Story
                                         [self::DRAW_CARD_COMMAND, self::QUIT_GAME_COMMAND]
                                     )
                                 )
+                        )
+                        ->withData($data);
+                }
+            )
+        );
+
+
+        $this->addNode(
+            new FunctionNode(
+                self::SUIT_CHOICE,
+                function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
+                    $sequence = StoryMessageSequence::empty();
+
+                    if ($text === self::QUIT_GAME_COMMAND) {
+                        return $sequence->add(
+                            new StoryMessage(
+                                self::FINISH_GAME,
+                                ['Вы покинули игру']
+                            )
+                        )->withData($data);
+                    }
+
+                    $game = $data->game();
+                    $player = $this->getAndCheckPlayer($game, $tgUser);
+
+                    // choose a suit if it's valid
+                    if (strlen($text) > 0) {
+                        $suit = Suit::tryParse($text);
+
+                        if (!$suit) {
+                            $sequence->add(
+                                new TextMessage('Не понятно, попробуйте еще раз...')
+                            );
+                        } else {
+                            // apply suit...
+                            $events = $game->playerChoosesEightSuit($player, $suit);
+
+                            $game->goToNextPlayer();
+
+                            return $sequence
+                                ->add(
+                                    new StoryMessage(
+                                        self::AUTO_MOVES,
+                                        $events->messagesFor($player)->toArray()
+                                    )
+                                )
+                                ->withData($data);
+                        }
+                    }
+
+                    return $sequence
+                        ->add(
+                            new StoryMessage(
+                                self::SUIT_CHOICE,
+                                ['Выберите масть (следующий игрок должен положить карту этой масти):'],
+                                [
+                                    ...Suit::all()->stringize(),
+                                    self::QUIT_GAME_COMMAND
+                                ]
+                            )
                         )
                         ->withData($data);
                 }

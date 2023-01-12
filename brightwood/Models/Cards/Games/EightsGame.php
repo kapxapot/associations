@@ -255,9 +255,9 @@ class EightsGame extends CardGame
 
     /**
      * Checks if the player can make a move in auto-mode (by the AI).
-     * 
+     *
      * Auto-move is possible when:
-     * 
+     *
      * - The player is a bot.
      * - The player has to skip a move and (optionally) do some pre-defined actions
      * (e.g., draw cards).
@@ -292,7 +292,7 @@ class EightsGame extends CardGame
         return new TextMessage(
             $player->equals($this->observer())
                 ? $player->personalName() . ' выиграли!'
-                : $this->parser()->parse($player, $player . ' выигра{л|ла}!')
+                : $this->parser()->parse($player, $player . ' выиграл{|а}!')
         );
     }
 
@@ -531,19 +531,26 @@ class EightsGame extends CardGame
         // 8
 
         if ($card->isRank(Rank::eight())) {
-            // todo: add restriction on discard, not here
+            /** @var Suit|null */
+            $suit = null;
+
             // get suit for action from restriction
-            $suit = $player
-                ? $this->chooseSuit($player)
-                : $card->suit();
 
-            $action = new EightGiftAction($card, $suit, $player);
+            if (!$player) {
+                // the card is put from deck
+                // just use the card's suit
+                $suit = $card->suit();
+            } else if ($player->isBot()) {
+                // the player is a bot - auto-choose the suit
+                $suit = $this->chooseSuit($player);
+            }
 
-            $card->withRestriction(
-                $action->restriction()
-            );
+            if (!$suit) {
+                // no action
+                return null;
+            }
 
-            return $action;
+            return $this->applyEightToCard($card, $suit, $player);
         }
 
         return null;
@@ -560,6 +567,33 @@ class EightsGame extends CardGame
             : Suit::random();
     }
 
+    private function applyEightToCard(Card $card, Suit $suit, ?Player $player): EightGiftAction
+    {
+        $action = new EightGiftAction($card, $suit, $player);
+
+        $card->withRestriction(
+            $action->restriction()
+        );
+
+        return $action;
+    }
+
+    public function playerChoosesEightSuit(Player $player, Suit $suit): CardEventCollection
+    {
+        // todo: check that they are the current player
+        Assert::true($this->isValidPlayer($player));
+
+        $card = $this->discard()->top();
+
+        Assert::notNull($card);
+
+        $this->placeGift(
+            $this->applyEightToCard($card, $suit, $player)
+        );
+
+        return $this->giftAnnouncementEvents();
+    }
+
     public function canBeDiscarded(Card $card): bool
     {
         if ($this->isSuperCard($card)) {
@@ -568,7 +602,7 @@ class EightsGame extends CardGame
 
         $topDiscard = $this->discard()->actualTop();
 
-        if (is_null($topDiscard) || $topDiscard->isJoker()) {
+        if (!$topDiscard || $topDiscard->isJoker()) {
             return true;
         }
 

@@ -65,6 +65,7 @@ class CardEventAccumulator
     {
         $merged = new self();
 
+        /** @var CardEventInterface */
         foreach ($this->events as $event) {
             $last = $merged->events()->last();
 

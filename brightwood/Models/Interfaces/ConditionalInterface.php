@@ -6,11 +6,12 @@ use Brightwood\Models\Data\StoryData;
 
 interface ConditionalInterface
 {
-    function withCondition(callable $condition) : self;
-    function satisfies(?StoryData $data) : bool;
+    public function withCondition(callable $condition): self;
+
+    public function satisfies(?StoryData $data): bool;
 
     /**
      * Alias for withCondition().
      */
-    function if(callable $condition) : self;
+    public function if(callable $condition): self;
 }

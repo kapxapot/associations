@@ -8,14 +8,17 @@ class RedirectLinkCollection extends StoryLinkCollection
 {
     protected string $class = RedirectLink::class;
 
-    public function choose() : ?RedirectLink
+    /**
+     * Chooses a random link taking weights into account.
+     */
+    public function choose(): ?RedirectLink
     {
         return $this->weightedRandom(
             fn (RedirectLink $l) => $l->weight()
         );
     }
 
-    private function weightedRandom(callable $weightFunc) : ?RedirectLink
+    private function weightedRandom(callable $weightFunc): ?RedirectLink
     {
         if ($this->isEmpty()) {
             return null;

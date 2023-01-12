@@ -53,7 +53,7 @@ abstract class StoryNode
 
     /**
      * Tries to get a node by id.
-     * 
+     *
      * Throws an {@see InvalidArgumentException} if the node is not found.
      *
      * @throws InvalidArgumentException

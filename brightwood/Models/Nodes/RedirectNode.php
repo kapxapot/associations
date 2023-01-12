@@ -31,7 +31,7 @@ class RedirectNode extends LinkedNode
         $this->links = RedirectLinkCollection::make($links);
     }
 
-    public function links() : RedirectLinkCollection
+    public function links(): RedirectLinkCollection
     {
         return $this->links;
     }
@@ -40,7 +40,7 @@ class RedirectNode extends LinkedNode
         TelegramUser $tgUser,
         StoryData $data,
         ?string $text = null
-    ) : StoryMessageSequence
+    ): StoryMessageSequence
     {
         $data = $this->mutate($data);
         $link = $this->links->satisfying($data)->choose();
@@ -61,7 +61,7 @@ class RedirectNode extends LinkedNode
     /**
      * @throws \InvalidArgumentException
      */
-    public function checkIntegrity() : void
+    public function checkIntegrity(): void
     {
         parent::checkIntegrity();
 

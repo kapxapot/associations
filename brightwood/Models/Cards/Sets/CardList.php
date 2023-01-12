@@ -20,7 +20,7 @@ abstract class CardList implements SerializableInterface
         $this->cards = $cards ?? CardCollection::empty();
     }
 
-    public function cards() : CardCollection
+    public function cards(): CardCollection
     {
         return $this->cards;
     }
@@ -28,29 +28,29 @@ abstract class CardList implements SerializableInterface
     /**
      * @return $this
      */
-    public function withCards(CardCollection $cards) : self
+    public function withCards(CardCollection $cards): self
     {
         $this->cards = $cards;
 
         return $this;
     }
 
-    public function size() : int
+    public function size(): int
     {
         return $this->cards->count();
     }
 
-    public function isEmpty() : bool
+    public function isEmpty(): bool
     {
-        return $this->size() == 0;
+        return $this->size() === 0;
     }
 
-    public function contains(Card $card) : bool
+    public function contains(Card $card): bool
     {
         return $this->cards->contains($card);
     }
 
-    public function suitedCards() : SuitedCardCollection
+    public function suitedCards(): SuitedCardCollection
     {
         return $this->cards->filterSuited();
     }
@@ -60,12 +60,12 @@ abstract class CardList implements SerializableInterface
         return $this->toString();
     }
 
-    public function toString() : string
+    public function toString(): string
     {
         return $this->cards->toString();
     }
 
-    public function toHomogeneousString() : string
+    public function toHomogeneousString(): string
     {
         return $this->cards->toHomogeneousString();
     }
@@ -80,7 +80,7 @@ abstract class CardList implements SerializableInterface
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return UniformSerializer::serialize(
             $this,

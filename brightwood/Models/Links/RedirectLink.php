@@ -24,7 +24,7 @@ class RedirectLink extends StoryLink
         $this->weight = $weight;
     }
 
-    public function weight() : float
+    public function weight(): float
     {
         return $this->weight;
     }
