@@ -244,10 +244,7 @@ class EightsStory extends Story
                             // for eight go to suit choice
                             if ($card->isRank(Rank::eight())) {
                                 return $sequence->add(
-                                    new StoryMessage(
-                                        self::SUIT_CHOICE,
-                                        ['Выберите масть (следующий игрок должен положить карту этой масти):']
-                                    )
+                                    new StoryMessage(self::SUIT_CHOICE)
                                 )->withData($data);
                             }
 
