@@ -55,11 +55,13 @@ class EightGiftAction extends GiftAction
             );
         }
 
-        return $events->add(
-            new PublicEvent(
-                'Следующий игрок должен положить <b>' . $this->suit()->fullNameRu() . '</b>'
-            )
-        );
+        return $events;
+
+        // return $events->add(
+        //     new PublicEvent(
+        //         'Следующий игрок должен положить <b>' . $this->suit()->fullNameRu() . '</b>'
+        //     )
+        // );
     }
 
     public function restriction(): RestrictionInterface

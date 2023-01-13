@@ -46,7 +46,7 @@ class EightsStory extends Story
         RootDeserializerInterface $rootDeserializer
     )
     {
-        parent::__construct($id, '♠ Восьмерки (почти готово!)', true);
+        parent::__construct($id, '♠ Карточная игра «Восьмерки»', true);
 
         $this->rootDeserializer = $rootDeserializer;
     }
@@ -176,7 +176,7 @@ class EightsStory extends Story
                         StoryMessageSequence::make(
                             new StoryMessage(
                                 self::AUTO_MOVES,
-                                ['Играют:', Text::join($players->toArray())]
+                                ['Играют:', Text::join($players)]
                             ),
                             $game->start()
                         )
@@ -295,7 +295,9 @@ class EightsStory extends Story
                                 self::HUMAN_MOVE,
                                 [
                                     $game->statusString(),
-                                    $game->players()->except($player)->handsString(),
+                                    Text::join(
+                                        $game->players()->except($player)->handsStrings()
+                                    ),
                                     'Ваши карты: ' . $player->hand()
                                 ]
                             ),

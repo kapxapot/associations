@@ -10,14 +10,17 @@ use Brightwood\Models\Cards\Events\Generic\PublicEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Player;
+use Brightwood\Models\Cards\Rank;
 
 class SixGiftAction extends GiftAction implements ApplicableActionInterface, SkipActionInterface
 {
     public function announcementEvents(): CardEventCollection
     {
-        return CardEventCollection::collect(
-            new PublicEvent('Следующий игрок берет 1 карту и пропускает ход')
-        );
+        return CardEventCollection::empty();
+
+        // return CardEventCollection::collect(
+        //     new PublicEvent('Следующий игрок берет 1 карту и пропускает ход')
+        // );
     }
 
     public function applyTo(CardGame $game, Player $player): CardEventCollection
@@ -32,7 +35,7 @@ class SixGiftAction extends GiftAction implements ApplicableActionInterface, Ski
             }
         }
 
-        $events[] = new SkipEvent($player);
+        $events[] = new SkipEvent($player, Rank::six()->nameRu());
 
         return CardEventCollection::make($events);
     }

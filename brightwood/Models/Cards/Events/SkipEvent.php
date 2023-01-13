@@ -32,7 +32,7 @@ class SkipEvent extends PlayerEvent
     private function withReason(string $text): string
     {
         return $this->reason
-            ? $text . ' (' . $this->reason . ')'
+            ? $text . ' <i>(' . $this->reason . ')</i>'
             : $text;
     }
 }

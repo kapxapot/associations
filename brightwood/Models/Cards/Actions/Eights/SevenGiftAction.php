@@ -10,15 +10,18 @@ use Brightwood\Models\Cards\Events\Generic\PublicEvent;
 use Brightwood\Models\Cards\Events\SkipEvent;
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Cards\Players\Player;
+use Brightwood\Models\Cards\Rank;
 use Webmozart\Assert\Assert;
 
 class SevenGiftAction extends GiftAction implements ApplicableActionInterface, SkipActionInterface
 {
     public function announcementEvents(): CardEventCollection
     {
-        return CardEventCollection::collect(
-            new PublicEvent('Следующий игрок берет 2 карты и пропускает ход')
-        );
+        return CardEventCollection::empty();
+
+        // return CardEventCollection::collect(
+        //     new PublicEvent('Следующий игрок берет 2 карты и пропускает ход')
+        // );
     }
 
     public function applyTo(CardGame $game, Player $player): CardEventCollection
@@ -37,7 +40,7 @@ class SevenGiftAction extends GiftAction implements ApplicableActionInterface, S
             $toDraw--;
         }
 
-        $events[] = new SkipEvent($player);
+        $events[] = new SkipEvent($player, Rank::seven()->nameRu());
 
         return CardEventCollection::make($events);
     }

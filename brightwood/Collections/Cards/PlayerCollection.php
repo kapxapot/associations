@@ -4,11 +4,22 @@ namespace Brightwood\Collections\Cards;
 
 use Brightwood\Models\Cards\Players\Player;
 use Plasticode\Collections\Generic\EquatableCollection;
+use Plasticode\Collections\Generic\StringCollection;
 use Plasticode\Semantics\Sentence;
+use Plasticode\Util\Cases;
 
 class PlayerCollection extends EquatableCollection
 {
     protected string $class = Player::class;
+
+    private Cases $cases;
+
+    protected function __construct(?array $data)
+    {
+        parent::__construct($data);
+
+        $this->cases = new Cases();
+    }
 
     public function inspector(): ?Player
     {
@@ -17,11 +28,14 @@ class PlayerCollection extends EquatableCollection
         );
     }
 
-    public function handsString(): string
+    public function handsStrings(): StringCollection
     {
-        return Sentence::join(
-            $this->map(
-                fn (Player $p) => $p->handString()
+        return $this->stringize(
+            fn (Player $p) => sprintf(
+                '%s: %s %s',
+                $p,
+                $p->handSize(),
+                $this->cases->caseForNumber('карта', $p->handSize())
             )
         );
     }

@@ -8,5 +8,5 @@ use Brightwood\Models\Cards\Players\Player;
 
 interface ApplicableActionInterface
 {
-    function applyTo(CardGame $game, Player $player) : CardEventCollection;
+    public function applyTo(CardGame $game, Player $player): CardEventCollection;
 }

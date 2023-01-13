@@ -45,13 +45,8 @@ class EightsTestController
         $game->withObserver($players->random());
         $game->withPlayersLine();
 
-        $result =
-            (MessageCollection::collect(
-                $game->start()
-            ))
-            ->concat(
-                $game->run()
-            )
+        $result = (MessageCollection::collect($game->start()))
+            ->concat($game->run())
             ->map(
                 fn ($msg) => $this->wrap($msg)
             )

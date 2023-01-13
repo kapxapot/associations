@@ -29,6 +29,7 @@ use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Parsing\StoryParser;
 use Plasticode\Util\Cases;
+use Plasticode\Util\Text;
 use Webmozart\Assert\Assert;
 
 class EightsGame extends CardGame
@@ -107,11 +108,12 @@ class EightsGame extends CardGame
         return $this;
     }
 
+    /**
+     * @return $this
+     */
     public function withPlayersLine(): self
     {
-        $this->showPlayersLine = true;
-
-        return $this;
+        return $this->withShowPlayersLine(true);
     }
 
     public function discard(): EightsDiscard
@@ -177,7 +179,7 @@ class EightsGame extends CardGame
     /**
      * @return $this
      */
-    public function withShowPlayersLine(int $show): self
+    public function withShowPlayersLine(bool $show): self
     {
         $this->showPlayersLine = $show;
 
@@ -346,20 +348,22 @@ class EightsGame extends CardGame
         Assert::true($this->isValidPlayer($player));
         Assert::true($this->isStarted());
 
-        $moveStatus = $this->statusString();
+        // $moveStatus = $this->statusString();
 
         $moveMessages = $this
             ->actualMove($player)
             ->messagesFor($this->observer());
 
         $message = new TextMessage(
-            $moveStatus,
+            // $moveStatus,
             ...$moveMessages
         );
 
         if ($this->showPlayersLine) {
             $message->appendLines(
-                $this->players()->handsString()
+                Text::join(
+                    $this->players()->handsStrings()
+                )
             );
         }
 
@@ -369,9 +373,9 @@ class EightsGame extends CardGame
     public function statusString(): string
     {
         return
-            '[' . $this->move . '] ' .
+            // '[' . $this->move . '] ' .
             'Стол: ' . $this->discard()->topString() . ', ' .
-            'Колода: ' . $this->deckSize();
+            'Колода: ' . $this->deckSize() . ' ' . $this->cases->caseForNumber('карта', $this->deckSize());
     }
 
     private function actualMove(Player $player): CardEventAccumulator

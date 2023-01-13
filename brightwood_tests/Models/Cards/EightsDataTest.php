@@ -109,18 +109,12 @@ final class EightsDataTest extends SerializationTestCase
                 new EightsDiscard(
                     CardCollection::collect(
                         Card::parse('♥J'),
-                        Card::parse('♥8')
-                            ->withRestriction(
-                                new SuitRestriction(
-                                    Suit::hearts()
-                                )
-                            ),
-                        Card::parse('♣8')
-                            ->withRestriction(
-                                new SuitRestriction(
-                                    Suit::spades()
-                                )
-                            ),
+                        Card::parse('♥8')->withRestriction(
+                            new SuitRestriction(Suit::hearts())
+                        ),
+                        Card::parse('♣8')->withRestriction(
+                            new SuitRestriction(Suit::spades())
+                        ),
                         Card::parse('♠7'),
                         Card::parse('🃏'),
                         Card::parse('♦7'),
@@ -135,14 +129,9 @@ final class EightsDataTest extends SerializationTestCase
             ->withIsStarted(true)
             ->withObserver($player4)
             ->withGift(
-                new SixGiftAction(
-                    Card::parse('♣6'),
-                    $player1
-                )
+                new SixGiftAction(Card::parse('♣6'), $player1)
             )
-            ->withMove(53)
-            ->withNoCardsInARow(0)
-            ->withShowPlayersLine(false);
+            ->withMove(53);
 
         $data = (new EightsData())->withGame($game);
 

@@ -145,14 +145,6 @@ abstract class Player implements EquatableInterface, GenderedInterface, NamedInt
             ->join(' ');
     }
 
-    /**
-     * Returns player's name with hand size.
-     */
-    public function handString(): string
-    {
-        return $this . ' (' . $this->handSize() . ')';
-    }
-
     public function __toString()
     {
         return $this->toString();

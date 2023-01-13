@@ -6,5 +6,5 @@ use Brightwood\Models\Cards\Players\Player;
 
 interface CardEventInterface
 {
-    function messageFor(?Player $player) : string;
+    public function messageFor(?Player $player): string;
 }
