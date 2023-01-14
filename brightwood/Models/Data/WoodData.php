@@ -19,7 +19,7 @@ class WoodData extends StoryData
     public const WANDERED_ENOUGH = 10;
     public const MAX_WANDERS_PER_DAY = 3;
 
-    protected function init() : void
+    protected function init(): void
     {
         $this->day = 1;
         $this->hp = self::MAX_HP;
@@ -31,7 +31,7 @@ class WoodData extends StoryData
     /**
      * Returns true if the player's HP is greater than 0.
      */
-    public function isAlive() : bool
+    public function isAlive(): bool
     {
         return $this->hp > 0;
     }
@@ -41,7 +41,7 @@ class WoodData extends StoryData
      * 
      * Shortcut for !isAlive().
      */
-    public function isDead() : bool
+    public function isDead(): bool
     {
         return !$this->isAlive();
     }
@@ -49,7 +49,7 @@ class WoodData extends StoryData
     /**
      * Returns true if the player has shoes.
      */
-    public function hasShoes() : bool
+    public function hasShoes(): bool
     {
         return $this->shoes > 0;
     }
@@ -57,7 +57,7 @@ class WoodData extends StoryData
     /**
      * Increments the current day and decrements hp.
      */
-    public function nextDay() : self
+    public function nextDay(): self
     {
         $this->day++;
         $this->wanderedToday = 0;
@@ -72,7 +72,7 @@ class WoodData extends StoryData
      * 
      * @throws InvalidOperationException
      */
-    public function removeShoe() : self
+    public function removeShoe(): self
     {
         if (!$this->hasShoes()) {
             throw new InvalidOperationException('No shows to remove.');
@@ -86,7 +86,7 @@ class WoodData extends StoryData
     /**
      * Brutally beats the player to death.
      */
-    public function kill() : self
+    public function kill(): self
     {
         $this->hp = 0;
 
@@ -95,11 +95,11 @@ class WoodData extends StoryData
 
     /**
      * Hits the player for $amount HP down to 0.
-     * 
+     *
      * @param int $amount Must be non-negative.
      * @throws \InvalidArgumentException
      */
-    public function hit(int $amount) : self
+    public function hit(int $amount): self
     {
         Assert::natural($amount);
 
@@ -113,13 +113,13 @@ class WoodData extends StoryData
 
     /**
      * Heals the player for $amount HP up to MAX_HP.
-     * 
+     *
      * If the player is already dead, they can't be healed (nothing happens).
-     * 
+     *
      * @param int $amount Must be non-negative int.
      * @throws \InvalidArgumentException
      */
-    public function heal(int $amount) : self
+    public function heal(int $amount): self
     {
         Assert::natural($amount);
 
@@ -138,10 +138,10 @@ class WoodData extends StoryData
     /**
      * Wander in the woods.
      */
-    public function wander() : self
+    public function wander(): self
     {
         $this->wandered++;
-        $this->wanderedToday;
+        $this->wanderedToday = 1;
 
         return $this;
     }
@@ -149,7 +149,7 @@ class WoodData extends StoryData
     /**
      * Has the player wandered enough to find the exit.
      */
-    public function hasWanderedEnough() : bool
+    public function hasWanderedEnough(): bool
     {
         return $this->wandered >= self::WANDERED_ENOUGH;
     }

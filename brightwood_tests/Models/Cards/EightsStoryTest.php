@@ -8,6 +8,7 @@ use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Testing\Factories\RootDeserializerFactory;
 use PHPUnit\Framework\TestCase;
+use Plasticode\Util\Cases;
 
 final class EightsStoryTest extends TestCase
 {
@@ -19,7 +20,7 @@ final class EightsStoryTest extends TestCase
         parent::setUp();
 
         $this->rootDeserializer = RootDeserializerFactory::make();
-        $this->story = new EightsStory(3, $this->rootDeserializer);
+        $this->story = new EightsStory(3, $this->rootDeserializer, new Cases());
     }
 
     public function tearDown() : void

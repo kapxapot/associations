@@ -372,10 +372,11 @@ class EightsGame extends CardGame
 
     public function statusString(): string
     {
-        return
+        return Text::join([
             // '[' . $this->move . '] ' .
-            'Стол: ' . $this->discard()->topString() . ', ' .
-            'Колода: ' . $this->deckSize() . ' ' . $this->cases->caseForNumber('карта', $this->deckSize());
+            'Стол: ' . $this->discard()->topString(),
+            'Колода: ' . $this->deckSize() . ' ' . $this->cases->caseForNumber('карта', $this->deckSize())
+        ]);
     }
 
     private function actualMove(Player $player): CardEventAccumulator

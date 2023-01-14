@@ -18,6 +18,7 @@ use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\SkipNode;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
+use Plasticode\Util\Cases;
 use Plasticode\Util\Text;
 use Webmozart\Assert\Assert;
 
@@ -40,15 +41,18 @@ class EightsStory extends Story
     private const SUIT_CHOICE = 10;
 
     private RootDeserializerInterface $rootDeserializer;
+    private Cases $cases;
 
     public function __construct(
         int $id,
-        RootDeserializerInterface $rootDeserializer
+        RootDeserializerInterface $rootDeserializer,
+        Cases $cases
     )
     {
         parent::__construct($id, '♠ Карточная игра «Восьмерки»', true);
 
         $this->rootDeserializer = $rootDeserializer;
+        $this->cases = $cases;
     }
 
     public function makeData(?array $data = null): EightsData
@@ -298,7 +302,12 @@ class EightsStory extends Story
                                     Text::join(
                                         $game->players()->except($player)->handsStrings()
                                     ),
-                                    'Ваши карты: ' . $player->hand()
+                                    sprintf(
+                                        'У вас %s %s: %s',
+                                        $player->handSize(),
+                                        $this->cases->caseForNumber('карта', $player->handSize()),
+                                        $player->hand()
+                                    )
                                 ]
                             ),
                             $playableCards->any()

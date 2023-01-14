@@ -10,7 +10,7 @@ abstract class StoryData extends Model
     {
         parent::__construct($data);
 
-        if (is_null($data)) {
+        if (!$data) {
             $this->init();
         }
     }
