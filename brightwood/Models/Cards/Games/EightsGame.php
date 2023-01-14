@@ -439,9 +439,26 @@ class EightsGame extends CardGame
      */
     private function chooseCardToPut(Player $player): ?Card
     {
-        return $this
-            ->getPlayableCardsFor($player)
-            ->random();
+        $cards = $this->getPlayableCardsFor($player);
+
+        $groups = [
+            fn (Card $c) => $c->isRank(Rank::seven()),
+            fn (Card $c) => $c->isRank(Rank::six()),
+            fn (Card $c) => $c->isRank(Rank::jack()),
+            fn (Card $c) => !$c->isJoker() && !$c->isRank(Rank::eight()),
+            fn (Card $c) => $c->isJoker(),
+            fn (Card $c) => $c->isRank(Rank::eight()),
+        ];
+
+        foreach ($groups as $group) {
+            $groupCards = $cards->where($group);
+
+            if ($groupCards->any()) {
+                return $groupCards->random();
+            }
+        }
+
+        return $cards->random();
     }
 
     public function putCard(Player $player, Card $card): CardEventCollection
