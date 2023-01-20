@@ -10,15 +10,14 @@ use Brightwood\Tests\SerializationTestCase;
 
 final class JackGiftActionTest extends SerializationTestCase
 {
-    private string $reason = 'some reason';
-    private string $json = '{"type":"Brightwood\\\\Models\\\\Cards\\\\Actions\\\\Eights\\\\JackGiftAction","data":{"card":"\u2660J","sender_id":"59f628bbf4cb3c3b44ae","reason":"some reason"}}';
+    private string $reason = 'валет';
+    private string $json = '{"type":"Brightwood\\\\Models\\\\Cards\\\\Actions\\\\Eights\\\\JackGiftAction","data":{"card":"\u2660J","sender_id":"59f628bbf4cb3c3b44ae","reason":"\u0432\u0430\u043b\u0435\u0442"}}';
 
     public function testSerialize() : void
     {
         $gift = new JackGiftAction(
             new SuitedCard(Suit::spades(), Rank::jack()),
-            $this->player,
-            $this->reason
+            $this->player
         );
 
         $json = json_encode($gift);
