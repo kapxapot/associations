@@ -27,7 +27,6 @@ class EightsStory extends Story
     private const RULES_COMMAND = '/rules';
     private const DRAW_CARD_COMMAND = '🎴 Взять карту';
     private const NO_CARDS_COMMAND = '❌ Нет карт';
-    private const QUIT_GAME_COMMAND = '🏃 Выйти';
 
     private const START = 1;
     private const TWO_PLAYERS = 2;
@@ -49,7 +48,12 @@ class EightsStory extends Story
         Cases $cases
     )
     {
-        parent::__construct($id, '♠ Карточная игра «Восьмерки»', true);
+        parent::__construct(
+            $id,
+            '♠ Карточная игра «Восьмерки»',
+            'Простая карточная игра с ботами. Сложность: 3/5',
+            true
+        );
 
         $this->rootDeserializer = $rootDeserializer;
         $this->cases = $cases;
@@ -221,15 +225,6 @@ class EightsStory extends Story
                 function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
                     $sequence = StoryMessageSequence::empty();
 
-                    if ($text === self::QUIT_GAME_COMMAND) {
-                        return $sequence->add(
-                            new StoryMessage(
-                                self::FINISH_GAME,
-                                ['Вы покинули игру']
-                            )
-                        )->withData($data);
-                    }
-
                     $game = $data->game();
                     $player = $this->getAndCheckPlayer($game, $tgUser);
                     $playableCards = $game->getPlayableCardsFor($player);
@@ -314,21 +309,18 @@ class EightsStory extends Story
                                 ? new StoryMessage(
                                     0,
                                     ['Ваш ход:'],
-                                    [
-                                        ...$playableCards->stringize(),
-                                        self::QUIT_GAME_COMMAND
-                                    ]
+                                    [...$playableCards->stringize()]
                                 )
                                 : ($game->isDeckEmpty()
                                     ? new StoryMessage(
                                         0,
                                         ['Вам нечем ходить, и колода пуста...'],
-                                        [self::NO_CARDS_COMMAND, self::QUIT_GAME_COMMAND]
+                                        [self::NO_CARDS_COMMAND]
                                     )
                                     : new StoryMessage(
                                         0,
                                         ['Вам нечем ходить, берите карту 👇'],
-                                        [self::DRAW_CARD_COMMAND, self::QUIT_GAME_COMMAND]
+                                        [self::DRAW_CARD_COMMAND]
                                     )
                                 )
                         )
@@ -343,15 +335,6 @@ class EightsStory extends Story
                 self::SUIT_CHOICE,
                 function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
                     $sequence = StoryMessageSequence::empty();
-
-                    if ($text === self::QUIT_GAME_COMMAND) {
-                        return $sequence->add(
-                            new StoryMessage(
-                                self::FINISH_GAME,
-                                ['Вы покинули игру']
-                            )
-                        )->withData($data);
-                    }
 
                     $game = $data->game();
                     $player = $this->getAndCheckPlayer($game, $tgUser);
@@ -386,10 +369,7 @@ class EightsStory extends Story
                             new StoryMessage(
                                 self::SUIT_CHOICE,
                                 ['Выберите масть (следующий игрок должен положить карту этой масти):'],
-                                [
-                                    ...Suit::all()->stringize(),
-                                    self::QUIT_GAME_COMMAND
-                                ]
+                                [...Suit::all()->stringize()]
                             )
                         )
                         ->withData($data);

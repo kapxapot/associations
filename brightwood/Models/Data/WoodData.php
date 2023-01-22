@@ -38,7 +38,7 @@ class WoodData extends StoryData
 
     /**
      * Returns true if the player's HP is <= 0.
-     * 
+     *
      * Shortcut for !isAlive().
      */
     public function isDead(): bool
@@ -67,9 +67,9 @@ class WoodData extends StoryData
 
     /**
      * Removes one shoe.
-     * 
+     *
      * Throws {@see InvalidOperationException} if the player has no shoes.
-     * 
+     *
      * @throws InvalidOperationException
      */
     public function removeShoe(): self

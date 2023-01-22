@@ -13,13 +13,14 @@ use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Plasticode\Semantics\Gender;
+use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Strings;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
 /**
  * Returns story message sequence in answer to a text from a telegram user.
- * 
+ *
  * Has some other side effects (and this is not good):
  * 
  * - Can change telegram users (set gender).
@@ -27,6 +28,8 @@ use Webmozart\Assert\Assert;
  */
 class Answerer
 {
+    use LoggerAwareTrait;
+
     private int $defaultStoryId = 1;
 
     private string $masAction = '👦 Мальчик';
@@ -35,8 +38,6 @@ class Answerer
     private StoryRepositoryInterface $storyRepository;
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
-
-    private LoggerInterface $logger;
 
     public function __construct(
         StoryRepositoryInterface $storyRepository,
@@ -49,7 +50,7 @@ class Answerer
         $this->storyStatusRepository = $storyStatusRepository;
         $this->telegramUserRepository = $telegramUserRepository;
 
-        $this->logger = $logger;
+        $this->withLogger($logger);
     }
 
     public function getAnswers(TelegramUser $tgUser, string $text): StoryMessageSequence
@@ -75,7 +76,7 @@ class Answerer
             }
         }
 
-        if (Story::STORY_SELECTION_COMMAND == $text) {
+        if (Story::STORY_SELECTION_COMMAND == $text || $text == '/story') {
             return $this->storySelection();
         }
 
@@ -118,7 +119,7 @@ class Answerer
         }
 
         return $sequence->merge(
-            $this->startOrContinueStory($tgUser)
+            $this->storySelection()
         );
     }
 
@@ -155,7 +156,7 @@ class Answerer
                 'Спасибо, уважаем{ый 👦|ая 👧}, ' .
                 'ваш пол сохранен и теперь будет учитываться. 👌'
             ),
-            $this->startOrContinueStory($tgUser)
+            $this->storySelection()
         );
     }
 
@@ -270,13 +271,16 @@ class Answerer
     {
         $stories = $this->storyRepository->getAllPublished();
 
-        $lines = ($stories->isEmpty())
-            ? ['⛔ Историй нет.', 'Что-то явно пошло не так.']
-            : $stories->toCommands()->stringize();
+        $sequence = ($stories->isEmpty())
+            ? StoryMessageSequence::make(
+                new TextMessage('⛔ Историй нет.', 'Что-то явно пошло не так.')
+            )
+            : $stories->toInfo();
 
         return
-            StoryMessageSequence::make(
-                new TextMessage(...$lines)
+            StoryMessageSequence::mash(
+                new TextMessage('Выберите историю:'),
+                $sequence
             )
             ->finalize();
     }

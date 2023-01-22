@@ -15,7 +15,7 @@ class TestStory extends Story
         int $id
     )
     {
-        parent::__construct($id, 'Лес');
+        parent::__construct($id, 'Лес', 'Blah');
     }
 
     public function makeData(?array $data = null) : TestData

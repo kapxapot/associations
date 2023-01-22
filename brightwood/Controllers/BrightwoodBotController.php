@@ -72,6 +72,7 @@ class BrightwoodBotController
             : null;
 
         if ($answers && $answers->any()) {
+            /** @var array */
             foreach ($answers as $answer) {
                 if ($logLevel >= self::LOG_FULL) {
                     $this->logger->info('Trying to send message', $answer);

@@ -6,5 +6,5 @@ use Brightwood\Models\Command;
 
 interface CommandProviderInterface
 {
-    function toCommand() : Command;
+    public function toCommand(): Command;
 }

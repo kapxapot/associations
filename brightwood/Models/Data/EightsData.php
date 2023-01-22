@@ -95,7 +95,7 @@ class EightsData extends StoryData implements SerializableInterface
         );
     }
 
-    private function fetchBots(int $count) : PlayerCollection
+    private function fetchBots(int $count): PlayerCollection
     {
         return $this
             ->botPool()
@@ -103,7 +103,7 @@ class EightsData extends StoryData implements SerializableInterface
             ->take($count);
     }
 
-    private function botPool() : PlayerCollection
+    private function botPool(): PlayerCollection
     {
         return PlayerCollection::collect(
             new FemaleBot('Джейн'),
@@ -129,7 +129,7 @@ class EightsData extends StoryData implements SerializableInterface
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return UniformSerializer::serialize(
             $this,

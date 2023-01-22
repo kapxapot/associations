@@ -42,11 +42,14 @@ class WoodStory extends Story
     private const KICK_FAIL = 28;
     private const GUMMY_BEARS = 29;
 
-    public function __construct(
-        int $id
-    )
+    public function __construct(int $id)
     {
-        parent::__construct($id, '🌲 Лес', true);
+        parent::__construct(
+            $id,
+            '🌲 Лес',
+            'Вы заблудились в лесу и пытаетесь из него выбраться. Или не пытаетесь. Сложность: 3/5',
+            true
+        );
     }
 
     public function makeData(?array $data = null) : WoodData

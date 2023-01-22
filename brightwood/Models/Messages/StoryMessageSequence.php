@@ -8,7 +8,6 @@ use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Interfaces\SequencableInterface;
 use Plasticode\Collections\Generic\Collection;
-use Plasticode\Collections\Generic\StringCollection;
 
 class StoryMessageSequence implements SequencableInterface
 {
@@ -154,7 +153,7 @@ class StoryMessageSequence implements SequencableInterface
 
     /**
      * Changes isFinalized property.
-     * 
+     *
      * @return $this
      */
     public function finalize(bool $state = true): self
@@ -224,7 +223,7 @@ class StoryMessageSequence implements SequencableInterface
 
     /**
      * Concats messages and creates a NEW sequence.
-     * 
+     *
      * If there are overrides or other attributes (such as isFinalized),
      * they are taken from the added sequence (!).
      */

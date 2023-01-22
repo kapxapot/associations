@@ -4,7 +4,7 @@ namespace Brightwood\Models\Data;
 
 class MysteryData extends StoryData
 {
-    protected function init() : void
+    protected function init(): void
     {
     }
 }

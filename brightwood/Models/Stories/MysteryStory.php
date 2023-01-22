@@ -9,19 +9,22 @@ use Brightwood\Models\Nodes\SkipNode;
 
 class MysteryStory extends Story
 {
-    public function __construct(
-        int $id
-    )
+    public function __construct(int $id)
     {
-        parent::__construct($id, '🏰 Тайная местность', true);
+        parent::__construct(
+            $id,
+            '🏰 Тайная местность',
+            'Куда-то исчезают люди, и вы не можете остаться в стороне... Сложность: 2/5',
+            true
+        );
     }
 
-    public function makeData(?array $data = null) : MysteryData
+    public function makeData(?array $data = null): MysteryData
     {
         return new MysteryData($data);
     }
 
-    protected function build() : void
+    protected function build(): void
     {
         $this->setStartNode(
             new ActionNode(
@@ -40,7 +43,7 @@ class MysteryStory extends Story
             new ActionNode(
                 2,
                 [
-                    'Ты {пришел|пришла} домой. Исчезла твоя мама.'
+                    'Ты приш{ел|ла} домой. Исчезла твоя мама.'
                 ],
                 [
                     5 => 'Пойти в полицию',
@@ -114,7 +117,7 @@ class MysteryStory extends Story
             new FinishNode(
                 9,
                 [
-                    'Ты {проиграл|проиграла}... 🙁 Попробуй еще раз!'
+                    'Ты проиграл{|а}... 🙁 Попробуй еще раз!'
                 ]
             )
         );
@@ -176,7 +179,7 @@ class MysteryStory extends Story
             new ActionNode(
                 14,
                 [
-                    'Ты {вернулся|вернулась} в комнату с драконом. Он тебя заметил и готовится к атаке.'
+                    'Ты вернул{ся|ась} в комнату с драконом. Он тебя заметил и готовится к атаке.'
                 ],
                 [
                     15 => 'Напасть на дракона',
@@ -212,7 +215,7 @@ class MysteryStory extends Story
             new ActionNode(
                 17,
                 [
-                    'Теперь нужно решить, что делать с кладом'
+                    'Теперь нужно решить, что делать с кладом.'
                 ],
                 [
                     18 => 'Раздать семьям пропавших',
@@ -225,7 +228,7 @@ class MysteryStory extends Story
             new FinishNode(
                 18,
                 [
-                    'Ура! Ты {выиграл|выиграла}!'
+                    'Ура! Ты выиграл{|а}!'
                 ]
             )
         );
