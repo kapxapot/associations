@@ -207,7 +207,7 @@ class UserAnswerer extends AbstractAnswerer
         return $this
             ->buildResponse(
                 $prependMessages,
-                'Для подтверждения команды {cmd:' . $command . '} скажи{att:те} {cmd:command} или повтори{att:те} её. Если {att:в|т}ы хо{att:тите|чешь} сказать это слово в игре, скажи{att:те} {cmd:playing}.'
+                'Для подтверждения команды повтори{att:те} её или скажи{att:те} слово {cmd:command}. Если {att:в|т}ы хо{att:тите|чешь} сказать слово {cmd:' . $command . '} в игре, скажи{att:те} {cmd:playing}.'
             )
             ->withUserVar(self::VAR_STATE, self::STATE_COMMAND_CONFIRM)
             ->withUserVar(self::VAR_COMMAND, $command)

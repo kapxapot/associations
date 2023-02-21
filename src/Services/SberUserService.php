@@ -22,12 +22,8 @@ class SberUserService
         $this->userRepository = $userRepository;
     }
 
-    public function getOrCreateSberUser(SberRequest $request): SberUser
+    public function getOrCreateSberUser(SberRequest $request, string $sberUserId): SberUser
     {
-        $sberUserId = $request->userId();
-
-        Assert::stringNotEmpty($sberUserId);
-
         $sberUser =
             $this->sberUserRepository->getBySberId($sberUserId)
             ?? $this->sberUserRepository->store(['sber_id' => $sberUserId]);

@@ -298,9 +298,29 @@ abstract class AbstractBotRequest
         return $this->userState;
     }
 
+    /**
+     * @return $this
+     */
+    public function withUserState(array $state): self
+    {
+        $this->userState = $state;
+
+        return $this;
+    }
+
     public function applicationState(): ?array
     {
         return $this->applicationState;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withApplicationState(array $state): self
+    {
+        $this->applicationState = $state;
+
+        return $this;
     }
 
     public function state(): ?array

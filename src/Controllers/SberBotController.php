@@ -9,6 +9,8 @@ use App\Bots\Command;
 use App\Bots\Factories\BotMessageRendererFactory;
 use App\Bots\Interfaces\MessageRendererInterface;
 use App\Bots\SberRequest;
+use App\Models\SberUser;
+use App\Repositories\Interfaces\SberUserRepositoryInterface;
 use App\Semantics\SentenceCleaner;
 use App\Services\SberUserService;
 use Exception;
@@ -27,12 +29,11 @@ class SberBotController
     private ApplicationAnswerer $applicationAnswerer;
     private UserAnswerer $userAnswerer;
 
+    private SberUserRepositoryInterface $sberUserRepository;
     private SberUserService $sberUserService;
 
     private SettingsProviderInterface $settingsProvider;
-
     private MessageRendererInterface $messageRenderer;
-
     private SentenceCleaner $sentenceCleaner;
 
     private bool $logEnabled;
@@ -40,6 +41,7 @@ class SberBotController
     public function __construct(
         ApplicationAnswerer $applicationAnswerer,
         UserAnswerer $userAnswerer,
+        SberUserRepositoryInterface $sberUserRepository,
         SberUserService $sberUserService,
         SettingsProviderInterface $settingsProvider,
         BotMessageRendererFactory $messageRendererFactory,
@@ -50,10 +52,10 @@ class SberBotController
         $this->applicationAnswerer = $applicationAnswerer;
         $this->userAnswerer = $userAnswerer;
 
+        $this->sberUserRepository = $sberUserRepository;
         $this->sberUserService = $sberUserService;
 
         $this->settingsProvider = $settingsProvider;
-
         $this->messageRenderer = ($messageRendererFactory)();
 
         $this->logger = $logger;
@@ -75,7 +77,20 @@ class SberBotController
             }
 
             $sberRequest = new SberRequest($data);
-            $sberResponse = $this->getResponse($sberRequest);
+
+            $hasUser = $sberRequest->hasUser();
+
+            $sberUserId = $hasUser
+                ? $sberRequest->userId()
+                : $sberRequest->applicationId();
+
+            $sberUser = $this->sberUserService->getOrCreateSberUser($sberRequest, $sberUserId);
+
+            $this->loadState($sberUser, $sberRequest);
+
+            $sberResponse = $this->getResponse($sberUser, $sberRequest);
+
+            $this->saveState($sberUser, $sberResponse);
 
             $answer = $this->buildMessage($sberRequest, $sberResponse);
 
@@ -94,12 +109,38 @@ class SberBotController
         return Response::text($response, 'Error');
     }
 
-    private function getResponse(SberRequest $request): BotResponse
+    private function loadState(SberUser $sberUser, SberRequest $request): void
     {
-        $sberUser = $request->hasUser()
-            ? $this->sberUserService->getOrCreateSberUser($request)
-            : null;
+        $rawState = $sberUser->state;
 
+        $state = strlen($rawState) > 0
+            ? json_decode($rawState, true)
+            : [];
+
+        $request
+            ->withUserState($state[SberRequest::USER_STATE] ?? [])
+            ->withApplicationState($state[SberRequest::APPLICATION_STATE] ?? []);
+    }
+
+    private function saveState(SberUser $sberUser, BotResponse $response): void
+    {
+        $state = [];
+
+        if (!empty($response->userState())) {
+            $state[SberRequest::USER_STATE] = $response->userState();
+        }
+
+        if (!empty($response->applicationState())) {
+            $state[SberRequest::APPLICATION_STATE] = $response->applicationState();
+        }
+
+        $sberUser->state = json_encode($state);
+
+        $this->sberUserRepository->save($sberUser);
+    }
+
+    private function getResponse(SberUser $sberUser, SberRequest $request): BotResponse
+    {
         return ($sberUser === null)
             ? $this->applicationAnswerer->getResponse($request)
             : $this->userAnswerer->getResponse($request, $sberUser);
@@ -120,7 +161,7 @@ class SberBotController
             ])
             ->render($response->text());
 
-        // special trailing dor trimming for Sber
+        // special trailing dot trimming for Sber
         $text = $this->sentenceCleaner->trimTrailingDot($text);
 
         $data = [
@@ -142,20 +183,6 @@ class SberBotController
                 ],
             ]
         ];
-
-        if ($response->hasState()) {
-            $state = [];
-
-            if (!empty($response->userState())) {
-                $state[SberRequest::USER_STATE] = $response->userState();
-            }
-
-            if (!empty($response->applicationState())) {
-                $state[SberRequest::APPLICATION_STATE] = $response->applicationState();
-            }
-
-            $data['payload'][SberRequest::STATE_ROOT] = json_encode($state);
-        }
 
         if ($response->hasActions()) {
             $buttons = array_map(

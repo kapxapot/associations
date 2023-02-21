@@ -22,7 +22,7 @@ abstract class AbstractAnswerer
 
     protected const MESSAGE_CLUELESS = 'Извини{att:те}, не понял{|а}.';
     protected const MESSAGE_WELCOME = '{hello}! Поиграем в ассоциации?';
-    protected const MESSAGE_WELCOME_BACK = 'С возвращением!';
+    protected const MESSAGE_WELCOME_BACK = 'С возвращением! Чтобы напомнить, как играть, скажите {cmd:rules}.';
     protected const MESSAGE_BYE = '{att:До свидания|Пока}! Заходи{att:те} ещё!';
 
     protected const CHUNK_RULES = 'Чтобы узнать, как играть, скажи{att:те} {cmd:rules}.';
@@ -185,7 +185,6 @@ abstract class AbstractAnswerer
     protected function isHelpRulesCommand(AbstractBotRequest $request): bool
     {
         return $request->hasAnySet(
-            ['команды'],
             ['правила'],
             ['правила', 'игры'],
             ['смысл', 'игры'],

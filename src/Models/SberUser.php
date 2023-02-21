@@ -4,6 +4,7 @@ namespace App\Models;
 
 /**
  * @property string $sberId
+ * @property string $state
  */
 class SberUser extends AbstractBotUser
 {
