@@ -76,10 +76,6 @@ class Answerer
             }
         }
 
-        if (Story::STORY_SELECTION_COMMAND == $text || $text == '/story') {
-            return $this->storySelection();
-        }
-
         // story switch command
         if (preg_match("#^/story(?:\s+|_)(\d+)$#i", $text, $matches)) {
             $storyId = $matches[1];
@@ -96,6 +92,10 @@ class Answerer
             );
         }
 
+        if ($text == Story::STORY_SELECTION_COMMAND || $text == '/story') {
+            return $this->storySelection();
+        }
+
         // default - next step
         return $this->nextStep($tgUser, $text);
     }
@@ -103,7 +103,7 @@ class Answerer
     private function startCommand(TelegramUser $tgUser): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
-        $isReader = !is_null($status);
+        $isReader = $status !== null;
 
         $greeting = $isReader ? 'С возвращением' : 'Добро пожаловать';
         $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
@@ -241,7 +241,14 @@ class Answerer
     {
         $status = $this->getStatus($tgUser);
 
-        Assert::notNull($status);
+        $cluelessMessage = new TextMessage('Что-что? Повторите-ка... 🧐');
+
+        if (!$status) {
+            return StoryMessageSequence::mash(
+                $cluelessMessage,
+                $this->storySelection()
+            );
+        }
 
         $story = $this->storyRepository->get($status->storyId);
         $node = $story->getNode($status->stepId);
@@ -262,7 +269,7 @@ class Answerer
         }
 
         return StoryMessageSequence::mash(
-            new TextMessage('Что-что? Повторите-ка... 🧐'),
+            $cluelessMessage,
             $this->currentStatusMessages($tgUser)
         );
     }
@@ -289,7 +296,9 @@ class Answerer
     {
         $status = $this->getStatus($tgUser);
 
-        Assert::notNull($status);
+        if (!$status) {
+            return $this->startStory($tgUser, $story->id());
+        }
 
         $sequence = $story->start($tgUser);
 
