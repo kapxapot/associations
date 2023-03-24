@@ -14,7 +14,7 @@ $scope.override = {
     with_severity: {{ override.hasSeverity ? 'true' : 'false' }},
     severity: {{ override.severity ?: word.severity }},
     with_word_correction: {{ override.hasWordCorrection ? 'true' : 'false' }},
-    word_correction: '{{ (override.wordCorrection ?? word.word)|e('js') }}',
+    word_correction: '{{ (override.wordCorrection ?: word.word)|e('js') }}',
     with_pos_correction: {{ override.hasPosCorrection ? 'true' : 'false' }},
     pos_correction: [
         {% for pos in parts_of_speech %}
