@@ -261,8 +261,7 @@ class TurnService
                 ->where(
                     fn (Association $a) => $a->isPlayableAgainst($user)
                 )
-                ->shuffle()
-                ->first(
+                ->random(
                     fn (AggregatedAssociation $a) => $this->canBePlayed(
                         $game,
                         $a->otherThanAnchor()

@@ -177,7 +177,7 @@ class GameService
             }
         }
 
-        $answer = $this->languageService->getRandomStartingWord($language, $word);
+        $answer = $this->languageService->getRandomStartingWord($language, $prevWord);
 
         return PseudoTurn::new($answer);
     }

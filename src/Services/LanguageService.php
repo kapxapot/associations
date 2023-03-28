@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Collections\WordCollection;
+use App\Config\Interfaces\WordConfigInterface;
 use App\Models\DTO\GameOptions;
 use App\Models\Game;
 use App\Models\Language;
@@ -20,6 +21,7 @@ class LanguageService
     private WordRepositoryInterface $wordRepository;
 
     private SettingsProviderInterface $settingsProvider;
+    private WordConfigInterface $wordConfig;
 
     private WordService $wordService;
 
@@ -27,6 +29,7 @@ class LanguageService
         LanguageRepositoryInterface $languageRepository,
         WordRepositoryInterface $wordRepository,
         SettingsProviderInterface $settingsProvider,
+        WordConfigInterface $wordConfig,
         WordService $wordService
     )
     {
@@ -34,6 +37,7 @@ class LanguageService
         $this->wordRepository = $wordRepository;
 
         $this->settingsProvider = $settingsProvider;
+        $this->wordConfig = $wordConfig;
 
         $this->wordService = $wordService;
     }
@@ -103,16 +107,36 @@ class LanguageService
             ? $words->except($exceptWord)
             : $words;
 
-        // 1. try find a common word
-        // 2. try find a public word
+        // 1. try to find a common word IF their number exceeds minimum
+        // 2. try to find a public word
         // 3. select one of the user's words
-        // 4. try find a private word
-        $sources = [
-            fn () => ($except)($this->wordRepository->getAllByScope(Scope::COMMON, $language)),
-            fn () => ($except)($this->wordRepository->getAllByScope(Scope::PUBLIC, $language)),
-            fn () => ($except)($this->wordService->getAllUsedBy($user, $language)),
-            fn () => ($except)($this->wordRepository->getAllByScope(Scope::PRIVATE, $language))
-        ];
+        // 4. try to find a private word
+        $sources = [];
+
+        $commonWords = $this->wordRepository->getAllByScope(Scope::COMMON, $language);
+        $minCommonNumber = $this->wordConfig->wordMinCommonNumber();
+
+        if ($commonWords->count() >= $minCommonNumber) {
+            // normal - common, then public
+            $sources[] = fn () => ($except)($commonWords);
+
+            $sources[] = fn () =>
+                ($except)($this->wordRepository->getAllByScope(Scope::PUBLIC, $language));
+        } else {
+            // not normal - common + public
+            /** @var WordCollection */
+            $fuzzyPublic = $commonWords->concat(
+                $this->wordRepository->getAllByScope(Scope::PUBLIC, $language)
+            );
+
+            $sources[] = fn () => ($except)($fuzzyPublic);
+        }
+
+        $sources[] = fn () =>
+            ($except)($this->wordService->getAllUsedBy($user, $language));
+
+        $sources[] = fn () =>
+            ($except)($this->wordRepository->getAllByScope(Scope::PRIVATE, $language));
 
         // 5. except word as a failsafe
         if ($exceptWord) {
@@ -141,11 +165,9 @@ class LanguageService
     private function retrieveSuitableWord(WordCollection $words, ?User $user, ?GameOptions $options): ?Word
     {
         /** @var Word|null $word */
-        $word = $words
-            ->shuffle()
-            ->first(
-                fn (Word $w) => $w->isPlayableAgainst($user, $options)
-            );
+        $word = $words->random(
+            fn (Word $w) => $w->isPlayableAgainst($user, $options)
+        );
 
         return $word
             ? $word->canonicalPlayableAgainst($user)

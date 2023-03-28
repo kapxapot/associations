@@ -64,6 +64,8 @@ users:
 words:
   approval_threshold: 1
   common_threshold: 10
+  # min number of common words to prioritize them
+  min_common_number: 5
   mature_threshold: 2
   coeffs:
     approved_association: 1

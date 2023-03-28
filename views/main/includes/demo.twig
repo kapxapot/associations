@@ -13,7 +13,7 @@
                 Нет слов на языке {{ language.name }}, демо-игра невозможна. Пожалуйста, <a href="javascript:void(0);" ng-click="signIn()">войдите</a> или <a href="javascript:void(0);" ng-click="signUp()">зарегистрируйтесь</a>.
             </div>
 
-            <div ng-if="demo.word">
+            <div ng-if="demo.word" class="mt-1">
                 <span ng-show="!demo.word.association">🤖 Компьютер говорит новое слово:</span>
                 <span ng-show="demo.word.association">В ответ на <span class="label turn-label label-success"><a ng-href="{{'{{demo.prevWord().url}}'}}" ng-bind="demo.prevWord().word"></a></span> 🤖 компьютер говорит:</span>
                 <span class="label br-word label-info turn-label">
@@ -24,10 +24,8 @@
             <div class="col-md-6 col-xs-12 mt-2 ph-0" ng-if="demo.word">
                 <form autocomplete="off">
                     <div class="form-group mb-2">
-                        <label for="demoNextWord">Ваше слово:</label>
-
-                        <div class="input-group">
-                            <input id="demoNextWord" ng-model="demo.input" class="form-control" maxlength="{{ word_max_length }}" data-focus required />
+                        <div class="input-group mt-2">
+                            <input id="demoNextWord" ng-model="demo.input" class="form-control" maxlength="{{ word_max_length }}" placeholder="Ваше слово" data-focus required />
 
                             <span class="input-group-btn">
                                 <button type="submit" ng-click="demo.send()" class="btn btn-success ajax-button" ng-disabled="!demo.input || demo.loading || demo.saving"><i class="fas fa-spinner fa-lg fa-spin ajax-button-spinner" ng-show="demo.saving"></i><span ng-hide="demo.saving">Отправить</span></button>

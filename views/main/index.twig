@@ -4,11 +4,12 @@
 
 {% set index = true %}
 {% set no_disqus = true %}
+{% set demo_mode = not auth.user %}
 
 {% set title = short_site_description %}
 
 {% block content %}
-    {% if not auth.user %}
+    {% if demo_mode %}
         {% include 'main/includes/demo.twig' %}
     {% else %}
         {% include 'main/includes/play.twig' %}
@@ -21,7 +22,7 @@
 {% set even_more_angular %}
     $scope.languageId = {{ language.id }};
 
-    {% if not auth.user %}
+    {% if demo_mode %}
         {% include 'main/scripts/demo.twig' %}
     {% else %}
         {% include 'main/scripts/play.twig' %}

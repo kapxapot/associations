@@ -75,6 +75,11 @@ class Config extends BaseConfig implements AssociationConfigInterface, NewsConfi
         return $this->get('words.common_threshold', 10);
     }
 
+    public function wordMinCommonNumber(): int
+    {
+        return $this->get('words.min_common_number', 5);
+    }
+
     public function wordMatureThreshold(): float
     {
         return $this->get('words.mature_threshold', 2);
