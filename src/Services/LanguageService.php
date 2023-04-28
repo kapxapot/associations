@@ -165,9 +165,11 @@ class LanguageService
     private function retrieveSuitableWord(WordCollection $words, ?User $user, ?GameOptions $options): ?Word
     {
         /** @var Word|null $word */
-        $word = $words->random(
-            fn (Word $w) => $w->isPlayableAgainst($user, $options)
-        );
+        $word = $words
+            ->shuffle()
+            ->first(
+                fn (Word $w) => $w->isPlayableAgainst($user, $options)
+            );
 
         return $word
             ? $word->canonicalPlayableAgainst($user)
