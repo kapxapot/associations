@@ -336,7 +336,7 @@ class TelegramBotController
      */
     private function startCommand(TelegramUser $tgUser, ?array $customGreeting = null): array
     {
-        $greeting = $customGreeting ?? [];
+        $greeting = $customGreeting;
 
         if (empty($greeting)) {
             if ($tgUser->isChat()) {
@@ -346,11 +346,11 @@ class TelegramBotController
                     '⚠ Внимание! Не делайте меня админом, иначе игра будет остановлена.',
                 ];
             } else {
-                $satulation = $tgUser->isNew() ? 'Добро пожаловать' : 'С возвращением';
+                $salutation = $tgUser->isNew() ? 'Добро пожаловать' : 'С возвращением';
                 $name = $tgUser->privateName();
 
-                $greeting[] = [
-                    sprintf('%s, <b>%s</b>!', $satulation, $name)
+                $greeting = [
+                    sprintf('%s, <b>%s</b>!', $salutation, $name)
                 ];
             }
         }
