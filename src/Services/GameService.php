@@ -56,7 +56,7 @@ class GameService
     {
         $lastGame = $user->lastGame();
 
-        $lastWord = $lastGame
+        $lastWord = ($lastGame && $lastGame->lastTurn())
             ? $lastGame->lastTurn()->word()
             : null;
 
