@@ -19,7 +19,7 @@ class AssociationCreatedHandler
         $this->associationRecountService = $associationRecountService;
     }
 
-    public function __invoke(AssociationCreatedEvent $event) : void
+    public function __invoke(AssociationCreatedEvent $event): void
     {
         $association = $event->getAssociation();
 
