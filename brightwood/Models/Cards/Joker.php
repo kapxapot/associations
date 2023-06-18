@@ -34,7 +34,7 @@ class Joker extends Card
 
     public function equals(?EquatableInterface $obj): bool
     {
-        return $obj && ($obj instanceof self);
+        return $obj instanceof self;
     }
 
     /**

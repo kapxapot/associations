@@ -63,8 +63,7 @@ class SuitedCard extends Card
     public function equals(?EquatableInterface $obj): bool
     {
         return
-            $obj
-            && ($obj instanceof self)
+            ($obj instanceof self)
             && $this->suit->equals($obj->suit())
             && $this->rank->equals($obj->rank());
     }

@@ -52,12 +52,11 @@ class AggregatedAssociation extends Association implements JsonSerializable
 
     /**
      * `equals()` override that takes anchor into account.
-     *
-     * @param self|null $obj
      */
     public function equals(?EquatableInterface $obj): bool
     {
         return parent::equals($obj)
+            && ($obj instanceof self)
             && (!$this->hasAnchor() && !$obj->hasAnchor()
                 || $this->anchor->equals($obj->anchor()));
     }

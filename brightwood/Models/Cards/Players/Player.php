@@ -91,10 +91,7 @@ abstract class Player implements EquatableInterface, GenderedInterface, NamedInt
 
     public function equals(?EquatableInterface $obj): bool
     {
-        return
-            $obj
-            && ($obj instanceof self)
-            && ($this->id() === $obj->id());
+        return ($obj instanceof self) && ($this->id() === $obj->id());
     }
 
     public function isInspector(): bool

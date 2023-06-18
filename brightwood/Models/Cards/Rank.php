@@ -98,12 +98,9 @@ class Rank implements EquatableInterface
         return $this->valueRu;
     }
 
-    /**
-     * @param self|null $obj
-     */
     public function equals(?EquatableInterface $obj): bool
     {
-        return $obj && ($this->id() == $obj->id());
+        return ($obj instanceof self) && ($this->id() == $obj->id());
     }
 
     public static function all(): RankCollection
