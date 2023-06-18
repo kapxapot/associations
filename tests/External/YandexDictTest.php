@@ -16,7 +16,7 @@ final class YandexDictTest extends IntegrationTest
     private Language $language;
     private YandexDict $dict;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ final class YandexDictTest extends IntegrationTest
         );
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         unset($this->dict);
         unset($this->language);
@@ -43,7 +43,7 @@ final class YandexDictTest extends IntegrationTest
     /**
      * @dataProvider existingWordsProvider
      */
-    public function testExistingWords(string $word) : void
+    public function testExistingWords(string $word): void
     {
         $result = $this->dict->request($this->language->yandexDictCode, $word);
 
@@ -67,8 +67,10 @@ final class YandexDictTest extends IntegrationTest
         ];
     }
 
-    /** @dataProvider notExistingWordsProvider */
-    public function testNotExistingWords(string $word) : void
+    /**
+     * @dataProvider notExistingWordsProvider
+     */
+    public function testNotExistingWords(string $word): void
     {
         $result = $this->dict->request($this->language->yandexDictCode, $word);
 

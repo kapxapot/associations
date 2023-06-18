@@ -11,14 +11,12 @@ use App\Parsing\DefinitionParser;
 use App\Repositories\Interfaces\DefinitionRepositoryInterface;
 use App\Repositories\Interfaces\GameRepositoryInterface;
 use App\Repositories\Interfaces\TurnRepositoryInterface;
-use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\WordFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\WordRepositoryInterface;
 use App\Services\LanguageService;
 use App\Services\WordFeedbackService;
 use App\Services\WordService;
 use App\Testing\Factories\LanguageRepositoryFactory;
-use App\Testing\Factories\UserRepositoryFactory;
 use App\Testing\Factories\WordRepositoryFactory;
 use App\Testing\Mocks\Config\WordConfigMock;
 use App\Testing\Mocks\LinkerMock;
@@ -40,7 +38,6 @@ final class WordFeedbackTest extends IntegrationTest
     private DefinitionRepositoryInterface $definitionRepository;
     private GameRepositoryInterface $gameRepository;
     private TurnRepositoryInterface $turnRepository;
-    private UserRepositoryInterface $userRepository;
     private WordFeedbackRepositoryInterface $wordFeedbackRepository;
     private WordRepositoryInterface $wordRepository;
 
@@ -49,8 +46,6 @@ final class WordFeedbackTest extends IntegrationTest
     public function setUp(): void
     {
         parent::setUp();
-
-        $this->userRepository = UserRepositoryFactory::make();
 
         $languageRepository = LanguageRepositoryFactory::make();
 
@@ -103,13 +98,15 @@ final class WordFeedbackTest extends IntegrationTest
 
         $eventDispatcher = new EventDispatcher();
 
+        $wordConfig = new WordConfigMock();
+
         $wordService = new WordService(
             $this->definitionRepository,
             $this->turnRepository,
             $this->wordRepository,
             $validator,
             $validationRules,
-            new WordConfigMock(),
+            $wordConfig,
             $eventDispatcher,
             new DefinitionParser()
         );
@@ -118,6 +115,7 @@ final class WordFeedbackTest extends IntegrationTest
             $languageRepository,
             $this->wordRepository,
             $settingsProvider,
+            $wordConfig,
             $wordService
         );
 
@@ -141,7 +139,6 @@ final class WordFeedbackTest extends IntegrationTest
         unset($this->wordFeedbackRepository);
         unset($this->definitionRepository);
         unset($this->wordRepository);
-        unset($this->userRepository);
 
         parent::tearDown();
     }
@@ -151,8 +148,7 @@ final class WordFeedbackTest extends IntegrationTest
      */
     public function testToModel(array $data, array $expected): void
     {
-        $user = $this->userRepository->get(1);
-
+        $user = $this->getDefaultUser();
         $model = $this->wordFeedbackService->toModel($data, $user);
 
         $this->assertInstanceOf(WordFeedback::class, $model);
@@ -201,8 +197,7 @@ final class WordFeedbackTest extends IntegrationTest
     {
         $this->expectException(ValidationException::class);
 
-        $user = $this->userRepository->get(1);
-
+        $user = $this->getDefaultUser();
         $this->wordFeedbackService->toModel([], $user);
     }
 
@@ -210,7 +205,7 @@ final class WordFeedbackTest extends IntegrationTest
     {
         $this->expectException(ValidationException::class);
 
-        $user = $this->userRepository->get(1);
+        $user = $this->getDefaultUser();
 
         $this->wordFeedbackService->toModel(
             [

@@ -8,9 +8,7 @@ use App\Models\Association;
 use App\Models\AssociationFeedback;
 use App\Repositories\Interfaces\AssociationFeedbackRepositoryInterface;
 use App\Repositories\Interfaces\AssociationRepositoryInterface;
-use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Services\AssociationFeedbackService;
-use App\Testing\Factories\UserRepositoryFactory;
 use App\Testing\Mocks\Repositories\AssociationFeedbackRepositoryMock;
 use App\Testing\Mocks\Repositories\AssociationRepositoryMock;
 use App\Tests\IntegrationTest;
@@ -25,7 +23,6 @@ final class AssociationFeedbackTest extends IntegrationTest
 {
     private AssociationFeedbackRepositoryInterface $associationFeedbackRepository;
     private AssociationRepositoryInterface $associationRepository;
-    private UserRepositoryInterface $userRepository;
 
     private AssociationFeedbackService $associationFeedbackService;
 
@@ -33,7 +30,6 @@ final class AssociationFeedbackTest extends IntegrationTest
     {
         parent::setUp();
 
-        $this->userRepository = UserRepositoryFactory::make();
         $this->associationRepository = new AssociationRepositoryMock();
 
         $this->associationRepository->save(
@@ -68,7 +64,6 @@ final class AssociationFeedbackTest extends IntegrationTest
 
         unset($this->associationFeedbackRepository);
         unset($this->associationRepository);
-        unset($this->userRepository);
 
         parent::tearDown();
     }
@@ -78,8 +73,7 @@ final class AssociationFeedbackTest extends IntegrationTest
      */
     public function testToModel(array $data, array $expected) : void
     {
-        $user = $this->userRepository->get(1);
-
+        $user = $this->getDefaultUser();
         $model = $this->associationFeedbackService->toModel($data, $user);
 
         $this->assertInstanceOf(AssociationFeedback::class, $model);
@@ -119,8 +113,7 @@ final class AssociationFeedbackTest extends IntegrationTest
     {
         $this->expectException(ValidationException::class);
 
-        $user = $this->userRepository->get(1);
-
+        $user = $this->getDefaultUser();
         $this->associationFeedbackService->toModel([], $user);
     }
 }
