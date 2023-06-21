@@ -24,7 +24,7 @@ final class DictionaryApiTest extends IntegrationTest
             new LanguageSeeder()
         );
 
-        $this->language = $this->languageRepository->get(LanguageSeeder::RUSSIAN);
+        $this->language = $this->languageRepository->get(LanguageSeeder::ENGLISH);
 
         $this->dictApi = new DictionaryApi(
             (new ConsoleLoggerFactory())()
@@ -45,8 +45,6 @@ final class DictionaryApiTest extends IntegrationTest
      */
     public function testExistingWords(string $word): void
     {
-        $this->markTestSkipped('Dictionary Api is unstable');
-
         $result = $this->dictApi->request($this->language->code, $word);
 
         $this->assertNotNull($result);
@@ -63,9 +61,9 @@ final class DictionaryApiTest extends IntegrationTest
     public function existingWordsProvider(): array
     {
         return [
-            ['секс'],
-            ['самолет'],
-            ['таблица'],
+            ['sex'],
+            ['plane'],
+            ['table'],
         ];
     }
 
@@ -74,8 +72,6 @@ final class DictionaryApiTest extends IntegrationTest
      */
     public function testNotExistingWords(string $word): void
     {
-        $this->markTestSkipped('Dictionary Api is unstable');
-
         $result = $this->dictApi->request($this->language->code, $word);
 
         $this->assertNotNull($result);
