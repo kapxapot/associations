@@ -14,6 +14,7 @@ use Brightwood\Testing\Factories\RootDeserializerFactory;
 use Brightwood\Testing\Mocks\Repositories\StoryStatusRepositoryMock;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Semantics\Gender;
+use Plasticode\Util\Cases;
 use Psr\Log\LoggerInterface;
 
 final class AnswererTest extends TestCase
@@ -34,7 +35,8 @@ final class AnswererTest extends TestCase
         $this->telegramUserRepository = new TelegramUserRepositoryMock();
 
         $this->storyRepository = new StoryRepository(
-            RootDeserializerFactory::make($this->telegramUserRepository)
+            RootDeserializerFactory::make($this->telegramUserRepository),
+            new Cases()
         );
 
         $this->logger = LoggerFactory::make();

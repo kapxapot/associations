@@ -44,10 +44,6 @@ class SkipGiftAction extends GiftAction implements ApplicableActionInterface, Sk
     public function announcementEvents(): CardEventCollection
     {
         return CardEventCollection::empty();
-
-        // return CardEventCollection::collect(
-        //     new PublicEvent('Следующий игрок пропускает ход')
-        // );
     }
 
     public function applyTo(CardGame $game, Player $player): CardEventCollection

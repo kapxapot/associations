@@ -29,7 +29,7 @@ class Message implements MessageInterface
     /**
      * @return string[]
      */
-    public function lines() : array
+    public function lines(): array
     {
         return $this->lines;
     }
@@ -37,30 +37,30 @@ class Message implements MessageInterface
     /**
      * @return string[]
      */
-    public function actions() : array
+    public function actions(): array
     {
         return $this->actions;
     }
 
-    public function hasActions() : bool
+    public function hasActions(): bool
     {
         return !empty($this->actions);
     }
 
-    public function data() : ?StoryData
+    public function data(): ?StoryData
     {
         return null;
     }
 
-    public function hasData() : bool
+    public function hasData(): bool
     {
-        return $this->data !== null;
+        return $this->data() !== null;
     }
 
     /**
      * @return static
      */
-    public function prependLines(string ...$lines) : self
+    public function prependLines(string ...$lines): self
     {
         $this->lines = array_merge(
             $lines,
@@ -73,7 +73,7 @@ class Message implements MessageInterface
     /**
      * @return static
      */
-    public function appendLines(string ...$lines) : self
+    public function appendLines(string ...$lines): self
     {
         $this->lines = array_merge(
             $this->lines,
@@ -86,7 +86,7 @@ class Message implements MessageInterface
     /**
      * @return static
      */
-    public function appendActions(string ...$actions) : self
+    public function appendActions(string ...$actions): self
     {
         $this->actions = array_merge(
             $this->actions,

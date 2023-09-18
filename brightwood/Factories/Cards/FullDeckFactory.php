@@ -12,10 +12,9 @@ class FullDeckFactory extends StandardDeckFactory
 {
     protected function collectCards(): CardCollection
     {
-        return parent::collectCards()
-            ->add(
-                new Joker(),
-                new Joker()
-            );
+        return parent::collectCards()->add(
+            new Joker(),
+            new Joker()
+        );
     }
 }

@@ -55,6 +55,26 @@ abstract class CardList implements SerializableInterface
         return $this->cards->filterSuited();
     }
 
+    /**
+     * Returns a copy of the card list with sorted cards.
+     *
+     * @return static
+     */
+    public function sort(callable $sortFunc): self
+    {
+        return new static($this->cards->sort($sortFunc));
+    }
+
+    /**
+     * Returns a copy of the card list with sorted cards in reverse order.
+     *
+     * @return static
+     */
+    public function sortReverse(callable $sortFunc): self
+    {
+        return new static($this->cards->sortReverse($sortFunc));
+    }
+
     public function __toString()
     {
         return $this->toString();
@@ -68,6 +88,11 @@ abstract class CardList implements SerializableInterface
     public function toHomogeneousString(): string
     {
         return $this->cards->toHomogeneousString();
+    }
+
+    public function toRuString(): string
+    {
+        return $this->cards->toRuString();
     }
 
     // SerializableInterface

@@ -69,8 +69,8 @@ class SuitedCard extends Card
     }
 
     /**
-     * Tries to parse suited card. If unsuccessful, returns null.
-     * 
+     * Tries to parse a suited card. If unsuccessful, returns `null`.
+     *
      * ♥8
      */
     public static function tryParse(?string $str): ?self
@@ -85,7 +85,7 @@ class SuitedCard extends Card
         $suit = Suit::tryParse($suitStr);
         $rank = Rank::tryParse($rankStr);
 
-        if (is_null($suit) || is_null($rank)) {
+        if (!$suit || !$rank) {
             return null;
         }
 

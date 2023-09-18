@@ -75,7 +75,8 @@ class Suit implements EquatableInterface, JsonSerializable
 
     public function equals(?EquatableInterface $obj): bool
     {
-        return ($obj instanceof self) && ($this->id() == $obj->id());
+        return ($obj instanceof self)
+            && $this->id() === $obj->id();
     }
 
     public static function all(): SuitCollection
@@ -97,22 +98,27 @@ class Suit implements EquatableInterface, JsonSerializable
 
     public static function spades(): self
     {
-        return self::all()->get(self::SPADES);
+        return self::get(self::SPADES);
     }
 
     public static function clubs(): self
     {
-        return self::all()->get(self::CLUBS);
+        return self::get(self::CLUBS);
     }
 
     public static function hearts(): self
     {
-        return self::all()->get(self::HEARTS);
+        return self::get(self::HEARTS);
     }
 
     public static function diamonds(): self
     {
-        return self::all()->get(self::DIAMONDS);
+        return self::get(self::DIAMONDS);
+    }
+
+    protected static function get(int $id): self
+    {
+        return self::all()->get($id);
     }
 
     /**

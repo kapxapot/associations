@@ -31,7 +31,6 @@ class StandardDeckFactory extends ShortDeckFactory
             }
         }
 
-        return parent::collectCards()
-            ->add(...$moreCards);
+        return parent::collectCards()->add(...$moreCards);
     }
 }

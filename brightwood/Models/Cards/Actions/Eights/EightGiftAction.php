@@ -5,7 +5,6 @@ namespace Brightwood\Models\Cards\Actions\Eights;
 use Brightwood\Collections\Cards\CardEventCollection;
 use Brightwood\Models\Cards\Actions\GiftAction;
 use Brightwood\Models\Cards\Card;
-use Brightwood\Models\Cards\Events\Generic\PublicEvent;
 use Brightwood\Models\Cards\Events\SuitRestrictionEvent;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Restrictions\Interfaces\RestrictionInterface;
@@ -56,12 +55,6 @@ class EightGiftAction extends GiftAction
         }
 
         return $events;
-
-        // return $events->add(
-        //     new PublicEvent(
-        //         'Следующий игрок должен положить <b>' . $this->suit()->fullNameRu() . '</b>'
-        //     )
-        // );
     }
 
     public function restriction(): RestrictionInterface

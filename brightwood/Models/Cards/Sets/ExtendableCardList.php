@@ -13,7 +13,7 @@ abstract class ExtendableCardList extends CardList
     /**
      * @return static
      */
-    public function add(Card $card) : self
+    public function add(Card $card): self
     {
         $this->cards = $this->cards->add($card);
 
@@ -23,7 +23,7 @@ abstract class ExtendableCardList extends CardList
     /**
      * @return static
      */
-    public function addMany(CardCollection $cards) : self
+    public function addMany(CardCollection $cards): self
     {
         $this->cards = $this->cards->concat($cards);
 

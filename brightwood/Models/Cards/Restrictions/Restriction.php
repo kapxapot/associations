@@ -8,14 +8,14 @@ use Brightwood\Serialization\UniformSerializer;
 
 abstract class Restriction implements RestrictionInterface
 {
-    abstract public function isCompatible(Card $card) : bool;
+    abstract public function isCompatible(Card $card): bool;
 
     public function __toString()
     {
         return $this->toString();
     }
 
-    abstract function toString() : string;
+    abstract function toString(): string;
 
     // SerializableInterface
 
@@ -24,7 +24,7 @@ abstract class Restriction implements RestrictionInterface
         return $this->serialize();
     }
 
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
         return UniformSerializer::serialize($this, ...$data);
     }

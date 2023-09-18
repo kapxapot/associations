@@ -302,6 +302,8 @@ class EightsStory extends Story
                                         $player->handSize(),
                                         $this->cases->caseForNumber('карта', $player->handSize()),
                                         $player->hand()
+                                            ->sortReverse([EightsGame::class, 'sort'])
+                                            ->toRuString()
                                     )
                                 ]
                             ),
@@ -309,7 +311,12 @@ class EightsStory extends Story
                                 ? new StoryMessage(
                                     0,
                                     ['Ваш ход:'],
-                                    [...$playableCards->stringize()]
+                                    [...$playableCards
+                                        ->distinct()
+                                        ->sortReverse([EightsGame::class, 'sort'])
+                                        ->stringize(
+                                            fn (Card $c) => $c->name('ru')
+                                        )]
                                 )
                                 : ($game->isDeckEmpty()
                                     ? new StoryMessage(

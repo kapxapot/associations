@@ -22,6 +22,11 @@ abstract class Card implements EquatableInterface, JsonSerializable
         return $this->name();
     }
 
+    public function toRuString(): string
+    {
+        return $this->name('ru');
+    }
+
     /**
      * @param string|null $lang 'ru' and 'en' are supported. null = 'en'.
      */

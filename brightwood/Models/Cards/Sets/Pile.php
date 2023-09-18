@@ -7,17 +7,18 @@ use Brightwood\Models\Cards\Card;
 use Webmozart\Assert\Assert;
 
 /**
- * A stack of cards that allows to put and take cards.
- * Cards are taken from the end of the list.
+ * A stack of cards that allows putting and taking cards.
+ *
+ * [!] Cards are taken from the end of the list.
  */
 class Pile extends ExtendableCardList
 {
-    public function top() : ?Card
+    public function top(): ?Card
     {
         return $this->cards->last();
     }
 
-    public function take() : ?Card
+    public function take(): ?Card
     {
         return $this->takeMany(1)->first();
     }
@@ -25,7 +26,7 @@ class Pile extends ExtendableCardList
     /**
      * @throws \InvalidArgumentException
      */
-    public function takeMany(int $amount) : CardCollection
+    public function takeMany(int $amount): CardCollection
     {
         Assert::greaterThan($amount, 0);
 
@@ -35,7 +36,7 @@ class Pile extends ExtendableCardList
         return $taken;
     }
 
-    public function flip() : self
+    public function flip(): self
     {
         $this->cards = $this->cards->reverse();
 

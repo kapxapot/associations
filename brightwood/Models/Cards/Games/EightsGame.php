@@ -19,6 +19,7 @@ use Brightwood\Models\Cards\Events\CardEventAccumulator;
 use Brightwood\Models\Cards\Events\DiscardEvent;
 use Brightwood\Models\Cards\Events\Interfaces\CardEventInterface;
 use Brightwood\Models\Cards\Events\NoCardsEvent;
+use Brightwood\Models\Cards\Joker;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Rank;
 use Brightwood\Models\Cards\Sets\Deck;
@@ -624,7 +625,7 @@ class EightsGame extends CardGame
 
         $topDiscard = $this->discard()->actualTop();
 
-        if (!$topDiscard || $topDiscard->isJoker()) {
+        if (!$topDiscard || $topDiscard instanceof Joker) {
             return true;
         }
 
@@ -679,10 +680,55 @@ class EightsGame extends CardGame
         }
 
         if ($this->noCardsInARow >= $this->players()->count()) {
-            return 'Ни у кого из игроков нет карт для хода';
+            return 'Ни у кого из игроков нет карт для хода.';
         }
 
         return null;
+    }
+
+    public static function sort(Card $a, Card $b): int
+    {
+        if (
+            $a instanceof SuitedCard
+            && $b instanceof SuitedCard
+        ) {
+            if ($a->isRank(Rank::eight())) {
+                if ($b->isRank(Rank::eight())) {
+                    return $a->suit()->id() - $b->suit()->id();
+                }
+
+                return 1;
+            }
+
+            if ($b->isRank(Rank::eight())) {
+                return -1;
+            }
+
+            if ($a->isSameSuit($b)) {
+                return $a->rank()->id() - $b->rank()->id();
+            }
+
+            return $a->suit()->id() - $b->suit()->id();
+        }
+
+        // Joker is < 8 and > any other card
+        if ($a instanceof Joker) {
+            if ($b instanceof SuitedCard && $b->isRank(Rank::eight())) {
+                return -1;
+            }
+
+            return $b instanceof Joker ? 0 : 1;
+        }
+
+        if ($b instanceof Joker) {
+            if ($a instanceof SuitedCard && $a->isRank(Rank::eight())) {
+                return 1;
+            }
+
+            return -1;
+        }
+
+        return 0;
     }
 
     // SerializableInterface

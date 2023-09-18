@@ -23,21 +23,21 @@ class Rank implements EquatableInterface
 
     private int $id;
 
-    /** @var integer|string */
+    /** @var int|string */
     private $value;
 
     private string $code;
     private string $name;
     private string $nameRu;
 
-    /** @var integer|string */
+    /** @var int|string */
     private $valueRu;
 
     private static ?RankCollection $ranks = null;
 
     /**
-     * @param integer|string $value
-     * @param integer|string|null $valueRu
+     * @param int|string $value
+     * @param int|string|null $valueRu
      */
     public function __construct(
         int $id,
@@ -68,7 +68,7 @@ class Rank implements EquatableInterface
     }
 
     /**
-     * @return integer|string
+     * @return int|string
      */
     public function value()
     {
@@ -91,7 +91,7 @@ class Rank implements EquatableInterface
     }
 
     /**
-     * @return integer|string
+     * @return int|string
      */
     public function valueRu()
     {
@@ -100,7 +100,8 @@ class Rank implements EquatableInterface
 
     public function equals(?EquatableInterface $obj): bool
     {
-        return ($obj instanceof self) && ($this->id() == $obj->id());
+        return ($obj instanceof self)
+            && $this->id() === $obj->id();
     }
 
     public static function all(): RankCollection
@@ -126,67 +127,72 @@ class Rank implements EquatableInterface
 
     public static function ace(): self
     {
-        return self::all()->get(self::ACE);
+        return self::get(self::ACE);
     }
 
     public static function two(): self
     {
-        return self::all()->get(self::TWO);
+        return self::get(self::TWO);
     }
 
     public static function three(): self
     {
-        return self::all()->get(self::THREE);
+        return self::get(self::THREE);
     }
 
     public static function four(): self
     {
-        return self::all()->get(self::FOUR);
+        return self::get(self::FOUR);
     }
 
     public static function five(): self
     {
-        return self::all()->get(self::FIVE);
+        return self::get(self::FIVE);
     }
 
     public static function six(): self
     {
-        return self::all()->get(self::SIX);
+        return self::get(self::SIX);
     }
 
     public static function seven(): self
     {
-        return self::all()->get(self::SEVEN);
+        return self::get(self::SEVEN);
     }
 
     public static function eight(): self
     {
-        return self::all()->get(self::EIGHT);
+        return self::get(self::EIGHT);
     }
 
     public static function nine(): self
     {
-        return self::all()->get(self::NINE);
+        return self::get(self::NINE);
     }
 
     public static function ten(): self
     {
-        return self::all()->get(self::TEN);
+        return self::get(self::TEN);
     }
 
     public static function jack(): self
     {
-        return self::all()->get(self::JACK);
+        return self::get(self::JACK);
     }
 
     public static function queen(): self
     {
-        return self::all()->get(self::QUEEN);
+        return self::get(self::QUEEN);
     }
 
     public static function king(): self
     {
-        return self::all()->get(self::KING);
+        return self::get(self::KING);
+    }
+
+    protected static function get(int $id): self
+    {
+        return self::all()->get($id);
     }
 
     /**
@@ -195,8 +201,25 @@ class Rank implements EquatableInterface
     public static function tryParse(?string $str): ?self
     {
         return self::all()->first(
-            fn (self $r) => $r->code === $str || (string)$r->value === $str
+            fn (self $r) => $r->is($str)
         );
+    }
+
+    public function is(?string $str): bool
+    {
+        $values = [
+            $this->code,
+            (string)$this->value,
+            (string)$this->valueRu
+        ];
+
+        foreach ($values as $value) {
+            if (mb_strtolower($value) === mb_strtolower($str)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function __toString()

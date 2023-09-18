@@ -27,24 +27,24 @@ class StoryMessage extends Message
         $this->data = $data;
     }
 
-    public function nodeId() : int
+    public function nodeId(): int
     {
         return $this->nodeId;
     }
 
-    public function data() : ?StoryData
+    public function data(): ?StoryData
     {
         return $this->data;
     }
 
-    public function withData(StoryData $data) : self
+    public function withData(StoryData $data): self
     {
         $this->data = $data;
 
         return $this;
     }
 
-    public function merge(self ...$messages) : self
+    public function merge(self ...$messages): self
     {
         $nodeId = $this->nodeId;
         $lines = $this->lines;

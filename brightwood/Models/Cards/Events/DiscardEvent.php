@@ -26,11 +26,11 @@ class DiscardEvent extends PlayerEvent
 
     public function publicChunk(): string
     {
-        return 'кладет ' . $this->cards . ' на стол';
+        return 'кладет ' . $this->cards->toRuString() . ' на стол';
     }
 
     public function personalChunk(): string
     {
-        return 'кладете ' . $this->cards . ' на стол';
+        return 'кладете ' . $this->cards->toRuString() . ' на стол';
     }
 }

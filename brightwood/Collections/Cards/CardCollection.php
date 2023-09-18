@@ -19,6 +19,35 @@ class CardCollection extends EquatableCollection
         );
     }
 
+    /**
+     * Sorts the cards and returns a new collection.
+     *
+     * @return static
+     */
+    public function sort(callable $sortFunc): self
+    {
+        $data = $this->data;
+        usort($data, $sortFunc);
+
+        return new static($data);
+    }
+
+    /**
+     * Sorts the cards in reverse order and returns a new collection.
+     *
+     * @return static
+     */
+    public function sortReverse(callable $sortFunc): self
+    {
+        $data = $this->data;
+        usort(
+            $data,
+            fn (Card $a, Card $b) => -1 * ($sortFunc)($a, $b)
+        );
+
+        return new static($data);
+    }
+
     public function __toString()
     {
         return $this->toString();
@@ -31,10 +60,28 @@ class CardCollection extends EquatableCollection
         );
     }
 
+    public function toRuString(): string
+    {
+        return Sentence::join(
+            $this->stringize(
+                fn (Card $c) => $c->toRuString()
+            )
+        );
+    }
+
     public function toHomogeneousString(): string
     {
         return Sentence::homogeneousJoin(
             $this->stringize()
+        );
+    }
+
+    public function toHomogeneousRuString(): string
+    {
+        return Sentence::homogeneousJoin(
+            $this->stringize(
+                fn (Card $c) => $c->toRuString()
+            )
         );
     }
 }
