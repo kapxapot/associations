@@ -385,10 +385,7 @@ class EightsStory extends Story
         );
 
         $this->addNode(
-            new FinishNode(
-                self::FINISH_GAME,
-                []
-            )
+            new FinishNode(self::FINISH_GAME, [])
         );
     }
 

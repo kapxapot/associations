@@ -231,9 +231,7 @@ class EightsGame extends CardGame
 
         while (
             !$this->isFinished()
-            && (!$withBreak
-                || $this->canAutoMove($this->currentPlayer)
-            )
+            && (!$withBreak || $this->canAutoMove($this->currentPlayer))
         ) {
             $messages[] = $this->makeMove($this->currentPlayer);
 
@@ -241,8 +239,9 @@ class EightsGame extends CardGame
         }
 
         if ($this->hasWinner()) {
-            $messages[] = $this->winMessageFor(
-                $this->currentPlayer
+            $messages = array_merge(
+                $messages,
+                $this->winMessagesFor($this->currentPlayer)
             );
         }
 
@@ -290,13 +289,22 @@ class EightsGame extends CardGame
         $this->move++;
     }
 
-    private function winMessageFor(Player $player): MessageInterface
+    /**
+     * @return MessageInterface[]
+     */
+    private function winMessagesFor(Player $player): array
     {
-        return new TextMessage(
-            $player->equals($this->observer())
-                ? $player->personalName() . ' выиграли!'
-                : $this->parser()->parse($player, $player . ' выиграл{|а}!')
-        );
+        return $player->equals($this->observer())
+            ? [
+                new TextMessage($player->personalName() . ' выиграли!'),
+                new TextMessage('🎉'),
+            ]
+            : [
+                new TextMessage(
+                    $this->parser()->parse($player, $player . ' выиграл{|а}!')
+                ),
+                new TextMessage('🙁'),
+            ];
     }
 
     protected function dealing(): MessageInterface
@@ -328,7 +336,7 @@ class EightsGame extends CardGame
         Assert::notEmpty($cards);
 
         $message->appendLines(
-            'Кладем ' . $cards . ' из колоды на стол'
+            'Кладем ' . $cards->toRuString() . ' из колоды на стол'
         );
 
         $events = $this->giftAnnouncementEvents();
@@ -349,14 +357,11 @@ class EightsGame extends CardGame
         Assert::true($this->isValidPlayer($player));
         Assert::true($this->isStarted());
 
-        // $moveStatus = $this->statusString();
-
         $moveMessages = $this
             ->actualMove($player)
             ->messagesFor($this->observer());
 
         $message = new TextMessage(
-            // $moveStatus,
             ...$moveMessages
         );
 
@@ -374,7 +379,6 @@ class EightsGame extends CardGame
     public function statusString(): string
     {
         return Text::join([
-            // '[' . $this->move . '] ' .
             'Стол: ' . $this->discard()->topString(),
             'Колода: ' . $this->deckSize() . ' ' . $this->cases->caseForNumber('карта', $this->deckSize())
         ]);
