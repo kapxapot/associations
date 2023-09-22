@@ -42,6 +42,8 @@ class EightsStory extends Story
     private RootDeserializerInterface $rootDeserializer;
     private Cases $cases;
 
+    private bool $drawing = false;
+
     public function __construct(
         int $id,
         RootDeserializerInterface $rootDeserializer,
@@ -225,6 +227,9 @@ class EightsStory extends Story
                 function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
                     $sequence = StoryMessageSequence::empty();
 
+                    $beenDrawing = $this->drawing;
+                    $this->drawing = false;
+
                     $game = $data->game();
                     $player = $this->getAndCheckPlayer($game, $tgUser);
                     $playableCards = $game->getPlayableCardsFor($player);
@@ -267,8 +272,8 @@ class EightsStory extends Story
                     // draw a card?
                     if ($text === self::DRAW_CARD_COMMAND && !$game->isDeckEmpty()) {
                         $event = $game->drawToHand($player);
-
                         Assert::notNull($event);
+                        $this->drawing = true;
                     }
 
                     // no cards?
@@ -292,20 +297,22 @@ class EightsStory extends Story
                         ->add(
                             new StoryMessage(
                                 self::HUMAN_MOVE,
-                                [
-                                    $game->statusString(),
-                                    Text::join(
-                                        $game->players()->except($player)->handsStrings()
-                                    ),
-                                    sprintf(
-                                        'У вас %s %s: %s',
-                                        $player->handSize(),
-                                        $this->cases->caseForNumber('карта', $player->handSize()),
-                                        $player->hand()
-                                            ->sortReverse([EightsGame::class, 'sort'])
-                                            ->toRuString()
-                                    )
-                                ]
+                                $beenDrawing && $playableCards->isEmpty()
+                                    ? []
+                                    : [
+                                        $game->statusString(),
+                                        Text::join(
+                                            $game->players()->except($player)->handsStrings()
+                                        ),
+                                        sprintf(
+                                            'У вас %s %s: %s',
+                                            $player->handSize(),
+                                            $this->cases->caseForNumber('карта', $player->handSize()),
+                                            $player->hand()
+                                                ->sortReverse([EightsGame::class, 'sort'])
+                                                ->toRuString()
+                                        )
+                                    ]
                             ),
                             $playableCards->any()
                                 ? new StoryMessage(

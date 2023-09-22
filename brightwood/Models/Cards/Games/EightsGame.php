@@ -266,11 +266,7 @@ class EightsGame extends CardGame
      */
     private function canAutoMove(Player $player): bool
     {
-        if ($player->isBot()) {
-            return true;
-        }
-
-        return $this->isNextMoveASkip();
+        return $player->isBot() || $this->isNextMoveASkip();
     }
 
     private function isNextMoveASkip(): bool
@@ -450,8 +446,8 @@ class EightsGame extends CardGame
             fn (Card $c) => $c->isRank(Rank::seven()),
             fn (Card $c) => $c->isRank(Rank::six()),
             fn (Card $c) => $c->isRank(Rank::jack()),
-            fn (Card $c) => !$c->isJoker() && !$c->isRank(Rank::eight()),
-            fn (Card $c) => $c->isJoker(),
+            fn (Card $c) => !$this->isSuperCard($c),
+            fn (Card $c) => $c instanceof Joker,
             fn (Card $c) => $c->isRank(Rank::eight()),
         ];
 
@@ -648,7 +644,7 @@ class EightsGame extends CardGame
 
     private function isSuperCard(Card $card): bool
     {
-        return $card->isJoker() || $card->isRank(Rank::eight());
+        return $card instanceof Joker || $card->isRank(Rank::eight());
     }
 
     public function winner(): ?Player

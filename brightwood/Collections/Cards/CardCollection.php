@@ -3,6 +3,7 @@
 namespace Brightwood\Collections\Cards;
 
 use Brightwood\Models\Cards\Card;
+use Brightwood\Models\Cards\SuitedCard;
 use Plasticode\Collections\Generic\EquatableCollection;
 use Plasticode\Semantics\Sentence;
 
@@ -14,7 +15,7 @@ class CardCollection extends EquatableCollection
     {
         return SuitedCardCollection::from(
             $this->where(
-                fn (Card $c) => $c->isSuited()
+                fn (Card $c) => $c instanceof SuitedCard
             )
         );
     }

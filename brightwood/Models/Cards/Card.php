@@ -39,16 +39,6 @@ abstract class Card implements EquatableInterface, JsonSerializable
 
     abstract public function equals(?EquatableInterface $obj): bool;
 
-    public function isJoker(): bool
-    {
-        return false;
-    }
-
-    public function isSuited(): bool
-    {
-        return false;
-    }
-
     public function isSuit(Suit $suit): bool
     {
         return false;

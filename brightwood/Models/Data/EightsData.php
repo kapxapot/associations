@@ -16,7 +16,7 @@ use Plasticode\Util\Cases;
 use Webmozart\Assert\Assert;
 
 /**
- * @property integer $playerCount
+ * @property int $playerCount
  */
 class EightsData extends StoryData implements SerializableInterface
 {

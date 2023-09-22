@@ -64,8 +64,8 @@ class SuitedCard extends Card
     {
         return
             ($obj instanceof self)
-            && $this->suit->equals($obj->suit())
-            && $this->rank->equals($obj->rank());
+            && $this->isSameSuit($obj)
+            && $this->isSameRank($obj);
     }
 
     /**
@@ -90,11 +90,6 @@ class SuitedCard extends Card
         }
 
         return new self($suit, $rank);
-    }
-
-    public function isSuited(): bool
-    {
-        return true;
     }
 
     public function isSameSuit(self $card): bool

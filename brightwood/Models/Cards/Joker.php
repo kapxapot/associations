@@ -42,13 +42,8 @@ class Joker extends Card
      */
     public static function tryParse(?string $str): ?self
     {
-        return $str == self::NAME
+        return $str === self::NAME
             ? new self()
             : null;
-    }
-
-    public function isJoker(): bool
-    {
-        return true;
     }
 }
