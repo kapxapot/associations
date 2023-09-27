@@ -5,20 +5,22 @@ namespace Brightwood\Models\Links;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Interfaces\ConditionalInterface;
 use Brightwood\Models\Interfaces\MutatorInterface;
+use Brightwood\Models\Traits\Mutator;
 
+/**
+ * @method $this withMutator(callable $mutator)
+ * @method $this do(callable $mutator)
+ */
 abstract class StoryLink implements ConditionalInterface, MutatorInterface
 {
+    use Mutator;
+
     protected int $nodeId;
 
     /** @var callable|null */
     private $condition = null;
 
-    /** @var callable|null */
-    protected $mutator = null;
-
-    public function __construct(
-        int $nodeId
-    )
+    public function __construct(int $nodeId)
     {
         $this->nodeId = $nodeId;
     }
@@ -29,43 +31,18 @@ abstract class StoryLink implements ConditionalInterface, MutatorInterface
     }
 
     /**
-     * @return static
-     */
-    public function withMutator(callable $func): self
-    {
-        $this->mutator = $func;
-        return $this;
-    }
-
-    public function mutate(StoryData $data): StoryData
-    {
-        return $this->mutator
-            ? ($this->mutator)($data)
-            : $data;
-    }
-
-    /**
-     * Alias for withMutator().
-     * 
-     * @return static
-     */
-    public function do(callable $func): self
-    {
-        return $this->withMutator($func);
-    }
-
-    /**
-     * @return static
+     * @return $this
      */
     public function withCondition(callable $condition): self
     {
         $this->condition = $condition;
+
         return $this;
     }
 
     public function satisfies(?StoryData $data): bool
     {
-        if ($data === null || $this->condition === null) {
+        if (!$data || !$this->condition) {
             return true;
         }
 

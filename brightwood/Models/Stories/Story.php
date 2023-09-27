@@ -12,7 +12,8 @@ use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FunctionNode;
-use Brightwood\Models\Nodes\StoryNode;
+use Brightwood\Models\Nodes\AbstractStoryNode;
+use InvalidArgumentException;
 use Plasticode\Exceptions\InvalidConfigurationException;
 use Webmozart\Assert\Assert;
 
@@ -28,9 +29,9 @@ abstract class Story implements CommandProviderInterface
     private bool $published;
 
     private StoryNodeCollection $nodes;
-    private ?StoryNode $startNode = null;
+    private ?AbstractStoryNode $startNode = null;
 
-    private ?string $messagePrefix = null;
+    private ?string $prefixMessage = null;
 
     public function __construct(
         int $id,
@@ -76,7 +77,7 @@ abstract class Story implements CommandProviderInterface
         return $this->nodes;
     }
 
-    public function startNode(): ?StoryNode
+    public function startNode(): ?AbstractStoryNode
     {
         return $this->startNode;
     }
@@ -96,7 +97,7 @@ abstract class Story implements CommandProviderInterface
     /**
      * @return $this
      */
-    public function setStartNode(StoryNode $node): self
+    public function setStartNode(AbstractStoryNode $node): self
     {
         Assert::null(
             $this->startNode,
@@ -112,9 +113,9 @@ abstract class Story implements CommandProviderInterface
     /**
      * @return $this
      */
-    public function setMessagePrefix(string $msg): self
+    public function setPrefixMessage(string $msg): self
     {
-        $this->messagePrefix = $msg;
+        $this->prefixMessage = $msg;
 
         return $this;
     }
@@ -122,7 +123,7 @@ abstract class Story implements CommandProviderInterface
     /**
      * @return $this
      */
-    public function addNode(StoryNode $node): self
+    public function addNode(AbstractStoryNode $node): self
     {
         $this->nodes = $this->nodes->add(
             $node->withStory($this)
@@ -131,14 +132,14 @@ abstract class Story implements CommandProviderInterface
         return $this;
     }
 
-    public function getNode(?int $id): ?StoryNode
+    public function getNode(?int $id): ?AbstractStoryNode
     {
-        if (is_null($id)) {
+        if ($id === null) {
             return null;
         }
 
         return $this->nodes->first(
-            fn (StoryNode $n) => $n->id() == $id
+            fn (AbstractStoryNode $n) => $n->id() === $id
         );
     }
 
@@ -158,14 +159,14 @@ abstract class Story implements CommandProviderInterface
      */
     public function renderNode(
         TelegramUser $tgUser,
-        StoryNode $node,
+        AbstractStoryNode $node,
         StoryData $data,
-        ?string $text = null
+        ?string $input = null
     ): StoryMessageSequence
     {
         $sequence = $node
-            ->getMessages($tgUser, $data, $text)
-            ->prependPrefix($this->messagePrefix);
+            ->getMessages($tgUser, $data, $input)
+            ->prependMessage($this->prefixMessage);
 
         return $this->checkForFinish($sequence);
     }
@@ -193,47 +194,65 @@ abstract class Story implements CommandProviderInterface
      */
     public function go(
         TelegramUser $tgUser,
-        StoryNode $node,
+        AbstractStoryNode $node,
         StoryData $data,
-        string $text
+        string $input
     ): ?StoryMessageSequence
     {
         if ($node->isFinish($data)) {
-            return (self::RESTART_COMMAND === $text)
+            return ($input === self::RESTART_COMMAND)
                 ? $this->start($tgUser)
                 : null;
         }
 
         if ($node instanceof FunctionNode) {
-            return $this->renderNode($tgUser, $node, $data, $text);
+            return $this->renderNode($tgUser, $node, $data, $input);
         }
 
-        if (!($node instanceof ActionNode)) {
-            throw new InvalidConfigurationException(
-                'Incorrect node type: ' . get_class($node) . '.'
+        if ($node instanceof ActionNode) {
+            return $this->renderActionNode($tgUser, $node, $data, $input);
+        }
+
+        throw new InvalidConfigurationException(
+            sprintf(
+                'Incorrect node type: %s.',
+                get_class($node)
+            )
+        );
+    }
+
+    // todo: move this inside of the action node somehow
+    private function renderActionNode(
+        TelegramUser $tgUser,
+        ActionNode $node,
+        StoryData $data,
+        string $input
+    ): ?StoryMessageSequence
+    {
+        $link = $node
+            ->links()
+            ->satisfying($data)
+            ->first(
+                fn (ActionLink $al) => $al->action() === $input
             );
+
+        if (!$link) {
+            return null;
         }
 
-        /** @var ActionLink */
-        foreach ($node->links()->satisfying($data) as $link) {
-            if ($link->action() !== $text) {
-                continue;
-            }
+        $nextNode = $this->getNode($link->nodeId());
 
-            $nextNode = $this->getNode($link->nodeId());
+        Assert::notNull($nextNode);
 
-            Assert::notNull($nextNode);
-
-            $data = $link->mutate($data);
-
-            return $this->renderNode($tgUser, $nextNode, $data);
-        }
-
-        return null;
+        return $this->renderNode(
+            $tgUser,
+            $nextNode,
+            $link->mutate($data)
+        );
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function checkIntegrity(): void
     {

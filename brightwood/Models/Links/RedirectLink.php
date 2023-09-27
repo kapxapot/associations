@@ -6,18 +6,13 @@ use Webmozart\Assert\Assert;
 
 class RedirectLink extends StoryLink
 {
-    private const DEFAULT_WEIGHT = 1;
+    const DEFAULT_WEIGHT = 1;
 
     private float $weight;
 
-    public function __construct(
-        int $nodeId,
-        ?float $weight = null
-    )
+    public function __construct(int $nodeId, float $weight = self::DEFAULT_WEIGHT)
     {
         parent::__construct($nodeId);
-
-        $weight ??= self::DEFAULT_WEIGHT;
 
         Assert::greaterThan($weight, 0);
 

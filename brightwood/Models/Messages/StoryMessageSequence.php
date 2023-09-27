@@ -20,9 +20,7 @@ class StoryMessageSequence implements SequencableInterface
 
     private bool $isFinalized = false;
 
-    public function __construct(
-        MessageInterface ...$messages
-    )
+    public function __construct(MessageInterface ...$messages)
     {
         $this->messages = MessageCollection::make($messages);
         $this->actions = [];
@@ -101,9 +99,9 @@ class StoryMessageSequence implements SequencableInterface
      * Prepends text prefix to the first message.
      * If there are no messages, adds a new one.
      */
-    public function prependPrefix(?string $prefix): self
+    public function prependMessage(?string $prefix): self
     {
-        if (strlen($prefix) == 0) {
+        if (strlen($prefix) === 0) {
             return $this;
         }
 
@@ -188,9 +186,7 @@ class StoryMessageSequence implements SequencableInterface
                 fn (MessageInterface $m) => $m->hasActions()
             );
 
-        return $last
-            ? $last->actions()
-            : [];
+        return $last ? $last->actions() : [];
     }
 
     public function data(): ?StoryData

@@ -14,7 +14,7 @@ class Message implements MessageInterface
     protected array $actions;
 
     /**
-     * @param string[] $lines
+     * @param string[]|null $lines
      * @param string[]|null $actions
      */
     public function __construct(

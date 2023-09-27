@@ -4,7 +4,7 @@ namespace Brightwood\Models\Nodes;
 
 use Brightwood\Models\Data\StoryData;
 
-class FinishNode extends StaticNode
+class FinishNode extends AbstractMutatorNode
 {
     public function isFinish(?StoryData $data): bool
     {

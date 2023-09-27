@@ -94,7 +94,7 @@ class BrightwoodBotController
         $chatId = $message['chat']['id'];
         $text = trim($message['text'] ?? null);
 
-        if (strlen($text) == 0) {
+        if (strlen($text) === 0) {
             $answer = $this->buildTelegramMessage(
                 $chatId,
                 '🧾 Я понимаю только сообщения с текстом.'
@@ -106,7 +106,7 @@ class BrightwoodBotController
         $from = $message['from'];
         $tgUser = $this->getTelegramUser($from);
 
-        return $this->tryGetAnswersFromText($tgUser, $chatId, $text);
+        return $this->tryGetAnswers($tgUser, $chatId, $text);
     }
 
     private function getTelegramUser(array $data): TelegramUser
@@ -120,14 +120,14 @@ class BrightwoodBotController
         return $tgUser;
     }
 
-    private function tryGetAnswersFromText(
+    private function tryGetAnswers(
         TelegramUser $tgUser,
         string $chatId,
         string $text
     ): ArrayCollection
     {
         try {
-            return $this->getAnswersFromText($tgUser, $chatId, $text);
+            return $this->getAnswers($tgUser, $chatId, $text);
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
 
@@ -149,7 +149,7 @@ class BrightwoodBotController
     /**
      * @throws Exception
      */
-    private function getAnswersFromText(
+    private function getAnswers(
         TelegramUser $tgUser,
         string $chatId,
         string $text
@@ -209,7 +209,7 @@ class BrightwoodBotController
 
         $answer['reply_markup'] = [
             'keyboard' => [$actions],
-            'resize_keyboard' => true
+            'resize_keyboard' => true,
         ];
 
         return $answer;
@@ -220,7 +220,7 @@ class BrightwoodBotController
         return [
             'chat_id' => $chatId,
             'parse_mode' => 'html',
-            'text' => $text
+            'text' => $text,
         ];
     }
 
@@ -229,15 +229,10 @@ class BrightwoodBotController
         MessageInterface $message
     ): MessageInterface
     {
-        $lines = array_map(
-            fn (string $line) => $this->parser->parse($tgUser, $line, $message->data()),
-            $message->lines()
-        );
+        $parse = fn (string $text) => $this->parser->parse($tgUser, $text, $message->data());
 
-        $actions = array_map(
-            fn (string $action) => $this->parser->parse($tgUser, $action, $message->data()),
-            $message->actions()
-        );
+        $lines = array_map($parse, $message->lines());
+        $actions = array_map($parse, $message->actions());
 
         return new Message($lines, $actions);
     }

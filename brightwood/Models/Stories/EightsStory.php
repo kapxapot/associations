@@ -176,7 +176,7 @@ class EightsStory extends Story
         $this->addNode(
             new FunctionNode(
                 self::START_GAME,
-                function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
+                function (TelegramUser $tgUser, EightsData $data, ?string $input = null) {
                     $data->initGame($tgUser);
 
                     $game = $data->game();
@@ -198,7 +198,7 @@ class EightsStory extends Story
         $this->addNode(
             new FunctionNode(
                 self::AUTO_MOVES,
-                function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
+                function (TelegramUser $tgUser, EightsData $data, ?string $input = null) {
                     $game = $data->game();
 
                     $sequence = new StoryMessageSequence(
@@ -224,7 +224,7 @@ class EightsStory extends Story
         $this->addNode(
             new FunctionNode(
                 self::HUMAN_MOVE,
-                function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
+                function (TelegramUser $tgUser, EightsData $data, ?string $input = null) {
                     $sequence = StoryMessageSequence::empty();
 
                     $beenDrawing = $this->drawing;
@@ -235,8 +235,8 @@ class EightsStory extends Story
                     $playableCards = $game->getPlayableCardsFor($player);
 
                     // play a card if it's valid
-                    if (strlen($text) > 0 && $playableCards->any()) {
-                        $card = Card::tryParse($text);
+                    if (strlen($input) > 0 && $playableCards->any()) {
+                        $card = Card::tryParse($input);
 
                         if (!$playableCards->contains($card)) {
                             $sequence->add(
@@ -270,14 +270,14 @@ class EightsStory extends Story
                     $event = null;
 
                     // draw a card?
-                    if ($text === self::DRAW_CARD_COMMAND && !$game->isDeckEmpty()) {
+                    if ($input === self::DRAW_CARD_COMMAND && !$game->isDeckEmpty()) {
                         $event = $game->drawToHand($player);
                         Assert::notNull($event);
                         $this->drawing = true;
                     }
 
                     // no cards?
-                    if ($text === self::NO_CARDS_COMMAND && $game->isDeckEmpty()) {
+                    if ($input === self::NO_CARDS_COMMAND && $game->isDeckEmpty()) {
                         $event = $game->hasNoCardsToPut($player);
                         $game->goToNextPlayer();
                     }
@@ -347,15 +347,15 @@ class EightsStory extends Story
         $this->addNode(
             new FunctionNode(
                 self::SUIT_CHOICE,
-                function (TelegramUser $tgUser, EightsData $data, ?string $text = null) {
+                function (TelegramUser $tgUser, EightsData $data, ?string $input = null) {
                     $sequence = StoryMessageSequence::empty();
 
                     $game = $data->game();
                     $player = $this->getAndCheckPlayer($game, $tgUser);
 
                     // choose a suit if it's valid
-                    if (strlen($text) > 0) {
-                        $suit = Suit::tryParse($text);
+                    if (strlen($input) > 0) {
+                        $suit = Suit::tryParse($input);
 
                         if (!$suit) {
                             $sequence->add(
@@ -392,7 +392,7 @@ class EightsStory extends Story
         );
 
         $this->addNode(
-            new FinishNode(self::FINISH_GAME, [])
+            new FinishNode(self::FINISH_GAME)
         );
     }
 

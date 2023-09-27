@@ -11,7 +11,7 @@ class StoryMessage extends Message
     protected ?StoryData $data = null;
 
     /**
-     * @param string[] $lines
+     * @param string[]|null $lines
      * @param string[]|null $actions
      */
     public function __construct(

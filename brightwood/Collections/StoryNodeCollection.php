@@ -2,10 +2,10 @@
 
 namespace Brightwood\Collections;
 
-use Brightwood\Models\Nodes\StoryNode;
+use Brightwood\Models\Nodes\AbstractStoryNode;
 use Plasticode\Collections\Generic\TypedCollection;
 
 class StoryNodeCollection extends TypedCollection
 {
-    protected string $class = StoryNode::class;
+    protected string $class = AbstractStoryNode::class;
 }

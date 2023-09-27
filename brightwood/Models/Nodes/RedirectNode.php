@@ -8,27 +8,65 @@ use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\RedirectLink;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
+use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
-class RedirectNode extends LinkedNode
+class RedirectNode extends AbstractLinkedNode
 {
     private RedirectLinkCollection $links;
 
     /**
      * @param string[] $text
-     * @param RedirectLink[] $links
+     * @param (RedirectLink|array|int)[] $links
+     *
+     * @throws InvalidArgumentException
      */
-    public function __construct(
-        int $id,
-        array $text,
-        array $links
-    )
+    public function __construct(int $id, array $text, array $links)
     {
         parent::__construct($id, $text);
 
-        Assert::notEmpty($links);
+        $this->links = $this->parseLinks($links);
 
-        $this->links = RedirectLinkCollection::make($links);
+        Assert::notEmpty($this->links);
+    }
+
+    /**
+     * @param (RedirectLink|array|int)[] $links
+     *
+     * @throws InvalidArgumentException
+     */
+    private function parseLinks(array $links): RedirectLinkCollection
+    {
+        $result = RedirectLinkCollection::empty();
+
+        foreach ($links as $link) {
+            if ($link instanceof RedirectLink) {
+                $result = $result->add($link);
+                continue;
+            }
+
+            if (is_array($link)) {
+                [$nodeId, $weight] = $link;
+
+                $result = $result->add(
+                    new RedirectLink($nodeId, $weight)
+                );
+
+                continue;
+            }
+
+            if (is_int($link)) {
+                $result = $result->add(
+                    new RedirectLink($link)
+                );
+
+                continue;
+            }
+
+            throw new InvalidArgumentException("Invalid redirect link format.");
+        }
+
+        return $result;
     }
 
     public function links(): RedirectLinkCollection
@@ -39,7 +77,7 @@ class RedirectNode extends LinkedNode
     public function getMessages(
         TelegramUser $tgUser,
         StoryData $data,
-        ?string $text = null
+        ?string $input = null
     ): StoryMessageSequence
     {
         $data = $this->mutate($data);
@@ -59,7 +97,7 @@ class RedirectNode extends LinkedNode
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function checkIntegrity(): void
     {

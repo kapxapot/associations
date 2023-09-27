@@ -4,6 +4,7 @@ namespace Brightwood\Models\Cards\Restrictions;
 
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Suit;
+use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
 class SuitRestriction extends Restriction
@@ -18,9 +19,9 @@ class SuitRestriction extends Restriction
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function suit() : Suit
+    public function suit(): Suit
     {
         Assert::notNull($this->suit);
 
@@ -30,7 +31,7 @@ class SuitRestriction extends Restriction
     /**
      * @return $this
      */
-    public function withSuit(Suit $suit) : self
+    public function withSuit(Suit $suit): self
     {
         $this->suit = $suit;
 

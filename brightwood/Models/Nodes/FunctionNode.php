@@ -6,35 +6,41 @@ use App\Models\TelegramUser;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 
-class FunctionNode extends StoryNode
+class FunctionNode extends AbstractStoryNode
 {
     /** @var callable */
-    protected $function;
+    protected $actionFunc;
+
+    /** @var callable */
+    protected $finishFunc;
 
     public function __construct(
         int $id,
-        callable $function
+        callable $actionFunc,
+        ?callable $finishFunc = null
     )
     {
         parent::__construct($id);
 
-        $this->function = $function;
+        $this->actionFunc = $actionFunc;
+        $this->finishFunc = $finishFunc;
     }
 
     public function isFinish(?StoryData $data): bool
     {
-        // todo: allow to redefine this
-        return false;
+        return $this->finishFunc
+            ? ($this->finishFunc)($data)
+            : parent::isFinish($data);
     }
 
     public function getMessages(
         TelegramUser $tgUser,
         StoryData $data,
-        ?string $text = null
+        ?string $input = null
     ): StoryMessageSequence
     {
         /** @var StoryMessageSequence */
-        $sequence = ($this->function)($tgUser, $data, $text);
+        $sequence = ($this->actionFunc)($tgUser, $data, $input);
 
         // function sequence can have no actions and return the next node id
         // in this case the next node needs to be resolved

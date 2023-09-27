@@ -24,7 +24,7 @@ class RedirectLinkCollection extends StoryLinkCollection
             return null;
         }
 
-        if ($this->count() == 1) {
+        if ($this->count() === 1) {
             return $this->first();
         }
 

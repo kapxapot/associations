@@ -6,11 +6,15 @@ use Brightwood\Models\Data\StoryData;
 
 interface MutatorInterface
 {
-    function withMutator(callable $mutator) : self;
-    function mutate(StoryData $data) : StoryData;
+    /**
+     * @return $this
+     */
+    public function withMutator(callable $mutator): self;
+
+    public function mutate(StoryData $data): StoryData;
 
     /**
      * Alias for withMutator().
      */
-    function do(callable $mutator) : self;
+    public function do(callable $mutator): self;
 }

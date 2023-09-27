@@ -8,9 +8,10 @@ use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
+use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
-class ActionNode extends LinkedNode
+class ActionNode extends AbstractLinkedNode
 {
     private ActionLinkCollection $links;
 
@@ -18,11 +19,7 @@ class ActionNode extends LinkedNode
      * @param string[] $text
      * @param array<int, string> $links NodeId -> Text
      */
-    public function __construct(
-        int $id,
-        array $text,
-        array $links
-    )
+    public function __construct(int $id, array $text, array $links)
     {
         parent::__construct($id, $text);
 
@@ -45,7 +42,7 @@ class ActionNode extends LinkedNode
     public function getMessages(
         TelegramUser $tgUser,
         StoryData $data,
-        ?string $text = null
+        ?string $input = null
     ): StoryMessageSequence
     {
         $data = $this->mutate($data);
@@ -59,9 +56,9 @@ class ActionNode extends LinkedNode
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
-    public function checkIntegrity() : void
+    public function checkIntegrity(): void
     {
         parent::checkIntegrity();
 

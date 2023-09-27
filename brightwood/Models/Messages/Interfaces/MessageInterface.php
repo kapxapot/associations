@@ -9,19 +9,22 @@ interface MessageInterface extends SequencableInterface
     /**
      * @return string[]
      */
-    function lines() : array;
+    public function lines(): array;
 
-    function prependLines(string ...$lines) : self;
-    function appendLines(string ...$lines) : self;
+    public function prependLines(string ...$lines): self;
+
+    public function appendLines(string ...$lines): self;
 
     /**
      * @return string[]
      */
-    function actions() : array;
+    public function actions(): array;
 
-    function hasActions() : bool;
-    function appendActions(string ...$actions) : self;
+    public function hasActions(): bool;
 
-    function data() : ?StoryData;
-    function hasData() : bool;
+    public function appendActions(string ...$actions): self;
+
+    public function data(): ?StoryData;
+
+    public function hasData(): bool;
 }
