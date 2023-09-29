@@ -3,9 +3,9 @@
 namespace Brightwood\Collections;
 
 use Brightwood\Models\Nodes\AbstractStoryNode;
-use Plasticode\Collections\Generic\TypedCollection;
+use Plasticode\Collections\Generic\EquatableCollection;
 
-class StoryNodeCollection extends TypedCollection
+class StoryNodeCollection extends EquatableCollection
 {
     protected string $class = AbstractStoryNode::class;
 }

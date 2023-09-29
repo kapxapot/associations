@@ -34,7 +34,7 @@ final class ActionLinkTest extends TestCase
 
         $link =
             (new ActionLink(0, 'some action'))
-            ->do(
+            ->does(
                 fn (TestData $d) => $d->nextDay()
             );
 

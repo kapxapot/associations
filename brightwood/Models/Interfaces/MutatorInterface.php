@@ -16,5 +16,5 @@ interface MutatorInterface
     /**
      * Alias for withMutator().
      */
-    public function do(callable $mutator): self;
+    public function does(callable $mutator): self;
 }

@@ -29,7 +29,7 @@ trait Mutator
     /**
      * @return $this
      */
-    public function do(callable $mutator): self
+    public function does(callable $mutator): self
     {
         return $this->withMutator($mutator);
     }

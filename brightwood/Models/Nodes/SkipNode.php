@@ -12,7 +12,10 @@ class SkipNode extends AbstractMutatorNode
 {
     private int $nextNodeId;
 
-    public function __construct(int $id, array $text, int $nextNodeId)
+    /**
+     * @param string[]|null $text
+     */
+    public function __construct(int $id, int $nextNodeId, ?array $text = null)
     {
         parent::__construct($id, $text);
         

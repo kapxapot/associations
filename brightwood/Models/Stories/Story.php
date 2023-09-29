@@ -104,7 +104,10 @@ abstract class Story implements CommandProviderInterface
             'Start node is already set.'
         );
 
-        $this->addNode($node);
+        if (!$this->nodes->contains($node)) {
+            $this->addNode($node);
+        }
+
         $this->startNode = $node;
 
         return $this;

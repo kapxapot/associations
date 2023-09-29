@@ -16,10 +16,7 @@ class Command
      * @param string $code Command code without '/'.
      * @param string|null $label Command description.
      */
-    public function __construct(
-        string $code,
-        ?string $label = null
-    )
+    public function __construct(string $code, ?string $label = null)
     {
         Assert::stringNotEmpty($code);
 

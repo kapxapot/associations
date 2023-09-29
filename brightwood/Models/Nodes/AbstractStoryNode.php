@@ -7,9 +7,10 @@ use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\Story;
 use InvalidArgumentException;
+use Plasticode\Models\Interfaces\EquatableInterface;
 use Webmozart\Assert\Assert;
 
-abstract class AbstractStoryNode
+abstract class AbstractStoryNode implements EquatableInterface
 {
     protected int $id;
     protected ?Story $story = null;
@@ -70,5 +71,11 @@ abstract class AbstractStoryNode
         Assert::notNull($node);
 
         return $node;
+    }
+
+    public function equals(?EquatableInterface $obj): bool
+    {
+        return $obj instanceof self
+            && $obj->id() === $this->id;
     }
 }

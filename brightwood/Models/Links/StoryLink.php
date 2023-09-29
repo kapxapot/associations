@@ -9,7 +9,7 @@ use Brightwood\Models\Traits\Mutator;
 
 /**
  * @method $this withMutator(callable $mutator)
- * @method $this do(callable $mutator)
+ * @method $this does(callable $mutator)
  */
 abstract class StoryLink implements ConditionalInterface, MutatorInterface
 {
