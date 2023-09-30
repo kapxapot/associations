@@ -164,7 +164,7 @@ class EightsStory extends Story
         $builder->addFinishNode(self::FINISH_GAME);
     }
 
-    private function startGame(
+    public function startGame(
         TelegramUser $tgUser,
         EightsData $data,
         ?string $input = null
@@ -186,7 +186,7 @@ class EightsStory extends Story
             ->withData($data);
     }
 
-    private function autoMoves(
+    public function autoMoves(
         TelegramUser $tgUser,
         EightsData $data,
         ?string $input = null
@@ -212,7 +212,7 @@ class EightsStory extends Story
             ->withData($data);
     }
 
-    private function humanMove(
+    public function humanMove(
         TelegramUser $tgUser,
         EightsData $data,
         ?string $input = null
@@ -334,7 +334,7 @@ class EightsStory extends Story
             ->withData($data);
     }
 
-    private function suitChoice(
+    public function suitChoice(
         TelegramUser $tgUser,
         EightsData $data,
         ?string $input = null
