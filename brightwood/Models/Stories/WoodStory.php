@@ -3,11 +3,7 @@
 namespace Brightwood\Models\Stories;
 
 use Brightwood\Models\Data\WoodData;
-use Brightwood\Models\Links\RedirectLink;
-use Brightwood\Models\Nodes\ActionNode;
-use Brightwood\Models\Nodes\FinishNode;
-use Brightwood\Models\Nodes\RedirectNode;
-use Brightwood\Models\Nodes\SkipNode;
+use Brightwood\Models\Stories\Core\Story;
 use Brightwood\StoryBuilder;
 
 class WoodStory extends Story

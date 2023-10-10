@@ -3,10 +3,11 @@
 namespace Brightwood\Repositories\Interfaces;
 
 use Brightwood\Collections\StoryCollection;
-use Brightwood\Models\Stories\Story;
+use Brightwood\Models\Stories\Core\Story;
 
 interface StoryRepositoryInterface
 {
-    function get(?int $id) : ?Story;
-    function getAllPublished() : StoryCollection;
+    public function get(?int $id): ?Story;
+
+    public function getAllPublished(): StoryCollection;
 }

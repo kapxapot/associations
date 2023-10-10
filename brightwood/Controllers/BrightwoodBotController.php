@@ -8,7 +8,7 @@ use Brightwood\Answers\Answerer;
 use Brightwood\External\TelegramTransport;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
-use Brightwood\Models\Stories\Story;
+use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Parsing\StoryParser;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;

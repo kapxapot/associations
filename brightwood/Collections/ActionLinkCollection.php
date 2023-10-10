@@ -2,7 +2,6 @@
 
 namespace Brightwood\Collections;
 
-use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
 
 class ActionLinkCollection extends StoryLinkCollection
@@ -12,7 +11,7 @@ class ActionLinkCollection extends StoryLinkCollection
     /**
      * @return string[]
      */
-    public function actions() : array
+    public function actions(): array
     {
         return $this
             ->map(

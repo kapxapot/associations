@@ -2,7 +2,7 @@
 
 namespace Brightwood\Testing\Models;
 
-use Brightwood\Models\Stories\Story;
+use Brightwood\Models\Stories\Core\Story;
 use Brightwood\StoryBuilder;
 
 class TestStory extends Story
@@ -21,7 +21,7 @@ class TestStory extends Story
     {
         $builder = new StoryBuilder($this);
 
-        $this->setPrefixMessage('День: {day}, Здоровье: {hp}');
+        $this->setPrefixMessage('День: {day}');
 
         $start = $builder->addActionNode(
             1,
@@ -72,6 +72,8 @@ class TestStory extends Story
             'Вас разбудила <b>избирательная комиссия</b> 👩‍👩‍👧‍👧, которой понадобился ваш пенек. 🤔 Вам пришлось уйти.'
         );
 
+        // yes, this is not linked to anything
+        // just for a test
         $builder->addFinishNode(8);
     }
 }

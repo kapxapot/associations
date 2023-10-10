@@ -5,7 +5,7 @@ namespace Brightwood\Models\Nodes;
 use App\Models\TelegramUser;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessageSequence;
-use Brightwood\Models\Stories\Story;
+use Brightwood\Models\Stories\Core\Story;
 use InvalidArgumentException;
 use Plasticode\Models\Interfaces\EquatableInterface;
 use Webmozart\Assert\Assert;

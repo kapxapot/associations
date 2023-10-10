@@ -3,9 +3,9 @@
 namespace Brightwood\Repositories;
 
 use Brightwood\Collections\StoryCollection;
+use Brightwood\Models\Stories\Core\JsonFileStory;
+use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\Stories\EightsStory;
-use Brightwood\Models\Stories\MysteryStory;
-use Brightwood\Models\Stories\Story;
 use Brightwood\Models\Stories\WoodStory;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
@@ -25,7 +25,7 @@ class StoryRepository implements StoryRepositoryInterface
     {
         $this->stories = StoryCollection::collect(
             new WoodStory(1),
-            new MysteryStory(2),
+            new JsonFileStory(2, __DIR__ . '/../Models/Stories/Json/mystery.json', true),
             new EightsStory(3, $rootDeserializer, $cases)
         );
     }

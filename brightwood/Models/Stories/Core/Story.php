@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Models\Stories;
+namespace Brightwood\Models\Stories\Core;
 
 use App\Models\TelegramUser;
 use Brightwood\Collections\StoryNodeCollection;
@@ -24,7 +24,7 @@ abstract class Story implements CommandProviderInterface
 
     private int $id;
     private string $name;
-    private string $description;
+    private ?string $description;
 
     private bool $published;
 
@@ -36,7 +36,7 @@ abstract class Story implements CommandProviderInterface
     public function __construct(
         int $id,
         string $name,
-        string $description,
+        string $description = null,
         bool $published = false
     )
     {
@@ -269,10 +269,15 @@ abstract class Story implements CommandProviderInterface
 
     public function toInfo(): TextMessage
     {
-        return new TextMessage(
-            $this->toCommand(),
-            $this->description
+        $msg = new TextMessage(
+            $this->toCommand()
         );
+        
+        if ($this->description) {
+            $msg->appendLines($this->description);
+        };
+
+        return $msg;
     }
 
     // CommandProviderInterface

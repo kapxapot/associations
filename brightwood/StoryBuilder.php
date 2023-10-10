@@ -8,7 +8,7 @@ use Brightwood\Models\Nodes\FinishNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\RedirectNode;
 use Brightwood\Models\Nodes\SkipNode;
-use Brightwood\Models\Stories\Story;
+use Brightwood\Models\Stories\Core\Story;
 
 class StoryBuilder
 {

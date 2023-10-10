@@ -17,7 +17,7 @@ abstract class SerializationTestCase extends TestCase
     protected TelegramUserRepositoryInterface $telegramUserRepository;
     protected Player $player;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -36,7 +36,7 @@ abstract class SerializationTestCase extends TestCase
         $this->deserializer->addPlayers($this->player);
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         unset($this->deserializer);
         unset($this->player);

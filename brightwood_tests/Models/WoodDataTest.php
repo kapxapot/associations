@@ -8,21 +8,17 @@ use Plasticode\Exceptions\InvalidOperationException;
 
 final class WoodDataTest extends TestCase
 {
-    public function testDays() : void
+    public function testDays(): void
     {
         $data = new WoodData();
-
         $this->assertEquals(1, $data->day);
-
         $data->nextDay();
-
         $this->assertEquals(2, $data->day);
     }
 
-    public function testShoes() : void
+    public function testShoes(): void
     {
         $data = new WoodData();
-
         $max = WoodData::MAX_SHOES;
 
         $this->assertEquals($max, $data->shoes);
@@ -41,10 +37,9 @@ final class WoodDataTest extends TestCase
         $data->removeShoe();
     }
 
-    public function testHitting() : void
+    public function testHitting(): void
     {
         $data = new WoodData();
-
         $max = WoodData::MAX_HP;
 
         $this->assertEquals($max, $data->hp);
@@ -70,7 +65,7 @@ final class WoodDataTest extends TestCase
         $this->assertTrue($data->isDead());
     }
 
-    public function testHittingForNegativeAmount() : void
+    public function testHittingForNegativeAmount(): void
     {
         $data = new WoodData();
 
@@ -79,10 +74,9 @@ final class WoodDataTest extends TestCase
         $data->hit(-1);
     }
 
-    public function testHealing() : void
+    public function testHealing(): void
     {
         $data = new WoodData();
-
         $max = WoodData::MAX_HP;
 
         $data->hit(1);
@@ -102,7 +96,7 @@ final class WoodDataTest extends TestCase
         $this->assertTrue($data->isAlive());
     }
 
-    public function testHealingForNegativeAmount() : void
+    public function testHealingForNegativeAmount(): void
     {
         $data = new WoodData();
 
@@ -111,7 +105,7 @@ final class WoodDataTest extends TestCase
         $data->heal(-1);
     }
 
-    public function testHealingDead() : void
+    public function testHealingDead(): void
     {
         $data = new WoodData();
 

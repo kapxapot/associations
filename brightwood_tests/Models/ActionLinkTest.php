@@ -2,7 +2,6 @@
 
 namespace Brightwood\Tests\Models;
 
-use App\Models\TelegramUser;
 use Brightwood\Models\Links\ActionLink;
 use Brightwood\Testing\Models\TestData;
 use Brightwood\Testing\Models\TestStory;
@@ -32,8 +31,7 @@ final class ActionLinkTest extends TestCase
 
         $this->assertNotNull($data);
 
-        $link =
-            (new ActionLink(0, 'some action'))
+        $link = (new ActionLink(0, 'some action'))
             ->does(
                 fn (TestData $d) => $d->nextDay()
             );

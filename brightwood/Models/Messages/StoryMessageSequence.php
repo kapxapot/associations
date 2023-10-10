@@ -247,9 +247,9 @@ class StoryMessageSequence implements SequencableInterface
 
     public function hasText(): bool
     {
-        return $this->messages->any(
-            fn (MessageInterface $m) =>
-                Collection::make($m->lines())->anyFirst(
+        return $this->messages->anyFirst(
+            fn (MessageInterface $m) => Collection::make($m->lines())
+                ->anyFirst(
                     fn ($s) => strlen($s) > 0
                 )
         );

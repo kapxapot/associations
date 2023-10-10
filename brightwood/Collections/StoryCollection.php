@@ -3,7 +3,7 @@
 namespace Brightwood\Collections;
 
 use Brightwood\Models\Messages\StoryMessageSequence;
-use Brightwood\Models\Stories\Story;
+use Brightwood\Models\Stories\Core\Story;
 use Plasticode\Collections\Generic\TypedCollection;
 
 class StoryCollection extends TypedCollection

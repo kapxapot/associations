@@ -9,15 +9,17 @@ use Brightwood\Models\Data\StoryData;
  */
 class TestData extends StoryData
 {
-    protected function init() : void
+    protected function init(): void
     {
         $this->day = 1;
     }
 
     /**
      * Increments the current day.
+     *
+     * @return $this
      */
-    public function nextDay() : self
+    public function nextDay(): self
     {
         $this->day++;
 

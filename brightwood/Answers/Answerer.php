@@ -8,7 +8,7 @@ use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
-use Brightwood\Models\Stories\Story;
+use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
@@ -92,7 +92,7 @@ class Answerer
             );
         }
 
-        if ($text == Story::STORY_SELECTION_COMMAND || $text == '/story') {
+        if ($text === Story::STORY_SELECTION_COMMAND || $text === '/story') {
             return $this->storySelection();
         }
 
@@ -225,14 +225,12 @@ class Answerer
             $story->start($tgUser)
         );
 
-        $this->storyStatusRepository->store(
-            [
-                'telegram_user_id' => $tgUser->getId(),
-                'story_id' => $story->id(),
-                'step_id' => $sequence->nodeId(),
-                'json_data' => json_encode($sequence->data())
-            ]
-        );
+        $this->storyStatusRepository->store([
+            'telegram_user_id' => $tgUser->getId(),
+            'story_id' => $story->id(),
+            'step_id' => $sequence->nodeId(),
+            'json_data' => json_encode($sequence->data())
+        ]);
 
         return $sequence;
     }

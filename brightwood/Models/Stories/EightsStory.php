@@ -13,6 +13,7 @@ use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
+use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\StoryBuilder;
 use Plasticode\Util\Cases;
