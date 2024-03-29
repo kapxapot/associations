@@ -29,16 +29,16 @@ class AggregatedAssociation extends Association implements JsonSerializable
         $this->association = $association;
 
         $this
-            ->withUrl(fn() => $association->url())
-            ->withCreator(fn() => $association->creator())
-            ->withLanguage(fn() => $association->language())
-            ->withMe(fn() => $association->me())
-            ->withTurns(fn() => $association->turns())
-            ->withCanonical(fn() => $association->canonical())
-            ->withFeedbacks(fn() => $association->feedbacks())
-            ->withFirstWord(fn() => $association->firstWord())
-            ->withOverrides(fn() => $association->overrides())
-            ->withSecondWord(fn() => $association->secondWord());
+            ->withUrl(fn () => $association->url())
+            ->withCreator(fn () => $association->creator())
+            ->withLanguage(fn () => $association->language())
+            ->withMe(fn () => $association->me())
+            ->withTurns(fn () => $association->turns())
+            ->withCanonical(fn () => $association->canonical())
+            ->withFeedbacks(fn () => $association->feedbacks())
+            ->withFirstWord(fn () => $association->firstWord())
+            ->withOverrides(fn () => $association->overrides())
+            ->withSecondWord(fn () => $association->secondWord());
 
         if ($anchor !== null) {
             $this->withAnchor($anchor);
