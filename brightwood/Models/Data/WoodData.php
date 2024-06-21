@@ -75,7 +75,7 @@ class WoodData extends StoryData
     public function removeShoe(): self
     {
         if (!$this->hasShoes()) {
-            throw new InvalidOperationException('No shows to remove.');
+            throw new InvalidOperationException('No shoes to remove.');
         }
 
         $this->shoes--;
