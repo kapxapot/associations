@@ -23,10 +23,13 @@ class StoryRepository implements StoryRepositoryInterface
         Cases $cases
     )
     {
+        $jsonDir = __DIR__ . '/../Models/Stories/Json/';
+
         $this->stories = StoryCollection::collect(
             new WoodStory(1),
-            new JsonFileStory(2, __DIR__ . '/../Models/Stories/Json/mystery.json', true),
-            new EightsStory(3, $rootDeserializer, $cases)
+            new JsonFileStory(2, $jsonDir . 'mystery.json', true),
+            new EightsStory(3, $rootDeserializer, $cases),
+            new JsonFileStory(6, $jsonDir . '359e097f-5620-477b-930d-48496393f747.json', true)
         );
     }
 
