@@ -26,8 +26,6 @@ abstract class Story implements CommandProviderInterface
     private string $name;
     private ?string $description;
 
-    private bool $published;
-
     private StoryNodeCollection $nodes;
     private ?AbstractStoryNode $startNode = null;
 
@@ -36,15 +34,12 @@ abstract class Story implements CommandProviderInterface
     public function __construct(
         int $id,
         string $name,
-        string $description = null,
-        bool $published = false
+        string $description = null
     )
     {
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
-
-        $this->published = $published;
 
         $this->nodes = StoryNodeCollection::empty();
 
@@ -65,11 +60,6 @@ abstract class Story implements CommandProviderInterface
     public function description(): string
     {
         return $this->description;
-    }
-
-    public function isPublished(): bool
-    {
-        return $this->published;
     }
 
     public function nodes(): StoryNodeCollection

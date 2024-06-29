@@ -274,18 +274,19 @@ class Answerer
 
     private function storySelection(): StoryMessageSequence
     {
-        $stories = $this->storyRepository->getAllPublished();
+        $stories = $this->storyRepository->getAll();
 
-        $sequence = ($stories->isEmpty())
-            ? StoryMessageSequence::make(
-                new TextMessage('⛔ Историй нет.', 'Что-то явно пошло не так.')
+        if ($stories->isEmpty()) {
+            return StoryMessageSequence::make(
+                new TextMessage('⛔ Историй нет.')
             )
-            : $stories->toInfo();
+            ->finalize();
+        }
 
         return
             StoryMessageSequence::mash(
                 new TextMessage('Выберите историю:'),
-                $sequence
+                $stories->toInfo()
             )
             ->finalize();
     }

@@ -51,8 +51,7 @@ class EightsStory extends Story
         parent::__construct(
             $id,
             '♠ Карточная игра «Восьмерки»',
-            'Простая карточная игра с ботами. Сложность: 3/5',
-            true
+            'Простая карточная игра с ботами. Сложность: 3/5'
         );
 
         $this->rootDeserializer = $rootDeserializer;

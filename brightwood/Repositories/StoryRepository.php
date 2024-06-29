@@ -40,10 +40,8 @@ class StoryRepository implements StoryRepositoryInterface
         );
     }
 
-    public function getAllPublished(): StoryCollection
+    public function getAll(): StoryCollection
     {
-        return $this->stories->where(
-            fn (Story $s) => $s->isPublished()
-        );
+        return $this->stories;
     }
 }

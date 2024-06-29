@@ -9,5 +9,5 @@ interface StoryRepositoryInterface
 {
     public function get(?int $id): ?Story;
 
-    public function getAllPublished(): StoryCollection;
+    public function getAll(): StoryCollection;
 }

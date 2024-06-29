@@ -12,14 +12,14 @@ class JsonStory extends Story
 {
     private array $jsonData;
 
-    public function __construct(int $id, array $jsonData, bool $published = false)
+    public function __construct(int $id, array $jsonData)
     {
         $this->jsonData = $jsonData;
 
         $name = $this->jsonData['title'] ?? 'Untitled';
         $description = $this->jsonData['description'] ?? null;
 
-        parent::__construct($id, $name, $description, $published);
+        parent::__construct($id, $name, $description);
     }
 
     public function makeData(?array $data = null): JsonStoryData
