@@ -6,7 +6,7 @@ use Plasticode\Config\Interfaces\CaptchaConfigInterface;
 
 class CaptchaConfig implements CaptchaConfigInterface
 {
-    public function getReplaces() : array
+    public function getReplaces(): array
     {
         return [
             'а' => ['4'],

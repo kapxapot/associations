@@ -3,6 +3,10 @@
   "title": "😯 I, Kolobok",
   "description": "An interactive story about Kolobok",
   "startId": 1,
+  "position": [
+    30,
+    30
+  ],
   "nodes": [
     {
       "id": 1,
@@ -11,7 +15,11 @@
         "You are Kolobok. The grandma has just baked you.",
         "You sit on the table."
       ],
-      "nextId": 2
+      "nextId": 2,
+      "position": [
+        386.0749969482422,
+        121
+      ]
     },
     {
       "id": 2,
@@ -28,6 +36,10 @@
           "label": "Jump onto the window",
           "id": 4
         }
+      ],
+      "position": [
+        703.0749969482422,
+        207
       ]
     },
     {
@@ -36,6 +48,10 @@
       "text": [
         "The grandma and grandpa come and eat you.",
         "The end. ☠"
+      ],
+      "position": [
+        1173.0749969482422,
+        119
       ]
     },
     {
@@ -53,6 +69,10 @@
           "label": "Sit on the window",
           "id": 3
         }
+      ],
+      "position": [
+        1114.0749969482422,
+        394
       ]
     },
     {
@@ -75,6 +95,10 @@
           "label": "Sing a song",
           "id": 10
         }
+      ],
+      "position": [
+        1504.0749969482422,
+        347
       ]
     },
     {
@@ -83,6 +107,10 @@
       "text": [
         "The 🐰 <b>Hare</b> rips you apart.",
         "This is the end, my friend. ☠"
+      ],
+      "position": [
+        2285.074996948242,
+        157
       ]
     },
     {
@@ -100,6 +128,10 @@
           "weight": 4,
           "id": 8
         }
+      ],
+      "position": [
+        1934.0749969482422,
+        469
       ]
     },
     {
@@ -109,7 +141,11 @@
         "The 🐰 <b>Hare</b> is faster than you.",
         "Unfortunately."
       ],
-      "nextId": 6
+      "nextId": 6,
+      "position": [
+        2251.074996948242,
+        366
+      ]
     },
     {
       "id": 9,
@@ -118,7 +154,11 @@
         "You manage to get away from the 🐰 <b>Hare</b>.",
         "You lucky bastard!"
       ],
-      "nextId": 11
+      "nextId": 11,
+      "position": [
+        2357.074996948242,
+        580
+      ]
     },
     {
       "id": 10,
@@ -135,6 +175,10 @@
           "weight": 1,
           "id": 12
         }
+      ],
+      "position": [
+        1910.0749969482422,
+        744
       ]
     },
     {
@@ -142,6 +186,10 @@
       "type": "finish",
       "text": [
         "This is the happy end. Congratulations! But this is to be continued..."
+      ],
+      "position": [
+        2706.074996948242,
+        674
       ]
     },
     {
@@ -150,12 +198,16 @@
       "text": [
         "You are not a good singer. The 🐰 <b>Hare</b> is not satisfied."
       ],
-      "nextId": 6
+      "nextId": 6,
+      "position": [
+        2278.074996948242,
+        906
+      ]
     }
   ],
   "viewport": {
-    "x": 86,
-    "y": 65.32001953124995,
-    "zoom": 1
+    "x": -9.25,
+    "y": 7.410009765624977,
+    "zoom": 0.5
   }
 }
