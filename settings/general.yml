@@ -98,7 +98,7 @@ jobs:
     batch_size: 100
   update_words:
     ttl_min: 1440
-    batch_size: 100
+    batch_size: 20
   load_unchecked_dict_words:
     batch_size: 10
   match_dangling_dict_words:
