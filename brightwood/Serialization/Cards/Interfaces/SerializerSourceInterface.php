@@ -5,12 +5,12 @@ namespace Brightwood\Serialization\Cards\Interfaces;
 interface SerializerSourceInterface
 {
     /**
-     * Registers new serializer for the specified class.
+     * Registers a new serializer for the specified class.
      */
-    function register(string $class, SerializerInterface $serializer) : self;
+    public function register(string $class, SerializerInterface $serializer): self;
 
     /**
-     * Get a serializer for the class. Null if absent.
+     * Returns a serializer for the class. `null` if absent.
      */
-    function getSerializer(string $class) : ?SerializerInterface;
+    public function getSerializer(string $class): ?SerializerInterface;
 }

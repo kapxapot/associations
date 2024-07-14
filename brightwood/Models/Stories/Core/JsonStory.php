@@ -6,6 +6,7 @@ use Brightwood\Models\Data\JsonStoryData;
 use Brightwood\Models\Nodes\AbstractStoryNode;
 use Brightwood\StoryBuilder;
 use InvalidArgumentException;
+use Plasticode\Util\Strings;
 use Webmozart\Assert\Assert;
 
 class JsonStory extends Story
@@ -16,10 +17,19 @@ class JsonStory extends Story
     {
         $this->jsonData = $jsonData;
 
-        $name = $this->jsonData['title'] ?? 'Untitled';
+        $title = $this->jsonData['title'] ?? 'Untitled';
         $description = $this->jsonData['description'] ?? null;
 
-        parent::__construct($id, $name, $description);
+        parent::__construct(
+            $id,
+            Strings::trunc($title, self::MAX_TITLE_LENGTH),
+            Strings::trunc($description, self::MAX_DESCRIPTION_LENGTH)
+        );
+    }
+
+    public function jsonData(): array
+    {
+        return $this->jsonData;
     }
 
     public function makeData(?array $data = null): JsonStoryData

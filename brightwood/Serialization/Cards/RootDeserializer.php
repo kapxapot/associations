@@ -11,7 +11,6 @@ use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\Serializers\CardSerializer;
 use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use Exception;
-use InvalidArgumentException;
 use Plasticode\Exceptions\InvalidConfigurationException;
 use Webmozart\Assert\Assert;
 
@@ -34,13 +33,9 @@ class RootDeserializer implements RootDeserializerInterface
         $this->players = PlayerCollection::empty();
     }
 
-    /**
-     * @throws InvalidArgumentException
-     * @throws InvalidConfigurationException
-     */
-    public function deserialize(?array $jsonData) : ?object
+    public function deserialize(?array $jsonData): ?object
     {
-        if (is_null($jsonData)) {
+        if (!$jsonData) {
             return null;
         }
 
@@ -54,9 +49,9 @@ class RootDeserializer implements RootDeserializerInterface
 
         $serializer = $this->config->getSerializer($type);
 
-        if (is_null($serializer)) {
+        if (!$serializer) {
             throw new InvalidConfigurationException(
-                'No serializer defined for class: ' . $type
+                "No serializer defined for class: {$type}"
             );
         }
 
@@ -68,33 +63,24 @@ class RootDeserializer implements RootDeserializerInterface
         return $serializer->deserialize($this, $obj, $data);
     }
 
-    /**
-     * @param string|array $rawCard
-     */
-    public function deserializeCard($rawCard) : Card
+    public function deserializeCard($rawCard): Card
     {
         return $this->cardSerializer->deserialize($this, $rawCard);
     }
 
-    public function deserializeSuit(string $rawSuit) : Suit
+    public function deserializeSuit(string $rawSuit): Suit
     {
         return $this->suitSerializer->deserialize($rawSuit);
     }
 
-    /**
-     * @return $this
-     */
-    public function addPlayers(Player ...$players) : self
+    public function addPlayers(Player ...$players): self
     {
         $this->players = $this->players->add(...$players);
 
         return $this;
     }
 
-    /**
-     * @throws Exception
-     */
-    function resolvePlayer(?string $id) : ?Player
+    function resolvePlayer(?string $id): ?Player
     {
         if (strlen($id) === 0) {
             return null;
@@ -106,6 +92,6 @@ class RootDeserializer implements RootDeserializerInterface
             return $player;
         }
 
-        throw new Exception('Player [' . $id . '] not found.');
+        throw new Exception("Player [{$id}] not found.");
     }
 }

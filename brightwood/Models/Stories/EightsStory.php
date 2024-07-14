@@ -16,12 +16,17 @@ use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\StoryBuilder;
+use InvalidArgumentException;
 use Plasticode\Util\Cases;
 use Plasticode\Util\Text;
 use Webmozart\Assert\Assert;
 
 class EightsStory extends Story
 {
+    const ID = 3;
+    const TITLE = '♠ Карточная игра «Восьмерки»';
+    const DESCRIPTION = 'Простая карточная игра с ботами. Сложность: 3/5';
+
     private const RULES_COMMAND = '/rules';
     private const DRAW_CARD_COMMAND = '🎴 Взять карту';
     private const NO_CARDS_COMMAND = '❌ Нет карт';
@@ -43,19 +48,14 @@ class EightsStory extends Story
     private bool $drawing = false;
 
     public function __construct(
-        int $id,
         RootDeserializerInterface $rootDeserializer,
         Cases $cases
     )
     {
-        parent::__construct(
-            $id,
-            '♠ Карточная игра «Восьмерки»',
-            'Простая карточная игра с ботами. Сложность: 3/5'
-        );
-
         $this->rootDeserializer = $rootDeserializer;
         $this->cases = $cases;
+
+        parent::__construct(self::ID, self::TITLE, self::DESCRIPTION);
     }
 
     public function makeData(?array $data = null): EightsData
@@ -63,9 +63,9 @@ class EightsStory extends Story
         if ($data !== null) {
             try {
                 return $this->rootDeserializer->deserialize($data);
-            } catch (\InvalidArgumentException $ex) {
+            } catch (InvalidArgumentException $ex) {
                 // just ignore it
-                // this is needed for parsing the data without a type
+                // this is needed for parsing a data without a type
             }
         }
 

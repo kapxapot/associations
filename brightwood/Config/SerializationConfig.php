@@ -44,24 +44,22 @@ class SerializationConfig extends SerializerSource
         $giftActionSerializer = new GiftActionSerializer();
         $skipGiftActionSerializer = new SkipGiftActionSerializer();
 
-        return parent::__construct(
-            [
-                Bot::class => $botSerializer,
-                Deck::class => $cardListSerializer,
-                EightGiftAction::class => new EightGiftActionSerializer(),
-                EightsData::class => new EightsDataSerializer(),
-                EightsDiscard::class => $cardListSerializer,
-                EightsGame::class => new EightsGameSerializer($parser, $cases),
-                FemaleBot::class => $botSerializer,
-                Hand::class => $cardListSerializer,
-                Human::class => new HumanSerializer($telegramUserRepository),
-                JackGiftAction::class => $skipGiftActionSerializer,
-                Pile::class => $cardListSerializer,
-                SevenGiftAction::class => $giftActionSerializer,
-                SixGiftAction::class => $giftActionSerializer,
-                SkipGiftAction::class => $skipGiftActionSerializer,
-                SuitRestriction::class => new SuitRestrictionSerializer(),
-            ]
-        );
+        return parent::__construct([
+            Bot::class => $botSerializer,
+            Deck::class => $cardListSerializer,
+            EightGiftAction::class => new EightGiftActionSerializer(),
+            EightsData::class => new EightsDataSerializer(),
+            EightsDiscard::class => $cardListSerializer,
+            EightsGame::class => new EightsGameSerializer($parser, $cases),
+            FemaleBot::class => $botSerializer,
+            Hand::class => $cardListSerializer,
+            Human::class => new HumanSerializer($telegramUserRepository),
+            JackGiftAction::class => $skipGiftActionSerializer,
+            Pile::class => $cardListSerializer,
+            SevenGiftAction::class => $giftActionSerializer,
+            SixGiftAction::class => $giftActionSerializer,
+            SkipGiftAction::class => $skipGiftActionSerializer,
+            SuitRestriction::class => new SuitRestrictionSerializer(),
+        ]);
     }
 }

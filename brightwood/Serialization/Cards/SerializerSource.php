@@ -14,9 +14,7 @@ class SerializerSource implements SerializerSourceInterface
     /**
      * @param array<string, SerializerInterface>|null $map
      */
-    public function __construct(
-        ?array $map = null
-    )
+    public function __construct(?array $map = null)
     {
         $this->map = [];
 
@@ -29,10 +27,7 @@ class SerializerSource implements SerializerSourceInterface
         }
     }
 
-    /**
-     * Registers new serializer for the specified class.
-     */
-    public function register(string $class, SerializerInterface $serializer) : self
+    public function register(string $class, SerializerInterface $serializer): self
     {
         Assert::stringNotEmpty($class);
 
@@ -41,10 +36,7 @@ class SerializerSource implements SerializerSourceInterface
         return $this;
     }
 
-    /**
-     * Get a serializer for the class. Null if absent.
-     */
-    public function getSerializer(string $class) : ?SerializerInterface
+    public function getSerializer(string $class): ?SerializerInterface
     {
         return $this->map[$class] ?? null;
     }

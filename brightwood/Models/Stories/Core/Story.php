@@ -19,11 +19,14 @@ use Webmozart\Assert\Assert;
 
 abstract class Story implements CommandProviderInterface
 {
-    public const RESTART_COMMAND = '♻ Начать заново';
-    public const STORY_SELECTION_COMMAND = '📚 Выбрать историю';
+    const MAX_TITLE_LENGTH = 250;
+    const MAX_DESCRIPTION_LENGTH = 1000;
+
+    const RESTART_COMMAND = '♻ Начать заново';
+    const STORY_SELECTION_COMMAND = '📚 Выбрать историю';
 
     private int $id;
-    private string $name;
+    private string $title;
     private ?string $description;
 
     private StoryNodeCollection $nodes;
@@ -33,12 +36,12 @@ abstract class Story implements CommandProviderInterface
 
     public function __construct(
         int $id,
-        string $name,
+        string $title,
         string $description = null
     )
     {
         $this->id = $id;
-        $this->name = $name;
+        $this->title = $title;
         $this->description = $description;
 
         $this->nodes = StoryNodeCollection::empty();
@@ -52,9 +55,9 @@ abstract class Story implements CommandProviderInterface
         return $this->id;
     }
 
-    public function name(): string
+    public function title(): string
     {
-        return $this->name;
+        return $this->title;
     }
 
     public function description(): string
@@ -75,7 +78,7 @@ abstract class Story implements CommandProviderInterface
     abstract public function makeData(?array $data = null): StoryData;
 
     /**
-     * Override this.
+     * Override this to handle story-specific commands.
      */
     public function executeCommand(string $command): StoryMessageSequence
     {
@@ -276,7 +279,7 @@ abstract class Story implements CommandProviderInterface
     {
         return new Command(
             'story_' . $this->id(),
-            $this->name()
+            $this->title()
         );
     }
 }

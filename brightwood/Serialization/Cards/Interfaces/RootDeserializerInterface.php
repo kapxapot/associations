@@ -5,29 +5,32 @@ namespace Brightwood\Serialization\Cards\Interfaces;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Models\Cards\Suit;
+use InvalidArgumentException;
+use Plasticode\Exceptions\InvalidConfigurationException;
 
 interface RootDeserializerInterface
 {
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @throws InvalidConfigurationException
      */
-    function deserialize(?array $jsonData) : ?object;
+    public function deserialize(?array $jsonData): ?object;
 
     /**
      * @param string|array $rawCard
      */
-    function deserializeCard($rawCard) : Card;
+    public function deserializeCard($rawCard): Card;
 
-    function deserializeSuit(string $rawSuit) : Suit;
+    public function deserializeSuit(string $rawSuit): Suit;
 
     /**
      * @return $this
      */
-    function addPlayers(Player ...$players) : self;
+    public function addPlayers(Player ...$players): self;
 
     /**
-     * The player can be resolved only if it was previously added using addPlayers() function.
+     * A player can be resolved only if they were previously added
+     * using the `addPlayers()` function.
      */
-    function resolvePlayer(?string $id) : ?Player;
+    public function resolvePlayer(?string $id): ?Player;
 }

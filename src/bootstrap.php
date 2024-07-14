@@ -42,9 +42,7 @@ $slimSettings = [
     'routerCacheFile' => false,
 ];
 
-$autowirer = new Autowirer();
-
-$autowirer = $autowirer->withUntypedParamResolver(
+$autowirer = (new Autowirer())->withUntypedParamResolver(
     new UntypedContainerParamResolver()
 );
 

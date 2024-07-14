@@ -4,19 +4,20 @@ namespace Brightwood\Serialization\Cards\Serializers;
 
 use Brightwood\Models\Cards\Card;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
+use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
 class CardSerializer
 {
     /**
      * @param string|array $rawCard
-     * 
-     * @throws \InvalidArgumentException
+     *
+     * @throws InvalidArgumentException
      */
     public function deserialize(
         RootDeserializerInterface $rootDeserializer,
         $rawCard
-    ) : Card
+    ): Card
     {
         if (is_string($rawCard)) {
             return Card::parse($rawCard);

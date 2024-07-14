@@ -5,11 +5,9 @@ namespace Brightwood\Repositories;
 use Brightwood\Collections\StoryCollection;
 use Brightwood\Models\Stories\Core\JsonFileStory;
 use Brightwood\Models\Stories\Core\Story;
-use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Models\Stories\WoodStory;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
-use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
-use Plasticode\Util\Cases;
+use EightsStoryFactory;
 
 /**
  * Stub repository for now.
@@ -18,18 +16,13 @@ class StoryRepository implements StoryRepositoryInterface
 {
     private StoryCollection $stories;
 
-    public function __construct(
-        RootDeserializerInterface $rootDeserializer,
-        Cases $cases
-    )
+    public function __construct(EightsStoryFactory $eightsFactory)
     {
-        $jsonDir = __DIR__ . '/../Models/Stories/Json/';
-
         $this->stories = StoryCollection::collect(
-            new WoodStory(1),
-            new JsonFileStory(2, $jsonDir . 'mystery.json', true),
-            new EightsStory(3, $rootDeserializer, $cases),
-            new JsonFileStory(6, $jsonDir . '359e097f-5620-477b-930d-48496393f747.json', true)
+            new WoodStory(),
+            new JsonFileStory(2, 'mystery.json'),
+            ($eightsFactory)(),
+            new JsonFileStory(6, '359e097f-5620-477b-930d-48496393f747.json')
         );
     }
 

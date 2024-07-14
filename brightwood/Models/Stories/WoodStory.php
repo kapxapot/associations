@@ -8,6 +8,10 @@ use Brightwood\StoryBuilder;
 
 class WoodStory extends Story
 {
+    const ID = 1;
+    const TITLE = '🌲 Лес';
+    const DESCRIPTION = 'Вы заблудились в лесу и пытаетесь из него выбраться. Или не пытаетесь. Сложность: 3/5';
+
     private const START = 1;
     private const STARVED = 2;
     private const WANDERING = 3;
@@ -38,13 +42,9 @@ class WoodStory extends Story
     private const KICK_FAIL = 28;
     private const GUMMY_BEARS = 29;
 
-    public function __construct(int $id)
+    public function __construct()
     {
-        parent::__construct(
-            $id,
-            '🌲 Лес',
-            'Вы заблудились в лесу и пытаетесь из него выбраться. Или не пытаетесь. Сложность: 3/5'
-        );
+        parent::__construct(self::ID, self::TITLE, self::DESCRIPTION);
     }
 
     public function makeData(?array $data = null): WoodData

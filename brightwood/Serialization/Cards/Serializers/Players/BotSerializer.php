@@ -14,7 +14,7 @@ class BotSerializer extends PlayerSerializer
         RootDeserializerInterface $rootDeserializer,
         object $obj,
         array $data
-    ) : Bot
+    ): Bot
     {
         /** @var Bot */
         $obj = parent::deserialize($rootDeserializer, $obj, $data);
