@@ -4,53 +4,56 @@ namespace Brightwood\Models\Stories\Core;
 
 use Brightwood\Models\Data\JsonStoryData;
 use Brightwood\Models\Nodes\AbstractStoryNode;
+use Brightwood\Models\StoryVersion;
 use Brightwood\StoryBuilder;
 use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
+/**
+ * @property string $uuid
+ * @method StoryVersion|null currentVersion()
+ * @method static withCurrentVersion(StoryVersion|callable|null $currentVersion)
+ */
 class JsonStory extends Story
 {
-    private string $uuid;
-    private array $jsonData;
+    private ?array $values = null;
 
-    public function __construct(int $id, array $jsonData)
+    private function getValue(string $key)
     {
-        $this->jsonData = $jsonData;
-        $this->uuid = $this->jsonData['id'] ?? null;
+        if (!$this->values) {
+            $this->values = $this->currentVersion()
+                ? json_decode($this->currentVersion()->jsonData, true)
+                : [];
+        }
 
-        Assert::notEmpty($this->uuid);
-
-        $title = $this->jsonData['title'] ?? 'Untitled';
-        $description = $this->jsonData['description'] ?? null;
-
-        parent::__construct($id, $title, $description);
+        return $this->values[$key] ?? null;
     }
 
-    public function uuid(): string
+    public function title(): string
     {
-        return $this->uuid;
+        return $this->getValue('title') ?? parent::title();
     }
 
-    public function jsonData(): array
+    public function description(): string
     {
-        return $this->jsonData;
+        return $this->getValue('description') ?? parent::description();
     }
 
     public function makeData(?array $data = null): JsonStoryData
     {
         return new JsonStoryData(
-            $this->jsonData['data'] ?? null,
+            $this->getValue('data') ?? null,
             $data
         );
     }
 
-    protected function build(): void
+    public function build(): void
     {
         $this->validate();
 
-        $startId = $this->jsonData['startId'];
-        $prefix = $this->jsonData['prefix'] ?? null;
-        $nodesData = $this->jsonData['nodes'];
+        $startId = $this->getValue('startId');
+        $prefix = $this->getValue('prefix');
+        $nodesData = $this->getValue('nodes');
 
         if ($prefix) {
             $this->setPrefixMessage($prefix);
@@ -126,12 +129,10 @@ class JsonStory extends Story
      */
     protected function validate(): void
     {
-        $startId = $this->jsonData['startId'] ?? null;
-
+        $startId = $this->getValue('startId');
         Assert::notNull($startId, '`startId` is undefined.');
 
-        $nodesData = $this->jsonData['nodes'] ?? [];
-
+        $nodesData = $this->getValue('nodes') ?? [];
         Assert::notEmpty($nodesData, 'No nodes defined.');
 
         $foundStartNode = false;
@@ -245,5 +246,11 @@ class JsonStory extends Story
             $foundStartNode,
             sprintf('Start node [%s] is undefined.', $startId)
         );
+    }
+
+    public function checkIntegrity(): void
+    {
+        parent::checkIntegrity();
+        $this->validate();
     }
 }

@@ -227,7 +227,7 @@ class Answerer
 
         $this->storyStatusRepository->store([
             'telegram_user_id' => $tgUser->getId(),
-            'story_id' => $story->id(),
+            'story_id' => $story->getId(),
             'step_id' => $sequence->nodeId(),
             'json_data' => json_encode($sequence->data())
         ]);
@@ -296,12 +296,12 @@ class Answerer
         $status = $this->getStatus($tgUser);
 
         if (!$status) {
-            return $this->startStory($tgUser, $story->id());
+            return $this->startStory($tgUser, $story->getId());
         }
 
         $sequence = $story->start($tgUser);
 
-        $status->storyId = $story->id();
+        $status->storyId = $story->getId();
         $status->stepId = $sequence->nodeId();
         $status->jsonData = json_encode($sequence->data());
 

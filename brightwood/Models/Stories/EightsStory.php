@@ -48,6 +48,7 @@ class EightsStory extends Story
     private bool $drawing = false;
 
     public function __construct(
+        array $data,
         RootDeserializerInterface $rootDeserializer,
         Cases $cases
     )
@@ -55,7 +56,11 @@ class EightsStory extends Story
         $this->rootDeserializer = $rootDeserializer;
         $this->cases = $cases;
 
-        parent::__construct(self::ID, self::TITLE, self::DESCRIPTION);
+        parent::__construct($data);
+
+        $this
+            ->withTitle(self::TITLE)
+            ->withDescription(self::DESCRIPTION);
     }
 
     public function makeData(?array $data = null): EightsData
@@ -111,7 +116,7 @@ class EightsStory extends Story
         return parent::executeCommand($command);
     }
 
-    protected function build(): void
+    public function build(): void
     {
         $builder = new StoryBuilder($this);
 

@@ -1,6 +1,6 @@
 <?php
 
-use Brightwood\Models\Stories\Core\JsonFileStory;
+use Brightwood\JsonDataLoader;
 use Phinx\Migration\AbstractMigration;
 
 class InitStoryVersions extends AbstractMigration
@@ -18,22 +18,24 @@ class InitStoryVersions extends AbstractMigration
             ->addForeignKey('story_id', 'stories', 'id', ['delete' => 'CASCADE', 'update' => 'CASCADE'])
             ->addForeignKey('prev_version_id', 'story_versions', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
             ->addForeignKey('created_by', 'users', 'id', ['delete' => 'SET_NULL', 'update' => 'CASCADE'])
+            ->addIndex(['story_id', 'prev_version_id'], ['unique' => true])
             ->create();
 
-        $mysteryStory = new JsonFileStory(2, 'mystery.json');
-        $kolobokStory = new JsonFileStory(6, '359e097f-5620-477b-930d-48496393f747.json');
+
+        $dir = __DIR__ . '/../../brightwood/Models/Stories/Json/';
+
+        $mysteryData = JsonDataLoader::load($dir . 'mystery.json');
+        $kolobokData = JsonDataLoader::load($dir . '359e097f-5620-477b-930d-48496393f747.json');
 
         $table
             ->insert([
                 [
-                    'story_id' => $mysteryStory->id(),
-                    'json_data' => json_encode($mysteryStory->jsonData()),
-                    'created_by' => 1,
+                    'story_id' => 2,
+                    'json_data' => json_encode($mysteryData),
                 ],
                 [
-                    'story_id' => $kolobokStory->id(),
-                    'json_data' => json_encode($kolobokStory->jsonData()),
-                    'created_by' => 1,
+                    'story_id' => 6,
+                    'json_data' => json_encode($kolobokData),
                 ],
             ])
             ->save();

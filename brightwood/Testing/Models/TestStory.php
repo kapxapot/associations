@@ -7,9 +7,13 @@ use Brightwood\StoryBuilder;
 
 class TestStory extends Story
 {
-    public function __construct(int $id)
+    public function __construct(array $data)
     {
-        parent::__construct($id, 'Лес', 'Blah');
+        parent::__construct($data);
+
+        $this
+            ->withTitle('Лес')
+            ->withDescription('Blah');
     }
 
     public function makeData(?array $data = null): TestData
@@ -17,7 +21,7 @@ class TestStory extends Story
         return new TestData($data);
     }
 
-    protected function build(): void
+    public function build(): void
     {
         $builder = new StoryBuilder($this);
 

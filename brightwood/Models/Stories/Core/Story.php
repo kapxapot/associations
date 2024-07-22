@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Stories\Core;
 
 use App\Models\TelegramUser;
+use App\Models\Traits\Created;
 use Brightwood\Collections\StoryNodeCollection;
 use Brightwood\Models\Command;
 use Brightwood\Models\Data\StoryData;
@@ -15,52 +16,59 @@ use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\AbstractStoryNode;
 use InvalidArgumentException;
 use Plasticode\Exceptions\InvalidConfigurationException;
+use Plasticode\Models\Generic\DbModel;
+use Plasticode\Models\Interfaces\CreatedInterface;
 use Webmozart\Assert\Assert;
 
-abstract class Story implements CommandProviderInterface
+abstract class Story extends DbModel implements CommandProviderInterface, CreatedInterface
 {
+    use Created;
+
     const MAX_TITLE_LENGTH = 250;
     const MAX_DESCRIPTION_LENGTH = 1000;
 
     const RESTART_COMMAND = '♻ Начать заново';
     const STORY_SELECTION_COMMAND = '📚 Выбрать историю';
 
-    private int $id;
-    private string $title;
-    private ?string $description;
+    private ?string $title = null;
+    private ?string $description = null;
 
-    private StoryNodeCollection $nodes;
-    private ?AbstractStoryNode $startNode = null;
+    protected StoryNodeCollection $nodes;
+    protected ?AbstractStoryNode $startNode = null;
 
-    private ?string $prefixMessage = null;
+    protected ?string $prefixMessage;
 
-    public function __construct(
-        int $id,
-        string $title,
-        string $description = null
-    )
+    public function __construct(array $data)
     {
-        $this->id = $id;
-        $this->title = $title;
-        $this->description = $description;
+        parent::__construct($data);
 
         $this->nodes = StoryNodeCollection::empty();
-
-        $this->build();
-        $this->checkIntegrity();
     }
 
-    public function id(): int
+    /**
+     * @return $this
+     */
+    public function withTitle(string $title): self
     {
-        return $this->id;
+        $this->title = $title;
+        return $this;
     }
 
     public function title(): string
     {
-        return $this->title;
+        return $this->title ?? 'Untitled';
     }
 
-    public function description(): string
+    /**
+     * @return $this
+     */
+    public function withDescription(string $description): self
+    {
+        $this->description = $description;
+        return $this;
+    }
+
+    public function description(): ?string
     {
         return $this->description;
     }
@@ -85,7 +93,7 @@ abstract class Story implements CommandProviderInterface
         return StoryMessageSequence::empty();
     }
 
-    abstract protected function build(): void;
+    abstract public function build(): void;
 
     /**
      * @return $this
@@ -266,8 +274,8 @@ abstract class Story implements CommandProviderInterface
             $this->toCommand()
         );
         
-        if ($this->description) {
-            $msg->appendLines($this->description);
+        if ($this->description()) {
+            $msg->appendLines($this->description());
         };
 
         return $msg;
@@ -278,7 +286,7 @@ abstract class Story implements CommandProviderInterface
     public function toCommand(): Command
     {
         return new Command(
-            'story_' . $this->id(),
+            'story_' . $this->getId(),
             $this->title()
         );
     }

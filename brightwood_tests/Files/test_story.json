@@ -1,4 +1,5 @@
 {
+    "id": "some-uuid",
     "title": "Лес",
     "startId": 1,
     "prefix": "День: {day}",

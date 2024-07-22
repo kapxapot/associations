@@ -42,9 +42,13 @@ class WoodStory extends Story
     private const KICK_FAIL = 28;
     private const GUMMY_BEARS = 29;
 
-    public function __construct()
+    public function __construct(array $data)
     {
-        parent::__construct(self::ID, self::TITLE, self::DESCRIPTION);
+        parent::__construct($data);
+
+        $this
+            ->withTitle(self::TITLE)
+            ->withDescription(self::DESCRIPTION);
     }
 
     public function makeData(?array $data = null): WoodData
@@ -52,7 +56,7 @@ class WoodStory extends Story
         return new WoodData($data);
     }
 
-    protected function build(): void
+    public function build(): void
     {
         $builder = new StoryBuilder($this);
 

@@ -9,8 +9,17 @@ class EightsStoryFactory
     public function __invoke(
         RootDeserializerInterface $rootDeserializer,
         Cases $cases
-    )
+    ): EightsStory
     {
-        return new EightsStory($rootDeserializer, $cases);
+        $story = new EightsStory(
+            ['id' => EightsStory::ID],
+            $rootDeserializer,
+            $cases
+        );
+
+        $story->build();
+        $story->checkIntegrity();
+
+        return $story;
     }
 }

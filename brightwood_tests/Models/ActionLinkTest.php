@@ -6,13 +6,23 @@ use Brightwood\Models\Links\ActionLink;
 use Brightwood\Testing\Models\TestData;
 use Brightwood\Testing\Models\TestStory;
 use PHPUnit\Framework\TestCase;
+use TestStoryFactory;
 
 final class ActionLinkTest extends TestCase
 {
+    private ?TestStory $story = null;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $factory = new TestStoryFactory();
+        $this->story = ($factory)();
+    }
+
     public function testEmptyMutatePreservesData() : void
     {
-        $story = new TestStory(1);
-        $data = $story->makeData();
+        $data = $this->story->makeData();
 
         $this->assertNotNull($data);
 
@@ -26,8 +36,7 @@ final class ActionLinkTest extends TestCase
 
     public function testMutateMutatesData() : void
     {
-        $story = new TestStory(1);
-        $data = $story->makeData();
+        $data = $this->story->makeData();
 
         $this->assertNotNull($data);
 
