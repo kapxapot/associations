@@ -72,7 +72,7 @@ class WordOverrideService
         $wordId = $data['word_id'];
         $word = $this->wordRepository->get($wordId);
 
-        $model = $this->wordOverrideRepository->create([
+        $model = $this->wordOverrideRepository->store([
             'word_id' => $word->getId(),
             'created_by' => $user->getId(),
         ]);

@@ -64,7 +64,7 @@ class AssociationOverrideService
         $associationId = $data['association_id'];
         $association = $this->associationRepository->get($associationId);
 
-        $model = $this->associationOverrideRepository->create([
+        $model = $this->associationOverrideRepository->store([
             'association_id' => $association->getId(),
             'created_by' => $user->getId(),
         ]);

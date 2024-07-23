@@ -36,7 +36,7 @@ class DictWordRepositoryMock extends RepositoryMock implements DictWordRepositor
             ->count();
     }
 
-    public function create(array $data): DictWordInterface
+    public function store(array $data): DictWordInterface
     {
         /** @var YandexDictWord */
         $dictWord = YandexDictWord::create($data);

@@ -28,7 +28,7 @@ class YandexDictWordRepository extends Repository implements YandexDictWordRepos
         return $this->getEntity($id);
     }
 
-    public function create(array $data): YandexDictWord
+    public function store(array $data): YandexDictWord
     {
         return $this->createEntity($data);
     }

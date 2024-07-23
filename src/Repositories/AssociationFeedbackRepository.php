@@ -25,7 +25,7 @@ class AssociationFeedbackRepository extends Repository implements AssociationFee
         return $this->getEntity($id);
     }
 
-    public function create(array $data): AssociationFeedback
+    public function store(array $data): AssociationFeedback
     {
         return $this->createEntity($data);
     }

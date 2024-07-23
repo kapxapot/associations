@@ -84,15 +84,11 @@ class AssociationFeedbackService
             ->associationRepository
             ->get($associationId);
 
-        $model =
-            $association->feedbackBy($user)
-            ??
-            $this->associationFeedbackRepository->create(
-                [
-                    'association_id' => $association->getId(),
-                    'created_by' => $user->getId(),
-                ]
-            );
+        $model = $association->feedbackBy($user)
+            ?? $this->associationFeedbackRepository->store([
+                'association_id' => $association->getId(),
+                'created_by' => $user->getId(),
+            ]);
 
         $model->dislike = Convert::toBit($data['dislike'] ?? null);
         $model->mature = Convert::toBit($data['mature'] ?? null);

@@ -12,7 +12,7 @@ interface AssociationOverrideRepositoryInterface extends FilteringRepositoryInte
 {
     public function get(?int $id): ?AssociationOverride;
 
-    public function create(array $data): AssociationOverride;
+    public function store(array $data): AssociationOverride;
 
     public function save(AssociationOverride $associationOverride): AssociationOverride;
 

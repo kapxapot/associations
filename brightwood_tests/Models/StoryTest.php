@@ -6,7 +6,6 @@ use App\Models\TelegramUser;
 use Brightwood\Testing\Models\TestData;
 use Brightwood\Testing\Models\TestStory;
 use PHPUnit\Framework\TestCase;
-use TestStoryFactory;
 
 final class StoryTest extends TestCase
 {
@@ -16,8 +15,7 @@ final class StoryTest extends TestCase
     {
         parent::setUp();
 
-        $factory = new TestStoryFactory();
-        $this->story = ($factory)();
+        $this->story = new TestStory();
     }
 
     public function testStart(): void

@@ -4,19 +4,24 @@ namespace Brightwood\Models\Stories\Core;
 
 use Brightwood\Models\Data\JsonStoryData;
 use Brightwood\Models\Nodes\AbstractStoryNode;
-use Brightwood\Models\StoryVersion;
 use Brightwood\StoryBuilder;
 use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
-/**
- * @property string $uuid
- * @method StoryVersion|null currentVersion()
- * @method static withCurrentVersion(StoryVersion|callable|null $currentVersion)
- */
 class JsonStory extends Story
 {
     private ?array $values = null;
+
+    public function __construct(Story $story)
+    {
+        parent::__construct($story->toArray());
+
+        $this
+            ->withCurrentVersion(fn () => $story->currentVersion())
+            ->withCreator(fn () => $story->creator());
+
+        $this->prepare();
+    }
 
     private function getValue(string $key)
     {
@@ -47,7 +52,7 @@ class JsonStory extends Story
         );
     }
 
-    public function build(): void
+    protected function build(): void
     {
         $this->validate();
 

@@ -10,9 +10,9 @@ interface DefinitionRepositoryInterface extends GetRepositoryInterface
 {
     public function get(?int $id): ?Definition;
 
-    public function save(Definition $definition): Definition;
-
     public function store(array $data): Definition;
+
+    public function save(Definition $definition): Definition;
 
     public function delete(Definition $definition): bool;
 

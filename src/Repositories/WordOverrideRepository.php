@@ -37,7 +37,7 @@ class WordOverrideRepository extends Repository implements FilteringRepositoryIn
         return $this->getEntity($id);
     }
 
-    public function create(array $data): WordOverride
+    public function store(array $data): WordOverride
     {
         return $this->createEntity($data);
     }

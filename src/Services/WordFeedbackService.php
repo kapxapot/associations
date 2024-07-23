@@ -94,15 +94,11 @@ class WordFeedbackService
         $normalize = fn (?string $w) =>
             $this->languageService->normalizeWord($language, $w);
 
-        $model =
-            $word->feedbackBy($user)
-            ??
-            $this->wordFeedbackRepository->create(
-                [
-                    'word_id' => $word->getId(),
-                    'created_by' => $user->getId(),
-                ]
-            );
+        $model = $word->feedbackBy($user)
+            ?? $this->wordFeedbackRepository->store([
+                'word_id' => $word->getId(),
+                'created_by' => $user->getId(),
+            ]);
 
         $model->dislike = Convert::toBit($data['dislike'] ?? null);
 

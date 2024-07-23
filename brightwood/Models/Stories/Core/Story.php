@@ -14,13 +14,20 @@ use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\AbstractStoryNode;
+use Brightwood\Models\StoryVersion;
 use InvalidArgumentException;
 use Plasticode\Exceptions\InvalidConfigurationException;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedInterface;
 use Webmozart\Assert\Assert;
 
-abstract class Story extends DbModel implements CommandProviderInterface, CreatedInterface
+/**
+ * @property integer $id
+ * @property string|null $uuid
+ * @method StoryVersion|null currentVersion()
+ * @method static withCurrentVersion(StoryVersion|callable|null $currentVersion)
+ */
+class Story extends DbModel implements CommandProviderInterface, CreatedInterface
 {
     use Created;
 
@@ -45,27 +52,9 @@ abstract class Story extends DbModel implements CommandProviderInterface, Create
         $this->nodes = StoryNodeCollection::empty();
     }
 
-    /**
-     * @return $this
-     */
-    public function withTitle(string $title): self
-    {
-        $this->title = $title;
-        return $this;
-    }
-
     public function title(): string
     {
         return $this->title ?? 'Untitled';
-    }
-
-    /**
-     * @return $this
-     */
-    public function withDescription(string $description): self
-    {
-        $this->description = $description;
-        return $this;
     }
 
     public function description(): ?string
@@ -83,7 +72,12 @@ abstract class Story extends DbModel implements CommandProviderInterface, Create
         return $this->startNode;
     }
 
-    abstract public function makeData(?array $data = null): StoryData;
+    public function makeData(?array $data = null): StoryData
+    {
+        // overload this
+
+        return new StoryData($data);
+    }
 
     /**
      * Override this to handle story-specific commands.
@@ -93,7 +87,21 @@ abstract class Story extends DbModel implements CommandProviderInterface, Create
         return StoryMessageSequence::empty();
     }
 
-    abstract public function build(): void;
+    /**
+     * Build the story and checks it for integrity.
+     *
+     * @throws InvalidArgumentException
+     */
+    protected function prepare(): void
+    {
+        $this->build();
+        $this->checkIntegrity();
+    }
+
+    protected function build(): void
+    {
+        // overload this
+    }
 
     /**
      * @return $this
@@ -273,7 +281,7 @@ abstract class Story extends DbModel implements CommandProviderInterface, Create
         $msg = new TextMessage(
             $this->toCommand()
         );
-        
+
         if ($this->description()) {
             $msg->appendLines($this->description());
         };

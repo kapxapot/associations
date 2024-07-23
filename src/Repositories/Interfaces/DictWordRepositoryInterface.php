@@ -9,13 +9,13 @@ use App\Models\Word;
 
 interface DictWordRepositoryInterface extends WithLanguageRepositoryInterface
 {
-    function create(array $data): DictWordInterface;
+    public function store(array $data): DictWordInterface;
 
-    function save(DictWordInterface $dictWord): DictWordInterface;
+    public function save(DictWordInterface $dictWord): DictWordInterface;
 
-    function getByWord(Word $word): ?DictWordInterface;
+    public function getByWord(Word $word): ?DictWordInterface;
 
-    function getByWordStr(Language $language, string $wordStr): ?DictWordInterface;
+    public function getByWordStr(Language $language, string $wordStr): ?DictWordInterface;
 
     /**
      * Returns dict words without associated words that need to be updated.

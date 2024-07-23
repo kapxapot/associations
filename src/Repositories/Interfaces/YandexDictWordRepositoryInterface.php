@@ -10,13 +10,14 @@ use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
 
 interface YandexDictWordRepositoryInterface extends ChangingRepositoryInterface, DictWordRepositoryInterface
 {
-    function get(?int $id): ?YandexDictWord;
+    public function get(?int $id): ?YandexDictWord;
 
     /**
      * @param YandexDictWord $dictWord
      */
-    function save(DictWordInterface $dictWord): YandexDictWord;
+    public function save(DictWordInterface $dictWord): YandexDictWord;
 
-    function getByWord(Word $word): ?YandexDictWord;
-    function getByWordStr(Language $language, string $wordStr): ?YandexDictWord;
+    public function getByWord(Word $word): ?YandexDictWord;
+
+    public function getByWordStr(Language $language, string $wordStr): ?YandexDictWord;
 }

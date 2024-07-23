@@ -6,6 +6,7 @@ use App\Models\TelegramUser;
 use Brightwood\JsonDataLoader;
 use Brightwood\Models\Data\JsonStoryData;
 use Brightwood\Models\Stories\Core\JsonStory;
+use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\StoryVersion;
 use PHPUnit\Framework\TestCase;
 
@@ -17,16 +18,14 @@ final class JsonStoryTest extends TestCase
     {
         $jsonData = JsonDataLoader::load('brightwood_tests/Files/test_story.json');
 
-        $story = new JsonStory([
+        $story = new Story([
             'id' => 1,
             'uuid' => $jsonData['id']
         ]);
 
         $story->withCurrentVersion(new StoryVersion(['json_data' => $jsonData]));
-        $story->build();
-        $story->checkIntegrity();
 
-        $this->story = $story;
+        $this->story = new JsonStory($story);
     }
 
     public function testStart(): void

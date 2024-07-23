@@ -38,7 +38,7 @@ class AssociationFeedbackRepositoryMock extends RepositoryMock implements Associ
         );
     }
 
-    public function create(array $data) : AssociationFeedback
+    public function store(array $data) : AssociationFeedback
     {
         return $this->hydrator->hydrate(
             AssociationFeedback::create($data)

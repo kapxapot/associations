@@ -10,8 +10,8 @@ use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\StoryStatus;
-use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
+use Brightwood\Services\StoryService;
 use Plasticode\Semantics\Gender;
 use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Strings;
@@ -22,7 +22,7 @@ use Webmozart\Assert\Assert;
  * Returns story message sequence in answer to a text from a telegram user.
  *
  * Has some other side effects (and this is not good):
- * 
+ *
  * - Can change telegram users (set gender).
  * - Can create and change story statuses.
  */
@@ -30,25 +30,25 @@ class Answerer
 {
     use LoggerAwareTrait;
 
-    private int $defaultStoryId = 1;
-
     private string $masAction = '👦 Мальчик';
     private string $femAction = '👧 Девочка';
 
-    private StoryRepositoryInterface $storyRepository;
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
 
+    private StoryService $storyService;
+
     public function __construct(
-        StoryRepositoryInterface $storyRepository,
         StoryStatusRepositoryInterface $storyStatusRepository,
         TelegramUserRepositoryInterface $telegramUserRepository,
+        StoryService $storyService,
         LoggerInterface $logger
     )
     {
-        $this->storyRepository = $storyRepository;
         $this->storyStatusRepository = $storyStatusRepository;
         $this->telegramUserRepository = $telegramUserRepository;
+
+        $this->storyService = $storyService;
 
         $this->withLogger($logger);
     }
@@ -80,14 +80,14 @@ class Answerer
         if (preg_match("#^/story(?:\s+|_)(\d+)$#i", $text, $matches)) {
             $storyId = $matches[1];
 
-            $story = $this->storyRepository->get($storyId);
+            $story = $this->getStory($storyId);
 
             if ($story) {
                 return $this->switchToStory($tgUser, $story);
             }
 
             return StoryMessageSequence::mash(
-                new TextMessage('История с id = ' . $storyId . ' не найдена.'),
+                new TextMessage("История с id = {$storyId} не найдена."),
                 $this->currentStatusMessages($tgUser)
             );
         }
@@ -184,11 +184,7 @@ class Answerer
             return StoryMessageSequence::empty();
         }
 
-        $story = $this->storyRepository->get($status->storyId);
-
-        Assert::notNull($story);
-
-        return $story->executeCommand($command);
+        return $status->story()->executeCommand($command);
     }
 
     /**
@@ -204,7 +200,7 @@ class Answerer
 
         return $this->startStory(
             $tgUser,
-            $this->defaultStoryId
+            $this->storyService->getDefaultStoryId()
         );
     }
 
@@ -218,7 +214,7 @@ class Answerer
 
     private function startStory(TelegramUser $tgUser, int $storyId): StoryMessageSequence
     {
-        $story = $this->storyRepository->get($storyId);
+        $story = $this->getStory($storyId);
 
         $sequence = StoryMessageSequence::mash(
             new TextMessage('Итак, начнем...'),
@@ -248,7 +244,7 @@ class Answerer
             );
         }
 
-        $story = $this->storyRepository->get($status->storyId);
+        $story = $status->story();
         $node = $story->getNode($status->stepId);
 
         Assert::notNull($node);
@@ -274,7 +270,7 @@ class Answerer
 
     private function storySelection(): StoryMessageSequence
     {
-        $stories = $this->storyRepository->getAll();
+        $stories = $this->storyService->getStories();
 
         if ($stories->isEmpty()) {
             return StoryMessageSequence::make(
@@ -321,8 +317,7 @@ class Answerer
 
     private function statusToMessages(StoryStatus $status): StoryMessageSequence
     {
-        $story = $this->storyRepository->get($status->storyId);
-
+        $story = $status->story();
         $node = $story->getNode($status->stepId);
         $data = $story->makeData($status->data());
 
@@ -331,6 +326,11 @@ class Answerer
             $node,
             $data
         );
+    }
+
+    private function getStory(?int $storyId): ?Story
+    {
+        return $this->storyService->getStory($storyId);
     }
 
     private function getStatus(TelegramUser $tgUser): ?StoryStatus

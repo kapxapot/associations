@@ -14,7 +14,7 @@ interface AliceUserRepositoryInterface extends ChangingRepositoryInterface
 
     public function getByUser(User $user): ?AliceUser;
 
-    public function save(AliceUser $user): AliceUser;
-
     public function store(array $data): AliceUser;
+
+    public function save(AliceUser $user): AliceUser;
 }

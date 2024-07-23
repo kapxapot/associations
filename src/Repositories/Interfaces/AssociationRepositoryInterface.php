@@ -14,9 +14,9 @@ interface AssociationRepositoryInterface extends FilteringRepositoryInterface, L
 {
     public function get(?int $id): ?Association;
 
-    public function save(Association $association): Association;
-
     public function store(array $data): Association;
+
+    public function save(Association $association): Association;
 
     public function getAllByLanguage(Language $language): AssociationCollection;
 

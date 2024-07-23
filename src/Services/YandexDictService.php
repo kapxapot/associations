@@ -39,13 +39,11 @@ class YandexDictService implements ExternalDictServiceInterface
             return null;
         }
 
-        $dictWord = $this->dictWordRepository->create(
-            [
-                'word' => $wordStr,
-                'language_id' => $language->getId(),
-                'response' => $result,
-            ]
-        );
+        $dictWord = $this->dictWordRepository->store([
+            'word' => $wordStr,
+            'language_id' => $language->getId(),
+            'response' => $result,
+        ]);
 
         $data = $this->parseApiResult($result);
         $dictWord = $this->applyParsedData($dictWord, $data);

@@ -15,9 +15,9 @@ interface GameRepositoryInterface extends FilteringRepositoryInterface, GetRepos
 
     public function getAllByLanguage(Language $language): GameCollection;
 
-    public function save(Game $game): Game;
-
     public function store(array $data): Game;
+
+    public function save(Game $game): Game;
 
     public function getCurrentByUser(User $user): ?Game;
 

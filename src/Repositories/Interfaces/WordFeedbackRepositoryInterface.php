@@ -10,11 +10,11 @@ use Plasticode\Repositories\Interfaces\Generic\FilteringRepositoryInterface;
 
 interface WordFeedbackRepositoryInterface extends ChangingRepositoryInterface, FilteringRepositoryInterface
 {
-    function get(?int $id): ?WordFeedback;
+    public function get(?int $id): ?WordFeedback;
 
-    function create(array $data): WordFeedback;
+    public function store(array $data): WordFeedback;
 
-    function save(WordFeedback $feedback): WordFeedback;
+    public function save(WordFeedback $feedback): WordFeedback;
 
-    function getAllByWord(Word $word): WordFeedbackCollection;
+    public function getAllByWord(Word $word): WordFeedbackCollection;
 }

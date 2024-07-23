@@ -12,7 +12,7 @@ interface AssociationFeedbackRepositoryInterface extends ChangingRepositoryInter
 {
     public function get(?int $id): ?AssociationFeedback;
 
-    public function create(array $data): AssociationFeedback;
+    public function store(array $data): AssociationFeedback;
 
     public function save(AssociationFeedback $feedback): AssociationFeedback;
 

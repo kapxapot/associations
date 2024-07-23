@@ -11,7 +11,7 @@ interface WordOverrideRepositoryInterface extends GetRepositoryInterface
 {
     public function get(?int $id): ?WordOverride;
 
-    public function create(array $data): WordOverride;
+    public function store(array $data): WordOverride;
 
     public function save(WordOverride $wordOverride): WordOverride;
 

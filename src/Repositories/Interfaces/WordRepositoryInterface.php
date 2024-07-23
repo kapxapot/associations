@@ -20,7 +20,7 @@ interface WordRepositoryInterface extends FilteringRepositoryInterface, Language
     public function getAllByLanguage(Language $language): WordCollection;
 
     /**
-     * Finds the word by string in the specified language strictly by `word_bin` field.
+     * Finds a word by string in the specified language strictly by `word_bin` field.
      *
      * - Normalized word string expected.
      */
@@ -31,7 +31,7 @@ interface WordRepositoryInterface extends FilteringRepositoryInterface, Language
     ): ?Word;
 
     /**
-     * Finds the word by string in the specified language.
+     * Finds a word by string in the specified language.
      *
      * - Searches by `word_bin` and `original_word` fields by default.
      * - In strict mode (`$strict === true`) searches strictly by `word_bin`.

@@ -37,11 +37,6 @@ class WordRelationRepository extends Repository implements WordRelationRepositor
         return $this->getEntity($id);
     }
 
-    public function create(array $data): WordRelation
-    {
-        return $this->createEntity($data);
-    }
-
     public function save(WordRelation $wordRelation): WordRelation
     {
         return $this->saveEntity($wordRelation);

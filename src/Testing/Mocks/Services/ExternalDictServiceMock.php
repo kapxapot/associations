@@ -24,25 +24,25 @@ class ExternalDictServiceMock implements ExternalDictServiceInterface
     ): ?DictWordInterface
     {
         if ($wordStr == 'стол') {
-            $dictWord = $this->dictWordRepository->create(
-                [
+            $dictWord = $this->dictWordRepository->getByWordStr($language, $wordStr);
+
+            if (!$dictWord) {
+                $dictWord = $this->dictWordRepository->store([
                     'word' => $wordStr,
                     'language_id' => $language->getId(),
                     'response' => '{"head":{},"def":[{"text":"стол","pos":"noun"}]}',
                     'pos' => 'noun',
-                ]
-            );
+                ]);
+            }
 
             return $dictWord;
         }
 
-        return $this->dictWordRepository->create(
-            [
-                'word' => $wordStr,
-                'language_id' => $language->getId(),
-                'response' => '{"head":{},"def":[]}',
-                'pos' => null,
-            ]
-        );
+        return $this->dictWordRepository->store([
+            'word' => $wordStr,
+            'language_id' => $language->getId(),
+            'response' => '{"head":{},"def":[]}',
+            'pos' => null,
+        ]);
     }
 }

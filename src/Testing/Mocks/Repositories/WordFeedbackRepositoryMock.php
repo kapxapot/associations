@@ -38,7 +38,7 @@ class WordFeedbackRepositoryMock extends RepositoryMock implements WordFeedbackR
         );
     }
 
-    public function create(array $data) : WordFeedback
+    public function store(array $data): WordFeedback
     {
         return $this->hydrator->hydrate(
             WordFeedback::create($data)

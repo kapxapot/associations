@@ -5,36 +5,24 @@ namespace Brightwood\Repositories;
 use Brightwood\Collections\StoryCollection;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
-use EightsStoryFactory;
-use WoodStoryFactory;
+use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 
-/**
- * Stub repository for now.
- */
-class StoryRepository implements StoryRepositoryInterface
+class StoryRepository extends IdiormRepository implements StoryRepositoryInterface
 {
-    private StoryCollection $fixedStories;
-
-    public function __construct(
-        WoodStoryFactory $woodStoryFactory,
-        EightsStoryFactory $eightsFactory
-    )
+    protected function entityClass(): string
     {
-        $this->fixedStories = StoryCollection::collect(
-            ($woodStoryFactory)(),
-            ($eightsFactory)(),
-        );
+        return Story::class;
     }
 
     public function get(?int $id): ?Story
     {
-        return $this->stories->first(
-            fn (Story $s) => $s->getId() === $id
-        );
+        return $this->getEntity($id);
     }
 
     public function getAll(): StoryCollection
     {
-        return $this->stories;
+        return StoryCollection::from(
+            $this->query()
+        );
     }
 }

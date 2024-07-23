@@ -6,9 +6,10 @@ use App\Models\TelegramUser;
 use Brightwood\Collections\StoryStatusCollection;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
+use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
-class StoryStatusRepositoryMock implements StoryStatusRepositoryInterface
+class StoryStatusRepositoryMock extends RepositoryMock implements StoryStatusRepositoryInterface
 {
     private StoryStatusCollection $statuses;
 

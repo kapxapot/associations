@@ -8,9 +8,13 @@ use Plasticode\Repositories\Interfaces\Generic\ChangingRepositoryInterface;
 
 interface TelegramUserRepositoryInterface extends ChangingRepositoryInterface
 {
-    function get(?int $id): ?TelegramUser;
-    function getByTelegramId(int $id): ?TelegramUser;
-    function getByUser(User $user): ?TelegramUser;
-    function save(TelegramUser $user): TelegramUser;
-    function store(array $data): TelegramUser;
+    public function get(?int $id): ?TelegramUser;
+
+    public function getByTelegramId(int $id): ?TelegramUser;
+
+    public function getByUser(User $user): ?TelegramUser;
+
+    public function save(TelegramUser $user): TelegramUser;
+
+    public function store(array $data): TelegramUser;
 }

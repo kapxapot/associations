@@ -34,7 +34,7 @@ class AssociationOverrideRepository extends Repository implements AssociationOve
         return $this->getEntity($id);
     }
 
-    public function create(array $data): AssociationOverride
+    public function store(array $data): AssociationOverride
     {
         return $this->createEntity($data);
     }

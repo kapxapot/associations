@@ -14,7 +14,7 @@ interface SberUserRepositoryInterface extends ChangingRepositoryInterface
 
     public function getByUser(User $user): ?SberUser;
 
-    public function save(SberUser $user): SberUser;
-
     public function store(array $data): SberUser;
+
+    public function save(SberUser $user): SberUser;
 }

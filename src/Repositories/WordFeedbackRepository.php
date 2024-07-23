@@ -26,7 +26,7 @@ class WordFeedbackRepository extends Repository implements WordFeedbackRepositor
         return $this->getEntity($id);
     }
 
-    public function create(array $data): WordFeedback
+    public function store(array $data): WordFeedback
     {
         return $this->createEntity($data);
     }

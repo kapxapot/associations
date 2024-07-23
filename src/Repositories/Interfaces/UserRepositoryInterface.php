@@ -8,6 +8,7 @@ use Plasticode\Repositories\Interfaces\UserRepositoryInterface as BaseUserReposi
 
 interface UserRepositoryInterface extends BaseUserRepositoryInterface, FilteringRepositoryInterface
 {
-    function get(?int $id): ?User;
-    function store(array $data): User;
+    public function get(?int $id): ?User;
+
+    public function store(array $data): User;
 }

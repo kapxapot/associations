@@ -18,7 +18,7 @@ class RootDeserializerFactory
 {
     public static function make(
         ?TelegramUserRepositoryInterface $telegramUserRepository = null
-    ) : RootDeserializerInterface
+    ): RootDeserializerInterface
     {
         $telegramUserRepository ??= new TelegramUserRepositoryMock(
             new TelegramUserSeeder()

@@ -13,8 +13,6 @@ interface WordRelationRepositoryInterface extends ChangingRepositoryInterface, F
 {
     public function get(?int $id): ?WordRelation;
 
-    public function create(array $data): WordRelation;
-
     public function save(WordRelation $wordRelation): WordRelation;
 
     public function getAllByWord(Word $word): WordRelationCollection;
