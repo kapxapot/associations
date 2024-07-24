@@ -12,7 +12,7 @@ final class EightGiftActionTest extends SerializationTestCase
 {
     private string $json = '{"type":"Brightwood\\\\Models\\\\Cards\\\\Actions\\\\Eights\\\\EightGiftAction","data":{"card":"\u26608","sender_id":"59f628bbf4cb3c3b44ae","suit":"\u2665"}}';
 
-    public function testSerialize() : void
+    public function testSerialize(): void
     {
         $gift = new EightGiftAction(
             new SuitedCard(Suit::spades(), Rank::eight()),
@@ -25,7 +25,7 @@ final class EightGiftActionTest extends SerializationTestCase
         $this->assertEquals($this->json, $json);
     }
 
-    public function testDeserialize() : void
+    public function testDeserialize(): void
     {
         $jsonData = json_decode($this->json, true);
         $gift = $this->deserializer->deserialize($jsonData);

@@ -69,7 +69,7 @@ final class EightsDataTest extends SerializationTestCase
                 )
             );
 
-        $tgUser = $this->telegramUserRepository->get(1);
+        $tgUser = self::$telegramUserRepository->get(1);
 
         $player4 = (new Human())
             ->withId('6027c68aadaac8c43f13')
@@ -212,7 +212,7 @@ final class EightsDataTest extends SerializationTestCase
 
         $this->assertTrue(
             $tgUser->equals(
-                $this->telegramUserRepository->get(1)
+                self::$telegramUserRepository->get(1)
             )
         );
 

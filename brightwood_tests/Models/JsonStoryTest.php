@@ -16,14 +16,15 @@ final class JsonStoryTest extends TestCase
 
     public function setUp(): void
     {
-        $jsonData = JsonDataLoader::load('brightwood_tests/Files/test_story.json');
+        $json = file_get_contents('brightwood_tests/Files/test_story.json');
+        $jsonData = json_decode($json, true, 512, JSON_THROW_ON_ERROR);
 
         $story = new Story([
             'id' => 1,
             'uuid' => $jsonData['id']
         ]);
 
-        $story->withCurrentVersion(new StoryVersion(['json_data' => $jsonData]));
+        $story->withCurrentVersion(new StoryVersion(['json_data' => $json]));
 
         $this->story = new JsonStory($story);
     }

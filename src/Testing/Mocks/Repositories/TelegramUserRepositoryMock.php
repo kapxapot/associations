@@ -17,7 +17,7 @@ class TelegramUserRepositoryMock extends RepositoryMock implements TelegramUserR
     public function __construct(?ArraySeederInterface $seeder = null)
     {
         if (self::$num++ == 1) {
-            throw new \Exception('mock created more than once');
+            throw new \Exception('Mock created more than once.');
         }
 
         $this->users = $seeder

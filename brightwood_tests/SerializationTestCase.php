@@ -13,22 +13,27 @@ use PHPUnit\Framework\TestCase;
 
 abstract class SerializationTestCase extends TestCase
 {
+    protected static ?TelegramUserRepositoryInterface $telegramUserRepository = null;
+
     protected RootDeserializerInterface $deserializer;
-    protected TelegramUserRepositoryInterface $telegramUserRepository;
     protected Player $player;
 
     public function setUp(): void
     {
         parent::setUp();
 
-        $this->telegramUserRepository = new TelegramUserRepositoryMock(
-            new TelegramUserSeeder()
+        if (!self::$telegramUserRepository) {
+            self::$telegramUserRepository = new TelegramUserRepositoryMock(
+                new TelegramUserSeeder()
+            );
+        }
+
+        $this->deserializer = RootDeserializerFactory::make(
+            self::$telegramUserRepository
         );
 
-        $this->deserializer = RootDeserializerFactory::make();
-
         $this->player = new Human(
-            $this->telegramUserRepository->get(1)
+            self::$telegramUserRepository->get(1)
         );
 
         $this->player->withId('59f628bbf4cb3c3b44ae');
@@ -40,7 +45,6 @@ abstract class SerializationTestCase extends TestCase
     {
         unset($this->deserializer);
         unset($this->player);
-        unset($this->telegramUserRepository);
 
         parent::tearDown();
     }
