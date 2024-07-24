@@ -3,7 +3,6 @@
 namespace Brightwood\Tests;
 
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
-use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use Brightwood\Answers\Answerer;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Models\Messages\StoryMessageSequence;
@@ -13,6 +12,7 @@ use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
 use Brightwood\Testing\Factories\LoggerFactory;
 use Brightwood\Testing\Factories\RootDeserializerFactory;
+use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
 use Brightwood\Testing\Mocks\Repositories\StoryRepositoryMock;
 use Brightwood\Testing\Mocks\Repositories\StoryStatusRepositoryMock;
 use Brightwood\Testing\Mocks\Repositories\StoryVersionRepositoryMock;
@@ -36,14 +36,12 @@ final class AnswererTest extends TestCase
     {
         parent::setUp();
 
-        $this->telegramUserRepository = new TelegramUserRepositoryMock();
+        $this->telegramUserRepository = TelegramUserRepositoryFactory::make();
 
         $woodStory = new WoodStory();
 
         $eightsStory = new EightsStory(
-            RootDeserializerFactory::make(
-                $this->telegramUserRepository
-            ),
+            RootDeserializerFactory::make(),
             new Cases()
         );
 

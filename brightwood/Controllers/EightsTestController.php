@@ -3,8 +3,6 @@
 namespace Brightwood\Controllers;
 
 use App\Bots\Factories\MessageRendererFactory;
-use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
-use App\Testing\Seeders\TelegramUserSeeder;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Games\EightsGame;
@@ -13,6 +11,7 @@ use Brightwood\Models\Cards\Players\FemaleBot;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Parsing\StoryParser;
+use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
 use Plasticode\Core\Response;
 use Plasticode\Util\Cases;
 use Plasticode\Util\Text;
@@ -68,9 +67,7 @@ class EightsTestController
         ResponseInterface $response
     )
     {
-        $tgUserRepo = new TelegramUserRepositoryMock(
-            new TelegramUserSeeder()
-        );
+        $tgUserRepo = TelegramUserRepositoryFactory::make();
 
         $tgUser = $tgUserRepo->get(1);
 

@@ -3,9 +3,6 @@
 namespace Brightwood\Testing\Factories;
 
 use App\Bots\Factories\MessageRendererFactory;
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
-use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
-use App\Testing\Seeders\TelegramUserSeeder;
 use Brightwood\Config\SerializationConfig;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
@@ -16,17 +13,11 @@ use Plasticode\Util\Cases;
 
 class RootDeserializerFactory
 {
-    public static function make(
-        ?TelegramUserRepositoryInterface $telegramUserRepository = null
-    ): RootDeserializerInterface
+    public static function make(): RootDeserializerInterface
     {
-        $telegramUserRepository ??= new TelegramUserRepositoryMock(
-            new TelegramUserSeeder()
-        );
-
         return new RootDeserializer(
             new SerializationConfig(
-                $telegramUserRepository,
+                TelegramUserRepositoryFactory::make(),
                 new StoryParser(
                     new MessageRendererFactory()
                 ),

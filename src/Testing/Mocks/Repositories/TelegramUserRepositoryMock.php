@@ -11,14 +11,16 @@ use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
 class TelegramUserRepositoryMock extends RepositoryMock implements TelegramUserRepositoryInterface
 {
-    private static int $num = 0;
+    private static int $instanceCount = 0;
     private TelegramUserCollection $users;
 
     public function __construct(?ArraySeederInterface $seeder = null)
     {
-        if (self::$num++ == 1) {
+        if (self::$instanceCount > 0) {
             throw new \Exception('Mock created more than once.');
         }
+
+        self::$instanceCount++;
 
         $this->users = $seeder
             ? TelegramUserCollection::make($seeder->seed())
