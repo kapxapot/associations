@@ -11,11 +11,11 @@ use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
 use Brightwood\Repositories\StoryRepository;
 use Brightwood\Repositories\StoryStatusRepository;
+use Brightwood\Repositories\StoryVersionRepository;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\RootDeserializer;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
 use Psr\Container\ContainerInterface;
-use StoryVersionRepository;
 
 class GeneralProvider extends MappingProvider
 {

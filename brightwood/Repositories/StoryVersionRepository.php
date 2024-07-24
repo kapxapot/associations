@@ -1,5 +1,7 @@
 <?php
 
+namespace Brightwood\Repositories;
+
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\StoryVersion;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
