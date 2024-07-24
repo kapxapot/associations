@@ -6,35 +6,47 @@ use App\Models\TelegramUser;
 use Brightwood\Collections\StoryStatusCollection;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
+use Plasticode\Hydrators\Interfaces\HydratorInterface;
+use Plasticode\ObjectProxy;
 use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
-use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
 class StoryStatusRepositoryMock extends RepositoryMock implements StoryStatusRepositoryInterface
 {
+    /** @var HydratorInterface|ObjectProxy */
+    private $hydrator;
+
     private StoryStatusCollection $statuses;
 
-    public function __construct(?ArraySeederInterface $seeder = null)
+    /**
+     * @param HydratorInterface|ObjectProxy $hydrator
+     */
+    public function __construct($hydrator)
     {
-        $this->statuses = $seeder
-            ? StoryStatusCollection::make($seeder->seed())
-            : StoryStatusCollection::empty();
+        $this->hydrator = $hydrator;
+        $this->statuses = StoryStatusCollection::empty();
     }
 
-    public function get(?int $id) : ?StoryStatus
+    public function get(?int $id): ?StoryStatus
     {
         return $this->statuses->first(
             fn (StoryStatus $s) => $s->getId() == $id
         );
     }
 
-    public function getByTelegramUser(TelegramUser $telegramUser) : ?StoryStatus
+    public function getByTelegramUser(TelegramUser $telegramUser): ?StoryStatus
     {
         return $this->statuses->first(
             fn (StoryStatus $s) => $s->telegramUserId == $telegramUser->getId()
         );
     }
 
-    public function save(StoryStatus $storyStatus) : StoryStatus
+    public function store(array $data): StoryStatus
+    {
+        $status = StoryStatus::create($data);
+        return $this->save($status);
+    }
+
+    public function save(StoryStatus $storyStatus): StoryStatus
     {
         if ($this->statuses->contains($storyStatus)) {
             return $storyStatus;
@@ -46,13 +58,6 @@ class StoryStatusRepositoryMock extends RepositoryMock implements StoryStatusRep
 
         $this->statuses = $this->statuses->add($storyStatus);
 
-        return $storyStatus;
-    }
-
-    public function store(array $data) : StoryStatus
-    {
-        $status = StoryStatus::create($data);
-
-        return $this->save($status);
+        return $this->hydrator->hydrate($storyStatus);
     }
 }

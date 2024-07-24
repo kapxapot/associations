@@ -2,8 +2,6 @@
 
 namespace App\Mapping\Providers;
 
-use App\Config\Config;
-use App\Data\MultilingualSearcher;
 use App\Hydrators\AliceUserHydrator;
 use App\Hydrators\AssociationFeedbackHydrator;
 use App\Hydrators\AssociationHydrator;

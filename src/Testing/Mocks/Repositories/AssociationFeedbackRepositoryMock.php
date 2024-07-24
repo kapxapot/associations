@@ -22,45 +22,43 @@ class AssociationFeedbackRepositoryMock extends RepositoryMock implements Associ
     /**
      * @param HydratorInterface|ObjectProxy $hydrator
      */
-    public function __construct(
-        $hydrator
-    )
+    public function __construct($hydrator)
     {
         $this->hydrator = $hydrator;
-
         $this->feedbacks = AssociationFeedbackCollection::empty();
     }
 
-    public function get(?int $id) : ?AssociationFeedback
+    public function get(?int $id): ?AssociationFeedback
     {
         return $this->feedbacks->first(
             fn (AssociationFeedback $f) => $f->getId() == $id
         );
     }
 
-    public function store(array $data) : AssociationFeedback
+    public function store(array $data): AssociationFeedback
     {
-        return $this->hydrator->hydrate(
-            AssociationFeedback::create($data)
-        );
+        $feedback = AssociationFeedback::create($data);
+        return $this->save($feedback);
     }
 
-    public function save(AssociationFeedback $feedback) : AssociationFeedback
+    public function save(AssociationFeedback $feedback): AssociationFeedback
     {
-        if (!$this->feedbacks->contains($feedback)) {
-            if (!$feedback->isPersisted()) {
-                $feedback->id = $this->feedbacks->nextId();
-            }
-
-            $this->feedbacks = $this->feedbacks->add($feedback);
+        if ($this->feedbacks->contains($feedback)) {
+            return $feedback;
         }
+
+        if (!$feedback->isPersisted()) {
+            $feedback->id = $this->feedbacks->nextId();
+        }
+
+        $this->feedbacks = $this->feedbacks->add($feedback);
 
         return $this->hydrator->hydrate($feedback);
     }
 
     public function getAllByAssociation(
         Association $association
-    ) : AssociationFeedbackCollection
+    ): AssociationFeedbackCollection
     {
         return $this
             ->feedbacks

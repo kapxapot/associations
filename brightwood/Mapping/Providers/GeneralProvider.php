@@ -5,6 +5,7 @@ namespace Brightwood\Mapping\Providers;
 use App\Repositories\Core\RepositoryContext;
 use Brightwood\Hydrators\StoryHydrator;
 use Brightwood\Hydrators\StoryStatusHydrator;
+use Brightwood\Hydrators\StoryVersionHydrator;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
@@ -34,8 +35,12 @@ class GeneralProvider extends MappingProvider
                     $c->get(RepositoryContext::class),
                     $this->proxy($c, StoryStatusHydrator::class)
                 ),
-            
-            StoryVersionRepositoryInterface::class => StoryVersionRepository::class,
+
+            StoryVersionRepositoryInterface::class =>
+                fn (ContainerInterface $c) => new StoryVersionRepository(
+                    $c->get(RepositoryContext::class),
+                    $this->proxy($c, StoryVersionHydrator::class)
+                ),
 
             // cards
 

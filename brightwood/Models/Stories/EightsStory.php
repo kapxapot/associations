@@ -69,6 +69,7 @@ class EightsStory extends Story
             try {
                 return $this->rootDeserializer->deserialize($data);
             } catch (InvalidArgumentException $ex) {
+                throw $ex;
                 // just ignore it
                 // this is needed for parsing a data without a type
             }

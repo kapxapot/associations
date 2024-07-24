@@ -43,7 +43,7 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
     protected StoryNodeCollection $nodes;
     protected ?AbstractStoryNode $startNode = null;
 
-    protected ?string $prefixMessage;
+    protected ?string $prefixMessage = null;
 
     public function __construct(array $data)
     {

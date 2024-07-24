@@ -11,35 +11,40 @@ use Plasticode\Testing\Seeders\Interfaces\ArraySeederInterface;
 
 class TelegramUserRepositoryMock extends RepositoryMock implements TelegramUserRepositoryInterface
 {
+    private static int $num = 0;
     private TelegramUserCollection $users;
 
     public function __construct(?ArraySeederInterface $seeder = null)
     {
+        if (self::$num++ == 1) {
+            throw new \Exception('mock created more than once');
+        }
+
         $this->users = $seeder
             ? TelegramUserCollection::make($seeder->seed())
             : TelegramUserCollection::empty();
     }
 
-    public function get(?int $id) : ?TelegramUser
+    public function get(?int $id): ?TelegramUser
     {
         return $this->users->first('id', $id);
     }
 
-    public function getByTelegramId(int $id) : ?TelegramUser
+    public function getByTelegramId(int $id): ?TelegramUser
     {
         return $this->users->first(
             fn (TelegramUser $u) => $u->telegramId == $id
         );
     }
 
-    public function getByUser(User $user) : ?TelegramUser
+    public function getByUser(User $user): ?TelegramUser
     {
         return $this->users->first(
             fn (TelegramUser $u) => $u->userId == $user->getId()
         );
     }
 
-    public function save(TelegramUser $user) : TelegramUser
+    public function save(TelegramUser $user): TelegramUser
     {
         if ($this->users->contains($user)) {
             return $user;
@@ -54,7 +59,7 @@ class TelegramUserRepositoryMock extends RepositoryMock implements TelegramUserR
         return $user;
     }
 
-    public function store(array $data) : TelegramUser
+    public function store(array $data): TelegramUser
     {
         $user = TelegramUser::create($data);
 

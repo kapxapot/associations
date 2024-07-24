@@ -19,7 +19,7 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
             : StoryCollection::empty();
     }
 
-    public function get(?int $id) : ?Story
+    public function get(?int $id): ?Story
     {
         return $this->stories->first(
             fn (Story $s) => $s->getId() == $id
