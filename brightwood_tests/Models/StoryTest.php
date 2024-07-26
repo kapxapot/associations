@@ -18,6 +18,13 @@ final class StoryTest extends TestCase
         $this->story = new TestStory();
     }
 
+    public function testProperties(): void
+    {
+        $this->assertEquals(TestStory::ID, $this->story->getId());
+        $this->assertEquals(TestStory::TITLE, $this->story->title());
+        $this->assertEquals(TestStory::DESCRIPTION, $this->story->description());
+    }
+
     public function testStart(): void
     {
         $sequence = $this->story->start(new TelegramUser());

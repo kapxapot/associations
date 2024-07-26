@@ -78,7 +78,7 @@ class Answerer
 
         // story switch command
         if (preg_match("#^/story(?:\s+|_)(\d+)$#i", $text, $matches)) {
-            $storyId = $matches[1];
+            $storyId = (int)$matches[1];
 
             $story = $this->getStory($storyId);
 
@@ -328,7 +328,7 @@ class Answerer
         );
     }
 
-    private function getStory(?int $storyId): ?Story
+    private function getStory(int $storyId): ?Story
     {
         return $this->storyService->getStory($storyId);
     }

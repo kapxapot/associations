@@ -12,8 +12,9 @@ use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 class StoryService
 {
     private StoryRepositoryInterface $storyRepository;
-
     private StoryCollection $fixedStories;
+
+    private array $cache = [];
 
     public function __construct(
         StoryRepositoryInterface $storyRepository,
@@ -27,36 +28,58 @@ class StoryService
             $woodStory,
             $eightsStory
         );
+
+        $this->fixedStories->apply(
+            fn (Story $s) => $this->addToCache($s)
+        );
     }
 
-    public function getStory(?int $id): ?Story
+    public function getStory(int $id): ?Story
     {
-        // first, try to get a fixed story
-        $story = $this->fixedStories->first(
-            fn (Story $s) => $s->getId() == $id
-        );
-
-        if ($story) {
-            return $story;
-        }
-
-        // second, get a story from the db and convert it into a `JsonStory`
-        $story = $this->storyRepository->get($id);
-
-        return $story
-            ? new JsonStory($story)
-            : null;
+        return $this->getFromCache($id)
+            ?? $this->addToCache(
+                $this->getJsonStory($id)
+            );
     }
 
     public function getStories(): StoryCollection
     {
-        return $this->fixedStories->concat(
-            $this->storyRepository->getAll()
+        return StoryCollection::from(
+            $this
+                ->storyRepository
+                ->getAll()
+                ->asc('id')
+                ->map(
+                    fn (Story $s) => $this->getFromCache($s->getId())
+                        ?? $this->addToCache(
+                            new JsonStory($s)
+                        )
+                )
         );
     }
 
     public function getDefaultStoryId(): int
     {
         return WoodStory::ID;
+    }
+
+    private function addToCache(Story $story): Story
+    {
+        $this->cache[$story->getId()] = $story;
+        return $story;
+    }
+
+    private function getFromCache(int $id): ?Story
+    {
+        return $this->cache[$id] ?? null;
+    }
+
+    private function getJsonStory(int $id): ?JsonStory
+    {
+        $story = $this->storyRepository->get($id);
+
+        return $story
+            ? new JsonStory($story)
+            : null;
     }
 }

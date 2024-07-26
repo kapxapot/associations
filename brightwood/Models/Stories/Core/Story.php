@@ -37,8 +37,8 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
     const RESTART_COMMAND = '♻ Начать заново';
     const STORY_SELECTION_COMMAND = '📚 Выбрать историю';
 
-    private ?string $title = null;
-    private ?string $description = null;
+    protected ?string $title = null;
+    protected ?string $description = null;
 
     protected StoryNodeCollection $nodes;
     protected ?AbstractStoryNode $startNode = null;

@@ -4,26 +4,28 @@ namespace Brightwood\Hydrators;
 
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\StoryStatus;
-use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
+use Brightwood\Services\StoryService;
 use Plasticode\Hydrators\Generic\Hydrator;
 use Plasticode\Models\Generic\DbModel;
 
 class StoryStatusHydrator extends Hydrator
 {
-    private StoryRepositoryInterface $storyRepository;
     private StoryVersionRepositoryInterface $storyVersionRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
 
+    private StoryService $storyService;
+
     public function __construct(
+        StoryVersionRepositoryInterface $storyVersionRepository,
         TelegramUserRepositoryInterface $telegramUserRepository,
-        StoryRepositoryInterface $storyRepository,
-        StoryVersionRepositoryInterface $storyVersionRepository
+        StoryService $storyService
     )
     {
-        $this->storyRepository = $storyRepository;
         $this->storyVersionRepository = $storyVersionRepository;
         $this->telegramUserRepository = $telegramUserRepository;
+
+        $this->storyService = $storyService;
     }
 
     /**
@@ -33,7 +35,7 @@ class StoryStatusHydrator extends Hydrator
     {
         return $entity
             ->withStory(
-                fn () => $this->storyRepository->get($entity->storyId)
+                fn () => $this->storyService->getStory($entity->storyId)
             )
             ->withStoryVersion(
                 fn () => $this->storyVersionRepository->get($entity->storyVersionId)

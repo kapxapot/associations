@@ -8,13 +8,15 @@ use Brightwood\StoryBuilder;
 class TestStory extends Story
 {
     const ID = 1;
+    const TITLE = 'Лес';
+    const DESCRIPTION = 'Blah';
 
     public function __construct()
     {
         parent::__construct(['id' => self::ID]);
 
-        $this->title = 'Лес';
-        $this->description = 'Blah';
+        $this->title = self::TITLE;
+        $this->description = self::DESCRIPTION;
 
         $this->prepare();
     }

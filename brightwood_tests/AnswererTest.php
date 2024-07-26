@@ -51,20 +51,20 @@ final class AnswererTest extends TestCase
 
         $storyVersionRepository = new StoryVersionRepositoryMock();
 
-        $this->storyStatusRepository = new StoryStatusRepositoryMock(
-            new ObjectProxy(
-                fn () => new StoryStatusHydrator(
-                    $this->telegramUserRepository,
-                    $storyRepository,
-                    $storyVersionRepository
-                )
-            )
-        );
-
         $storyService = new StoryService(
             $storyRepository,
             $woodStory,
             $eightsStory
+        );
+
+        $this->storyStatusRepository = new StoryStatusRepositoryMock(
+            new ObjectProxy(
+                fn () => new StoryStatusHydrator(
+                    $storyVersionRepository,
+                    $this->telegramUserRepository,
+                    $storyService
+                )
+            )
         );
 
         $this->logger = LoggerFactory::make();
