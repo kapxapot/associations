@@ -221,9 +221,12 @@ class Answerer
             $story->start($tgUser)
         );
 
+        $storyVersion = $story->currentVersion();
+
         $this->storyStatusRepository->store([
             'telegram_user_id' => $tgUser->getId(),
             'story_id' => $story->getId(),
+            'story_version_id' => $storyVersion ? $storyVersion->getId() : null,
             'step_id' => $sequence->nodeId(),
             'json_data' => json_encode($sequence->data())
         ]);
@@ -297,7 +300,10 @@ class Answerer
 
         $sequence = $story->start($tgUser);
 
+        $storyVersion = $story->currentVersion();
+
         $status->storyId = $story->getId();
+        $status->storyVersionId = $storyVersion ? $storyVersion->getId() : null;
         $status->stepId = $sequence->nodeId();
         $status->jsonData = json_encode($sequence->data());
 

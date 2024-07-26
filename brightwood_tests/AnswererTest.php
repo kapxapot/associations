@@ -5,6 +5,7 @@ namespace Brightwood\Tests;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Answers\Answerer;
 use Brightwood\Hydrators\StoryStatusHydrator;
+use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Models\Stories\WoodStory;
@@ -88,25 +89,56 @@ final class AnswererTest extends TestCase
         parent::tearDown();
     }
 
-    public function testDebug1(): void
+    // public function testDebug1(): void
+    // {
+    //     $tgUser = $this->telegramUserRepository->store([
+    //         'id' => 2,
+    //         'username' => 'kapxapot',
+    //         'gender_id' => Gender::MAS
+    //     ]);
+
+    //     $this->storyStatusRepository->store([
+    //         'id' => 15,
+    //         'telegram_user_id' => $tgUser->getId(),
+    //         'story_id' => EightsStory::ID,
+    //         'step_id' => 8,
+    //         'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug1.json')
+    //     ]);
+
+    //     $answers = $this->answerer->getAnswers($tgUser, '♻ Начать заново');
+
+    //     $this->assertInstanceOf(StoryMessageSequence::class, $answers);
+    //     $this->assertTrue($answers->hasText());
+    // }
+
+    public function testDebug2(): void
     {
         $tgUser = $this->telegramUserRepository->store([
-            'id' => 2,
+            'id' => 31,
             'username' => 'kapxapot',
             'gender_id' => Gender::MAS
         ]);
 
         $this->storyStatusRepository->store([
-            'id' => 15,
+            'id' => 24,
             'telegram_user_id' => $tgUser->getId(),
             'story_id' => EightsStory::ID,
-            'step_id' => 8,
-            'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug1.json')
+            'step_id' => 5,
+            'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug2.json')
         ]);
 
-        $answers = $this->answerer->getAnswers($tgUser, '♻ Начать заново');
+        $answers = $this->answerer->getAnswers($tgUser, '4');
 
         $this->assertInstanceOf(StoryMessageSequence::class, $answers);
         $this->assertTrue($answers->hasText());
+
+        $this->assertEquals('Раздаем по 4 карты', $answers->messages()[2]->lines()[0]);
+
+        $this->assertInstanceOf(EightsData::class, $answers->data());
+
+        /** @var EightsData */
+        $eightsData = $answers->data();
+
+        $this->assertEquals(4, $eightsData->playerCount);
     }
 }

@@ -31,9 +31,7 @@ class SkipNode extends AbstractMutatorNode
         $nextNode = $this->getNextNode();
 
         return StoryMessageSequence::mash(
-            new StoryMessage(
-                $this->id, $this->text, null, $data
-            ),
+            parent::getMessages($tgUser, $data, $input),
             $nextNode->getMessages($tgUser, $data)
         );
     }
