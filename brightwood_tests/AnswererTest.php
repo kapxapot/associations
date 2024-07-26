@@ -89,27 +89,27 @@ final class AnswererTest extends TestCase
         parent::tearDown();
     }
 
-    // public function testDebug1(): void
-    // {
-    //     $tgUser = $this->telegramUserRepository->store([
-    //         'id' => 2,
-    //         'username' => 'kapxapot',
-    //         'gender_id' => Gender::MAS
-    //     ]);
+    public function testDebug1(): void
+    {
+        $tgUser = $this->telegramUserRepository->store([
+            'id' => 2,
+            'username' => 'kapxapot',
+            'gender_id' => Gender::MAS
+        ]);
 
-    //     $this->storyStatusRepository->store([
-    //         'id' => 15,
-    //         'telegram_user_id' => $tgUser->getId(),
-    //         'story_id' => EightsStory::ID,
-    //         'step_id' => 8,
-    //         'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug1.json')
-    //     ]);
+        $this->storyStatusRepository->store([
+            'id' => 15,
+            'telegram_user_id' => $tgUser->getId(),
+            'story_id' => EightsStory::ID,
+            'step_id' => 8,
+            'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug1.json')
+        ]);
 
-    //     $answers = $this->answerer->getAnswers($tgUser, '♻ Начать заново');
+        $answers = $this->answerer->getAnswers($tgUser, '♻ Начать заново');
 
-    //     $this->assertInstanceOf(StoryMessageSequence::class, $answers);
-    //     $this->assertTrue($answers->hasText());
-    // }
+        $this->assertInstanceOf(StoryMessageSequence::class, $answers);
+        $this->assertTrue($answers->hasText());
+    }
 
     public function testDebug2(): void
     {
