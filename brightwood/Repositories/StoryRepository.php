@@ -19,6 +19,14 @@ class StoryRepository extends IdiormRepository implements StoryRepositoryInterfa
         return $this->getEntity($id);
     }
 
+    public function getByUuid(string $uuid): ?Story
+    {
+        return $this
+            ->query()
+            ->where('uuid', $uuid)
+            ->one();
+    }
+
     public function getAll(): StoryCollection
     {
         return StoryCollection::from(

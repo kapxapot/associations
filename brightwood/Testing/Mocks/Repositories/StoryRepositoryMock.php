@@ -26,6 +26,13 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
         );
     }
 
+    public function getByUuid(string $uuid): ?Story
+    {
+        return $this->stories->first(
+            fn (Story $s) => $s->uuid == $uuid
+        );
+    }
+
     public function getAll(): StoryCollection
     {
         return $this->stories;

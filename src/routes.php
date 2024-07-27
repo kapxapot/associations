@@ -23,6 +23,7 @@ use App\Controllers\WordRecountController;
 use Brightwood\Controllers\BrightwoodBotController;
 use Brightwood\Controllers\CardsTestController;
 use Brightwood\Controllers\EightsTestController;
+use Brightwood\Controllers\StoryController;
 use Plasticode\Config\Config;
 use Plasticode\Controllers\AuthController;
 use Plasticode\Controllers\CaptchaController;
@@ -76,6 +77,11 @@ $app->group(
                     '/public/words',
                     WordController::class . ':publicWords'
                 )->setName('api.public.words');
+
+                $this->get(
+                    '/stories/{uuid}',
+                    StoryController::class . ':get'
+                )->setName('api.stories.get');
             }
         );
 

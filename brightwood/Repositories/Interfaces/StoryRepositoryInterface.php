@@ -10,5 +10,7 @@ interface StoryRepositoryInterface extends GetRepositoryInterface
 {
     public function get(?int $id): ?Story;
 
+    public function getByUuid(string $uuid): ?Story;
+
     public function getAll(): StoryCollection;
 }

@@ -42,6 +42,15 @@ class StoryService
             );
     }
 
+    public function getStoryByUuid(string $uuid): ?Story
+    {
+        $story = $this->storyRepository->getByUuid($uuid);
+
+        return $story
+            ? $this->getOrAddJsonStory($story)
+            : null;
+    }
+
     public function getStories(): StoryCollection
     {
         return StoryCollection::from(
@@ -50,10 +59,7 @@ class StoryService
                 ->getAll()
                 ->asc('id')
                 ->map(
-                    fn (Story $s) => $this->getFromCache($s->getId())
-                        ?? $this->addToCache(
-                            new JsonStory($s)
-                        )
+                    fn (Story $s) => $this->getOrAddJsonStory($s)
                 )
         );
     }
@@ -81,5 +87,18 @@ class StoryService
         return $story
             ? new JsonStory($story)
             : null;
+    }
+
+    private function getOrAddJsonStory(Story $story): Story
+    {
+        $cached = $this->getFromCache($story->getId());
+
+        if ($cached) {
+            return $cached;
+        }
+
+        return $this->addToCache(
+            new JsonStory($story)
+        );
     }
 }

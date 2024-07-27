@@ -71,7 +71,7 @@ class Controller extends BaseController
      */
     protected bool $autoOneColumn = false;
 
-    protected function buildParams(array $settings) : array
+    protected function buildParams(array $settings): array
     {
         $params = $settings['params'] ?? [];
 
