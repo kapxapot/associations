@@ -55,6 +55,14 @@ class StoryMessageSequence implements SequencableInterface
     }
 
     /**
+     * Makes a finalized sequence.
+     */
+    public static function makeFinalized(MessageInterface ...$messages): self
+    {
+        return self::make(...$messages)->finalize();
+    }
+
+    /**
      * Shortcut for constructor.
      */
     public static function make(MessageInterface ...$messages): self

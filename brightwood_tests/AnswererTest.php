@@ -3,6 +3,7 @@
 namespace Brightwood\Tests;
 
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use App\Testing\Mocks\LinkerMock;
 use Brightwood\Answers\Answerer;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Models\Data\EightsData;
@@ -80,6 +81,7 @@ final class AnswererTest extends TestCase
         $this->answerer = new Answerer(
             $logger,
             $settingsProvider,
+            new LinkerMock(),
             $this->storyStatusRepository,
             $this->telegramUserRepository,
             $storyService

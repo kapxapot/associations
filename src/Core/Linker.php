@@ -6,6 +6,7 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Word;
+use Brightwood\Models\Stories\Core\Story;
 use Plasticode\Core\Linker as BaseLinker;
 use Plasticode\Models\Generic\DbModel;
 
@@ -44,5 +45,14 @@ class Linker extends BaseLinker implements LinkerInterface
         }
 
         return $this->router->pathFor('main.word', ['id' => $word->getId()]);
+    }
+
+    public function story(Story $story): ?string
+    {
+        if (!$this->check($story) || !$story->hasUuid()) {
+            return null;
+        }
+
+        return $this->router->pathFor('api.stories.get', ['uuid' => $story->uuid]);
     }
 }

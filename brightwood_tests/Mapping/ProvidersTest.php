@@ -3,6 +3,7 @@
 namespace Brightwood\Tests\Mapping;
 
 use App\Auth\Interfaces\AuthInterface;
+use App\Core\Interfaces\LinkerInterface;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Brightwood\Answers\Answerer;
@@ -46,6 +47,7 @@ final class GeneralProviderTest extends AbstractProviderTest
             AuthInterface::class,
             Core\CacheInterface::class,
             DbMetadata::class,
+            LinkerInterface::class,
             LoggerInterface::class,
             SettingsProviderInterface::class,
 

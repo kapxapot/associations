@@ -2,6 +2,7 @@
 
 namespace Brightwood\Answers;
 
+use App\Core\Interfaces\LinkerInterface;
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\BotCommand;
@@ -36,6 +37,7 @@ class Answerer
     private string $femAction = '👧 Девочка';
 
     private SettingsProviderInterface $settingsProvider;
+    private LinkerInterface $linker;
 
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
@@ -45,6 +47,7 @@ class Answerer
     public function __construct(
         LoggerInterface $logger,
         SettingsProviderInterface $settingsProvider,
+        LinkerInterface $linker,
         StoryStatusRepositoryInterface $storyStatusRepository,
         TelegramUserRepositoryInterface $telegramUserRepository,
         StoryService $storyService
@@ -53,6 +56,7 @@ class Answerer
         $this->withLogger($logger);
 
         $this->settingsProvider = $settingsProvider;
+        $this->linker = $linker;
 
         $this->storyStatusRepository = $storyStatusRepository;
         $this->telegramUserRepository = $telegramUserRepository;
@@ -99,12 +103,32 @@ class Answerer
             );
         }
 
+        // story edit command
+        if (preg_match("#^/edit(?:\s+|_)(\d+)$#i", $text, $matches)) {
+            $storyId = (int)$matches[1];
+
+            $story = $this->getStory($storyId);
+
+            if ($story) {
+                return $this->editStoryLink($story);
+            }
+
+            return StoryMessageSequence::mash(
+                new TextMessage("История с id = {$storyId} не найдена."),
+                $this->currentStatusMessages($tgUser)
+            );
+        }
+
         if ($text === BotCommand::STORY_SELECTION || $text === BotCommand::CODE_STORY) {
             return $this->storySelection();
         }
 
         if ($text === BotCommand::CODE_EDIT) {
-            return $this->storyEdit($tgUser);
+            return $this->storyEditing($tgUser);
+        }
+
+        if ($text === BotCommand::CODE_NEW) {
+            return $this->storyCreation();
         }
 
         // default - next step
@@ -287,10 +311,9 @@ class Answerer
         $stories = $this->storyService->getStories();
 
         if ($stories->isEmpty()) {
-            return StoryMessageSequence::make(
+            return StoryMessageSequence::makeFinalized(
                 new TextMessage('⛔ Историй нет.')
-            )
-            ->finalize();
+            );
         }
 
         return
@@ -301,10 +324,31 @@ class Answerer
             ->finalize();
     }
 
-    private function storyEdit(TelegramUser $tgUser): StoryMessageSequence
+    private function switchToStory(TelegramUser $tgUser, Story $story): StoryMessageSequence
+    {
+        $status = $this->getStatus($tgUser);
+
+        if (!$status) {
+            return $this->startStory($tgUser, $story->getId());
+        }
+
+        $sequence = $story->start($tgUser);
+
+        $storyVersion = $story->currentVersion();
+
+        $status->storyId = $story->getId();
+        $status->storyVersionId = $storyVersion ? $storyVersion->getId() : null;
+        $status->stepId = $sequence->nodeId();
+        $status->jsonData = json_encode($sequence->data());
+
+        $this->storyStatusRepository->save($status);
+
+        return $sequence;
+    }
+
+    private function storyEditing(TelegramUser $tgUser): StoryMessageSequence
     {
         $sequence = StoryMessageSequence::empty();
-
         $stories = $this->storyService->getStoriesEditableBy($tgUser);
 
         if ($stories->isEmpty()) {
@@ -334,26 +378,24 @@ class Answerer
         return $sequence->finalize();
     }
 
-    private function switchToStory(TelegramUser $tgUser, Story $story): StoryMessageSequence
+    private function editStoryLink(Story $story): StoryMessageSequence
     {
-        $status = $this->getStatus($tgUser);
+        return StoryMessageSequence::makeFinalized(
+            new TextMessage(
+                "Для редактирования истории <b>{$story->title()}</b> перейдите по ссылке:",
+                $this->buildStoryEditUrl($story)
+            )
+        );
+    }
 
-        if (!$status) {
-            return $this->startStory($tgUser, $story->getId());
-        }
-
-        $sequence = $story->start($tgUser);
-
-        $storyVersion = $story->currentVersion();
-
-        $status->storyId = $story->getId();
-        $status->storyVersionId = $storyVersion ? $storyVersion->getId() : null;
-        $status->stepId = $sequence->nodeId();
-        $status->jsonData = json_encode($sequence->data());
-
-        $this->storyStatusRepository->save($status);
-
-        return $sequence;
+    private function storyCreation(): StoryMessageSequence
+    {
+        return StoryMessageSequence::makeFinalized(
+            new TextMessage(
+                'Для создания новой истории перейдите по ссылке:',
+                $this->buildStoryCreationUrl()
+            )
+        );
     }
 
     private function currentStatusMessages(TelegramUser $tgUser): StoryMessageSequence
@@ -386,6 +428,25 @@ class Answerer
     private function getStatus(TelegramUser $tgUser): ?StoryStatus
     {
         return $this->storyStatusRepository->getByTelegramUser($tgUser);
+    }
+
+    private function buildStoryEditUrl(Story $story): string
+    {
+        return sprintf(
+            '%s?edit=%s',
+            $this->getBuilderUrl(),
+            $this->linker->abs(
+                $this->linker->story($story)
+            )
+        );
+    }
+
+    private function buildStoryCreationUrl(): string
+    {
+        return sprintf(
+            '%s?new',
+            $this->getBuilderUrl()
+        );
     }
 
     private function getBuilderUrl(): string
