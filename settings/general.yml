@@ -81,7 +81,6 @@ telegram:
   bot_token: {TELEGRAM_BOT_TOKEN}
   bot_log: {DEBUG}
   brightwood_bot_token: {BRIGHTWOOD_BOT_TOKEN}
-  brightwood_bot_log_level: {BRIGHTWOOD_BOT_LOG_LEVEL}
 
 alice:
   bot_secret: {ALICE_BOT_SECRET}
@@ -106,3 +105,8 @@ jobs:
     batch_size: 10
   load_missing_definitions:
     batch_size: 10
+
+brightwood:
+  log_level: {BRIGHTWOOD_BOT_LOG_LEVEL}
+  builder_url: {BRIGHTWOOD_BUILDER_URL}
+  admin_telegram_user_id: {BRIGHTWOOD_ADMIN_TELEGRAM_USER_ID}

@@ -6,16 +6,15 @@ use App\Models\TelegramUser;
 use App\Services\TelegramUserService;
 use Brightwood\Answers\Answerer;
 use Brightwood\External\TelegramTransport;
+use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
-use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Parsing\StoryParser;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Debug;
 use Plasticode\Util\Text;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Log\LoggerInterface;
@@ -37,16 +36,23 @@ class BrightwoodBotController
     private Answerer $answerer;
     private StoryParser $parser;
 
-    public function __construct(ContainerInterface $container)
+    public function __construct(
+        SettingsProviderInterface $settingsProvider,
+        LoggerInterface $logger,
+        TelegramUserService $telegramUserService,
+        TelegramTransport $telegram,
+        Answerer $answerer,
+        StoryParser $parser
+    )
     {
-        $this->settingsProvider = $container->get(SettingsProviderInterface::class);
-        $this->logger = $container->get(LoggerInterface::class);
+        $this->settingsProvider = $settingsProvider;
+        $this->logger = $logger;
 
-        $this->telegramUserService = $container->get(TelegramUserService::class);
-        $this->telegram = $container->get(TelegramTransport::class);
-        $this->answerer = $container->get(Answerer::class);
+        $this->telegramUserService = $telegramUserService;
+        $this->telegram = $telegram;
+        $this->answerer = $answerer;
 
-        $this->parser = $container->get(StoryParser::class);
+        $this->parser = $parser;
     }
 
     public function __invoke(
@@ -55,7 +61,7 @@ class BrightwoodBotController
     ): ResponseInterface
     {
         $logLevel = $this->settingsProvider->get(
-            'telegram.brightwood_bot_log_level',
+            'brightwood.log_level',
             self::LOG_DISABLED
         );
 
@@ -81,7 +87,7 @@ class BrightwoodBotController
                 $result = $this->telegram->sendMessage($answer);
 
                 if ($logLevel >= self::LOG_FULL) {
-                    $this->logger->info('Send message result: ' . $result);
+                    $this->logger->info("Send message result: {$result}");
                 }
             }
         }
@@ -138,12 +144,9 @@ class BrightwoodBotController
             );
         }
 
-        $answer = $this->buildTelegramMessage(
-            $chatId,
-            'Что-то пошло не так. 😐'
+        return ArrayCollection::collect(
+            $this->buildTelegramMessage($chatId, 'Что-то пошло не так. 😐')
         );
-
-        return ArrayCollection::collect($answer);
     }
 
     /**
@@ -166,7 +169,7 @@ class BrightwoodBotController
 
         if (empty($defaultActions)) {
             $defaultActions = $sequence->isFinalized()
-                ? [Story::RESTART_COMMAND, Story::STORY_SELECTION_COMMAND]
+                ? [BotCommand::RESTART, BotCommand::STORY_SELECTION]
                 : [self::TROUBLESHOOT_COMMAND];
         }
 

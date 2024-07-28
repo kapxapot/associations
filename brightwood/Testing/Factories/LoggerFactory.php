@@ -9,7 +9,7 @@ use Psr\Log\LoggerInterface;
 
 class LoggerFactory
 {
-    public static function make() : LoggerInterface
+    public static function make(): LoggerInterface
     {
         $logger = new Logger('brightwood-test');
 

@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 final class StoryMessageSequenceTest extends TestCase
 {
-    public function testMash() : void
+    public function testMash(): void
     {
         $mashed = StoryMessageSequence::mash(
             new TextMessage('hey'),
@@ -33,7 +33,7 @@ final class StoryMessageSequenceTest extends TestCase
         StoryMessageSequence $base,
         StoryMessageSequence $added,
         bool $expected
-    ) : void
+    ): void
     {
         $this->assertEquals(
             $expected,
@@ -41,7 +41,7 @@ final class StoryMessageSequenceTest extends TestCase
         );
     }
 
-    public function finalizedMergeProvider() : array
+    public function finalizedMergeProvider(): array
     {
         return [
             [
@@ -60,12 +60,12 @@ final class StoryMessageSequenceTest extends TestCase
     /**
      * @dataProvider hasTextProvider
      */
-    public function testHasText(StoryMessageSequence $sequence, bool $expected) : void
+    public function testHasText(StoryMessageSequence $sequence, bool $expected): void
     {
         $this->assertEquals($expected, $sequence->hasText());
     }
 
-    public function hasTextProvider() : array
+    public function hasTextProvider(): array
     {
         return [
             'no messages' => [

@@ -121,7 +121,7 @@ class StoryMessageSequence implements SequencableInterface
 
     /**
      * Overrides actions.
-     * 
+     *
      * @return $this
      */
     public function withActions(string ...$actions): self
@@ -139,7 +139,7 @@ class StoryMessageSequence implements SequencableInterface
 
     /**
      * Overrides data.
-     * 
+     *
      * @return $this
      */
     public function withData(StoryData $data): self
@@ -157,7 +157,6 @@ class StoryMessageSequence implements SequencableInterface
     public function finalize(bool $state = true): self
     {
         $this->isFinalized = $state;
-
         return $this;
     }
 
@@ -173,6 +172,9 @@ class StoryMessageSequence implements SequencableInterface
             : null;
     }
 
+    /**
+     * @return string[]
+     */
     public function actions(): array
     {
         if (!empty($this->actions)) {
@@ -180,13 +182,15 @@ class StoryMessageSequence implements SequencableInterface
         }
 
         /** @var MessageInterface|null */
-        $last = $this
+        $lastActionMessage = $this
             ->messages
             ->last(
                 fn (MessageInterface $m) => $m->hasActions()
             );
 
-        return $last ? $last->actions() : [];
+        return $lastActionMessage
+            ? $lastActionMessage->actions()
+            : [];
     }
 
     public function data(): ?StoryData

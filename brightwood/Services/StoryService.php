@@ -2,36 +2,32 @@
 
 namespace Brightwood\Services;
 
+use App\Models\TelegramUser;
 use Brightwood\Collections\StoryCollection;
 use Brightwood\Models\Stories\Core\JsonStory;
 use Brightwood\Models\Stories\Core\Story;
-use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Models\Stories\WoodStory;
+use Brightwood\Repositories\Interfaces\StaticStoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 
 class StoryService
 {
     private StoryRepositoryInterface $storyRepository;
-    private StoryCollection $fixedStories;
 
     private array $cache = [];
 
     public function __construct(
-        StoryRepositoryInterface $storyRepository,
-        WoodStory $woodStory,
-        EightsStory $eightsStory
+        StaticStoryRepositoryInterface $staticStoryRepository,
+        StoryRepositoryInterface $storyRepository
     )
     {
         $this->storyRepository = $storyRepository;
 
-        $this->fixedStories = StoryCollection::collect(
-            $woodStory,
-            $eightsStory
-        );
-
-        $this->fixedStories->apply(
-            fn (Story $s) => $this->addToCache($s)
-        );
+        $staticStoryRepository
+            ->getAll()
+            ->apply(
+                fn (Story $s) => $this->addToCache($s)
+            );
     }
 
     public function getStory(int $id): ?Story
@@ -47,26 +43,39 @@ class StoryService
         $story = $this->storyRepository->getByUuid($uuid);
 
         return $story
-            ? $this->getOrAddJsonStory($story)
+            ? $this->getCachedOrAddJsonStory($story)
             : null;
     }
 
     public function getStories(): StoryCollection
     {
-        return StoryCollection::from(
-            $this
-                ->storyRepository
-                ->getAll()
-                ->asc('id')
-                ->map(
-                    fn (Story $s) => $this->getOrAddJsonStory($s)
-                )
+        return $this->toRichStories(
+            $this->storyRepository->getAll()
+        );
+    }
+
+    public function getStoriesEditableBy(TelegramUser $tgUser): StoryCollection
+    {
+        return $this->toRichStories(
+            $this->storyRepository->getAllEditableBy($tgUser)
         );
     }
 
     public function getDefaultStoryId(): int
     {
         return WoodStory::ID;
+    }
+
+    /**
+     * Converts every story into a static story or a json story.
+     */
+    private function toRichStories(StoryCollection $stories): StoryCollection
+    {
+        return StoryCollection::from(
+            $stories->map(
+                fn (Story $s) => $this->getCachedOrAddJsonStory($s)
+            )
+        );
     }
 
     private function addToCache(Story $story): Story
@@ -89,7 +98,7 @@ class StoryService
             : null;
     }
 
-    private function getOrAddJsonStory(Story $story): Story
+    private function getCachedOrAddJsonStory(Story $story): Story
     {
         $cached = $this->getFromCache($story->getId());
 

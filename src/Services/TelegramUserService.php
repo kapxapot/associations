@@ -55,13 +55,11 @@ class TelegramUserService
         // set age 1 for chat "users"
         $age = $tgUser->isChat() ? 1 : 0;
 
-        $user = $this->userRepository->store(
-            [
-                'login' => '',
-                'password' => '',
-                'age' => $age,
-            ]
-        );
+        $user = $this->userRepository->store([
+            'login' => '',
+            'password' => '',
+            'age' => $age,
+        ]);
 
         Assert::notNull($user);
 

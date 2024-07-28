@@ -15,9 +15,11 @@ use Brightwood\Mapping\Providers\GeneralProvider;
 use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Models\Stories\WoodStory;
 use Brightwood\Parsing\StoryParser;
+use Brightwood\Repositories\Interfaces\StaticStoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
+use Brightwood\Repositories\StaticStoryRepository;
 use Brightwood\Repositories\StoryRepository;
 use Brightwood\Repositories\StoryStatusRepository;
 use Brightwood\Repositories\StoryVersionRepository;
@@ -26,6 +28,7 @@ use Brightwood\Serialization\Cards\RootDeserializer;
 use Brightwood\Serialization\Cards\Serializers\CardSerializer;
 use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use Brightwood\Services\StoryService;
+use Brightwood\Services\TelegramUserService;
 use Plasticode\Auth\Access;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Data\DbMetadata;
@@ -84,6 +87,11 @@ final class GeneralProviderTest extends AbstractProviderTest
             StoryVersionRepository::class
         );
 
+        $this->check(
+            StaticStoryRepositoryInterface::class,
+            StaticStoryRepository::class
+        );
+
         // stories
 
         $this->check(WoodStory::class);
@@ -92,6 +100,7 @@ final class GeneralProviderTest extends AbstractProviderTest
         // services
 
         $this->check(StoryService::class);
+        $this->check(TelegramUserService::class);
 
         // external
 

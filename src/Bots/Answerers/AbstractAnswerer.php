@@ -471,7 +471,6 @@ abstract class AbstractAnswerer
     protected function findWord(?string $wordStr): ?Word
     {
         $language = $this->getLanguage();
-
         return $this->languageService->findWord($language, $wordStr);
     }
 

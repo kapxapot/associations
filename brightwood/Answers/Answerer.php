@@ -4,6 +4,7 @@ namespace Brightwood\Answers;
 
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\StoryMessageSequence;
@@ -13,6 +14,7 @@ use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
 use Plasticode\Semantics\Gender;
+use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Strings;
 use Psr\Log\LoggerInterface;
@@ -33,30 +35,35 @@ class Answerer
     private string $masAction = '👦 Мальчик';
     private string $femAction = '👧 Девочка';
 
+    private SettingsProviderInterface $settingsProvider;
+
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
 
     private StoryService $storyService;
 
     public function __construct(
+        LoggerInterface $logger,
+        SettingsProviderInterface $settingsProvider,
         StoryStatusRepositoryInterface $storyStatusRepository,
         TelegramUserRepositoryInterface $telegramUserRepository,
-        StoryService $storyService,
-        LoggerInterface $logger
+        StoryService $storyService
     )
     {
+        $this->withLogger($logger);
+
+        $this->settingsProvider = $settingsProvider;
+
         $this->storyStatusRepository = $storyStatusRepository;
         $this->telegramUserRepository = $telegramUserRepository;
 
         $this->storyService = $storyService;
-
-        $this->withLogger($logger);
     }
 
     public function getAnswers(TelegramUser $tgUser, string $text): StoryMessageSequence
     {
         // start command
-        if (Strings::startsWith($text, '/start')) {
+        if (Strings::startsWith($text, BotCommand::CODE_START)) {
             return $this->startCommand($tgUser);
         }
 
@@ -92,8 +99,12 @@ class Answerer
             );
         }
 
-        if ($text === Story::STORY_SELECTION_COMMAND || $text === '/story') {
+        if ($text === BotCommand::STORY_SELECTION || $text === BotCommand::CODE_STORY) {
             return $this->storySelection();
+        }
+
+        if ($text === BotCommand::CODE_EDIT) {
+            return $this->storyEdit($tgUser);
         }
 
         // default - next step
@@ -290,6 +301,39 @@ class Answerer
             ->finalize();
     }
 
+    private function storyEdit(TelegramUser $tgUser): StoryMessageSequence
+    {
+        $sequence = StoryMessageSequence::empty();
+
+        $stories = $this->storyService->getStoriesEditableBy($tgUser);
+
+        if ($stories->isEmpty()) {
+            $sequence->add(
+                new TextMessage('⛔ У вас нет доступных историй для редактирования.')
+            );
+        } else {
+            $sequence->add(
+                new TextMessage('Вы можете редактировать следующие истории:'),
+                ...$stories->map(
+                    fn (Story $s) => new TextMessage(
+                        sprintf(
+                            '%s %s_%s',
+                            $s->title(),
+                            BotCommand::CODE_EDIT,
+                            $s->getId()
+                        )
+                    )
+                )
+            );
+        }
+
+        $sequence->add(
+            new TextMessage('Создать новую историю: ' . BotCommand::CODE_NEW)
+        );
+
+        return $sequence->finalize();
+    }
+
     private function switchToStory(TelegramUser $tgUser, Story $story): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
@@ -342,5 +386,13 @@ class Answerer
     private function getStatus(TelegramUser $tgUser): ?StoryStatus
     {
         return $this->storyStatusRepository->getByTelegramUser($tgUser);
+    }
+
+    private function getBuilderUrl(): string
+    {
+        return $this->settingsProvider->get(
+            'brightwood.builder_url',
+            'https://brightwood-builder.onrender.com'
+        );
     }
 }

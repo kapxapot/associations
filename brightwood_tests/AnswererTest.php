@@ -10,7 +10,9 @@ use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Models\Stories\WoodStory;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
+use Brightwood\Repositories\StaticStoryRepository;
 use Brightwood\Services\StoryService;
+use Brightwood\Services\TelegramUserService;
 use Brightwood\Testing\Factories\LoggerFactory;
 use Brightwood\Testing\Factories\RootDeserializerFactory;
 use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
@@ -21,21 +23,21 @@ use Brightwood\Testing\Seeders\StorySeeder;
 use PHPUnit\Framework\TestCase;
 use Plasticode\ObjectProxy;
 use Plasticode\Semantics\Gender;
+use Plasticode\Settings\SettingsProvider;
 use Plasticode\Util\Cases;
-use Psr\Log\LoggerInterface;
 
 final class AnswererTest extends TestCase
 {
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
 
-    private LoggerInterface $logger;
-
     private Answerer $answerer;
 
     public function setUp(): void
     {
         parent::setUp();
+
+        $settingsProvider = new SettingsProvider();
 
         $this->telegramUserRepository = TelegramUserRepositoryFactory::make();
 
@@ -47,15 +49,20 @@ final class AnswererTest extends TestCase
         );
 
         $storyRepository = new StoryRepositoryMock(
+            new TelegramUserService($settingsProvider),
             new StorySeeder($woodStory, $eightsStory)
         );
 
         $storyVersionRepository = new StoryVersionRepositoryMock();
 
-        $storyService = new StoryService(
-            $storyRepository,
+        $staticStoryRepository = new StaticStoryRepository(
             $woodStory,
             $eightsStory
+        );
+
+        $storyService = new StoryService(
+            $staticStoryRepository,
+            $storyRepository
         );
 
         $this->storyStatusRepository = new StoryStatusRepositoryMock(
@@ -68,20 +75,20 @@ final class AnswererTest extends TestCase
             )
         );
 
-        $this->logger = LoggerFactory::make();
+        $logger = LoggerFactory::make();
 
         $this->answerer = new Answerer(
+            $logger,
+            $settingsProvider,
             $this->storyStatusRepository,
             $this->telegramUserRepository,
-            $storyService,
-            $this->logger
+            $storyService
         );
     }
 
     public function tearDown(): void
     {
         unset($this->answerer);
-        unset($this->logger);
 
         unset($this->storyStatusRepository);
         unset($this->telegramUserRepository);

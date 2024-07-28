@@ -101,7 +101,8 @@ class BotResponse
     }
 
     /**
-     * @param mixed $value
+     * Adds a variable based on the request: user or application.
+     *
      * @return $this
      */
     public function withVarBy(AbstractBotRequest $request, string $name, $value): self

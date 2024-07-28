@@ -5,6 +5,7 @@ namespace Brightwood\Models\Stories\Core;
 use App\Models\TelegramUser;
 use App\Models\Traits\Created;
 use Brightwood\Collections\StoryNodeCollection;
+use Brightwood\Models\BotCommand;
 use Brightwood\Models\Command;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Interfaces\CommandProviderInterface;
@@ -19,6 +20,7 @@ use InvalidArgumentException;
 use Plasticode\Exceptions\InvalidConfigurationException;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedInterface;
+use Plasticode\Util\Strings;
 use Webmozart\Assert\Assert;
 
 /**
@@ -31,13 +33,10 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
 {
     use Created;
 
-    const MAX_TITLE_LENGTH = 250;
-    const MAX_DESCRIPTION_LENGTH = 1000;
+    protected const MAX_TITLE_LENGTH = 250;
+    protected const MAX_DESCRIPTION_LENGTH = 1000;
 
-    const RESTART_COMMAND = '♻ Начать заново';
-    const STORY_SELECTION_COMMAND = '📚 Выбрать историю';
-
-    protected ?string $title = null;
+    protected string $title = 'Untitled';
     protected ?string $description = null;
 
     protected StoryNodeCollection $nodes;
@@ -54,12 +53,27 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
 
     public function title(): string
     {
-        return $this->title ?? 'Untitled';
+        return Strings::trunc(
+            $this->title,
+            self::MAX_TITLE_LENGTH
+        );
     }
 
     public function description(): ?string
     {
-        return $this->description;
+        if (!$this->description) {
+            return null;
+        }
+
+        return Strings::trunc(
+            $this->description,
+            self::MAX_DESCRIPTION_LENGTH
+        );
+    }
+
+    public function hasUuid(): bool
+    {
+        return strlen($this->uuid) > 0;
     }
 
     public function nodes(): StoryNodeCollection
@@ -212,7 +226,7 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
     ): ?StoryMessageSequence
     {
         if ($node->isFinish($data)) {
-            return ($input === self::RESTART_COMMAND)
+            return ($input === BotCommand::RESTART)
                 ? $this->start($tgUser)
                 : null;
         }
