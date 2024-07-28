@@ -383,7 +383,8 @@ class Answerer
         return StoryMessageSequence::makeFinalized(
             new TextMessage(
                 "Для редактирования истории <b>{$story->title()}</b> перейдите по ссылке:",
-                $this->buildStoryEditUrl($story)
+                $this->buildStoryEditUrl($story),
+                '(Рекомендуем открывать редактор на компьютере или планшете.)'
             )
         );
     }
@@ -393,7 +394,8 @@ class Answerer
         return StoryMessageSequence::makeFinalized(
             new TextMessage(
                 'Для создания новой истории перейдите по ссылке:',
-                $this->buildStoryCreationUrl()
+                $this->buildStoryCreationUrl(),
+                '(Рекомендуем открывать редактор на компьютере или планшете.)'
             )
         );
     }
