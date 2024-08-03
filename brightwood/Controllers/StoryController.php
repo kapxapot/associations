@@ -52,7 +52,9 @@ class StoryController
 
                 throw new NotFoundException('Story version not found.');
             }
-    
+
+            $response = $response->withHeader('Access-Control-Allow-Origin', '*');
+
             return Response::json(
                 $response,
                 json_decode($story->currentVersion()->jsonData, true)
