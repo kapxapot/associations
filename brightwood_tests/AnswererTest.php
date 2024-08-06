@@ -5,27 +5,21 @@ namespace Brightwood\Tests;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\LinkerMock;
 use Brightwood\Answers\Answerer;
+use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\EightsStory;
-use Brightwood\Models\Stories\WoodStory;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
-use Brightwood\Repositories\StaticStoryRepository;
-use Brightwood\Services\StoryService;
-use Brightwood\Services\TelegramUserService;
 use Brightwood\Testing\Factories\LoggerFactory;
-use Brightwood\Testing\Factories\RootDeserializerFactory;
+use Brightwood\Testing\Factories\SettingsProviderFactory;
+use Brightwood\Testing\Factories\StoryServiceFactory;
 use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
-use Brightwood\Testing\Mocks\Repositories\StoryRepositoryMock;
 use Brightwood\Testing\Mocks\Repositories\StoryStatusRepositoryMock;
 use Brightwood\Testing\Mocks\Repositories\StoryVersionRepositoryMock;
-use Brightwood\Testing\Seeders\StorySeeder;
 use PHPUnit\Framework\TestCase;
 use Plasticode\ObjectProxy;
 use Plasticode\Semantics\Gender;
-use Plasticode\Settings\SettingsProvider;
-use Plasticode\Util\Cases;
 
 final class AnswererTest extends TestCase
 {
@@ -38,53 +32,28 @@ final class AnswererTest extends TestCase
     {
         parent::setUp();
 
-        $settingsProvider = new SettingsProvider();
+        $settingsProvider = (new SettingsProviderFactory())();
+        $storyService = StoryServiceFactory::make($settingsProvider);
 
         $this->telegramUserRepository = TelegramUserRepositoryFactory::make();
-
-        $woodStory = new WoodStory();
-
-        $eightsStory = new EightsStory(
-            RootDeserializerFactory::make(),
-            new Cases()
-        );
-
-        $storyRepository = new StoryRepositoryMock(
-            new TelegramUserService($settingsProvider),
-            new StorySeeder($woodStory, $eightsStory)
-        );
-
-        $storyVersionRepository = new StoryVersionRepositoryMock();
-
-        $staticStoryRepository = new StaticStoryRepository(
-            $woodStory,
-            $eightsStory
-        );
-
-        $storyService = new StoryService(
-            $staticStoryRepository,
-            $storyRepository
-        );
 
         $this->storyStatusRepository = new StoryStatusRepositoryMock(
             new ObjectProxy(
                 fn () => new StoryStatusHydrator(
-                    $storyVersionRepository,
+                    new StoryVersionRepositoryMock(),
                     $this->telegramUserRepository,
                     $storyService
                 )
             )
         );
 
-        $logger = LoggerFactory::make();
-
         $this->answerer = new Answerer(
-            $logger,
+            LoggerFactory::make(),
             $settingsProvider,
             new LinkerMock(),
             $this->storyStatusRepository,
-            $this->telegramUserRepository,
-            $storyService
+            $storyService,
+            new TelegramTransportFactory($settingsProvider)
         );
     }
 

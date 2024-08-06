@@ -7,6 +7,7 @@ use Brightwood\Collections\StoryCollection;
 use Brightwood\Models\Stories\Core\JsonStory;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\Stories\WoodStory;
+use Brightwood\Models\StoryVersion;
 use Brightwood\Repositories\Interfaces\StaticStoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 
@@ -64,6 +65,14 @@ class StoryService
     public function getDefaultStoryId(): int
     {
         return WoodStory::ID;
+    }
+
+    public function makeStoryFromJson(string $json): JsonStory
+    {
+        $story = new Story();
+        $story->withCurrentVersion(new StoryVersion(['json_data' => $json]));
+
+        return new JsonStory($story);
     }
 
     /**

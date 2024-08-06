@@ -12,12 +12,11 @@ class TelegramTransport implements TelegramTransportInterface
 
     const COMMAND_SEND_MESSAGE = 'sendMessage';
     const COMMAND_GET_CHAT_MEMBER = 'getChatMember';
+    const COMMAND_GET_FILE = 'getFile';
 
     private TelegramBotInfo $botInfo;
 
-    public function __construct(
-        TelegramBotInfo $botInfo
-    )
+    public function __construct(TelegramBotInfo $botInfo)
     {
         $this->botInfo = $botInfo;
     }
@@ -60,6 +59,16 @@ class TelegramTransport implements TelegramTransportInterface
         }
 
         return $result;
+    }
+
+    public function getFileUrl(string $filePath): string
+    {
+        return sprintf(
+            '%s/file/bot%s/%s',
+            self::API_BASE_URL,
+            $this->botInfo->token(),
+            $filePath
+        );
     }
 
     private function serialize(array $message): array

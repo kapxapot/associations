@@ -2,10 +2,12 @@
 
 namespace Brightwood\Controllers;
 
+use App\External\Interfaces\TelegramTransportInterface;
 use App\Models\TelegramUser;
+use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
 use Brightwood\Answers\Answerer;
-use Brightwood\External\TelegramTransport;
+use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
@@ -31,16 +33,18 @@ class BrightwoodBotController
     private SettingsProviderInterface $settingsProvider;
     private LoggerInterface $logger;
 
+    private TelegramUserRepositoryInterface $telegramUserRepository;
     private TelegramUserService $telegramUserService;
-    private TelegramTransport $telegram;
+    private TelegramTransportInterface $telegram;
     private Answerer $answerer;
     private StoryParser $parser;
 
     public function __construct(
         SettingsProviderInterface $settingsProvider,
         LoggerInterface $logger,
+        TelegramUserRepositoryInterface $telegramUserRepository,
         TelegramUserService $telegramUserService,
-        TelegramTransport $telegram,
+        TelegramTransportFactory $telegramFactory,
         Answerer $answerer,
         StoryParser $parser
     )
@@ -48,8 +52,9 @@ class BrightwoodBotController
         $this->settingsProvider = $settingsProvider;
         $this->logger = $logger;
 
+        $this->telegramUserRepository = $telegramUserRepository;
         $this->telegramUserService = $telegramUserService;
-        $this->telegram = $telegram;
+        $this->telegram = ($telegramFactory)();
         $this->answerer = $answerer;
 
         $this->parser = $parser;
@@ -84,7 +89,11 @@ class BrightwoodBotController
                     $this->logger->info('Trying to send message', $answer);
                 }
 
-                $result = $this->telegram->sendMessage($answer);
+                try {
+                    $result = $this->telegram->sendMessage($answer);
+                } catch (Exception $ex) {
+                    $result = $ex->getMessage();
+                }
 
                 if ($logLevel >= self::LOG_FULL) {
                     $this->logger->info("Send message result: {$result}");
@@ -98,21 +107,13 @@ class BrightwoodBotController
     private function processIncomingMessage(array $message): ArrayCollection
     {
         $chatId = $message['chat']['id'];
-        $text = trim($message['text'] ?? null);
-
-        if (strlen($text) === 0) {
-            $answer = $this->buildTelegramMessage(
-                $chatId,
-                '🧾 Я понимаю только сообщения с текстом.'
-            );
-
-            return ArrayCollection::collect($answer);
-        }
+        $text = $message['text'] ?? null;
+        $document = $message['document'] ?? null;
 
         $from = $message['from'];
         $tgUser = $this->getTelegramUser($from);
 
-        return $this->tryGetAnswers($tgUser, $chatId, $text);
+        return $this->tryGetAnswers($tgUser, $chatId, $text, $document);
     }
 
     private function getTelegramUser(array $data): TelegramUser
@@ -129,11 +130,12 @@ class BrightwoodBotController
     private function tryGetAnswers(
         TelegramUser $tgUser,
         string $chatId,
-        string $text
+        ?string $text,
+        ?array $document
     ): ArrayCollection
     {
         try {
-            return $this->getAnswers($tgUser, $chatId, $text);
+            return $this->getAnswers($tgUser, $chatId, $text, $document);
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
 
@@ -155,10 +157,13 @@ class BrightwoodBotController
     private function getAnswers(
         TelegramUser $tgUser,
         string $chatId,
-        string $text
+        ?string $text,
+        ?array $document
     ): ArrayCollection
     {
-        $sequence = $this->answerer->getAnswers($tgUser, $text);
+        $sequence = $this->answerer->getAnswers($tgUser, $text, $document);
+
+        $this->updateTelegramUser($tgUser, $sequence->stage());
 
         Assert::true(
             $sequence->hasText(),
@@ -181,6 +186,21 @@ class BrightwoodBotController
                         $this->toTelegramMessage($tgUser, $chatId, $m, $defaultActions)
                 )
         );
+    }
+
+    private function updateTelegramUser(TelegramUser $tgUser, ?string $stage): void
+    {
+        $key = Answerer::BRIGHTWOOD_STAGE;
+
+        if ($stage) {
+            $tgUser->setMetaValue($key, $stage);
+        } elseif ($tgUser->getMetaValue($key)) {
+            $tgUser->deleteMetaValue($key);
+        } else {
+            return;
+        }
+
+        $this->telegramUserRepository->save($tgUser);
     }
 
     /**

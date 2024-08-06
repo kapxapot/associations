@@ -8,7 +8,7 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Brightwood\Answers\Answerer;
 use Brightwood\Config\SerializationConfig;
-use Brightwood\External\TelegramTransport;
+use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Hydrators\StoryHydrator;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Hydrators\StoryVersionHydrator;
@@ -30,6 +30,7 @@ use Brightwood\Serialization\Cards\Serializers\CardSerializer;
 use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use Brightwood\Services\StoryService;
 use Brightwood\Services\TelegramUserService;
+use Brightwood\Testing\Factories\SettingsProviderFactory;
 use Plasticode\Auth\Access;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Data\DbMetadata;
@@ -42,6 +43,9 @@ final class GeneralProviderTest extends AbstractProviderTest
 {
     protected function getOuterDependencies(): array
     {
+        // for TelegramTransportFactory
+        $this->container[SettingsProviderInterface::class] = SettingsProviderFactory::class;
+
         return [
             Access::class,
             AuthInterface::class,
@@ -49,7 +53,6 @@ final class GeneralProviderTest extends AbstractProviderTest
             DbMetadata::class,
             LinkerInterface::class,
             LoggerInterface::class,
-            SettingsProviderInterface::class,
 
             TelegramUserRepositoryInterface::class,
             UserRepositoryInterface::class,
@@ -106,7 +109,7 @@ final class GeneralProviderTest extends AbstractProviderTest
 
         // external
 
-        $this->check(TelegramTransport::class);
+        $this->check(TelegramTransportFactory::class);
 
         // cards
 

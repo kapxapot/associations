@@ -11,4 +11,6 @@ class BotCommand
     const CODE_STORY = '/story';
     const CODE_EDIT = '/edit';
     const CODE_NEW = '/new';
+    const CODE_UPLOAD = '/upload';
+    const CODE_CANCEL_UPLOAD = '/cancel_upload';
 }

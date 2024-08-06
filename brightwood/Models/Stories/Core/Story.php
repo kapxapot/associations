@@ -44,7 +44,7 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
 
     protected ?string $prefixMessage = null;
 
-    public function __construct(array $data)
+    public function __construct(?array $data = null)
     {
         parent::__construct($data);
 
@@ -285,6 +285,7 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
         Assert::notNull($this->startNode);
         Assert::notEmpty($this->nodes);
 
+        /** @var AbstractStoryNode */
         foreach ($this->nodes as $node) {
             $node->checkIntegrity();
         }

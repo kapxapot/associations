@@ -17,6 +17,7 @@ class StoryMessageSequence implements SequencableInterface
     private array $actions;
 
     private ?StoryData $data = null;
+    private ?string $stage = null;
 
     private bool $isFinalized = false;
 
@@ -34,6 +35,11 @@ class StoryMessageSequence implements SequencableInterface
     public function storyMessages(): StoryMessageCollection
     {
         return $this->messages->storyMessages();
+    }
+
+    public function stage(): ?string
+    {
+        return $this->stage;
     }
 
     /**
@@ -60,6 +66,16 @@ class StoryMessageSequence implements SequencableInterface
     public static function makeFinalized(MessageInterface ...$messages): self
     {
         return self::make(...$messages)->finalize();
+    }
+
+    /**
+     * Makes a sequence from one TextMessage.
+     */
+    public static function text(string ...$lines): self
+    {
+        return self::make(
+            new TextMessage(...$lines)
+        );
     }
 
     /**
@@ -153,7 +169,15 @@ class StoryMessageSequence implements SequencableInterface
     public function withData(StoryData $data): self
     {
         $this->data = $data;
+        return $this;
+    }
 
+    /**
+     * @return $this
+     */
+    public function withStage(string $stage): self
+    {
+        $this->stage = $stage;
         return $this;
     }
 

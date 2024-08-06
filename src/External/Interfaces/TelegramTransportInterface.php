@@ -11,4 +11,6 @@ interface TelegramTransportInterface
     public function sendMessage(array $message): string;
 
     public function executeCommand(string $command, array $payload): string;
+
+    public function getFileUrl(string $filePath): string;
 }

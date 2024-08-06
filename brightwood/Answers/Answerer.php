@@ -3,8 +3,10 @@
 namespace Brightwood\Answers;
 
 use App\Core\Interfaces\LinkerInterface;
+use App\External\Interfaces\TelegramTransportInterface;
+use App\External\TelegramTransport;
 use App\Models\TelegramUser;
-use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
+use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
@@ -14,10 +16,12 @@ use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
+use Exception;
 use Plasticode\Semantics\Gender;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Strings;
+use Plasticode\Util\Text;
 use Psr\Log\LoggerInterface;
 use Webmozart\Assert\Assert;
 
@@ -26,12 +30,18 @@ use Webmozart\Assert\Assert;
  *
  * Has some other side effects (and this is not good):
  *
- * - Can change telegram users (set gender).
+ * - Can change telegram users (set gender), but doesn't save them.
  * - Can create and change story statuses.
  */
 class Answerer
 {
     use LoggerAwareTrait;
+
+    const BRIGHTWOOD_STAGE = 'brightwood_stage';
+
+    private const STAGE_UPLOAD = 'upload';
+    private const MAX_JSON_SIZE = 1024 * 1024; // 1 Mb
+    private const MAX_JSON_SIZE_NAME = '1 Мб';
 
     private string $masAction = '👦 Мальчик';
     private string $femAction = '👧 Девочка';
@@ -40,17 +50,16 @@ class Answerer
     private LinkerInterface $linker;
 
     private StoryStatusRepositoryInterface $storyStatusRepository;
-    private TelegramUserRepositoryInterface $telegramUserRepository;
-
     private StoryService $storyService;
+    private TelegramTransportInterface $telegram;
 
     public function __construct(
         LoggerInterface $logger,
         SettingsProviderInterface $settingsProvider,
         LinkerInterface $linker,
         StoryStatusRepositoryInterface $storyStatusRepository,
-        TelegramUserRepositoryInterface $telegramUserRepository,
-        StoryService $storyService
+        StoryService $storyService,
+        TelegramTransportFactory $telegramFactory
     )
     {
         $this->withLogger($logger);
@@ -59,12 +68,15 @@ class Answerer
         $this->linker = $linker;
 
         $this->storyStatusRepository = $storyStatusRepository;
-        $this->telegramUserRepository = $telegramUserRepository;
-
         $this->storyService = $storyService;
+        $this->telegram = ($telegramFactory)();
     }
 
-    public function getAnswers(TelegramUser $tgUser, string $text): StoryMessageSequence
+    public function getAnswers(
+        TelegramUser $tgUser,
+        ?string $text = null,
+        ?array $documentInfo = null
+    ): StoryMessageSequence
     {
         // start command
         if (Strings::startsWith($text, BotCommand::CODE_START)) {
@@ -72,6 +84,7 @@ class Answerer
         }
 
         // check gender
+        // todo: use stage for this? but must be mandatory
         if (!$tgUser->hasGender()) {
             return $this->readGender($tgUser, $text);
         }
@@ -90,7 +103,6 @@ class Answerer
         // story switch command
         if (preg_match("#^/story(?:\s+|_)(\d+)$#i", $text, $matches)) {
             $storyId = (int)$matches[1];
-
             $story = $this->getStory($storyId);
 
             if ($story) {
@@ -106,7 +118,6 @@ class Answerer
         // story edit command
         if (preg_match("#^/edit(?:\s+|_)(\d+)$#i", $text, $matches)) {
             $storyId = (int)$matches[1];
-
             $story = $this->getStory($storyId);
 
             if ($story) {
@@ -131,6 +142,30 @@ class Answerer
             return $this->storyCreation();
         }
 
+        if ($text === BotCommand::CODE_UPLOAD) {
+            return $this->storyUpload($tgUser);
+        }
+
+        $stage = $tgUser->getMetaValue(self::BRIGHTWOOD_STAGE);
+
+        if ($stage === self::STAGE_UPLOAD) {
+            if (empty($documentInfo)) {
+                return
+                    StoryMessageSequence::text(
+                        '❌ Пожалуйста, загрузите документ.',
+                        $this->uploadTips()
+                    )
+                    ->withStage(self::STAGE_UPLOAD) // we are still on this stage
+                    ->finalize();
+            }
+
+            return $this->processDocument($tgUser, $documentInfo);
+        }
+
+        if (strlen($text) === 0) {
+            return StoryMessageSequence::text('🧾 Я понимаю только сообщения с текстом.');
+        }
+
         // default - next step
         return $this->nextStep($tgUser, $text);
     }
@@ -143,9 +178,7 @@ class Answerer
         $greeting = $isReader ? 'С возвращением' : 'Добро пожаловать';
         $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
 
-        $sequence = StoryMessageSequence::make(
-            new TextMessage($greeting)
-        );
+        $sequence = StoryMessageSequence::text($greeting);
 
         if (!$tgUser->hasGender()) {
             return $sequence->add(
@@ -184,8 +217,6 @@ class Answerer
 
         $tgUser->genderId = $gender;
 
-        $this->telegramUserRepository->save($tgUser);
-
         return StoryMessageSequence::mash(
             new TextMessage(
                 'Спасибо, уважаем{ый 👦|ая 👧}, ' .
@@ -198,13 +229,8 @@ class Answerer
     private function askGender(): MessageInterface
     {
         return new Message(
-            [
-                'Для корректного текста историй, пожалуйста, укажите ваш <b>пол</b>:'
-            ],
-            [
-                $this->masAction,
-                $this->femAction
-            ]
+            ['Для корректного текста историй, пожалуйста, укажите ваш <b>пол</b>:'],
+            [$this->masAction, $this->femAction]
         );
     }
 
@@ -372,7 +398,8 @@ class Answerer
         }
 
         $sequence->add(
-            new TextMessage('Создать новую историю: ' . BotCommand::CODE_NEW)
+            new TextMessage('Создать новую историю: ' . BotCommand::CODE_NEW),
+            new TextMessage('Загрузить новую или отредактированную историю: ' . BotCommand::CODE_UPLOAD)
         );
 
         return $sequence->finalize();
@@ -384,7 +411,7 @@ class Answerer
             new TextMessage(
                 "Для редактирования истории <b>{$story->title()}</b> перейдите по ссылке:",
                 $this->buildStoryEditUrl($story),
-                '(Рекомендуем открывать редактор на компьютере или планшете.)'
+                $this->editorTips()
             )
         );
     }
@@ -395,8 +422,118 @@ class Answerer
             new TextMessage(
                 'Для создания новой истории перейдите по ссылке:',
                 $this->buildStoryCreationUrl(),
-                '(Рекомендуем открывать редактор на компьютере или планшете.)'
+                $this->editorTips()
             )
+        );
+    }
+
+    private function storyUpload(): StoryMessageSequence
+    {
+        return
+            StoryMessageSequence::text(
+                'Загрузите JSON-файл истории, экспортированный из редактора. 👇',
+                $this->uploadTips()
+            )
+            ->withStage(self::STAGE_UPLOAD)
+            ->finalize();
+    }
+
+    private function editorTips(): string
+    {
+        return Text::join([
+            '🔹 Рекомендуем открывать редактор на компьютере или планшете.',
+            '🔹 После завершения работы на историей экспортируйте ее в JSON-файл и загрузите его сюда, используя команду ' . BotCommand::CODE_UPLOAD
+        ]);
+    }
+
+    private function uploadTips(): string
+    {
+        return 'Отмена загрузки: ' . BotCommand::CODE_CANCEL_UPLOAD;
+    }
+
+    private function processDocument(
+        TelegramUser $tgUser,
+        array $documentInfo
+    ): StoryMessageSequence
+    {
+        try {
+            $mimeType = $documentInfo['mime_type'];
+            $fileId = $documentInfo['file_id'];
+            $fileSize = $documentInfo['file_size'];
+
+            // 1. check the mime_type
+            if ($mimeType !== 'application/json') {
+                throw new Exception('Неверный тип файла, загрузите JSON, полученный из редактора, пожалуйста.');
+            }
+
+            // 2. check the file size
+            if ($fileSize > self::MAX_JSON_SIZE) {
+                throw new Exception('Размер файла не может превышать ' . self::MAX_JSON_SIZE_NAME . '. Загрузите файл поменьше, пожалуйста.');
+            }
+
+            // 3. get a file link
+            $response = $this->telegram->executeCommand(
+                TelegramTransport::COMMAND_GET_FILE,
+                ['file_id' => $fileId]
+            );
+
+            $responseObject = json_decode($response, true);
+
+            if ($responseObject['ok'] !== true) {
+                throw new Exception('Не удалось получить файл от Telegram, попробуйте еще раз.');
+            }
+
+            $filePath = $responseObject['result']['file_path'];
+
+            // 4. download the file
+            $fileUrl = $this->telegram->getFileUrl($filePath);
+            $json = file_get_contents($fileUrl);
+
+            // 5. validate JSON, check that it can be parsed
+            $jsonArray = json_decode($json, true);
+
+            if (empty($jsonArray)) {
+                throw new Exception('Файл поврежден. Пожалуйста, загрузите валидный JSON-файл.');
+            }
+
+            // 6. get story id, check that it's a valid uuid (!!!)
+            $storyUuid = $jsonArray['id'];
+
+            if (!$this->isValidUuid($storyUuid)) {
+                throw new Exception('Story id must be a valid uuid4.');
+            }
+
+            // 7. check that a story created from JSON passes validation
+            $this->storyService->makeStoryFromJson($json);
+
+            // 8. store the JSON to the user's story candidate record
+            throw new Exception('Not implemented yet.');
+
+            // 9. get the story by id
+
+            // 10. if the story doesn't exist, create new story
+
+            // 11. if the story exists, check that the current user can update the story
+
+            // 12. if they can't update it, tell them that access is denied, but they can save it as a new story (mark it as a fork?)
+
+            // 13. if they can update it, ask them if they want to create a new version or create a new story (mark it as a fork again)
+        } catch (Exception $ex) {
+            return 
+                StoryMessageSequence::text(
+                    '❌ ' . $ex->getMessage(),
+                    $this->uploadTips()
+                )
+                ->withStage(self::STAGE_UPLOAD) // yes, we are still on this stage
+                ->finalize();
+        }
+    }
+
+    private function isValidUuid(string $uuid): bool
+    {
+        return preg_match(
+            "#^[a-f0-9]{32}$#i",
+            str_replace('-', '', $uuid)
         );
     }
 
