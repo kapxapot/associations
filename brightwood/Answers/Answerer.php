@@ -507,13 +507,26 @@ class Answerer
             $this->storyService->makeStoryFromJson($json);
 
             // 8. store the JSON to the user's story candidate record
-            throw new Exception('Not implemented yet.');
+            $storyCandidate = $this->storyService->saveStoryCandidate($tgUser, $json);
 
             // 9. get the story by id
+            $story = $this->storyService->getStoryByUuid($storyUuid);
 
             // 10. if the story doesn't exist, create new story
+            if (!$story) {
+                $story = $this->storyService->createStoryFromCandidate(
+                    $storyUuid,
+                    $storyCandidate
+                );
+
+                return StoryMessageSequence::text(
+                    "Новая история <b>{$story->title()}</b> успешно создана!",
+                    'Играть: ' . $story->toCommand()->codeString()
+                )->finalize();
+            }
 
             // 11. if the story exists, check that the current user can update the story
+            throw new Exception('Not implemented yet.');
 
             // 12. if they can't update it, tell them that access is denied, but they can save it as a new story (mark it as a fork?)
 

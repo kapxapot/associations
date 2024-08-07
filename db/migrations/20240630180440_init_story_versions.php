@@ -21,7 +21,6 @@ class InitStoryVersions extends AbstractMigration
             ->addIndex(['story_id', 'prev_version_id'], ['unique' => true])
             ->create();
 
-
         $dir = __DIR__ . '/../../brightwood/Models/Stories/Json/';
 
         $mysteryData = JsonDataLoader::load($dir . 'mystery.json');

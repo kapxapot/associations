@@ -17,7 +17,7 @@ final class JsonStoryTest extends TestCase
     {
         $json = file_get_contents('brightwood_tests/Files/test_story.json');
 
-        $settingsProvider = (new SettingsProviderFactory())();
+        $settingsProvider = SettingsProviderFactory::make();
         $storyService = StoryServiceFactory::make($settingsProvider);
 
         $this->story = $storyService->makeStoryFromJson($json);

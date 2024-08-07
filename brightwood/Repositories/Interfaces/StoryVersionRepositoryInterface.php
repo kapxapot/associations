@@ -11,4 +11,6 @@ interface StoryVersionRepositoryInterface extends GetRepositoryInterface
     public function get(?int $id): ?StoryVersion;
 
     public function getCurrentVersion(Story $story): ?StoryVersion;
+
+    public function store(array $data): StoryVersion;
 }

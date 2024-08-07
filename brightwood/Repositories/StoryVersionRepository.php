@@ -27,4 +27,9 @@ class StoryVersionRepository extends IdiormRepository implements StoryVersionRep
             ->orderByAsc('created_at')
             ->one();
     }
+
+    public function store(array $data): StoryVersion
+    {
+        return $this->storeEntity($data);
+    }
 }

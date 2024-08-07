@@ -79,4 +79,9 @@ class StoryRepository extends IdiormRepository implements StoryRepositoryInterfa
 
         return StoryCollection::from($query);
     }
+
+    public function store(array $data): Story
+    {
+        return $this->storeEntity($data);
+    }
 }

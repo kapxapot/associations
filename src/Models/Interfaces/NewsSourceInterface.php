@@ -7,5 +7,5 @@ use Plasticode\Models\Interfaces\NewsSourceInterface as BaseNewsSourceInterface;
 
 interface NewsSourceInterface extends BaseNewsSourceInterface
 {
-    function creator() : ?User;
+    public function creator(): ?User;
 }

@@ -10,16 +10,16 @@ use Plasticode\Testing\Mocks\Repositories\Generic\RepositoryMock;
 
 class StoryVersionRepositoryMock extends RepositoryMock implements StoryVersionRepositoryInterface
 {
-    private StoryVersionCollection $storyVersions;
+    private StoryVersionCollection $versions;
 
     public function __construct()
     {
-        $this->storyVersions = StoryVersionCollection::empty();
+        $this->versions = StoryVersionCollection::empty();
     }
 
     public function get(?int $id): ?StoryVersion
     {
-        return $this->storyVersions->first(
+        return $this->versions->first(
             fn (StoryVersion $sv) => $sv->getId() == $id
         );
     }
@@ -28,5 +28,27 @@ class StoryVersionRepositoryMock extends RepositoryMock implements StoryVersionR
     {
         // placeholder
         return null;
+    }
+
+    public function store(array $data): StoryVersion
+    {
+        $version = StoryVersion::create($data);
+        return $this->save($version);
+    }
+
+    private function save(StoryVersion $version): StoryVersion
+    {
+        if ($this->versions->contains($version)) {
+            return $version;
+        }
+
+        if (!$version->isPersisted()) {
+            $version->id = $this->versions->nextId();
+        }
+
+        $this->versions = $this->versions->add($version);
+
+        // return $this->hydrator->hydrate($version);
+        return $version;
     }
 }

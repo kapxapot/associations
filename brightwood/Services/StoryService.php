@@ -7,22 +7,32 @@ use Brightwood\Collections\StoryCollection;
 use Brightwood\Models\Stories\Core\JsonStory;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\Stories\WoodStory;
+use Brightwood\Models\StoryCandidate;
 use Brightwood\Models\StoryVersion;
 use Brightwood\Repositories\Interfaces\StaticStoryRepositoryInterface;
+use Brightwood\Repositories\Interfaces\StoryCandidateRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
+use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
+use Plasticode\Util\Date;
 
 class StoryService
 {
     private StoryRepositoryInterface $storyRepository;
+    private StoryCandidateRepositoryInterface $storyCandidateRepository;
+    private StoryVersionRepositoryInterface $storyVersionRepository;
 
     private array $cache = [];
 
     public function __construct(
         StaticStoryRepositoryInterface $staticStoryRepository,
-        StoryRepositoryInterface $storyRepository
+        StoryRepositoryInterface $storyRepository,
+        StoryCandidateRepositoryInterface $storyCandidateRepository,
+        StoryVersionRepositoryInterface $storyVersionRepository
     )
     {
         $this->storyRepository = $storyRepository;
+        $this->storyCandidateRepository = $storyCandidateRepository;
+        $this->storyVersionRepository = $storyVersionRepository;
 
         $staticStoryRepository
             ->getAll()
@@ -72,6 +82,48 @@ class StoryService
         $story = new Story();
         $story->withCurrentVersion(new StoryVersion(['json_data' => $json]));
 
+        return new JsonStory($story);
+    }
+
+    public function getStoryCandidate(TelegramUser $tgUser): ?StoryCandidate
+    {
+        $user = $tgUser->user();
+        return $this->storyCandidateRepository->getByCreator($user);
+    }
+
+    public function saveStoryCandidate(TelegramUser $tgUser, string $json): StoryCandidate
+    {
+        $user = $tgUser->user();
+        $candidate = $this->storyCandidateRepository->getByCreator($user);
+
+        if (!$candidate) {
+            $candidate = StoryCandidate::create([
+                'created_by' => $user->getId()
+            ]);
+        }
+
+        $candidate->jsonData = $json;
+
+        return $this->storyCandidateRepository->save($candidate);
+    }
+
+    public function createStoryFromCandidate(string $uuid, StoryCandidate $candidate): JsonStory
+    {
+        // create story entity
+        $story = $this->storyRepository->store([
+            'uuid' => $uuid,
+            'created_by' => $candidate->createdBy
+        ]);
+
+        // create story version entity
+        $storyVersion = $this->storyVersionRepository->store([
+            'story_id' => $story->getId(),
+
+        ]);
+
+        // remove candidate
+
+        // return json story
         return new JsonStory($story);
     }
 

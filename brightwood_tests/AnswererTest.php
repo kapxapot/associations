@@ -7,6 +7,7 @@ use App\Testing\Mocks\LinkerMock;
 use Brightwood\Answers\Answerer;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Hydrators\StoryStatusHydrator;
+use Brightwood\Hydrators\StoryVersionHydrator;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\EightsStory;
@@ -32,15 +33,17 @@ final class AnswererTest extends TestCase
     {
         parent::setUp();
 
-        $settingsProvider = (new SettingsProviderFactory())();
+        $settingsProvider = SettingsProviderFactory::make();
         $storyService = StoryServiceFactory::make($settingsProvider);
 
         $this->telegramUserRepository = TelegramUserRepositoryFactory::make();
 
+        $storyVersionRepository = new StoryVersionRepositoryMock();
+
         $this->storyStatusRepository = new StoryStatusRepositoryMock(
             new ObjectProxy(
                 fn () => new StoryStatusHydrator(
-                    new StoryVersionRepositoryMock(),
+                    $storyVersionRepository,
                     $this->telegramUserRepository,
                     $storyService
                 )

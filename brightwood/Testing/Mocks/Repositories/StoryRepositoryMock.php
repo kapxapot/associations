@@ -66,4 +66,26 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
             fn (Story $s) => $s->creator()->equals($user)
         );
     }
+
+    public function store(array $data): Story
+    {
+        $story = Story::create($data);
+        return $this->save($story);
+    }
+
+    private function save(Story $story): Story
+    {
+        if ($this->stories->contains($story)) {
+            return $story;
+        }
+
+        if (!$story->isPersisted()) {
+            $story->id = $this->stories->nextId();
+        }
+
+        $this->stories = $this->stories->add($story);
+
+        // return $this->hydrator->hydrate($version);
+        return $story;
+    }
 }
