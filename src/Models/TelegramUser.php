@@ -31,6 +31,8 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
 
     const META_BOT_ADMIN = 'bot_admin';
 
+    private bool $dirty = false;
+
     protected function requiredWiths(): array
     {
         return ['user'];
@@ -111,8 +113,30 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
     public function withBotAdmin(bool $botAdmin): self
     {
         $this->setMetaValue(self::META_BOT_ADMIN, $botAdmin);
+        $this->dirty = true;
 
         return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withGenderId(int $genderId): self
+    {
+        $this->genderId = $genderId;
+        $this->dirty = true;
+
+        return $this;
+    }
+
+    public function setDirty(bool $dirty = true): void
+    {
+        $this->dirty = $dirty;
+    }
+
+    public function isDirty(): bool
+    {
+        return $this->dirty;
     }
 
     // GenderedInterface

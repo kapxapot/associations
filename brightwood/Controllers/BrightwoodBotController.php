@@ -11,6 +11,7 @@ use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
+use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Parsing\StoryParser;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;
@@ -165,10 +166,18 @@ class BrightwoodBotController
 
         $this->updateTelegramUser($tgUser, $sequence->stage());
 
-        Assert::true(
-            $sequence->hasText(),
-            'Answers sequence must contain text.'
-        );
+        if ($sequence->isFinalized()) {
+            if (!$sequence->hasText()) {
+                $sequence->add(
+                    new TextMessage('The end.') // todo: localize this
+                );
+            }
+        } else {
+            Assert::true(
+                $sequence->hasText(),
+                'Answers sequence must contain text.'
+            );
+        }
 
         $defaultActions = $sequence->actions();
 
@@ -194,13 +203,15 @@ class BrightwoodBotController
 
         if ($stage) {
             $tgUser->setMetaValue($key, $stage);
+            $tgUser->setDirty(true);
         } elseif ($tgUser->getMetaValue($key)) {
             $tgUser->deleteMetaValue($key);
-        } else {
-            return;
+            $tgUser->setDirty(true);
         }
 
-        $this->telegramUserRepository->save($tgUser);
+        if ($tgUser->isDirty()) {
+            $this->telegramUserRepository->save($tgUser);
+        }
     }
 
     /**

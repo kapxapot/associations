@@ -58,10 +58,10 @@ class StoryService
             : null;
     }
 
-    public function getStories(): StoryCollection
+    public function getStoriesPlayableBy(TelegramUser $tgUser): StoryCollection
     {
         return $this->toRichStories(
-            $this->storyRepository->getAll()
+            $this->storyRepository->getAllPlayableBy($tgUser)
         );
     }
 
@@ -116,12 +116,14 @@ class StoryService
         ]);
 
         // create story version entity
-        $storyVersion = $this->storyVersionRepository->store([
+        $this->storyVersionRepository->store([
             'story_id' => $story->getId(),
-
+            'json_data' => $candidate->jsonData,
+            'created_by' => $candidate->createdBy
         ]);
 
         // remove candidate
+        $this->storyCandidateRepository->delete($candidate);
 
         // return json story
         return new JsonStory($story);

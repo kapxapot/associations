@@ -57,6 +57,7 @@ class TelegramUserRepositoryMock extends RepositoryMock implements TelegramUserR
         }
 
         $this->users = $this->users->add($user);
+        $user->setDirty(false);
 
         return $user;
     }
@@ -64,7 +65,6 @@ class TelegramUserRepositoryMock extends RepositoryMock implements TelegramUserR
     public function store(array $data): TelegramUser
     {
         $user = TelegramUser::create($data);
-
         return $this->save($user);
     }
 }

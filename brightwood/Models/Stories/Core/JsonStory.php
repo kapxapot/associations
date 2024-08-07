@@ -49,7 +49,7 @@ class JsonStory extends Story
         );
     }
 
-    public function description(): string
+    public function description(): ?string
     {
         $description = $this->getValue('description');
 

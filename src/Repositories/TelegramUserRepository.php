@@ -36,7 +36,11 @@ class TelegramUserRepository extends Repository implements TelegramUserRepositor
     {
         $user->meta = $user->encodeMeta();
 
-        return $this->saveEntity($user);
+        /** @var TelegramUser */
+        $user = $this->saveEntity($user);
+        $user->setDirty(false);
+
+        return $user;
     }
 
     public function store(array $data): TelegramUser

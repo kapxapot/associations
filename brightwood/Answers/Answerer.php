@@ -131,7 +131,7 @@ class Answerer
         }
 
         if ($text === BotCommand::STORY_SELECTION || $text === BotCommand::CODE_STORY) {
-            return $this->storySelection();
+            return $this->storySelection($tgUser);
         }
 
         if ($text === BotCommand::CODE_EDIT) {
@@ -187,7 +187,7 @@ class Answerer
         }
 
         return $sequence->merge(
-            $this->storySelection()
+            $this->storySelection($tgUser)
         );
     }
 
@@ -215,14 +215,14 @@ class Answerer
             );
         }
 
-        $tgUser->genderId = $gender;
+        $tgUser->withGenderId($gender);
 
         return StoryMessageSequence::mash(
             new TextMessage(
                 'Спасибо, уважаем{ый 👦|ая 👧}, ' .
                 'ваш пол сохранен и теперь будет учитываться. 👌'
             ),
-            $this->storySelection()
+            $this->storySelection($tgUser)
         );
     }
 
@@ -304,7 +304,7 @@ class Answerer
         if (!$status) {
             return StoryMessageSequence::mash(
                 $cluelessMessage,
-                $this->storySelection()
+                $this->storySelection($tgUser)
             );
         }
 
@@ -332,9 +332,9 @@ class Answerer
         );
     }
 
-    private function storySelection(): StoryMessageSequence
+    private function storySelection(TelegramUser $tgUser): StoryMessageSequence
     {
-        $stories = $this->storyService->getStories();
+        $stories = $this->storyService->getStoriesPlayableBy($tgUser);
 
         if ($stories->isEmpty()) {
             return StoryMessageSequence::makeFinalized(

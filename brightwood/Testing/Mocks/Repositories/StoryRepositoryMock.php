@@ -47,6 +47,15 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
         return $this->stories;
     }
 
+    public function getAllPlayableBy(TelegramUser $tgUser): StoryCollection
+    {
+        $user = $tgUser->user();
+
+        return $this->stories->where(
+            fn (Story $s) => !$s->creator() || $s->creator()->equals($user)
+        );
+    }
+
     public function getAllEditableBy(TelegramUser $tgUser): StoryCollection
     {
         $stories = $this->stories->where(
@@ -57,8 +66,7 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
 
         if ($this->telegramUserService->isAdmin($tgUser)) {
             return $stories->where(
-                fn (Story $s) => $s->creator() === null
-                    || $s->creator()->equals($user)
+                fn (Story $s) => !$s->creator() || $s->creator()->equals($user)
             );
         }
 
