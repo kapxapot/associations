@@ -28,8 +28,10 @@ class StoryServiceFactory
             new Cases()
         );
 
+        $telegramUserService = new TelegramUserService($settingsProvider);
+
         $storyRepository = new StoryRepositoryMock(
-            new TelegramUserService($settingsProvider),
+            $telegramUserService,
             new StorySeeder($woodStory, $eightsStory)
         );
 
@@ -50,7 +52,8 @@ class StoryServiceFactory
             $staticStoryRepository,
             $storyRepository,
             $storyCandidateRepository,
-            new StoryVersionRepositoryMock()
+            new StoryVersionRepositoryMock(),
+            $telegramUserService
         );
     }
 }

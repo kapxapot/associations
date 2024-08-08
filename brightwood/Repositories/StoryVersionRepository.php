@@ -24,7 +24,7 @@ class StoryVersionRepository extends IdiormRepository implements StoryVersionRep
         return $this
             ->query()
             ->where('story_id', $story->getId())
-            ->orderByAsc('created_at')
+            ->orderByDesc('created_at')
             ->one();
     }
 

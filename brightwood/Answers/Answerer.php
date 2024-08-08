@@ -13,9 +13,11 @@ use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Models\Stories\Core\Story;
+use Brightwood\Models\StoryCandidate;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
+use Brightwood\Util\Uuid;
 use Exception;
 use Plasticode\Semantics\Gender;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
@@ -40,11 +42,21 @@ class Answerer
     const BRIGHTWOOD_STAGE = 'brightwood_stage';
 
     private const STAGE_UPLOAD = 'upload';
+    private const STAGE_EXISTING_STORY = 'existing_story';
+    private const STAGE_NOT_ALLOWED_STORY = 'not_allowed_story';
+
     private const MAX_JSON_SIZE = 1024 * 1024; // 1 Mb
     private const MAX_JSON_SIZE_NAME = '1 Мб';
 
-    private string $masAction = '👦 Мальчик';
-    private string $femAction = '👧 Девочка';
+    private const ACTION_MAS = '👦 Мальчик';
+    private const ACTION_FEM = '👧 Девочка';
+
+    private const ACTION_UPDATE_STORY = 'Обновить';
+    private const ACTION_NEW_STORY = 'Создать новую';
+
+    private const ACTION_CANCEL = 'Отмена';
+
+    private const MESSAGE_CLUELESS = 'Что-что? Повторите-ка... 🧐';
 
     private SettingsProviderInterface $settingsProvider;
     private LinkerInterface $linker;
@@ -106,12 +118,16 @@ class Answerer
             $story = $this->getStory($storyId);
 
             if ($story) {
-                return $this->switchToStory($tgUser, $story);
+                $playable = $this->storyService->isStoryPlayableBy($story, $tgUser);
+
+                if ($playable) {
+                    return $this->startStory($tgUser, $story);
+                }
             }
 
-            return StoryMessageSequence::mash(
-                new TextMessage("История с id = {$storyId} не найдена."),
-                $this->currentStatusMessages($tgUser)
+            return $this->errorMessage(
+                $tgUser,
+                "История с id = {$storyId} не найдена."
             );
         }
 
@@ -121,12 +137,16 @@ class Answerer
             $story = $this->getStory($storyId);
 
             if ($story) {
-                return $this->editStoryLink($story);
+                $editable = $this->storyService->isStoryEditableBy($story, $tgUser);
+
+                if ($editable) {
+                    return $this->editStoryLink($story);
+                }
             }
 
-            return StoryMessageSequence::mash(
-                new TextMessage("История с id = {$storyId} не найдена."),
-                $this->currentStatusMessages($tgUser)
+            return $this->errorMessage(
+                $tgUser,
+                "История с id = {$storyId} не найдена."
             );
         }
 
@@ -148,8 +168,16 @@ class Answerer
 
         $stage = $tgUser->getMetaValue(self::BRIGHTWOOD_STAGE);
 
+        if ($text === BotCommand::CODE_CANCEL_UPLOAD) {
+            if (in_array($stage, $this->uploadStages())) {
+                return $this->uploadCanceled();
+            }
+        }
+
+        $documentUploaded = !empty($documentInfo);
+
         if ($stage === self::STAGE_UPLOAD) {
-            if (empty($documentInfo)) {
+            if (!$documentUploaded) {
                 return
                     StoryMessageSequence::text(
                         '❌ Пожалуйста, загрузите документ.',
@@ -159,15 +187,36 @@ class Answerer
                     ->finalize();
             }
 
-            return $this->processDocument($tgUser, $documentInfo);
+            return $this->processUpload($tgUser, $documentInfo);
+        }
+
+        if ($stage === self::STAGE_EXISTING_STORY || $stage === self::STAGE_NOT_ALLOWED_STORY) {
+            return $this->processOverwrite($tgUser, $stage, $text);
         }
 
         if (strlen($text) === 0) {
-            return StoryMessageSequence::text('🧾 Я понимаю только сообщения с текстом.');
+            if ($documentUploaded) {
+                return StoryMessageSequence::text(
+                    '❌ Вы загрузили документ, но не там, где нужно.',
+                    'Если вы хотите загрузить историю, используйте команду ' . BotCommand::CODE_UPLOAD
+                )
+                ->finalize();
+            }
+
+            return StoryMessageSequence::text('❌ Я понимаю только сообщения с текстом.')
+                ->finalize();
         }
 
         // default - next step
         return $this->nextStep($tgUser, $text);
+    }
+
+    private function errorMessage(TelegramUser $tgUser, string $message): StoryMessageSequence
+    {
+        return StoryMessageSequence::mash(
+            new TextMessage("❌ {$message}"),
+            $this->currentStatusMessages($tgUser)
+        );
     }
 
     private function startCommand(TelegramUser $tgUser): StoryMessageSequence
@@ -197,11 +246,11 @@ class Answerer
         $gender = null;
 
         switch ($text) {
-            case $this->masAction:
+            case self::ACTION_MAS:
                 $gender = Gender::MAS;
                 break;
 
-            case $this->femAction:
+            case self::ACTION_FEM:
                 $gender = Gender::FEM;
                 break;
         }
@@ -230,7 +279,7 @@ class Answerer
     {
         return new Message(
             ['Для корректного текста историй, пожалуйста, укажите ваш <b>пол</b>:'],
-            [$this->masAction, $this->femAction]
+            [self::ACTION_MAS, self::ACTION_FEM]
         );
     }
 
@@ -245,24 +294,7 @@ class Answerer
             return StoryMessageSequence::empty();
         }
 
-        return $status->story()->executeCommand($command);
-    }
-
-    /**
-     * Starts the default story or continues the current one.
-     */
-    private function startOrContinueStory(TelegramUser $tgUser): StoryMessageSequence
-    {
-        $status = $this->getStatus($tgUser);
-
-        if ($status) {
-            return $this->continueStory($status);
-        }
-
-        return $this->startStory(
-            $tgUser,
-            $this->storyService->getDefaultStoryId()
-        );
+        return $this->getStatusStory($status)->executeCommand($command);
     }
 
     private function continueStory(StoryStatus $status): StoryMessageSequence
@@ -273,33 +305,11 @@ class Answerer
         );
     }
 
-    private function startStory(TelegramUser $tgUser, int $storyId): StoryMessageSequence
-    {
-        $story = $this->getStory($storyId);
-
-        $sequence = StoryMessageSequence::mash(
-            new TextMessage('Итак, начнем...'),
-            $story->start($tgUser)
-        );
-
-        $storyVersion = $story->currentVersion();
-
-        $this->storyStatusRepository->store([
-            'telegram_user_id' => $tgUser->getId(),
-            'story_id' => $story->getId(),
-            'story_version_id' => $storyVersion ? $storyVersion->getId() : null,
-            'step_id' => $sequence->nodeId(),
-            'json_data' => json_encode($sequence->data())
-        ]);
-
-        return $sequence;
-    }
-
     private function nextStep(TelegramUser $tgUser, string $text): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
 
-        $cluelessMessage = new TextMessage('Что-что? Повторите-ка... 🧐');
+        $cluelessMessage = new TextMessage(self::MESSAGE_CLUELESS);
 
         if (!$status) {
             return StoryMessageSequence::mash(
@@ -308,7 +318,7 @@ class Answerer
             );
         }
 
-        $story = $status->story();
+        $story = $this->getStatusStory($status);
         $node = $story->getNode($status->stepId);
 
         Assert::notNull($node);
@@ -350,12 +360,13 @@ class Answerer
             ->finalize();
     }
 
-    private function switchToStory(TelegramUser $tgUser, Story $story): StoryMessageSequence
+    private function startStory(TelegramUser $tgUser, Story $story): StoryMessageSequence
     {
         $status = $this->getStatus($tgUser);
 
         if (!$status) {
-            return $this->startStory($tgUser, $story->getId());
+            $status = StoryStatus::create();
+            $status->telegramUserId = $tgUser->getId();
         }
 
         $sequence = $story->start($tgUser);
@@ -448,10 +459,10 @@ class Answerer
 
     private function uploadTips(): string
     {
-        return 'Отмена загрузки: ' . BotCommand::CODE_CANCEL_UPLOAD;
+        return 'Отменить загрузку: ' . BotCommand::CODE_CANCEL_UPLOAD;
     }
 
-    private function processDocument(
+    private function processUpload(
         TelegramUser $tgUser,
         array $documentInfo
     ): StoryMessageSequence
@@ -490,16 +501,16 @@ class Answerer
             $json = file_get_contents($fileUrl);
 
             // 5. validate JSON, check that it can be parsed
-            $jsonArray = json_decode($json, true);
+            $jsonData = json_decode($json, true);
 
-            if (empty($jsonArray)) {
+            if (empty($jsonData)) {
                 throw new Exception('Файл поврежден. Пожалуйста, загрузите валидный JSON-файл.');
             }
 
             // 6. get story id, check that it's a valid uuid (!!!)
-            $storyUuid = $jsonArray['id'];
+            $storyUuid = $jsonData['id'];
 
-            if (!$this->isValidUuid($storyUuid)) {
+            if (!Uuid::isValid($storyUuid)) {
                 throw new Exception('Story id must be a valid uuid4.');
             }
 
@@ -507,30 +518,40 @@ class Answerer
             $this->storyService->makeStoryFromJson($json);
 
             // 8. store the JSON to the user's story candidate record
-            $storyCandidate = $this->storyService->saveStoryCandidate($tgUser, $json);
+            $storyCandidate = $this->storyService->saveStoryCandidate($tgUser, $jsonData);
 
             // 9. get the story by id
             $story = $this->storyService->getStoryByUuid($storyUuid);
 
             // 10. if the story doesn't exist, create new story
             if (!$story) {
-                $story = $this->storyService->createStoryFromCandidate(
-                    $storyUuid,
-                    $storyCandidate
-                );
-
-                return StoryMessageSequence::text(
-                    "Новая история <b>{$story->title()}</b> успешно создана!",
-                    'Играть: ' . $story->toCommand()->codeString()
-                )->finalize();
+                return $this->newStory($storyCandidate);
             }
 
             // 11. if the story exists, check that the current user can update the story
-            throw new Exception('Not implemented yet.');
+            $canUpdate = $this->storyService->isStoryEditableBy($story, $tgUser);
 
-            // 12. if they can't update it, tell them that access is denied, but they can save it as a new story (mark it as a fork?)
+            // 12. if they can update it, ask them if they want to create a new version or create a new story (mark the original story as a source story)
+            if ($canUpdate) {
+                $sequence = StoryMessageSequence::text(
+                    "⚠ История <b>{$story->title()}</b> уже существует.",
+                    'Вы хотите обновить ее или создать новую?',
+                    $this->uploadTips()
+                );
 
-            // 13. if they can update it, ask them if they want to create a new version or create a new story (mark it as a fork again)
+                return $this->stage($sequence, self::STAGE_EXISTING_STORY);
+            }
+
+            // 13. if they can't update it, tell them that access is denied, but they can save it as a new story (mark the original story as a source story)
+            $sequence = StoryMessageSequence::text(
+                '⛔ Вы пытаетесь загрузить историю, к которой у вас нет доступа.',
+                'Строго говоря, вам не следует этого делать. 🤔',
+                'Но раз мы уже здесь, то вы можете создать новую историю.',
+                'Cоздать новую историю?',
+                $this->uploadTips()
+            );
+
+            return $this->stage($sequence, self::STAGE_NOT_ALLOWED_STORY);
         } catch (Exception $ex) {
             return 
                 StoryMessageSequence::text(
@@ -542,12 +563,100 @@ class Answerer
         }
     }
 
-    private function isValidUuid(string $uuid): bool
+    private function processOverwrite(
+        TelegramUser $tgUser,
+        string $stage,
+        string $text
+    ): StoryMessageSequence
     {
-        return preg_match(
-            "#^[a-f0-9]{32}$#i",
-            str_replace('-', '', $uuid)
+        if ($text === self::ACTION_CANCEL) {
+            $this->storyService->deleteStoryCandidateFor($tgUser);
+            return $this->uploadCanceled();
+        }
+
+        $storyCandidate = $this->storyService->getStoryCandidateFor($tgUser);
+
+        if (!$storyCandidate) {
+            $this->logger->error("Story candidate for Telegram user [{$tgUser->getId()}] not found.");
+
+            return StoryMessageSequence::text('❌ Ошибка загрузки. Попробуйте еще раз.')
+                ->finalize();
+        }
+
+        if ($stage === self::STAGE_EXISTING_STORY && $text === self::ACTION_UPDATE_STORY) {
+            $story = $this->storyService->getStoryByUuid($storyCandidate->uuid);
+
+            // if the story was deleted for some reason...
+            if (!$story) {
+                return $this->newStory($storyCandidate);
+            }
+
+            $updatedStory = $this->storyService->updateStory($story, $storyCandidate);
+
+            return StoryMessageSequence::text(
+                "✅ История <b>{$updatedStory->title()}</b> успешно обновлена!",
+                'Играть: ' . $updatedStory->toCommand()->codeString()
+            )->finalize();
+        }
+
+        if ($text === self::ACTION_NEW_STORY) {
+            return $this->newStory($storyCandidate, Uuid::new());
+        }
+
+        // we stay put
+        return $this->stage(
+            StoryMessageSequence::text(
+                self::MESSAGE_CLUELESS,
+                $this->uploadTips()
+            ),
+            $stage
         );
+    }
+
+    private function newStory(
+        StoryCandidate $storyCandidate,
+        ?string $uuid = null
+    ): StoryMessageSequence
+    {
+        $newStory = $this->storyService->newStory($storyCandidate, $uuid);
+
+        return StoryMessageSequence::text(
+            "✅ Новая история <b>{$newStory->title()}</b> успешно создана!",
+            'Играть: ' . $newStory->toCommand()->codeString()
+        )->finalize();
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function stage(StoryMessageSequence $sequence, string $stage): StoryMessageSequence
+    {
+        if ($stage === self::STAGE_EXISTING_STORY) {
+            return $sequence
+                ->withStage($stage)
+                ->withActions(
+                    self::ACTION_UPDATE_STORY,
+                    self::ACTION_NEW_STORY,
+                    self::ACTION_CANCEL
+                );
+        }
+
+        if ($stage === self::STAGE_NOT_ALLOWED_STORY) {
+            return $sequence
+                ->withStage($stage)
+                ->withActions(
+                    self::ACTION_NEW_STORY,
+                    self::ACTION_CANCEL
+                );
+        }
+
+        throw new Exception('Unknown stage: ' . $stage);
+    }
+
+    private function uploadCanceled(): StoryMessageSequence
+    {
+        return StoryMessageSequence::text('✅ Загрузка истории отменена.')
+            ->finalize();;
     }
 
     private function currentStatusMessages(TelegramUser $tgUser): StoryMessageSequence
@@ -561,7 +670,7 @@ class Answerer
 
     private function statusToMessages(StoryStatus $status): StoryMessageSequence
     {
-        $story = $status->story();
+        $story = $this->getStatusStory($status);
         $node = $story->getNode($status->stepId);
         $data = $story->makeData($status->data());
 
@@ -580,6 +689,14 @@ class Answerer
     private function getStatus(TelegramUser $tgUser): ?StoryStatus
     {
         return $this->storyStatusRepository->getByTelegramUser($tgUser);
+    }
+
+    private function getStatusStory(StoryStatus $status): Story
+    {
+        return $this->storyService->applyVersion(
+            $status->story(),
+            $status->storyVersion()
+        );
     }
 
     private function buildStoryEditUrl(Story $story): string
@@ -607,5 +724,17 @@ class Answerer
             'brightwood.builder_url',
             'https://brightwood-builder.onrender.com'
         );
+    }
+
+    /**
+     * @return string[]
+     */
+    private function uploadStages(): array
+    {
+        return [
+            self::STAGE_UPLOAD,
+            self::STAGE_EXISTING_STORY,
+            self::STAGE_NOT_ALLOWED_STORY
+        ];
     }
 }

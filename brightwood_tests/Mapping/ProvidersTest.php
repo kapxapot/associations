@@ -9,6 +9,7 @@ use App\Repositories\Interfaces\UserRepositoryInterface;
 use Brightwood\Answers\Answerer;
 use Brightwood\Config\SerializationConfig;
 use Brightwood\Factories\TelegramTransportFactory;
+use Brightwood\Hydrators\StoryCandidateHydrator;
 use Brightwood\Hydrators\StoryHydrator;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Hydrators\StoryVersionHydrator;
@@ -17,10 +18,12 @@ use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Models\Stories\WoodStory;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StaticStoryRepositoryInterface;
+use Brightwood\Repositories\Interfaces\StoryCandidateRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
 use Brightwood\Repositories\StaticStoryRepository;
+use Brightwood\Repositories\StoryCandidateRepository;
 use Brightwood\Repositories\StoryRepository;
 use Brightwood\Repositories\StoryStatusRepository;
 use Brightwood\Repositories\StoryVersionRepository;
@@ -72,6 +75,7 @@ final class GeneralProviderTest extends AbstractProviderTest
         // hydrators
 
         $this->check(StoryHydrator::class);
+        $this->check(StoryCandidateHydrator::class);
         $this->check(StoryStatusHydrator::class);
         $this->check(StoryVersionHydrator::class);
 
@@ -80,6 +84,11 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(
             StoryRepositoryInterface::class,
             StoryRepository::class
+        );
+
+        $this->check(
+            StoryCandidateRepositoryInterface::class,
+            StoryCandidateRepository::class
         );
 
         $this->check(

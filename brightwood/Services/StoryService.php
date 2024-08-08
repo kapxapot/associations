@@ -13,7 +13,6 @@ use Brightwood\Repositories\Interfaces\StaticStoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryCandidateRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
-use Plasticode\Util\Date;
 
 class StoryService
 {
@@ -21,18 +20,23 @@ class StoryService
     private StoryCandidateRepositoryInterface $storyCandidateRepository;
     private StoryVersionRepositoryInterface $storyVersionRepository;
 
+    private TelegramUserService $telegramUserService;
+
     private array $cache = [];
 
     public function __construct(
         StaticStoryRepositoryInterface $staticStoryRepository,
         StoryRepositoryInterface $storyRepository,
         StoryCandidateRepositoryInterface $storyCandidateRepository,
-        StoryVersionRepositoryInterface $storyVersionRepository
+        StoryVersionRepositoryInterface $storyVersionRepository,
+        TelegramUserService $telegramUserService
     )
     {
         $this->storyRepository = $storyRepository;
         $this->storyCandidateRepository = $storyCandidateRepository;
         $this->storyVersionRepository = $storyVersionRepository;
+
+        $this->telegramUserService = $telegramUserService;
 
         $staticStoryRepository
             ->getAll()
@@ -85,13 +89,7 @@ class StoryService
         return new JsonStory($story);
     }
 
-    public function getStoryCandidate(TelegramUser $tgUser): ?StoryCandidate
-    {
-        $user = $tgUser->user();
-        return $this->storyCandidateRepository->getByCreator($user);
-    }
-
-    public function saveStoryCandidate(TelegramUser $tgUser, string $json): StoryCandidate
+    public function saveStoryCandidate(TelegramUser $tgUser, array $jsonData): StoryCandidate
     {
         $user = $tgUser->user();
         $candidate = $this->storyCandidateRepository->getByCreator($user);
@@ -102,31 +100,138 @@ class StoryService
             ]);
         }
 
-        $candidate->jsonData = $json;
+        $candidate->jsonData = json_encode($jsonData);
+        $candidate->uuid = $jsonData['id'];
 
         return $this->storyCandidateRepository->save($candidate);
     }
 
-    public function createStoryFromCandidate(string $uuid, StoryCandidate $candidate): JsonStory
+    /**
+     * Creates a story + a story version from a story candidate.
+     * Then deletes the candidate.
+     *
+     * @param string|null $uuid If uuid is provided, a story with this uuid is created.
+     */
+    public function newStory(
+        StoryCandidate $storyCandidate,
+        ?string $uuid = null
+    ): JsonStory
     {
-        // create story entity
         $story = $this->storyRepository->store([
-            'uuid' => $uuid,
-            'created_by' => $candidate->createdBy
+            'uuid' => $uuid ?? $storyCandidate->uuid,
+            'created_by' => $storyCandidate->createdBy
         ]);
 
-        // create story version entity
+        $jsonData = $storyCandidate->jsonData;
+
+        if ($uuid) {
+            $jsonData['id'] = $uuid;
+        }
+
         $this->storyVersionRepository->store([
             'story_id' => $story->getId(),
-            'json_data' => $candidate->jsonData,
-            'created_by' => $candidate->createdBy
+            'json_data' => $jsonData,
+            'created_by' => $storyCandidate->createdBy
         ]);
 
-        // remove candidate
-        $this->storyCandidateRepository->delete($candidate);
+        $this->deleteStoryCandidate($storyCandidate);
 
-        // return json story
         return new JsonStory($story);
+    }
+
+    /**
+     * Applies story candidate to the story as a new story version.
+     */
+    public function updateStory(Story $story, StoryCandidate $storyCandidate): JsonStory
+    {
+        $currentVersion = $story->currentVersion();
+
+        $newVersion = $this->storyVersionRepository->store([
+            'story_id' => $story->getId(),
+            'prev_version_id' => $currentVersion ? $currentVersion->getId() : null,
+            'json_data' => $storyCandidate->jsonData,
+            'created_by' => $storyCandidate->createdBy
+        ]);
+
+        $this->deleteStoryCandidate($storyCandidate);
+
+        $story->withCurrentVersion($newVersion);
+
+        return new JsonStory($story);
+    }
+
+    public function deleteStoryCandidateFor(TelegramUser $tgUser): bool
+    {
+        $candidate = $this->getStoryCandidateFor($tgUser);
+
+        return $candidate
+            ? $this->deleteStoryCandidate($candidate)
+            : false;
+    }
+
+    public function getStoryCandidateFor(TelegramUser $tgUser): ?StoryCandidate
+    {
+        $user = $tgUser->user();
+        return $this->storyCandidateRepository->getByCreator($user);
+    }
+
+    /**
+     * Admin can play any story.
+     */
+    public function isStoryPlayableBy(Story $story, TelegramUser $tgUser): bool
+    {
+        $creator = $story->creator();
+
+        if (!$creator) {
+            return true;
+        }
+
+        $isAdmin = $this->telegramUserService->isAdmin($tgUser);
+
+        if ($isAdmin) {
+            return true;
+        }
+
+        $user = $tgUser->user();
+
+        return $creator->equals($user);
+    }
+
+    /**
+     * Admin can edit any story.
+     */
+    public function isStoryEditableBy(Story $story, TelegramUser $tgUser): bool
+    {
+        if (!$story->hasUuid()) {
+            return false;
+        }
+
+        $creator = $story->creator();
+
+        if ($creator) {
+            $user = $tgUser->user();
+            return $creator->equals($user);
+        }
+
+        return $this->telegramUserService->isAdmin($tgUser);
+    }
+
+    public function applyVersion(Story $story, ?StoryVersion $storyVersion): Story
+    {
+        // if there is no version or the story is already on that version, do nothing
+        if (!$storyVersion || $storyVersion->equals($story->currentVersion())) {
+            return $story;
+        }
+
+        $storyCopy = Story::create($story->toArray());
+        $storyCopy->withCurrentVersion($storyVersion);
+
+        return new JsonStory($storyCopy);
+    }
+
+    private function deleteStoryCandidate(StoryCandidate $candidate): bool
+    {
+        return $this->storyCandidateRepository->delete($candidate);
     }
 
     /**

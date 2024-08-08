@@ -12,6 +12,7 @@ use Plasticode\Models\Traits\UpdatedAt;
 /**
  * @property integer $id
  * @property string $jsonData
+ * @property string $uuid
  * @method User creator()
  * @method static withCreator(User|callable $creator)
  */

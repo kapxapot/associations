@@ -25,9 +25,12 @@ use Webmozart\Assert\Assert;
 
 /**
  * @property integer $id
+ * @property integer|null $sourceStoryId
  * @property string|null $uuid
  * @method StoryVersion|null currentVersion()
  * @method static withCurrentVersion(StoryVersion|callable|null $currentVersion)
+ * @method Story|null sourceStory()
+ * @method static withSourceStory(Story|callable|null $sourceStory)
  */
 class Story extends DbModel implements CommandProviderInterface, CreatedInterface
 {
