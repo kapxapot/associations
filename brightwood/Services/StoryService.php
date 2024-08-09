@@ -47,10 +47,17 @@ class StoryService
 
     public function getStory(int $id): ?Story
     {
-        return $this->getFromCache($id)
-            ?? $this->addToCache(
-                $this->getJsonStory($id)
-            );
+        $cachedStory = $this->getFromCache($id);
+
+        if ($cachedStory) {
+            return $cachedStory;
+        }
+
+        $jsonStory = $this->getJsonStory($id);
+
+        return $jsonStory
+            ? $this->addToCache($jsonStory)
+            : null;
     }
 
     public function getStoryByUuid(string $uuid): ?Story
