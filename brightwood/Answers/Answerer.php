@@ -51,10 +51,10 @@ class Answerer
     private const ACTION_MAS = '👦 Мальчик';
     private const ACTION_FEM = '👧 Девочка';
 
-    private const ACTION_UPDATE_STORY = 'Обновить';
-    private const ACTION_NEW_STORY = 'Создать новую';
+    private const ACTION_UPDATE_STORY = '♻ Обновить';
+    private const ACTION_NEW_STORY = '🌱 Создать новую';
 
-    private const ACTION_CANCEL = 'Отмена';
+    private const ACTION_CANCEL = '❌ Отмена';
 
     private const MESSAGE_CLUELESS = 'Что-что? Повторите-ка... 🧐';
 
@@ -665,14 +665,21 @@ class Answerer
 
         Assert::notNull($status);
 
-        return $this->statusToMessages($status);
+        return $this->statusToMessages($status, true);
     }
 
-    private function statusToMessages(StoryStatus $status): StoryMessageSequence
+    private function statusToMessages(
+        StoryStatus $status,
+        bool $ignoreFinish = false
+    ): StoryMessageSequence
     {
         $story = $this->getStatusStory($status);
         $node = $story->getNode($status->stepId);
         $data = $story->makeData($status->data());
+
+        if ($ignoreFinish && $node->isFinish($data)) {
+            return StoryMessageSequence::makeFinalized();
+        }
 
         return $story->renderNode(
             $status->telegramUser(),
