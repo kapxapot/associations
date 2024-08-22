@@ -6,8 +6,8 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
-use Brightwood\Testing\Factories\RootDeserializerFactory;
-use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
+use Brightwood\Testing\Factories\RootDeserializerTestFactory;
+use Brightwood\Testing\Factories\TelegramUserRepositoryTestFactory;
 use PHPUnit\Framework\TestCase;
 
 abstract class SerializationTestCase extends TestCase
@@ -21,8 +21,8 @@ abstract class SerializationTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->telegramUserRepository = TelegramUserRepositoryFactory::make();
-        $this->deserializer = RootDeserializerFactory::make();
+        $this->telegramUserRepository = TelegramUserRepositoryTestFactory::make();
+        $this->deserializer = RootDeserializerTestFactory::make();
 
         $this->player = new Human(
             $this->telegramUserRepository->get(1)

@@ -11,6 +11,7 @@ use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Parsing\StoryParserFactory;
 use Brightwood\Serialization\Interfaces\SerializableInterface;
 use Brightwood\Serialization\UniformSerializer;
+use Brightwood\Testing\Factories\TranslatorTestFactory;
 use Plasticode\Util\Cases;
 use Webmozart\Assert\Assert;
 
@@ -80,9 +81,13 @@ class EightsData extends StoryData implements SerializableInterface
             ->add($human)
             ->shuffle();
 
+        $storyParserFactory = new StoryParserFactory(
+            new TranslatorTestFactory()
+        );
+
         $game = new EightsGame(
             // todo: should be provided by container definitions (a factory!)
-            (new StoryParserFactory())(),
+            ($storyParserFactory)(),
             new Cases(),
             $players
         );

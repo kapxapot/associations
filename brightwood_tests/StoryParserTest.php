@@ -2,9 +2,12 @@
 
 namespace Brightwood\Tests;
 
+use App\Models\Language;
 use App\Models\TelegramUser;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Parsing\StoryParserFactory;
+use Brightwood\Testing\Factories\TranslatorTestFactory;
+use Brightwood\Testing\Mocks\DictionaryMock;
 use Brightwood\Testing\Models\TestData;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Semantics\Gender;
@@ -21,12 +24,22 @@ final class StoryParserTest extends TestCase
     {
         parent::setUp();
 
-        $this->parser = (new StoryParserFactory())();
+        $parserFactory = new StoryParserFactory(
+            new TranslatorTestFactory([
+                Language::RU => new DictionaryMock([
+                    'two' => 'два',
+                    'two {day}' => 'два {day}'
+                ])
+            ])
+        );
 
-        $this->default = new TelegramUser();
+        $this->parser = ($parserFactory)();
+
+        $this->default = new TelegramUser(); // mas, ru
 
         $this->male = new TelegramUser([
-            'gender_id' => Gender::MAS
+            'gender_id' => Gender::MAS,
+            'lang_code' => Language::EN
         ]);
 
         $this->female = new TelegramUser([
@@ -91,6 +104,53 @@ final class StoryParserTest extends TestCase
         $this->assertEquals(
             'Здоровье: hp',
             $this->parser->parse($this->default, $text, $data)
+        );
+    }
+
+    public function testTranslateSimple(): void
+    {
+        $text = 'one [[two]] three';
+
+        $this->assertEquals(
+            'one два three',
+            $this->parser->parse($this->default, $text)
+        );
+
+        $this->assertEquals(
+            'one two three',
+            $this->parser->parse($this->male, $text)
+        );
+    }
+
+    public function testTranslateWithVar(): void
+    {
+        $text = 'one [[two {day}]] three';
+
+        $data = new TestData();
+
+        $this->assertEquals(
+            'one два 1 three',
+            $this->parser->parse($this->default, $text, $data)
+        );
+
+        $this->assertEquals(
+            'one two 1 three',
+            $this->parser->parse($this->male, $text, $data)
+        );
+    }
+
+    public function testTranslateUndefined(): void
+    {
+        $text = 'one two [[three]]';
+
+        $this->assertEquals(
+            'one two three',
+            $this->parser->parse($this->default, $text)
+        );
+
+        $this->assertEquals(
+            'one two three',
+            $this->parser->parse($this->male, $text)
         );
     }
 }

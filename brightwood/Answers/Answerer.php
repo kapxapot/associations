@@ -46,17 +46,17 @@ class Answerer
     private const STAGE_NOT_ALLOWED_STORY = 'not_allowed_story';
 
     private const MAX_JSON_SIZE = 1024 * 1024; // 1 Mb
-    private const MAX_JSON_SIZE_NAME = '1 [Mb]';
+    private const MAX_JSON_SIZE_NAME = '1 [[Mb]]';
 
-    private const ACTION_MAS = '👦 [Boy]';
-    private const ACTION_FEM = '👧 [Girl]';
+    private const ACTION_MAS = '👦 [[Boy]]';
+    private const ACTION_FEM = '👧 [[Girl]]';
 
-    private const ACTION_UPDATE_STORY = '♻ [Update]';
-    private const ACTION_NEW_STORY = '🌱 [Create new]';
+    private const ACTION_UPDATE_STORY = '♻ [[Update]]';
+    private const ACTION_NEW_STORY = '🌱 [[Create new]]';
 
-    private const ACTION_CANCEL = '❌ [Cancel]';
+    private const ACTION_CANCEL = '❌ [[Cancel]]';
 
-    private const MESSAGE_CLUELESS = '[Huh? I didn\'t get it...] 🧐';
+    private const MESSAGE_CLUELESS = '[[Huh? I didn\'t get it...]] 🧐';
 
     private SettingsProviderInterface $settingsProvider;
     private LinkerInterface $linker;
@@ -466,7 +466,7 @@ class Answerer
 
             // 1. check the mime_type
             if ($mimeType !== 'application/json') {
-                throw new Exception('[Incorrect file type. Upload a JSON exported from the editor, please.]');
+                throw new Exception('[[Incorrect file type. Upload a JSON exported from the editor, please.]]');
             }
 
             // 2. check the file size
@@ -483,7 +483,7 @@ class Answerer
             $responseObject = json_decode($response, true);
 
             if ($responseObject['ok'] !== true) {
-                throw new Exception('[Failed to get the file from Telegram, try again.]');
+                throw new Exception('[[Failed to get the file from Telegram, try again.]]');
             }
 
             $filePath = $responseObject['result']['file_path'];
@@ -496,14 +496,14 @@ class Answerer
             $jsonData = json_decode($json, true);
 
             if (empty($jsonData)) {
-                throw new Exception('[Invalid file. Upload a valid JSON file, please.]');
+                throw new Exception('[[Invalid file. Upload a valid JSON file, please.]]');
             }
 
             // 6. get story id, check that it's a valid uuid (!!!)
             $storyUuid = $jsonData['id'];
 
             if (!Uuid::isValid($storyUuid)) {
-                throw new Exception('[Story id must be a valid uuid4.]');
+                throw new Exception('[[Story id must be a valid uuid4.]]');
             }
 
             // 7. check that a story created from JSON passes validation

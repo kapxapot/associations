@@ -84,11 +84,28 @@ class MessageRenderer implements MessageRendererInterface
      */
     public function render(string $text): string
     {
+        if ($this->translator) {
+            $text = preg_replace_callback(
+                "/\\[\\[([^\\]]+)\\]\\]/",
+                fn (array $m) => $this->translateMatch($m[1]),
+                $text
+            );
+        }
+
         return preg_replace_callback(
             "/{(?:([^:}]+):)?([^}]+)}/",
             fn (array $m) => $this->renderMatch($m[1], $m[2]),
             $text
         );
+    }
+
+    private function translateMatch(string $text): string
+    {
+        if (!$this->translator) {
+            return $text;
+        }
+
+        return $this->translator->translate($text);
     }
 
     /**

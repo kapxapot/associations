@@ -10,14 +10,18 @@ use Brightwood\Serialization\Cards\Serializers\CardSerializer;
 use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use Plasticode\Util\Cases;
 
-class RootDeserializerFactory
+class RootDeserializerTestFactory
 {
     public static function make(): RootDeserializerInterface
     {
+        $storyParserFactory = new StoryParserFactory(
+            new TranslatorTestFactory()
+        );
+
         return new RootDeserializer(
             new SerializationConfig(
-                TelegramUserRepositoryFactory::make(),
-                (new StoryParserFactory())(),
+                TelegramUserRepositoryTestFactory::make(),
+                ($storyParserFactory)(),
                 new Cases()
             ),
             new CardSerializer(),

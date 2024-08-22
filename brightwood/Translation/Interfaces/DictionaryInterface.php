@@ -4,12 +4,8 @@ namespace Brightwood\Translation\Interfaces;
 
 interface DictionaryInterface
 {
-    public function languageCode(): string;
-
-    public function languageName(): string;
-
     /**
-     * @return array<string, string>
+     * @return array<string, string|array>
      */
     public function definitions(): array;
 }

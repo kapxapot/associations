@@ -4,19 +4,20 @@ namespace Brightwood\Parsing;
 
 use App\Bots\Factories\MessageRendererFactory;
 use App\Models\Interfaces\ActorInterface;
+use App\Models\Language;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Translation\Dictionaries\Ru;
-use Brightwood\Translation\TranslatorFactory;
+use Brightwood\Translation\Interfaces\TranslatorFactoryInterface;
 use Plasticode\Semantics\Gender;
 
 class StoryParser
 {
     private MessageRendererFactory $rendererFactory;
-    private TranslatorFactory $translatorFactory;
+    private TranslatorFactoryInterface $translatorFactory;
 
     public function __construct(
         MessageRendererFactory $rendererFactory,
-        TranslatorFactory $translatorFactory
+        TranslatorFactoryInterface $translatorFactory
     )
     {
         $this->rendererFactory = $rendererFactory;
@@ -29,7 +30,7 @@ class StoryParser
         ?StoryData $data = null
     ): string
     {
-        $langCode = $actor->languageCode() ?? Ru::LANG_CODE;
+        $langCode = $actor->languageCode() ?? Language::RU;
         $gender = $actor->gender() ?? Gender::MAS;
 
         $renderer = ($this->rendererFactory)();

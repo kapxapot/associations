@@ -6,7 +6,7 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\Repositories\TelegramUserRepositoryMock;
 use App\Testing\Seeders\TelegramUserSeeder;
 
-class TelegramUserRepositoryFactory
+class TelegramUserRepositoryTestFactory
 {
     private static ?TelegramUserRepositoryInterface $instance = null;
 

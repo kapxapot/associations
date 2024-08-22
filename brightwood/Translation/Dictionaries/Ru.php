@@ -6,22 +6,6 @@ use Brightwood\Translation\Interfaces\DictionaryInterface;
 
 class Ru implements DictionaryInterface
 {
-    const LANG_CODE = 'ru';
-    const LANG_NAME = 'Русский';
-
-    public function languageCode(): string
-    {
-        return self::LANG_CODE;
-    }
-
-    public function languageName(): string
-    {
-        return self::LANG_NAME;
-    }
-
-    /**
-     * @return array<string, string>
-     */
     public function definitions(): array
     {
         return [

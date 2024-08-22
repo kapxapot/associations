@@ -22,6 +22,7 @@ use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Cards\SuitedCard;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Parsing\StoryParserFactory;
+use Brightwood\Testing\Factories\TranslatorTestFactory;
 use Brightwood\Tests\SerializationTestCase;
 use Plasticode\Semantics\Gender;
 use Plasticode\Util\Cases;
@@ -94,8 +95,12 @@ final class EightsDataTest extends SerializationTestCase
             $player4
         );
 
+        $storyParserFactory = new StoryParserFactory(
+            new TranslatorTestFactory()
+        );
+
         $game = new EightsGame(
-            (new StoryParserFactory())(),
+            ($storyParserFactory)(),
             new Cases(),
             $players,
             new Deck() // empty deck

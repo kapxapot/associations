@@ -33,7 +33,8 @@ use Brightwood\Serialization\Cards\Serializers\CardSerializer;
 use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use Brightwood\Services\StoryService;
 use Brightwood\Services\TelegramUserService;
-use Brightwood\Testing\Factories\SettingsProviderFactory;
+use Brightwood\Testing\Factories\SettingsProviderTestFactory;
+use Brightwood\Translation\Interfaces\TranslatorFactoryInterface;
 use Brightwood\Translation\TranslatorFactory;
 use Plasticode\Auth\Access;
 use Plasticode\Core\Interfaces as Core;
@@ -48,7 +49,7 @@ final class GeneralProviderTest extends AbstractProviderTest
     protected function getOuterDependencies(): array
     {
         // for TelegramTransportFactory
-        $this->container[SettingsProviderInterface::class] = SettingsProviderFactory::class;
+        $this->container[SettingsProviderInterface::class] = SettingsProviderTestFactory::class;
 
         return [
             Access::class,
@@ -128,8 +129,8 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(SerializationConfig::class);
         $this->check(SuitSerializer::class);
 
-        // translator
+        // translation
 
-        $this->check(TranslatorFactory::class);
+        $this->check(TranslatorFactoryInterface::class, TranslatorFactory::class);
     }
 }

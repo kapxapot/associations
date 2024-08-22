@@ -10,7 +10,7 @@ use Brightwood\Models\Cards\Players\FemaleBot;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Parsing\StoryParserFactory;
-use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
+use Brightwood\Testing\Factories\TelegramUserRepositoryTestFactory;
 use Plasticode\Core\Response;
 use Plasticode\Util\Cases;
 use Plasticode\Util\Text;
@@ -64,7 +64,7 @@ class EightsTestController
         ResponseInterface $response
     )
     {
-        $tgUserRepo = TelegramUserRepositoryFactory::make();
+        $tgUserRepo = TelegramUserRepositoryTestFactory::make();
 
         $tgUser = $tgUserRepo->get(1);
 

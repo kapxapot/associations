@@ -2,13 +2,15 @@
 
 namespace Brightwood\Translation;
 
+use App\Models\Language;
 use Brightwood\Translation\Dictionaries\En;
 use Brightwood\Translation\Dictionaries\Ru;
 use Brightwood\Translation\Interfaces\DictionaryInterface;
+use Brightwood\Translation\Interfaces\TranslatorFactoryInterface;
 use Brightwood\Translation\Interfaces\TranslatorInterface;
 use Exception;
 
-class TranslatorFactory
+class TranslatorFactory implements TranslatorFactoryInterface
 {
     public function __invoke(string $langCode): TranslatorInterface
     {
@@ -19,16 +21,16 @@ class TranslatorFactory
     /**
      * @throws Exception
      */
-    private function getDictionary(string $langCode): DictionaryInterface
+    private function getDictionary(string $langCode): ?DictionaryInterface
     {
         switch ($langCode) {
-            case Ru::LANG_CODE:
+            case Language::RU:
                 return new Ru();
 
-            case En::LANG_CODE:
+            case Language::EN:
                 return new En();
         }
 
-        throw new Exception("Undefined dictionary: {$langCode}");
+        return null;
     }
 }

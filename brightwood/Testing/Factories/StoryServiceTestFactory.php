@@ -17,14 +17,14 @@ use Plasticode\ObjectProxy;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Cases;
 
-class StoryServiceFactory
+class StoryServiceTestFactory
 {
     public static function make(SettingsProviderInterface $settingsProvider): StoryService
     {
         $woodStory = new WoodStory();
 
         $eightsStory = new EightsStory(
-            RootDeserializerFactory::make(),
+            RootDeserializerTestFactory::make(),
             new Cases()
         );
 

@@ -7,8 +7,8 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use Brightwood\JsonDataLoader;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Stories\EightsStory;
-use Brightwood\Testing\Factories\RootDeserializerFactory;
-use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
+use Brightwood\Testing\Factories\RootDeserializerTestFactory;
+use Brightwood\Testing\Factories\TelegramUserRepositoryTestFactory;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Semantics\Gender;
 use Plasticode\Util\Cases;
@@ -22,10 +22,10 @@ final class EightsStoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->telegramUserRepository = TelegramUserRepositoryFactory::make();
+        $this->telegramUserRepository = TelegramUserRepositoryTestFactory::make();
 
         $this->story = new EightsStory(
-            RootDeserializerFactory::make(),
+            RootDeserializerTestFactory::make(),
             new Cases()
         );
     }

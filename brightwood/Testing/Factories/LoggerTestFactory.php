@@ -7,7 +7,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
-class LoggerFactory
+class LoggerTestFactory
 {
     public static function make(): LoggerInterface
     {

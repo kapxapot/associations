@@ -5,8 +5,8 @@ namespace Brightwood\Tests\Models;
 use App\Models\TelegramUser;
 use Brightwood\Models\Data\JsonStoryData;
 use Brightwood\Models\Stories\Core\JsonStory;
-use Brightwood\Testing\Factories\SettingsProviderFactory;
-use Brightwood\Testing\Factories\StoryServiceFactory;
+use Brightwood\Testing\Factories\SettingsProviderTestFactory;
+use Brightwood\Testing\Factories\StoryServiceTestFactory;
 use PHPUnit\Framework\TestCase;
 
 final class JsonStoryTest extends TestCase
@@ -17,8 +17,8 @@ final class JsonStoryTest extends TestCase
     {
         $json = file_get_contents('brightwood_tests/Files/test_story.json');
 
-        $settingsProvider = SettingsProviderFactory::make();
-        $storyService = StoryServiceFactory::make($settingsProvider);
+        $settingsProvider = SettingsProviderTestFactory::make();
+        $storyService = StoryServiceTestFactory::make($settingsProvider);
 
         $this->story = $storyService->makeStoryFromJson($json);
     }

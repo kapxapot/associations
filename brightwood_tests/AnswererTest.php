@@ -2,6 +2,7 @@
 
 namespace Brightwood\Tests;
 
+use App\Models\Language;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\LinkerMock;
 use Brightwood\Answers\AnswererFactory;
@@ -11,14 +12,12 @@ use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
-use Brightwood\Testing\Factories\LoggerFactory;
-use Brightwood\Testing\Factories\SettingsProviderFactory;
-use Brightwood\Testing\Factories\StoryServiceFactory;
-use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
+use Brightwood\Testing\Factories\LoggerTestFactory;
+use Brightwood\Testing\Factories\SettingsProviderTestFactory;
+use Brightwood\Testing\Factories\StoryServiceTestFactory;
+use Brightwood\Testing\Factories\TelegramUserRepositoryTestFactory;
 use Brightwood\Testing\Mocks\Repositories\StoryStatusRepositoryMock;
 use Brightwood\Testing\Mocks\Repositories\StoryVersionRepositoryMock;
-use Brightwood\Translation\Dictionaries\Ru;
-use Brightwood\Translation\TranslatorFactory;
 use PHPUnit\Framework\TestCase;
 use Plasticode\ObjectProxy;
 use Plasticode\Semantics\Gender;
@@ -34,10 +33,10 @@ final class AnswererTest extends TestCase
     {
         parent::setUp();
 
-        $settingsProvider = SettingsProviderFactory::make();
-        $storyService = StoryServiceFactory::make($settingsProvider);
+        $settingsProvider = SettingsProviderTestFactory::make();
+        $storyService = StoryServiceTestFactory::make($settingsProvider);
 
-        $this->telegramUserRepository = TelegramUserRepositoryFactory::make();
+        $this->telegramUserRepository = TelegramUserRepositoryTestFactory::make();
 
         $storyVersionRepository = new StoryVersionRepositoryMock();
 
@@ -52,13 +51,12 @@ final class AnswererTest extends TestCase
         );
 
         $this->answererFactory = new AnswererFactory(
-            LoggerFactory::make(),
+            LoggerTestFactory::make(),
             $settingsProvider,
             new LinkerMock(),
             $this->storyStatusRepository,
             $storyService,
-            new TelegramTransportFactory($settingsProvider),
-            new TranslatorFactory()
+            new TelegramTransportFactory($settingsProvider)
         );
     }
 
@@ -78,7 +76,7 @@ final class AnswererTest extends TestCase
             'id' => 2,
             'username' => 'kapxapot',
             'gender_id' => Gender::MAS,
-            'lang_code' => Ru::LANG_CODE
+            'lang_code' => Language::RU
         ]);
 
         $this->storyStatusRepository->store([
@@ -102,7 +100,7 @@ final class AnswererTest extends TestCase
             'id' => 31,
             'username' => 'kapxapot',
             'gender_id' => Gender::MAS,
-            'lang_code' => Ru::LANG_CODE
+            'lang_code' => Language::RU
         ]);
 
         $this->storyStatusRepository->store([

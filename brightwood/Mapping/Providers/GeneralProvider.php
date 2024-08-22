@@ -20,6 +20,8 @@ use Brightwood\Repositories\StoryVersionRepository;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\RootDeserializer;
 use Brightwood\Services\TelegramUserService;
+use Brightwood\Translation\Interfaces\TranslatorFactoryInterface;
+use Brightwood\Translation\TranslatorFactory;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
 use Psr\Container\ContainerInterface;
 
@@ -60,6 +62,10 @@ class GeneralProvider extends MappingProvider
             // cards
 
             RootDeserializerInterface::class => RootDeserializer::class,
+
+            // translation
+
+            TranslatorFactoryInterface::class => TranslatorFactory::class,
         ];
     }
 }

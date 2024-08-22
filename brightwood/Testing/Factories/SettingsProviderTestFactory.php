@@ -5,7 +5,7 @@ namespace Brightwood\Testing\Factories;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Settings\SettingsProvider;
 
-class SettingsProviderFactory
+class SettingsProviderTestFactory
 {
     public static function make(): SettingsProviderInterface
     {
