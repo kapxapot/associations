@@ -2,7 +2,7 @@
 
 namespace Brightwood\Models\Cards\Players;
 
-use App\Models\Interfaces\GenderedInterface;
+use App\Models\Interfaces\ActorInterface;
 use App\Models\Interfaces\NamedInterface;
 use App\Models\Traits\Gendered;
 use Brightwood\Collections\Cards\CardCollection;
@@ -14,7 +14,7 @@ use Plasticode\Collections\Generic\Collection;
 use Plasticode\Core\Security;
 use Plasticode\Models\Interfaces\EquatableInterface;
 
-abstract class Player implements EquatableInterface, GenderedInterface, NamedInterface, SerializableInterface
+abstract class Player implements EquatableInterface, ActorInterface, NamedInterface, SerializableInterface
 {
     use Gendered;
 
@@ -156,9 +156,11 @@ abstract class Player implements EquatableInterface, GenderedInterface, NamedInt
 
     abstract public function name(): string;
 
-    // GenderedInterface
+    // ActorInterface
 
     abstract public function gender(): ?int;
+
+    abstract public function languageCode(): ?string;
 
     // SerializableInterface
 

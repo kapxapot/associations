@@ -4,10 +4,10 @@ namespace App\Models\Interfaces;
 
 interface GenderedInterface
 {
-    function hasGender() : bool;
+    public function hasGender(): bool;
 
     /**
      * Returns gender if it's defined.
      */
-    function gender() : ?int;
+    public function gender(): ?int;
 }

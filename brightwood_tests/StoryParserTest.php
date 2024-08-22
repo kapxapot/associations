@@ -2,9 +2,9 @@
 
 namespace Brightwood\Tests;
 
-use App\Bots\Factories\MessageRendererFactory;
 use App\Models\TelegramUser;
 use Brightwood\Parsing\StoryParser;
+use Brightwood\Parsing\StoryParserFactory;
 use Brightwood\Testing\Models\TestData;
 use PHPUnit\Framework\TestCase;
 use Plasticode\Semantics\Gender;
@@ -17,30 +17,24 @@ final class StoryParserTest extends TestCase
     private TelegramUser $male;
     private TelegramUser $female;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->parser = new StoryParser(
-            new MessageRendererFactory()
-        );
+        $this->parser = (new StoryParserFactory())();
 
         $this->default = new TelegramUser();
 
-        $this->male = new TelegramUser(
-            [
-                'gender_id' => Gender::MAS
-            ]
-        );
+        $this->male = new TelegramUser([
+            'gender_id' => Gender::MAS
+        ]);
 
-        $this->female = new TelegramUser(
-            [
-                'gender_id' => Gender::FEM
-            ]
-        );
+        $this->female = new TelegramUser([
+            'gender_id' => Gender::FEM
+        ]);
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         unset($this->female);
         unset($this->male);
@@ -51,7 +45,7 @@ final class StoryParserTest extends TestCase
         parent::tearDown();
     }
 
-    public function testPlainText() : void
+    public function testPlainText(): void
     {
         $text = 'just text';
 
@@ -61,7 +55,7 @@ final class StoryParserTest extends TestCase
         );
     }
 
-    public function testGenderedText() : void
+    public function testGenderedText(): void
     {
         $text = 'hello, {male|female} friend';
 
@@ -76,7 +70,7 @@ final class StoryParserTest extends TestCase
         );
     }
 
-    public function testValidVar() : void
+    public function testValidVar(): void
     {
         $text = 'День: {day}';
 
@@ -88,7 +82,7 @@ final class StoryParserTest extends TestCase
         );
     }
 
-    public function testInvalidVar() : void
+    public function testInvalidVar(): void
     {
         $text = 'Здоровье: {hp}';
 

@@ -2,14 +2,13 @@
 
 namespace Brightwood\Models\Data;
 
-use App\Bots\Factories\MessageRendererFactory;
 use App\Models\TelegramUser;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Models\Cards\Games\EightsGame;
 use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\FemaleBot;
 use Brightwood\Models\Cards\Players\Human;
-use Brightwood\Parsing\StoryParser;
+use Brightwood\Parsing\StoryParserFactory;
 use Brightwood\Serialization\Interfaces\SerializableInterface;
 use Brightwood\Serialization\UniformSerializer;
 use Plasticode\Util\Cases;
@@ -83,9 +82,7 @@ class EightsData extends StoryData implements SerializableInterface
 
         $game = new EightsGame(
             // todo: should be provided by container definitions (a factory!)
-            new StoryParser(
-                new MessageRendererFactory()
-            ),
+            (new StoryParserFactory())(),
             new Cases(),
             $players
         );

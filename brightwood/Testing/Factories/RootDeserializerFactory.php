@@ -2,9 +2,8 @@
 
 namespace Brightwood\Testing\Factories;
 
-use App\Bots\Factories\MessageRendererFactory;
 use Brightwood\Config\SerializationConfig;
-use Brightwood\Parsing\StoryParser;
+use Brightwood\Parsing\StoryParserFactory;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\RootDeserializer;
 use Brightwood\Serialization\Cards\Serializers\CardSerializer;
@@ -18,9 +17,7 @@ class RootDeserializerFactory
         return new RootDeserializer(
             new SerializationConfig(
                 TelegramUserRepositoryFactory::make(),
-                new StoryParser(
-                    new MessageRendererFactory()
-                ),
+                (new StoryParserFactory())(),
                 new Cases()
             ),
             new CardSerializer(),

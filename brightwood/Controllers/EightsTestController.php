@@ -2,7 +2,6 @@
 
 namespace Brightwood\Controllers;
 
-use App\Bots\Factories\MessageRendererFactory;
 use Brightwood\Collections\Cards\PlayerCollection;
 use Brightwood\Collections\MessageCollection;
 use Brightwood\Models\Cards\Games\EightsGame;
@@ -10,7 +9,7 @@ use Brightwood\Models\Cards\Players\Bot;
 use Brightwood\Models\Cards\Players\FemaleBot;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
-use Brightwood\Parsing\StoryParser;
+use Brightwood\Parsing\StoryParserFactory;
 use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
 use Plasticode\Core\Response;
 use Plasticode\Util\Cases;
@@ -34,9 +33,7 @@ class EightsTestController
 
         $game = new EightsGame(
             // todo: should be provided by container definitions (a factory!)
-            new StoryParser(
-                new MessageRendererFactory()
-            ),
+            (new StoryParserFactory())(),
             new Cases(),
             $players
         );

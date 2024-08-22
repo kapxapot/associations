@@ -61,11 +61,16 @@ class Bot extends Player
         return $this->name;
     }
 
-    // GenderedInterface
+    // ActorInterface
 
     public function gender(): ?int
     {
         return $this->gender;
+    }
+
+    public function languageCode(): ?string
+    {
+        return null;
     }
 
     // SerializableInterface
@@ -75,11 +80,9 @@ class Bot extends Player
      */
     public function serialize(array ...$data): array
     {
-        return parent::serialize(
-            [
-                'name' => $this->name,
-                'gender' => $this->gender
-            ]
-        );
+        return parent::serialize([
+            'name' => $this->name,
+            'gender' => $this->gender
+        ]);
     }
 }

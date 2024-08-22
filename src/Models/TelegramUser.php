@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Models\Interfaces\GenderedInterface;
+use App\Models\Interfaces\ActorInterface;
 use App\Models\Interfaces\NamedInterface;
 use App\Models\Traits\Meta;
 use Exception;
@@ -15,6 +15,7 @@ use Plasticode\Models\Traits\UpdatedAt;
 /**
  * @property integer|null $genderId
  * @property integer $id
+ * @property string|null $langCode
  * @property integer|null $userId
  * @property integer $telegramId
  * @property string|null $username
@@ -23,7 +24,7 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @method User|null user()
  * @method static withUser(User|callable|null $user)
  */
-class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterface, NamedInterface, UpdatedAtInterface
+class TelegramUser extends DbModel implements CreatedAtInterface, ActorInterface, NamedInterface, UpdatedAtInterface
 {
     use CreatedAt;
     use Meta;
@@ -123,8 +124,23 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
      */
     public function withGenderId(int $genderId): self
     {
-        $this->genderId = $genderId;
-        $this->dirty = true;
+        if ($this->genderId !== $genderId) {
+            $this->genderId = $genderId;
+            $this->dirty = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withLangCode(string $langCode): self
+    {
+        if ($this->langCode !== $langCode) {
+            $this->langCode = $langCode;
+            $this->dirty = true;
+        }
 
         return $this;
     }
@@ -139,7 +155,7 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
         return $this->dirty;
     }
 
-    // GenderedInterface
+    // ActorInterface
 
     public function hasGender(): bool
     {
@@ -149,6 +165,11 @@ class TelegramUser extends DbModel implements CreatedAtInterface, GenderedInterf
     public function gender(): ?int
     {
         return $this->genderId;
+    }
+
+    public function languageCode(): ?string
+    {
+        return $this->langCode;
     }
 
     // NamedInterface

@@ -19,7 +19,7 @@ class Human extends Player
         }
     }
 
-    public function telegramUser() : TelegramUser
+    public function telegramUser(): TelegramUser
     {
         Assert::notNull($this->telegramUser);
 
@@ -29,7 +29,7 @@ class Human extends Player
     /**
      * @return $this
      */
-    public function withTelegramUser(TelegramUser $telegramUser) : self
+    public function withTelegramUser(TelegramUser $telegramUser): self
     {
         $this->telegramUser = $telegramUser;
 
@@ -42,23 +42,28 @@ class Human extends Player
         return $this;
     }
 
-    public function isBot() : bool
+    public function isBot(): bool
     {
         return false;
     }
 
     // NamedInterface
 
-    public function name() : string
+    public function name(): string
     {
         return $this->telegramUser()->name();
     }
 
-    // GenderedInterface
+    // ActorInterface
 
-    public function gender() : ?int
+    public function gender(): ?int
     {
         return $this->telegramUser()->gender();
+    }
+
+    public function languageCode(): ?string
+    {
+        return $this->telegramUser()->languageCode();
     }
 
     // SerializableInterface
@@ -66,10 +71,10 @@ class Human extends Player
     /**
      * @param array[] $data
      */
-    public function serialize(array ...$data) : array
+    public function serialize(array ...$data): array
     {
-        return parent::serialize(
-            ['telegram_user_id' => $this->telegramUser()->getId()]
-        );
+        return parent::serialize([
+            'telegram_user_id' => $this->telegramUser()->getId()
+        ]);
     }
 }

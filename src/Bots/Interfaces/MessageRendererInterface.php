@@ -2,6 +2,8 @@
 
 namespace App\Bots\Interfaces;
 
+use Brightwood\Translation\Interfaces\TranslatorInterface;
+
 interface MessageRendererInterface
 {
     /**
@@ -33,5 +35,13 @@ interface MessageRendererInterface
      */
     public function withHandler(string $name, callable $handler): self;
 
+    /**
+     * @return $this
+     */
+    public function withTranslator(TranslatorInterface $translator): self;
+
+    /**
+     * @param array<string, mixed>|null $text
+     */
     public function render(string $text): string;
 }

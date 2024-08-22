@@ -9,5 +9,5 @@ interface SerializableInterface extends JsonSerializable
     /**
      * @param array[] $data
      */
-    function serialize(array ...$data) : array;
+    public function serialize(array ...$data): array;
 }

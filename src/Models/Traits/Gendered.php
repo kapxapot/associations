@@ -7,10 +7,10 @@ namespace App\Models\Traits;
  */
 trait Gendered
 {
-    public function hasGender() : bool
+    public function hasGender(): bool
     {
         return $this->gender() !== null;
     }
 
-    abstract public function gender() : ?int;
+    abstract public function gender(): ?int;
 }

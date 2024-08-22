@@ -46,17 +46,17 @@ class Answerer
     private const STAGE_NOT_ALLOWED_STORY = 'not_allowed_story';
 
     private const MAX_JSON_SIZE = 1024 * 1024; // 1 Mb
-    private const MAX_JSON_SIZE_NAME = '1 Мб';
+    private const MAX_JSON_SIZE_NAME = '1 [Mb]';
 
-    private const ACTION_MAS = '👦 Мальчик';
-    private const ACTION_FEM = '👧 Девочка';
+    private const ACTION_MAS = '👦 [Boy]';
+    private const ACTION_FEM = '👧 [Girl]';
 
-    private const ACTION_UPDATE_STORY = '♻ Обновить';
-    private const ACTION_NEW_STORY = '🌱 Создать новую';
+    private const ACTION_UPDATE_STORY = '♻ [Update]';
+    private const ACTION_NEW_STORY = '🌱 [Create new]';
 
-    private const ACTION_CANCEL = '❌ Отмена';
+    private const ACTION_CANCEL = '❌ [Cancel]';
 
-    private const MESSAGE_CLUELESS = 'Что-что? Повторите-ка... 🧐';
+    private const MESSAGE_CLUELESS = '[Huh? I didn\'t get it...] 🧐';
 
     private SettingsProviderInterface $settingsProvider;
     private LinkerInterface $linker;
@@ -65,13 +65,16 @@ class Answerer
     private StoryService $storyService;
     private TelegramTransportInterface $telegram;
 
+    private TelegramUser $tgUser;
+
     public function __construct(
         LoggerInterface $logger,
         SettingsProviderInterface $settingsProvider,
         LinkerInterface $linker,
         StoryStatusRepositoryInterface $storyStatusRepository,
         StoryService $storyService,
-        TelegramTransportFactory $telegramFactory
+        TelegramTransportFactory $telegramFactory,
+        TelegramUser $tgUser
     )
     {
         $this->withLogger($logger);
@@ -82,32 +85,33 @@ class Answerer
         $this->storyStatusRepository = $storyStatusRepository;
         $this->storyService = $storyService;
         $this->telegram = ($telegramFactory)();
+
+        $this->tgUser = $tgUser;
     }
 
     public function getAnswers(
-        TelegramUser $tgUser,
         ?string $text = null,
         ?array $documentInfo = null
     ): StoryMessageSequence
     {
         // start command
         if (Strings::startsWith($text, BotCommand::CODE_START)) {
-            return $this->startCommand($tgUser);
+            return $this->startCommand();
         }
 
         // check gender
         // todo: use stage for this? but must be mandatory
-        if (!$tgUser->hasGender()) {
-            return $this->readGender($tgUser, $text);
+        if (!$this->tgUser->hasGender()) {
+            return $this->readGender($text);
         }
 
         // try executing story-specific commands
         if (Strings::startsWith($text, '/')) {
-            $executionResults = $this->executeStoryCommand($tgUser, $text);
+            $executionResults = $this->executeStoryCommand($text);
 
             if (!$executionResults->isEmpty()) {
                 return $executionResults->merge(
-                    $this->currentStatusMessages($tgUser)
+                    $this->currentStatusMessages()
                 );
             }
         }
@@ -118,17 +122,14 @@ class Answerer
             $story = $this->getStory($storyId);
 
             if ($story) {
-                $playable = $this->storyService->isStoryPlayableBy($story, $tgUser);
+                $playable = $this->storyService->isStoryPlayableBy($story, $this->tgUser);
 
                 if ($playable) {
-                    return $this->startStory($tgUser, $story);
+                    return $this->startStory($story);
                 }
             }
 
-            return $this->errorMessage(
-                $tgUser,
-                "История с id = {$storyId} не найдена."
-            );
+            return $this->errorMessage("История с id = {$storyId} не найдена.");
         }
 
         // story edit command
@@ -137,25 +138,22 @@ class Answerer
             $story = $this->getStory($storyId);
 
             if ($story) {
-                $editable = $this->storyService->isStoryEditableBy($story, $tgUser);
+                $editable = $this->storyService->isStoryEditableBy($story, $this->tgUser);
 
                 if ($editable) {
                     return $this->editStoryLink($story);
                 }
             }
 
-            return $this->errorMessage(
-                $tgUser,
-                "История с id = {$storyId} не найдена."
-            );
+            return $this->errorMessage("История с id = {$storyId} не найдена.");
         }
 
         if ($text === BotCommand::STORY_SELECTION || $text === BotCommand::CODE_STORY) {
-            return $this->storySelection($tgUser);
+            return $this->storySelection();
         }
 
         if ($text === BotCommand::CODE_EDIT) {
-            return $this->storyEditing($tgUser);
+            return $this->storyEditing();
         }
 
         if ($text === BotCommand::CODE_NEW) {
@@ -163,10 +161,10 @@ class Answerer
         }
 
         if ($text === BotCommand::CODE_UPLOAD) {
-            return $this->storyUpload($tgUser);
+            return $this->storyUpload();
         }
 
-        $stage = $tgUser->getMetaValue(self::BRIGHTWOOD_STAGE);
+        $stage = $this->tgUser->getMetaValue(self::BRIGHTWOOD_STAGE);
 
         if ($text === BotCommand::CODE_CANCEL_UPLOAD) {
             if (in_array($stage, $this->uploadStages())) {
@@ -187,11 +185,11 @@ class Answerer
                     ->finalize();
             }
 
-            return $this->processUpload($tgUser, $documentInfo);
+            return $this->processUpload($documentInfo);
         }
 
         if ($stage === self::STAGE_EXISTING_STORY || $stage === self::STAGE_NOT_ALLOWED_STORY) {
-            return $this->processOverwrite($tgUser, $stage, $text);
+            return $this->processOverwrite($stage, $text);
         }
 
         if (strlen($text) === 0) {
@@ -208,39 +206,39 @@ class Answerer
         }
 
         // default - next step
-        return $this->nextStep($tgUser, $text);
+        return $this->nextStep($text);
     }
 
-    private function errorMessage(TelegramUser $tgUser, string $message): StoryMessageSequence
+    private function errorMessage(string $message): StoryMessageSequence
     {
         return StoryMessageSequence::mash(
             new TextMessage("❌ {$message}"),
-            $this->currentStatusMessages($tgUser)
+            $this->currentStatusMessages()
         );
     }
 
-    private function startCommand(TelegramUser $tgUser): StoryMessageSequence
+    private function startCommand(): StoryMessageSequence
     {
-        $status = $this->getStatus($tgUser);
+        $status = $this->getStatus();
         $isReader = $status !== null;
 
         $greeting = $isReader ? 'С возвращением' : 'Добро пожаловать';
-        $greeting .= ', <b>' . $tgUser->privateName() . '</b>!';
+        $greeting .= ', <b>' . $this->tgUser->privateName() . '</b>!';
 
         $sequence = StoryMessageSequence::text($greeting);
 
-        if (!$tgUser->hasGender()) {
+        if (!$this->tgUser->hasGender()) {
             return $sequence->add(
                 $this->askGender()
             );
         }
 
         return $sequence->merge(
-            $this->storySelection($tgUser)
+            $this->storySelection()
         );
     }
 
-    private function readGender(TelegramUser $tgUser, string $text): StoryMessageSequence
+    private function readGender(string $text): StoryMessageSequence
     {
         /** @var integer|null */
         $gender = null;
@@ -264,14 +262,14 @@ class Answerer
             );
         }
 
-        $tgUser->withGenderId($gender);
+        $this->tgUser->withGenderId($gender);
 
         return StoryMessageSequence::mash(
             new TextMessage(
                 'Спасибо, уважаем{ый 👦|ая 👧}, ' .
                 'ваш пол сохранен и теперь будет учитываться. 👌'
             ),
-            $this->storySelection($tgUser)
+            $this->storySelection()
         );
     }
 
@@ -283,12 +281,9 @@ class Answerer
         );
     }
 
-    private function executeStoryCommand(
-        TelegramUser $tgUser,
-        string $command
-    ): StoryMessageSequence
+    private function executeStoryCommand(string $command): StoryMessageSequence
     {
-        $status = $this->getStatus($tgUser);
+        $status = $this->getStatus();
 
         if (!$status) {
             return StoryMessageSequence::empty();
@@ -305,16 +300,16 @@ class Answerer
         );
     }
 
-    private function nextStep(TelegramUser $tgUser, string $text): StoryMessageSequence
+    private function nextStep(string $text): StoryMessageSequence
     {
-        $status = $this->getStatus($tgUser);
+        $status = $this->getStatus();
 
         $cluelessMessage = new TextMessage(self::MESSAGE_CLUELESS);
 
         if (!$status) {
             return StoryMessageSequence::mash(
                 $cluelessMessage,
-                $this->storySelection($tgUser)
+                $this->storySelection()
             );
         }
 
@@ -325,7 +320,7 @@ class Answerer
 
         $data = $story->makeData($status->data());
 
-        $sequence = $story->go($tgUser, $node, $data, $text);
+        $sequence = $story->go($this->tgUser, $node, $data, $text);
 
         if ($sequence) {
             $status->stepId = $sequence->nodeId();
@@ -338,13 +333,13 @@ class Answerer
 
         return StoryMessageSequence::mash(
             $cluelessMessage,
-            $this->currentStatusMessages($tgUser)
+            $this->currentStatusMessages()
         );
     }
 
-    private function storySelection(TelegramUser $tgUser): StoryMessageSequence
+    private function storySelection(): StoryMessageSequence
     {
-        $stories = $this->storyService->getStoriesPlayableBy($tgUser);
+        $stories = $this->storyService->getStoriesPlayableBy($this->tgUser);
 
         if ($stories->isEmpty()) {
             return StoryMessageSequence::makeFinalized(
@@ -360,16 +355,16 @@ class Answerer
             ->finalize();
     }
 
-    private function startStory(TelegramUser $tgUser, Story $story): StoryMessageSequence
+    private function startStory(Story $story): StoryMessageSequence
     {
-        $status = $this->getStatus($tgUser);
+        $status = $this->getStatus();
 
         if (!$status) {
             $status = StoryStatus::create();
-            $status->telegramUserId = $tgUser->getId();
+            $status->telegramUserId = $this->tgUser->getId();
         }
 
-        $sequence = $story->start($tgUser);
+        $sequence = $story->start($this->tgUser);
 
         $storyVersion = $story->currentVersion();
 
@@ -383,10 +378,10 @@ class Answerer
         return $sequence;
     }
 
-    private function storyEditing(TelegramUser $tgUser): StoryMessageSequence
+    private function storyEditing(): StoryMessageSequence
     {
         $sequence = StoryMessageSequence::empty();
-        $stories = $this->storyService->getStoriesEditableBy($tgUser);
+        $stories = $this->storyService->getStoriesEditableBy($this->tgUser);
 
         if ($stories->isEmpty()) {
             $sequence->add(
@@ -462,10 +457,7 @@ class Answerer
         return 'Отменить загрузку: ' . BotCommand::CODE_CANCEL_UPLOAD;
     }
 
-    private function processUpload(
-        TelegramUser $tgUser,
-        array $documentInfo
-    ): StoryMessageSequence
+    private function processUpload(array $documentInfo): StoryMessageSequence
     {
         try {
             $mimeType = $documentInfo['mime_type'];
@@ -474,7 +466,7 @@ class Answerer
 
             // 1. check the mime_type
             if ($mimeType !== 'application/json') {
-                throw new Exception('Неверный тип файла, загрузите JSON, полученный из редактора, пожалуйста.');
+                throw new Exception('[Incorrect file type. Upload a JSON exported from the editor, please.]');
             }
 
             // 2. check the file size
@@ -491,7 +483,7 @@ class Answerer
             $responseObject = json_decode($response, true);
 
             if ($responseObject['ok'] !== true) {
-                throw new Exception('Не удалось получить файл от Telegram, попробуйте еще раз.');
+                throw new Exception('[Failed to get the file from Telegram, try again.]');
             }
 
             $filePath = $responseObject['result']['file_path'];
@@ -504,21 +496,21 @@ class Answerer
             $jsonData = json_decode($json, true);
 
             if (empty($jsonData)) {
-                throw new Exception('Файл поврежден. Пожалуйста, загрузите валидный JSON-файл.');
+                throw new Exception('[Invalid file. Upload a valid JSON file, please.]');
             }
 
             // 6. get story id, check that it's a valid uuid (!!!)
             $storyUuid = $jsonData['id'];
 
             if (!Uuid::isValid($storyUuid)) {
-                throw new Exception('Story id must be a valid uuid4.');
+                throw new Exception('[Story id must be a valid uuid4.]');
             }
 
             // 7. check that a story created from JSON passes validation
             $this->storyService->makeStoryFromJson($json);
 
             // 8. store the JSON to the user's story candidate record
-            $storyCandidate = $this->storyService->saveStoryCandidate($tgUser, $jsonData);
+            $storyCandidate = $this->storyService->saveStoryCandidate($this->tgUser, $jsonData);
 
             // 9. get the story by id
             $story = $this->storyService->getStoryByUuid($storyUuid);
@@ -529,7 +521,7 @@ class Answerer
             }
 
             // 11. if the story exists, check that the current user can update the story
-            $canUpdate = $this->storyService->isStoryEditableBy($story, $tgUser);
+            $canUpdate = $this->storyService->isStoryEditableBy($story, $this->tgUser);
 
             // 12. if they can update it, ask them if they want to create a new version or create a new story (mark the original story as a source story)
             if ($canUpdate) {
@@ -563,21 +555,17 @@ class Answerer
         }
     }
 
-    private function processOverwrite(
-        TelegramUser $tgUser,
-        string $stage,
-        string $text
-    ): StoryMessageSequence
+    private function processOverwrite(string $stage, string $text): StoryMessageSequence
     {
         if ($text === self::ACTION_CANCEL) {
-            $this->storyService->deleteStoryCandidateFor($tgUser);
+            $this->storyService->deleteStoryCandidateFor($this->tgUser);
             return $this->uploadCanceled();
         }
 
-        $storyCandidate = $this->storyService->getStoryCandidateFor($tgUser);
+        $storyCandidate = $this->storyService->getStoryCandidateFor($this->tgUser);
 
         if (!$storyCandidate) {
-            $this->logger->error("Story candidate for Telegram user [{$tgUser->getId()}] not found.");
+            $this->logger->error("Story candidate for Telegram user [{$this->tgUser->getId()}] not found.");
 
             return StoryMessageSequence::text('❌ Ошибка загрузки. Попробуйте еще раз.')
                 ->finalize();
@@ -650,7 +638,7 @@ class Answerer
                 );
         }
 
-        throw new Exception('Unknown stage: ' . $stage);
+        throw new Exception("Unknown stage: {$stage}");
     }
 
     private function uploadCanceled(): StoryMessageSequence
@@ -659,9 +647,9 @@ class Answerer
             ->finalize();;
     }
 
-    private function currentStatusMessages(TelegramUser $tgUser): StoryMessageSequence
+    private function currentStatusMessages(): StoryMessageSequence
     {
-        $status = $this->getStatus($tgUser);
+        $status = $this->getStatus();
 
         Assert::notNull($status);
 
@@ -693,9 +681,9 @@ class Answerer
         return $this->storyService->getStory($storyId);
     }
 
-    private function getStatus(TelegramUser $tgUser): ?StoryStatus
+    private function getStatus(): ?StoryStatus
     {
-        return $this->storyStatusRepository->getByTelegramUser($tgUser);
+        return $this->storyStatusRepository->getByTelegramUser($this->tgUser);
     }
 
     private function getStatusStory(StoryStatus $status): Story

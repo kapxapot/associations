@@ -6,7 +6,7 @@ use App\Auth\Interfaces\AuthInterface;
 use App\Core\Interfaces\LinkerInterface;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
-use Brightwood\Answers\Answerer;
+use Brightwood\Answers\AnswererFactory;
 use Brightwood\Config\SerializationConfig;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Hydrators\StoryCandidateHydrator;
@@ -34,6 +34,7 @@ use Brightwood\Serialization\Cards\Serializers\SuitSerializer;
 use Brightwood\Services\StoryService;
 use Brightwood\Services\TelegramUserService;
 use Brightwood\Testing\Factories\SettingsProviderFactory;
+use Brightwood\Translation\TranslatorFactory;
 use Plasticode\Auth\Access;
 use Plasticode\Core\Interfaces as Core;
 use Plasticode\Data\DbMetadata;
@@ -69,7 +70,7 @@ final class GeneralProviderTest extends AbstractProviderTest
 
     public function testWiring(): void
     {
-        $this->check(Answerer::class);
+        $this->check(AnswererFactory::class);
         $this->check(StoryParser::class);
 
         // hydrators
@@ -126,5 +127,9 @@ final class GeneralProviderTest extends AbstractProviderTest
         $this->check(RootDeserializerInterface::class, RootDeserializer::class);
         $this->check(SerializationConfig::class);
         $this->check(SuitSerializer::class);
+
+        // translator
+
+        $this->check(TranslatorFactory::class);
     }
 }

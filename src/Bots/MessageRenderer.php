@@ -3,12 +3,14 @@
 namespace App\Bots;
 
 use App\Bots\Interfaces\MessageRendererInterface;
+use Brightwood\Translation\Interfaces\TranslatorInterface;
 use Plasticode\Exceptions\InvalidConfigurationException;
 use Plasticode\Semantics\Gender;
 
 /**
  * Renders the following constructs:
  *
+ * - [text] - translates text using the provided translator
  * - {one|two|three} - based on genders (1, 2, 3)
  * - {var_name} - renders var value
  * - {handler:text} - applies handler to text
@@ -22,6 +24,8 @@ class MessageRenderer implements MessageRendererInterface
     /** @var array<string, callable> */
     private array $handlers;
 
+    private ?TranslatorInterface $translator = null;
+
     private int $gender;
 
     public function __construct()
@@ -31,10 +35,12 @@ class MessageRenderer implements MessageRendererInterface
         $this->gender = Gender::MAS;
     }
 
-    /**
-     * @param array<string, mixed> $vars
-     * @return $this
-     */
+    public function withGender(int $gender): self
+    {
+        $this->gender = $gender;
+        return $this;
+    }
+
     public function withVars(array $vars): self
     {
         foreach ($vars as $name => $value) {
@@ -44,21 +50,12 @@ class MessageRenderer implements MessageRendererInterface
         return $this;
     }
 
-    /**
-     * @param mixed $value
-     * @return $this
-     */
     public function withVar(string $name, $value): self
     {
         $this->vars[$name] = $value;
-
         return $this;
     }
 
-    /**
-     * @param array<string, mixed> $handlers
-     * @return $this
-     */
     public function withHandlers(array $handlers): self
     {
         foreach ($handlers as $name => $handler) {
@@ -68,29 +65,20 @@ class MessageRenderer implements MessageRendererInterface
         return $this;
     }
 
-    /**
-     * @param mixed $handler
-     * @return $this
-     */
     public function withHandler(string $name, callable $handler): self
     {
         $this->handlers[$name] = $handler;
-
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function withGender(int $gender): self
+    public function withTranslator(TranslatorInterface $translator): self
     {
-        $this->gender = $gender;
-
+        $this->translator = $translator;
         return $this;
     }
 
     /**
-     * @param array<string, mixed>|null $context
+     * @inheritDoc
      *
      * @throws InvalidConfigurationException
      */

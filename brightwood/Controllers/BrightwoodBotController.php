@@ -7,6 +7,7 @@ use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
 use Brightwood\Answers\Answerer;
+use Brightwood\Answers\AnswererFactory;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
@@ -37,7 +38,7 @@ class BrightwoodBotController
     private TelegramUserRepositoryInterface $telegramUserRepository;
     private TelegramUserService $telegramUserService;
     private TelegramTransportInterface $telegram;
-    private Answerer $answerer;
+    private AnswererFactory $answererFactory;
     private StoryParser $parser;
 
     public function __construct(
@@ -46,7 +47,7 @@ class BrightwoodBotController
         TelegramUserRepositoryInterface $telegramUserRepository,
         TelegramUserService $telegramUserService,
         TelegramTransportFactory $telegramFactory,
-        Answerer $answerer,
+        AnswererFactory $answererFactory,
         StoryParser $parser
     )
     {
@@ -56,7 +57,7 @@ class BrightwoodBotController
         $this->telegramUserRepository = $telegramUserRepository;
         $this->telegramUserService = $telegramUserService;
         $this->telegram = ($telegramFactory)();
-        $this->answerer = $answerer;
+        $this->answererFactory = $answererFactory;
 
         $this->parser = $parser;
     }
@@ -162,7 +163,8 @@ class BrightwoodBotController
         ?array $document
     ): ArrayCollection
     {
-        $sequence = $this->answerer->getAnswers($tgUser, $text, $document);
+        $answerer = ($this->answererFactory)($tgUser);
+        $sequence = $answerer->getAnswers($text, $document);
 
         $this->updateTelegramUser($tgUser, $sequence->stage());
 

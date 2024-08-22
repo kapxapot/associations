@@ -4,10 +4,9 @@ namespace Brightwood\Tests;
 
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\LinkerMock;
-use Brightwood\Answers\Answerer;
+use Brightwood\Answers\AnswererFactory;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Hydrators\StoryStatusHydrator;
-use Brightwood\Hydrators\StoryVersionHydrator;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\EightsStory;
@@ -18,6 +17,8 @@ use Brightwood\Testing\Factories\StoryServiceFactory;
 use Brightwood\Testing\Factories\TelegramUserRepositoryFactory;
 use Brightwood\Testing\Mocks\Repositories\StoryStatusRepositoryMock;
 use Brightwood\Testing\Mocks\Repositories\StoryVersionRepositoryMock;
+use Brightwood\Translation\Dictionaries\Ru;
+use Brightwood\Translation\TranslatorFactory;
 use PHPUnit\Framework\TestCase;
 use Plasticode\ObjectProxy;
 use Plasticode\Semantics\Gender;
@@ -27,7 +28,7 @@ final class AnswererTest extends TestCase
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
 
-    private Answerer $answerer;
+    private AnswererFactory $answererFactory;
 
     public function setUp(): void
     {
@@ -50,13 +51,14 @@ final class AnswererTest extends TestCase
             )
         );
 
-        $this->answerer = new Answerer(
+        $this->answererFactory = new AnswererFactory(
             LoggerFactory::make(),
             $settingsProvider,
             new LinkerMock(),
             $this->storyStatusRepository,
             $storyService,
-            new TelegramTransportFactory($settingsProvider)
+            new TelegramTransportFactory($settingsProvider),
+            new TranslatorFactory()
         );
     }
 
@@ -75,7 +77,8 @@ final class AnswererTest extends TestCase
         $tgUser = $this->telegramUserRepository->store([
             'id' => 2,
             'username' => 'kapxapot',
-            'gender_id' => Gender::MAS
+            'gender_id' => Gender::MAS,
+            'lang_code' => Ru::LANG_CODE
         ]);
 
         $this->storyStatusRepository->store([
@@ -86,7 +89,8 @@ final class AnswererTest extends TestCase
             'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug1.json')
         ]);
 
-        $answers = $this->answerer->getAnswers($tgUser, '♻ Начать заново');
+        $answerer = ($this->answererFactory)($tgUser);
+        $answers = $answerer->getAnswers('♻ Начать заново');
 
         $this->assertInstanceOf(StoryMessageSequence::class, $answers);
         $this->assertTrue($answers->hasText());
@@ -97,7 +101,8 @@ final class AnswererTest extends TestCase
         $tgUser = $this->telegramUserRepository->store([
             'id' => 31,
             'username' => 'kapxapot',
-            'gender_id' => Gender::MAS
+            'gender_id' => Gender::MAS,
+            'lang_code' => Ru::LANG_CODE
         ]);
 
         $this->storyStatusRepository->store([
@@ -108,7 +113,8 @@ final class AnswererTest extends TestCase
             'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug2.json')
         ]);
 
-        $answers = $this->answerer->getAnswers($tgUser, '4');
+        $answerer = ($this->answererFactory)($tgUser);
+        $answers = $answerer->getAnswers('4');
 
         $this->assertInstanceOf(StoryMessageSequence::class, $answers);
         $this->assertTrue($answers->hasText());
