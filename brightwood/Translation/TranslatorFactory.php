@@ -2,16 +2,22 @@
 
 namespace Brightwood\Translation;
 
-use App\Models\Language;
-use Brightwood\Translation\Dictionaries\En;
-use Brightwood\Translation\Dictionaries\Ru;
-use Brightwood\Translation\Interfaces\DictionaryInterface;
+use Brightwood\JsonDataLoader;
 use Brightwood\Translation\Interfaces\TranslatorFactoryInterface;
 use Brightwood\Translation\Interfaces\TranslatorInterface;
 use Exception;
+use Plasticode\Traits\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
 
 class TranslatorFactory implements TranslatorFactoryInterface
 {
+    use LoggerAwareTrait;
+
+    public function __construct(LoggerInterface $logger)
+    {
+        $this->withLogger($logger);
+    }
+
     public function __invoke(string $langCode): TranslatorInterface
     {
         $dictionary = $this->getDictionary($langCode);
@@ -21,14 +27,14 @@ class TranslatorFactory implements TranslatorFactoryInterface
     /**
      * @throws Exception
      */
-    private function getDictionary(string $langCode): ?DictionaryInterface
+    private function getDictionary(string $langCode): ?array
     {
-        switch ($langCode) {
-            case Language::RU:
-                return new Ru();
+        $path = __DIR__ . "/Locales/{$langCode}.json";
 
-            case Language::EN:
-                return new En();
+        try {
+            return JsonDataLoader::load($path);
+        } catch (Exception $ex) {
+            $this->logEx($ex);
         }
 
         return null;

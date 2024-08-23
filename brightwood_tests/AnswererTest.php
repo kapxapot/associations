@@ -11,11 +11,13 @@ use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Models\Data\EightsData;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\EightsStory;
+use Brightwood\Parsing\StoryParserFactory;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Testing\Factories\LoggerTestFactory;
 use Brightwood\Testing\Factories\SettingsProviderTestFactory;
 use Brightwood\Testing\Factories\StoryServiceTestFactory;
 use Brightwood\Testing\Factories\TelegramUserRepositoryTestFactory;
+use Brightwood\Testing\Factories\TranslatorTestFactory;
 use Brightwood\Testing\Mocks\Repositories\StoryStatusRepositoryMock;
 use Brightwood\Testing\Mocks\Repositories\StoryVersionRepositoryMock;
 use PHPUnit\Framework\TestCase;
@@ -50,12 +52,17 @@ final class AnswererTest extends TestCase
             )
         );
 
+        $storyParserFactory = new StoryParserFactory(
+            new TranslatorTestFactory()
+        );
+
         $this->answererFactory = new AnswererFactory(
             LoggerTestFactory::make(),
             $settingsProvider,
             new LinkerMock(),
             $this->storyStatusRepository,
             $storyService,
+            ($storyParserFactory)(),
             new TelegramTransportFactory($settingsProvider)
         );
     }
