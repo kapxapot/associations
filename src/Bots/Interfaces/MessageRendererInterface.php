@@ -12,10 +12,10 @@ interface MessageRendererInterface
     public function withGender(int $gender): self;
 
     /**
-     * @param array<string, mixed> $vars
+     * @param array<string, mixed>|null $vars
      * @return $this
      */
-    public function withVars(array $vars): self;
+    public function withVars(?array $vars = null): self;
 
     /**
      * @param mixed $value

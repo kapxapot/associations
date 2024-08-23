@@ -15,6 +15,7 @@ use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\StoryCandidate;
 use Brightwood\Models\StoryStatus;
+use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
 use Brightwood\Util\Uuid;
@@ -57,12 +58,14 @@ class Answerer
     private const ACTION_CANCEL = '❌ [[Cancel]]';
 
     private const MESSAGE_CLUELESS = '[[Huh? I didn\'t get it...]] 🧐';
+    private const MESSAGE_STORY_NOT_FOUND = '[[Story with id = {storyId} not found.]]';
 
     private SettingsProviderInterface $settingsProvider;
     private LinkerInterface $linker;
 
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private StoryService $storyService;
+    private StoryParser $parser;
     private TelegramTransportInterface $telegram;
 
     private TelegramUser $tgUser;
@@ -73,6 +76,7 @@ class Answerer
         LinkerInterface $linker,
         StoryStatusRepositoryInterface $storyStatusRepository,
         StoryService $storyService,
+        StoryParser $parser,
         TelegramTransportFactory $telegramFactory,
         TelegramUser $tgUser
     )
@@ -84,6 +88,7 @@ class Answerer
 
         $this->storyStatusRepository = $storyStatusRepository;
         $this->storyService = $storyService;
+        $this->parser = $parser;
         $this->telegram = ($telegramFactory)();
 
         $this->tgUser = $tgUser;
@@ -129,7 +134,10 @@ class Answerer
                 }
             }
 
-            return $this->errorMessage("История с id = {$storyId} не найдена.");
+            return $this->errorMessage(
+                self::MESSAGE_STORY_NOT_FOUND,
+                ['storyId' => $storyId]
+            );
         }
 
         // story edit command
@@ -145,10 +153,16 @@ class Answerer
                 }
             }
 
-            return $this->errorMessage("История с id = {$storyId} не найдена.");
+            return $this->errorMessage(
+                self::MESSAGE_STORY_NOT_FOUND,
+                ['storyId' => $storyId]
+            );
         }
 
-        if ($text === BotCommand::STORY_SELECTION || $text === BotCommand::CODE_STORY) {
+        if (
+            $text === $this->parse(BotCommand::STORY_SELECTION)
+            || $text === BotCommand::CODE_STORY
+        ) {
             return $this->storySelection();
         }
 
@@ -178,7 +192,7 @@ class Answerer
             if (!$documentUploaded) {
                 return
                     StoryMessageSequence::text(
-                        '❌ Пожалуйста, загрузите документ.',
+                        '❌ [[Please, upload a document.]]',
                         $this->uploadTips()
                     )
                     ->withStage(self::STAGE_UPLOAD) // we are still on this stage
@@ -194,14 +208,16 @@ class Answerer
 
         if (strlen($text) === 0) {
             if ($documentUploaded) {
-                return StoryMessageSequence::text(
-                    '❌ Вы загрузили документ, но не там, где нужно.',
-                    'Если вы хотите загрузить историю, используйте команду ' . BotCommand::CODE_UPLOAD
-                )
-                ->finalize();
+                return
+                    StoryMessageSequence::text(
+                        '❌ [[You\'ve uploaded a document, but in a wrong place.]]',
+                        '[[If you want to upload a story, use {upload_command} command]]'
+                    )
+                    ->withVar('upload_command', BotCommand::CODE_UPLOAD)
+                    ->finalize();
             }
 
-            return StoryMessageSequence::text('❌ Я понимаю только сообщения с текстом.')
+            return StoryMessageSequence::text('❌ [[I understand only messages with text.]]')
                 ->finalize();
         }
 
@@ -209,12 +225,14 @@ class Answerer
         return $this->nextStep($text);
     }
 
-    private function errorMessage(string $message): StoryMessageSequence
+    private function errorMessage(string $message, ?array $vars = null): StoryMessageSequence
     {
-        return StoryMessageSequence::mash(
-            new TextMessage("❌ {$message}"),
-            $this->currentStatusMessages()
-        );
+        return
+            StoryMessageSequence::mash(
+                new TextMessage("❌ {$message}"),
+                $this->currentStatusMessages()
+            )
+            ->withVars($vars);
     }
 
     private function startCommand(): StoryMessageSequence
@@ -222,10 +240,12 @@ class Answerer
         $status = $this->getStatus();
         $isReader = $status !== null;
 
-        $greeting = $isReader ? 'С возвращением' : 'Добро пожаловать';
-        $greeting .= ', <b>' . $this->tgUser->privateName() . '</b>!';
+        $greeting = $isReader
+            ? '[[Welcome back, <b>{userName}</b>!]]'
+            : '[[Welcome, <b>{userName}</b>!]]';
 
-        $sequence = StoryMessageSequence::text($greeting);
+        $sequence = StoryMessageSequence::text($greeting)
+            ->withVar('userName', $this->tgUser->privateName());
 
         if (!$this->tgUser->hasGender()) {
             return $sequence->add(
@@ -731,5 +751,10 @@ class Answerer
             self::STAGE_EXISTING_STORY,
             self::STAGE_NOT_ALLOWED_STORY
         ];
+    }
+
+    private function parse(string $text, ?array $vars = null): string
+    {
+        return $this->parser->parse($this->tgUser, $text, $vars);
     }
 }

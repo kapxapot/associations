@@ -4,8 +4,9 @@ namespace Brightwood\Models;
 
 class BotCommand
 {
-    const RESTART = '♻ Начать заново';
-    const STORY_SELECTION = '📚 Выбрать историю';
+    const RESTART = '♻ [[Start again]]';
+    const STORY_SELECTION = '📚 [[Select story]]';
+    const TROUBLESHOOT = '[[The bot is broken! Fix it!]]';
 
     const CODE_START = '/start';
     const CODE_STORY = '/story';

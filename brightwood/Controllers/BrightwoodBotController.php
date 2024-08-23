@@ -30,8 +30,6 @@ class BrightwoodBotController
     private const LOG_BRIEF = 1;
     private const LOG_FULL = 2;
 
-    private const TROUBLESHOOT_COMMAND = 'Бот сломался! Почините!';
-
     private SettingsProviderInterface $settingsProvider;
     private LoggerInterface $logger;
 
@@ -149,7 +147,13 @@ class BrightwoodBotController
         }
 
         return ArrayCollection::collect(
-            $this->buildTelegramMessage($chatId, 'Что-то пошло не так. 😐')
+            $this->buildTelegramMessage(
+                $chatId,
+                $this->parse(
+                    $tgUser,
+                    '[[Something went wrong.]] 😐'
+                )
+            )
         );
     }
 
@@ -171,7 +175,7 @@ class BrightwoodBotController
         if ($sequence->isFinalized()) {
             if (!$sequence->hasText()) {
                 $sequence->add(
-                    new TextMessage('The end.') // todo: localize this
+                    new TextMessage('[[The end]]')
                 );
             }
         } else {
@@ -186,15 +190,21 @@ class BrightwoodBotController
         if (empty($defaultActions)) {
             $defaultActions = $sequence->isFinalized()
                 ? [BotCommand::RESTART, BotCommand::STORY_SELECTION]
-                : [self::TROUBLESHOOT_COMMAND];
+                : [BotCommand::TROUBLESHOOT];
         }
 
         return ArrayCollection::from(
             $sequence
                 ->messages()
                 ->map(
-                    fn (MessageInterface $m) =>
-                        $this->toTelegramMessage($tgUser, $chatId, $m, $defaultActions)
+                    fn (MessageInterface $message) =>
+                        $this->toTelegramMessage(
+                            $tgUser,
+                            $chatId,
+                            $message,
+                            $defaultActions,
+                            $sequence->vars()
+                        )
                 )
         );
     }
@@ -217,21 +227,22 @@ class BrightwoodBotController
     }
 
     /**
-     * @param string[] $defaultActions
+     * @param string[] $defaultActions The actions that are used if the message doesn't have its own actions.
      */
     private function toTelegramMessage(
         TelegramUser $tgUser,
         string $chatId,
         MessageInterface $message,
-        array $defaultActions
+        array $defaultActions,
+        array $vars
     ): array
     {
-        $message = $this->parseMessage($tgUser, $message);
-        $actions = $message->actions();
-
-        if (empty($actions)) {
-            $actions = $defaultActions;
+        if (!$message->hasActions()) {
+            $message->appendActions(...$defaultActions);
         }
+
+        $message = $this->parseMessage($tgUser, $message, $vars);
+        $actions = $message->actions();
 
         Assert::notEmpty(
             $actions,
@@ -262,10 +273,16 @@ class BrightwoodBotController
 
     private function parseMessage(
         TelegramUser $tgUser,
-        MessageInterface $message
+        MessageInterface $message,
+        array $vars
     ): MessageInterface
     {
-        $parse = fn (string $text) => $this->parser->parse($tgUser, $text, $message->data());
+        $combinedVars = array_merge(
+            $message->data() ? $message->data()->toArray() : [],
+            $vars
+        );
+
+        $parse = fn (string $text) => $this->parse($tgUser, $text, $combinedVars);
 
         $lines = array_map($parse, $message->lines());
         $actions = array_map($parse, $message->actions());
@@ -276,5 +293,10 @@ class BrightwoodBotController
     private function messageToText(MessageInterface $message): string
     {
         return Text::sparseJoin($message->lines());
+    }
+
+    private function parse(TelegramUser $tgUser, string $text, ?array $vars = null): string
+    {
+        return $this->parser->parse($tgUser, $text, $vars);
     }
 }

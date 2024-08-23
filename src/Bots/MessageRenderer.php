@@ -3,6 +3,7 @@
 namespace App\Bots;
 
 use App\Bots\Interfaces\MessageRendererInterface;
+use App\Bots\Traits\Vars;
 use Brightwood\Translation\Interfaces\TranslatorInterface;
 use Plasticode\Exceptions\InvalidConfigurationException;
 use Plasticode\Semantics\Gender;
@@ -10,7 +11,7 @@ use Plasticode\Semantics\Gender;
 /**
  * Renders the following constructs:
  *
- * - [text] - translates text using the provided translator
+ * - [[text]] - translates text using the provided translator
  * - {one|two|three} - based on genders (1, 2, 3)
  * - {var_name} - renders var value
  * - {handler:text} - applies handler to text
@@ -18,8 +19,7 @@ use Plasticode\Semantics\Gender;
  */
 class MessageRenderer implements MessageRendererInterface
 {
-    /** @var array<string, mixed> */
-    private array $vars;
+    use Vars;
 
     /** @var array<string, callable> */
     private array $handlers;
@@ -30,7 +30,6 @@ class MessageRenderer implements MessageRendererInterface
 
     public function __construct()
     {
-        $this->vars = [];
         $this->handlers = [];
         $this->gender = Gender::MAS;
     }
@@ -38,21 +37,6 @@ class MessageRenderer implements MessageRendererInterface
     public function withGender(int $gender): self
     {
         $this->gender = $gender;
-        return $this;
-    }
-
-    public function withVars(array $vars): self
-    {
-        foreach ($vars as $name => $value) {
-            $this->withVar($name, $value);
-        }
-
-        return $this;
-    }
-
-    public function withVar(string $name, $value): self
-    {
-        $this->vars[$name] = $value;
         return $this;
     }
 
@@ -147,11 +131,6 @@ class MessageRenderer implements MessageRendererInterface
         $parts = explode('|', $text);
 
         return $parts[$index - 1] ?? '';
-    }
-
-    private function hasVar(string $name): bool
-    {
-        return array_key_exists($name, $this->vars);
     }
 
     private function hasHandler(string $name): bool

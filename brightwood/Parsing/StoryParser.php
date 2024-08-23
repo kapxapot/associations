@@ -5,8 +5,6 @@ namespace Brightwood\Parsing;
 use App\Bots\Factories\MessageRendererFactory;
 use App\Models\Interfaces\ActorInterface;
 use App\Models\Language;
-use Brightwood\Models\Data\StoryData;
-use Brightwood\Translation\Dictionaries\Ru;
 use Brightwood\Translation\Interfaces\TranslatorFactoryInterface;
 use Plasticode\Semantics\Gender;
 
@@ -24,26 +22,24 @@ class StoryParser
         $this->translatorFactory = $translatorFactory;
     }
 
+    /**
+     * @param array<string, mixed>|null $data
+     */
     public function parse(
         ActorInterface $actor,
         string $text,
-        ?StoryData $data = null
+        ?array $vars = null
     ): string
     {
         $langCode = $actor->languageCode() ?? Language::RU;
         $gender = $actor->gender() ?? Gender::MAS;
 
-        $renderer = ($this->rendererFactory)();
         $translator = ($this->translatorFactory)($langCode);
 
-        $renderer
+        return ($this->rendererFactory)()
             ->withTranslator($translator)
-            ->withGender($gender);
-
-        if ($data) {
-            $renderer->withVars($data->toArray());
-        }
-
-        return $renderer->render($text);
+            ->withGender($gender)
+            ->withVars($vars)
+            ->render($text);
     }
 }

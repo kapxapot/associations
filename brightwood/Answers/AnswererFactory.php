@@ -5,6 +5,7 @@ namespace Brightwood\Answers;
 use App\Core\Interfaces\LinkerInterface;
 use App\Models\TelegramUser;
 use Brightwood\Factories\TelegramTransportFactory;
+use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
@@ -21,6 +22,7 @@ class AnswererFactory
         LinkerInterface $linker,
         StoryStatusRepositoryInterface $storyStatusRepository,
         StoryService $storyService,
+        StoryParser $parser,
         TelegramTransportFactory $telegramFactory
     )
     {
@@ -30,6 +32,7 @@ class AnswererFactory
             $linker,
             $storyStatusRepository,
             $storyService,
+            $parser,
             $telegramFactory,
             $tgUser
         );

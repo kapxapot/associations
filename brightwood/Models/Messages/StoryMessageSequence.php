@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Messages;
 
+use App\Bots\Traits\Vars;
 use Brightwood\Collections\MessageCollection;
 use Brightwood\Collections\StoryMessageCollection;
 use Brightwood\Models\Data\StoryData;
@@ -11,6 +12,8 @@ use Plasticode\Collections\Generic\Collection;
 
 class StoryMessageSequence implements SequencableInterface
 {
+    use Vars;
+
     private MessageCollection $messages;
 
     /** @var string[] */
@@ -227,54 +230,33 @@ class StoryMessageSequence implements SequencableInterface
 
     public function data(): ?StoryData
     {
+        // if sequence itself has data, return it
         if ($this->data) {
             return $this->data;
         }
 
+        // otherwise, look for the last message with data and return it
         /** @var MessageInterface|null */
-        $last = $this
+        $lastWithData = $this
             ->messages
             ->last(
                 fn (MessageInterface $m) => $m->hasData()
             );
 
-        return $last
-            ? $last->data()
+        return $lastWithData
+            ? $lastWithData->data()
             : null;
-    }
-
-    public function overrideActions(): array
-    {
-        return $this->actions;
-    }
-
-    public function overrideData(): ?StoryData
-    {
-        return $this->data;
     }
 
     /**
      * Concats messages and creates a NEW sequence.
      *
-     * If there are overrides or other attributes (such as isFinalized),
-     * they are taken from the added sequence (!).
+     * `isFinalized` is taken from the `$other` sequence.
      */
     public function merge(self $other): self
     {
         $sequence = new self(...$this->messages);
         $sequence->add(...$other->messages());
-
-        if (!empty($other->overrideActions())) {
-            $sequence->withActions(
-                ...$other->overrideActions()
-            );
-        }
-
-        if ($other->overrideData()) {
-            $sequence->withData(
-                $other->overrideData()
-            );
-        }
 
         return $sequence->finalize(
             $other->isFinalized()
