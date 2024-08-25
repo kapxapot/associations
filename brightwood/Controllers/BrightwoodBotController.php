@@ -174,9 +174,7 @@ class BrightwoodBotController
 
         if ($sequence->isFinalized()) {
             if (!$sequence->hasText()) {
-                $sequence->add(
-                    new TextMessage('[[The end]]')
-                );
+                $sequence->addText('[[The end]]');
             }
         } else {
             Assert::true(

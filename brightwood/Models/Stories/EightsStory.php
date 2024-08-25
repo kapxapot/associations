@@ -238,17 +238,17 @@ class EightsStory extends Story
             $card = Card::tryParse($input);
 
             if (!$playableCards->contains($card)) {
-                $sequence->add(
-                    new TextMessage('У вас нет такой карты. Вы что, шулер{|ка}? 🤔')
-                );
+                $sequence->addText('У вас нет такой карты. Вы что, шулер{|ка}? 🤔');
             } else {
                 $events = $game->putCard($player, $card);
 
                 // for eight go to suit choice
                 if ($card->isRank(Rank::eight())) {
-                    return $sequence->add(
-                        new StoryMessage(self::SUIT_CHOICE)
-                    )->withData($data);
+                    return $sequence
+                        ->add(
+                            new StoryMessage(self::SUIT_CHOICE)
+                        )
+                        ->withData($data);
                 }
 
                 // otherwise go to next player
@@ -356,9 +356,7 @@ class EightsStory extends Story
             $suit = Suit::tryParse($input);
 
             if (!$suit) {
-                $sequence->add(
-                    new TextMessage('Не понятно, попробуйте еще раз...')
-                );
+                $sequence->addText('Не понятно, попробуйте еще раз...');
             } else {
                 // apply suit...
                 $events = $game->playerChoosesEightSuit($player, $suit);

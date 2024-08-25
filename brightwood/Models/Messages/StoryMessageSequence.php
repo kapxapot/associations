@@ -56,11 +56,31 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * @return $this
      */
+    public function addText(string ...$lines): self
+    {
+        $this->messages = $this->messages->add(
+            new TextMessage(...$lines)
+        );
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function add(MessageInterface ...$messages): self
     {
         $this->messages = $this->messages->add(...$messages);
 
         return $this;
+    }
+
+    /**
+     * Makes a finalized sequence from one TextMessage.
+     */
+    public static function textFinalized(string ...$lines): self
+    {
+        return self::text(...$lines)->finalize();
     }
 
     /**
@@ -138,9 +158,7 @@ class StoryMessageSequence implements SequencableInterface
         if ($first) {
             $first->prependLines($prefix);
         } else {
-            $this->add(
-                new TextMessage($prefix)
-            );
+            $this->addText($prefix);
         }
 
         return $this;

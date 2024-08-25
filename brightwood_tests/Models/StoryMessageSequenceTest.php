@@ -46,11 +46,11 @@ final class StoryMessageSequenceTest extends TestCase
         return [
             [
                 StoryMessageSequence::empty(),
-                StoryMessageSequence::empty()->finalize(),
+                StoryMessageSequence::makeFinalized(),
                 true
             ],
             [
-                StoryMessageSequence::empty()->finalize(),
+                StoryMessageSequence::makeFinalized(),
                 StoryMessageSequence::empty(),
                 false
             ],

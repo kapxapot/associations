@@ -46,8 +46,8 @@ class Answerer
     private const STAGE_EXISTING_STORY = 'existing_story';
     private const STAGE_NOT_ALLOWED_STORY = 'not_allowed_story';
 
-    private const MAX_JSON_SIZE = 1024 * 1024; // 1 Mb
-    private const MAX_JSON_SIZE_NAME = '1 [[Mb]]';
+    private const MB = 1024 * 1024; // 1 Mb
+    private const MAX_JSON_SIZE = 1; // Mb
 
     private const ACTION_MAS = '👦 [[Boy]]';
     private const ACTION_FEM = '👧 [[Girl]]';
@@ -136,7 +136,7 @@ class Answerer
 
             return $this->errorMessage(
                 self::MESSAGE_STORY_NOT_FOUND,
-                ['storyId' => $storyId]
+                ['story_id' => $storyId]
             );
         }
 
@@ -155,10 +155,11 @@ class Answerer
 
             return $this->errorMessage(
                 self::MESSAGE_STORY_NOT_FOUND,
-                ['storyId' => $storyId]
+                ['story_id' => $storyId]
             );
         }
 
+        // translate the action label here
         if (
             $text === $this->parse(BotCommand::STORY_SELECTION)
             || $text === BotCommand::CODE_STORY
@@ -191,12 +192,11 @@ class Answerer
         if ($stage === self::STAGE_UPLOAD) {
             if (!$documentUploaded) {
                 return
-                    StoryMessageSequence::text(
+                    StoryMessageSequence::textFinalized(
                         '❌ [[Please, upload a document.]]',
                         $this->uploadTips()
                     )
-                    ->withStage(self::STAGE_UPLOAD) // we are still on this stage
-                    ->finalize();
+                    ->withStage(self::STAGE_UPLOAD); // we are still on this stage
             }
 
             return $this->processUpload($documentInfo);
@@ -209,16 +209,16 @@ class Answerer
         if (strlen($text) === 0) {
             if ($documentUploaded) {
                 return
-                    StoryMessageSequence::text(
+                    StoryMessageSequence::textFinalized(
                         '❌ [[You\'ve uploaded a document, but in a wrong place.]]',
-                        '[[If you want to upload a story, use {upload_command} command]]'
+                        '[[If you want to upload a story, use the {upload_command} command.]]'
                     )
-                    ->withVar('upload_command', BotCommand::CODE_UPLOAD)
-                    ->finalize();
+                    ->withVar('upload_command', BotCommand::CODE_UPLOAD);
             }
 
-            return StoryMessageSequence::text('❌ [[I understand only messages with text.]]')
-                ->finalize();
+            return StoryMessageSequence::textFinalized(
+                '❌ [[I understand only messages with text.]]'
+            );
         }
 
         // default - next step
@@ -241,11 +241,11 @@ class Answerer
         $isReader = $status !== null;
 
         $greeting = $isReader
-            ? '[[Welcome back, <b>{userName}</b>!]]'
-            : '[[Welcome, <b>{userName}</b>!]]';
+            ? '[[Welcome back, <b>{user_name}</b>!]]'
+            : '[[Welcome, <b>{user_name}</b>!]]';
 
         $sequence = StoryMessageSequence::text($greeting)
-            ->withVar('userName', $this->tgUser->privateName());
+            ->withVar('user_name', $this->tgUser->privateName());
 
         if (!$this->tgUser->hasGender()) {
             return $sequence->add(
@@ -263,12 +263,13 @@ class Answerer
         /** @var integer|null */
         $gender = null;
 
+        // actions must be translated to be checked correctly
         switch ($text) {
-            case self::ACTION_MAS:
+            case $this->parse(self::ACTION_MAS):
                 $gender = Gender::MAS;
                 break;
 
-            case self::ACTION_FEM:
+            case $this->parse(self::ACTION_FEM):
                 $gender = Gender::FEM;
                 break;
         }
@@ -277,7 +278,7 @@ class Answerer
 
         if (!$genderIsOk) {
             return new StoryMessageSequence(
-                new TextMessage('Вы написали что-то не то. 🤔'),
+                new TextMessage('[[You\'ve written something wrong.]] 🤔'),
                 $this->askGender()
             );
         }
@@ -286,8 +287,7 @@ class Answerer
 
         return StoryMessageSequence::mash(
             new TextMessage(
-                'Спасибо, уважаем{ый 👦|ая 👧}, ' .
-                'ваш пол сохранен и теперь будет учитываться. 👌'
+                '[[Thank you, dear {👦|👧}, your gender has been saved and will now be taken into account.]] 👌'
             ),
             $this->storySelection()
         );
@@ -296,7 +296,7 @@ class Answerer
     private function askGender(): MessageInterface
     {
         return new Message(
-            ['Для корректного текста историй, пожалуйста, укажите ваш <b>пол</b>:'],
+            ['[[For better story texts, please provide your <b>gender</b>]]:'],
             [self::ACTION_MAS, self::ACTION_FEM]
         );
     }
@@ -315,7 +315,7 @@ class Answerer
     private function continueStory(StoryStatus $status): StoryMessageSequence
     {
         return StoryMessageSequence::mash(
-            new TextMessage('Итак, продолжим...'),
+            new TextMessage('[[Let\'s continue...]]'),
             $this->statusToMessages($status)
         );
     }
@@ -362,14 +362,12 @@ class Answerer
         $stories = $this->storyService->getStoriesPlayableBy($this->tgUser);
 
         if ($stories->isEmpty()) {
-            return StoryMessageSequence::makeFinalized(
-                new TextMessage('⛔ Историй нет.')
-            );
+            return StoryMessageSequence::textFinalized('⛔ [[No stories.]]');
         }
 
         return
             StoryMessageSequence::mash(
-                new TextMessage('Выберите историю:'),
+                new TextMessage('[[Select a story]]:'),
                 $stories->toInfo()
             )
             ->finalize();
@@ -400,81 +398,77 @@ class Answerer
 
     private function storyEditing(): StoryMessageSequence
     {
-        $sequence = StoryMessageSequence::empty();
         $stories = $this->storyService->getStoriesEditableBy($this->tgUser);
 
-        if ($stories->isEmpty()) {
-            $sequence->add(
-                new TextMessage('⛔ У вас нет доступных историй для редактирования.')
-            );
-        } else {
-            $sequence->add(
-                new TextMessage('Вы можете редактировать следующие истории:'),
+        $text = $stories->isEmpty()
+            ? ['⛔ [[You have no stories available for edit.]]']
+            : [
+                '[[You can edit the following stories]]:',
                 ...$stories->map(
-                    fn (Story $s) => new TextMessage(
-                        sprintf(
-                            '%s %s_%s',
-                            $s->title(),
-                            BotCommand::CODE_EDIT,
-                            $s->getId()
-                        )
+                    fn (Story $s) => sprintf(
+                        '%s %s_%s',
+                        $s->title(),
+                        BotCommand::CODE_EDIT,
+                        $s->getId()
                     )
                 )
-            );
-        }
+            ];
 
-        $sequence->add(
-            new TextMessage('Создать новую историю: ' . BotCommand::CODE_NEW),
-            new TextMessage('Загрузить новую или отредактированную историю: ' . BotCommand::CODE_UPLOAD)
-        );
+        $text[] = '[[Create a new story]]: ' . BotCommand::CODE_NEW;
+        $text[] = '[[Upload a new or an edited story]]: ' . BotCommand::CODE_UPLOAD;
 
-        return $sequence->finalize();
+        return StoryMessageSequence::textFinalized(...$text);
     }
 
     private function editStoryLink(Story $story): StoryMessageSequence
     {
-        return StoryMessageSequence::makeFinalized(
-            new TextMessage(
-                "Для редактирования истории <b>{$story->title()}</b> перейдите по ссылке:",
+        return
+            StoryMessageSequence::textFinalized(
+                '[[Follow the link to edit the story <b>{story_title}</b>]]:',
                 $this->buildStoryEditUrl($story),
                 $this->editorTips()
             )
-        );
+            ->withVars([
+                'story_title' => $story->title(),
+                'upload_command' => BotCommand::CODE_UPLOAD,
+            ]);
     }
 
     private function storyCreation(): StoryMessageSequence
     {
-        return StoryMessageSequence::makeFinalized(
-            new TextMessage(
-                'Для создания новой истории перейдите по ссылке:',
+        return
+            StoryMessageSequence::textFinalized(
+                '[[Follow the link to create a new story]]:',
                 $this->buildStoryCreationUrl(),
                 $this->editorTips()
             )
-        );
+            ->withVar('upload_command', BotCommand::CODE_UPLOAD);
     }
 
     private function storyUpload(): StoryMessageSequence
     {
         return
-            StoryMessageSequence::text(
-                'Загрузите JSON-файл истории, экспортированный из редактора. 👇',
+            StoryMessageSequence::textFinalized(
+                '[[Upload the story JSON file exported from the editor.]] 👇',
                 $this->uploadTips()
             )
-            ->withStage(self::STAGE_UPLOAD)
-            ->finalize();
+            ->withStage(self::STAGE_UPLOAD);
     }
 
+    /**
+     * Add {upload_command} var.
+     */
     private function editorTips(): string
     {
         return Text::join([
-            '🔹 Рекомендуем открывать редактор на компьютере или планшете.',
-            '🔹 После завершения работы на историей экспортируйте ее в JSON-файл и загрузите его сюда, используя команду ' . BotCommand::CODE_UPLOAD
+            '🔹 [[At the moment the editor works only on a desktop!]]',
+            '🔹 [[After editing the story export it into a JSON file and upload it here, using the {upload_command} command.]]'
         ]);
     }
 
     private function uploadTips(): string
     {
-        return 'Отменить загрузку: ' . BotCommand::CODE_CANCEL_UPLOAD;
+        return '[[Cancel the upload]]: ' . BotCommand::CODE_CANCEL_UPLOAD;
     }
 
     private function processUpload(array $documentInfo): StoryMessageSequence
@@ -490,8 +484,14 @@ class Answerer
             }
 
             // 2. check the file size
-            if ($fileSize > self::MAX_JSON_SIZE) {
-                throw new Exception('Размер файла не может превышать ' . self::MAX_JSON_SIZE_NAME . '. Загрузите файл поменьше, пожалуйста.');
+            if ($fileSize > self::MAX_JSON_SIZE * self::MB) {
+                // translate the message right away because we need to set the var
+                throw new Exception(
+                    $this->parse(
+                        '[[The file size cannot exceed {max_json_size} MB. Upload a smaller file, please.]]',
+                        ['max_json_size' => self::MAX_JSON_SIZE]
+                    )
+                );
             }
 
             // 3. get a file link
@@ -545,33 +545,34 @@ class Answerer
 
             // 12. if they can update it, ask them if they want to create a new version or create a new story (mark the original story as a source story)
             if ($canUpdate) {
-                $sequence = StoryMessageSequence::text(
-                    "⚠ История <b>{$story->title()}</b> уже существует.",
-                    'Вы хотите обновить ее или создать новую?',
-                    $this->uploadTips()
-                );
+                $sequence =
+                    StoryMessageSequence::text(
+                        '⚠ [[The story <b>{story_title}</b> already exists.]]',
+                        '[[Would you like to update it or to create a new one?]]',
+                        $this->uploadTips()
+                    )
+                    ->withVar('story_title', $story->title());
 
-                return $this->stage($sequence, self::STAGE_EXISTING_STORY);
+                return $this->setStage($sequence, self::STAGE_EXISTING_STORY);
             }
 
             // 13. if they can't update it, tell them that access is denied, but they can save it as a new story (mark the original story as a source story)
             $sequence = StoryMessageSequence::text(
-                '⛔ Вы пытаетесь загрузить историю, к которой у вас нет доступа.',
-                'Строго говоря, вам не следует этого делать. 🤔',
-                'Но раз мы уже здесь, то вы можете создать новую историю.',
-                'Cоздать новую историю?',
+                '⛔ [[You are trying to upload a story that you don\'t have access to.]]',
+                '[[Strictly speaking, you shouldn\'t do this.]] 🤔',
+                '[[But since we are already here, you can create a new story.]]',
+                '[[Create a new story?]]',
                 $this->uploadTips()
             );
 
-            return $this->stage($sequence, self::STAGE_NOT_ALLOWED_STORY);
+            return $this->setStage($sequence, self::STAGE_NOT_ALLOWED_STORY);
         } catch (Exception $ex) {
             return 
-                StoryMessageSequence::text(
+                StoryMessageSequence::textFinalized(
                     '❌ ' . $ex->getMessage(),
                     $this->uploadTips()
                 )
-                ->withStage(self::STAGE_UPLOAD) // yes, we are still on this stage
-                ->finalize();
+                ->withStage(self::STAGE_UPLOAD); // yes, we are still on this stage
         }
     }
 
@@ -587,8 +588,9 @@ class Answerer
         if (!$storyCandidate) {
             $this->logger->error("Story candidate for Telegram user [{$this->tgUser->getId()}] not found.");
 
-            return StoryMessageSequence::text('❌ Ошибка загрузки. Попробуйте еще раз.')
-                ->finalize();
+            return StoryMessageSequence::textFinalized(
+                '❌ [[Upload error. Try again.]]'
+            );
         }
 
         if ($stage === self::STAGE_EXISTING_STORY && $text === self::ACTION_UPDATE_STORY) {
@@ -601,18 +603,21 @@ class Answerer
 
             $updatedStory = $this->storyService->updateStory($story, $storyCandidate);
 
-            return StoryMessageSequence::text(
-                "✅ История <b>{$updatedStory->title()}</b> успешно обновлена!",
-                'Играть: ' . $updatedStory->toCommand()->codeString()
-            )->finalize();
+            return
+                StoryMessageSequence::textFinalized(
+                    "✅ [[The story <b>{story_title}</b> was successfully updated!]]",
+                    '[[Play]]: ' . $updatedStory->toCommand()->codeString()
+                )
+                ->withVar('story_title', $updatedStory->title());
         }
 
-        if ($text === self::ACTION_NEW_STORY) {
+        // action label must be translated here
+        if ($text === $this->parse(self::ACTION_NEW_STORY)) {
             return $this->newStory($storyCandidate, Uuid::new());
         }
 
         // we stay put
-        return $this->stage(
+        return $this->setStage(
             StoryMessageSequence::text(
                 self::MESSAGE_CLUELESS,
                 $this->uploadTips()
@@ -628,43 +633,42 @@ class Answerer
     {
         $newStory = $this->storyService->newStory($storyCandidate, $uuid);
 
-        return StoryMessageSequence::text(
-            "✅ Новая история <b>{$newStory->title()}</b> успешно создана!",
-            'Играть: ' . $newStory->toCommand()->codeString()
-        )->finalize();
+        return
+            StoryMessageSequence::textFinalized(
+                "✅ [[A new story <b>{story_title}</b> has been successfully created!]]",
+                '[[Play]]: ' . $newStory->toCommand()->codeString()
+            )
+            ->withVar('story_title', $newStory->title());
     }
 
     /**
      * @throws Exception
      */
-    private function stage(StoryMessageSequence $sequence, string $stage): StoryMessageSequence
+    private function setStage(StoryMessageSequence $sequence, string $stage): StoryMessageSequence
     {
+        $sequence->withStage($stage);
+
         if ($stage === self::STAGE_EXISTING_STORY) {
-            return $sequence
-                ->withStage($stage)
-                ->withActions(
-                    self::ACTION_UPDATE_STORY,
-                    self::ACTION_NEW_STORY,
-                    self::ACTION_CANCEL
-                );
+            return $sequence->withActions(
+                self::ACTION_UPDATE_STORY,
+                self::ACTION_NEW_STORY,
+                self::ACTION_CANCEL
+            );
         }
 
         if ($stage === self::STAGE_NOT_ALLOWED_STORY) {
-            return $sequence
-                ->withStage($stage)
-                ->withActions(
-                    self::ACTION_NEW_STORY,
-                    self::ACTION_CANCEL
-                );
+            return $sequence->withActions(
+                self::ACTION_NEW_STORY,
+                self::ACTION_CANCEL
+            );
         }
 
-        throw new Exception("Unknown stage: {$stage}");
+        return $sequence;
     }
 
     private function uploadCanceled(): StoryMessageSequence
     {
-        return StoryMessageSequence::text('✅ Загрузка истории отменена.')
-            ->finalize();;
+        return StoryMessageSequence::textFinalized('✅ [[Story upload canceled.]]');
     }
 
     private function currentStatusMessages(): StoryMessageSequence
