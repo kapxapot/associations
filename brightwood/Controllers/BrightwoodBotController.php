@@ -12,7 +12,6 @@ use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
-use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Parsing\StoryParser;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;

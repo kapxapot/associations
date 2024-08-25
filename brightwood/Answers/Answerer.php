@@ -5,6 +5,7 @@ namespace Brightwood\Answers;
 use App\Core\Interfaces\LinkerInterface;
 use App\External\Interfaces\TelegramTransportInterface;
 use App\External\TelegramTransport;
+use App\Models\Language;
 use App\Models\TelegramUser;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
@@ -39,6 +40,8 @@ use Webmozart\Assert\Assert;
 class Answerer
 {
     use LoggerAwareTrait;
+
+    const DEFAULT_LANGUAGE = Language::EN;
 
     const BRIGHTWOOD_STAGE = 'brightwood_stage';
 
@@ -404,18 +407,22 @@ class Answerer
             ? ['⛔ [[You have no stories available for edit.]]']
             : [
                 '[[You can edit the following stories]]:',
-                ...$stories->map(
-                    fn (Story $s) => sprintf(
-                        '%s %s_%s',
-                        $s->title(),
-                        BotCommand::CODE_EDIT,
-                        $s->getId()
+                Text::join(
+                    $stories->map(
+                        fn (Story $s) => sprintf(
+                            '🔹 %s %s_%s',
+                            $s->title(),
+                            BotCommand::CODE_EDIT,
+                            $s->getId()
+                        )
                     )
                 )
             ];
 
-        $text[] = '[[Create a new story]]: ' . BotCommand::CODE_NEW;
-        $text[] = '[[Upload a new or an edited story]]: ' . BotCommand::CODE_UPLOAD;
+        $text[] = Text::join([
+            '[[Create a new story]]: ' . BotCommand::CODE_NEW,
+            '[[Upload a new or an edited story]]: ' . BotCommand::CODE_UPLOAD,
+        ]);
 
         return StoryMessageSequence::textFinalized(...$text);
     }
@@ -461,7 +468,7 @@ class Answerer
     private function editorTips(): string
     {
         return Text::join([
-            '🔹 [[At the moment the editor works only on a desktop!]]',
+            '🔹 ⚠ [[At the moment the editor works only on a desktop!]]',
             '🔹 [[After editing the story export it into a JSON file and upload it here, using the {upload_command} command.]]'
         ]);
     }
@@ -721,19 +728,21 @@ class Answerer
     private function buildStoryEditUrl(Story $story): string
     {
         return sprintf(
-            '%s?edit=%s',
+            '%s?edit=%s&lng=%s',
             $this->getBuilderUrl(),
             $this->linker->abs(
                 $this->linker->story($story)
-            )
+            ),
+            $this->getLanguageCode()
         );
     }
 
     private function buildStoryCreationUrl(): string
     {
         return sprintf(
-            '%s?new',
-            $this->getBuilderUrl()
+            '%s?new&lng=%s',
+            $this->getBuilderUrl(),
+            $this->getLanguageCode()
         );
     }
 
@@ -743,6 +752,11 @@ class Answerer
             'brightwood.builder_url',
             'https://brightwood-builder.onrender.com'
         );
+    }
+
+    private function getLanguageCode(): string
+    {
+        return $this->tgUser->languageCode() ?? self::DEFAULT_LANGUAGE;
     }
 
     /**
