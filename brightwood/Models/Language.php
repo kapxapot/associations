@@ -68,6 +68,13 @@ class Language implements CommandProviderInterface
         );
     }
 
+    public static function purifyCode(string $code): string
+    {
+        return self::allCodes()->contains($code)
+            ? $code
+            : self::UNKNOWN;
+    }
+
     public function toString(): string
     {
         return $this->__toString();

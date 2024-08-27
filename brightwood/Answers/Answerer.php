@@ -493,13 +493,8 @@ class Answerer
     {
         $stories = $this->storyService->getStoriesPlayableBy($this->tgUser);
 
-        $knownLangCodes = Language::allCodes();
-
         $groups = $stories->group(
-            fn (Story $story) =>
-                $knownLangCodes->contains($story->langCode)
-                    ? $story->langCode
-                    : Language::UNKNOWN
+            fn (Story $story) => Language::purifyCode($story->langCode)
         );
 
         $curLangCode = $langCode ?? $this->tgUser->languageCode();
