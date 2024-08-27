@@ -165,7 +165,8 @@ class StoryMessageSequence implements SequencableInterface
     }
 
     /**
-     * Overrides actions.
+     * Appends actions to the last message if there is any.
+     * Otherwise, sets them to the sequence itself.
      *
      * @return $this
      */
@@ -267,18 +268,51 @@ class StoryMessageSequence implements SequencableInterface
     }
 
     /**
+     * Returns the actions set on the sequence itself.
+     */
+    public function ownActions(): array
+    {
+        return $this->actions;
+    }
+
+    /**
+     * Returns the data set on the sequence itself.
+     */
+    public function ownData(): ?StoryData
+    {
+        return $this->data;
+    }
+
+    /**
      * Concats messages and creates a NEW sequence.
      *
      * `isFinalized` is taken from the `$other` sequence.
      */
     public function merge(self $other): self
     {
+        // messages - merge
         $sequence = new self(...$this->messages);
         $sequence->add(...$other->messages());
 
+        // actions - override only own actions
+        if (!empty($other->ownActions())) {
+            $sequence->withActions(
+                ...$other->ownActions()
+            );
+        }
+
+        // data - override only own data
+        if ($other->ownData()) {
+            $sequence->withData(
+                $other->ownData()
+            );
+        }
+
+        // vars - merge
         $sequence->withVars($this->vars());
         $sequence->withVars($other->vars());
 
+        // stage - override if defined
         if ($this->stage()) {
             $sequence->withStage($this->stage());
         }
@@ -287,6 +321,7 @@ class StoryMessageSequence implements SequencableInterface
             $sequence->withStage($other->stage());
         }
 
+        // finalized - override
         return $sequence->finalize(
             $other->isFinalized()
         );

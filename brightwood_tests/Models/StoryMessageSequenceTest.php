@@ -2,6 +2,7 @@
 
 namespace Brightwood\Tests\Models;
 
+use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
@@ -97,6 +98,46 @@ final class StoryMessageSequenceTest extends TestCase
                 true
             ]
         ];
+    }
+
+    public function testMergeMergesActions()
+    {
+        $sequence1 = StoryMessageSequence::empty()
+            ->withActions('one');
+
+        $sequence2 = StoryMessageSequence::empty()
+            ->withActions('two');
+
+        $merged = $sequence1->merge($sequence2);
+        $actions = $merged->actions();
+
+        $this->assertCount(1, $actions);
+        $this->assertEquals('two', $actions[0]);
+    }
+
+    public function testMergeMergesData()
+    {
+        $sequence1 = StoryMessageSequence::empty()
+            ->withData(new StoryData([
+                'first' => 1,
+                'second' => 2,
+            ]));
+
+        $sequence2 = StoryMessageSequence::empty()
+            ->withData(new StoryData([
+                'second' => 10,
+                'third' => 3,
+            ]));
+
+        $merged = $sequence1->merge($sequence2);
+
+        $this->assertInstanceOf(StoryData::class, $merged->data());
+
+        $data = $merged->data()->toArray();
+
+        $this->assertCount(2, $data);
+        $this->assertEquals(10, $data['second']);
+        $this->assertEquals(3, $data['third']);
     }
 
     public function testMergeMergesVars()

@@ -5,6 +5,7 @@ namespace Brightwood\Tests\Models\Cards;
 use App\Models\TelegramUser;
 use Brightwood\Collections\Cards\CardCollection;
 use Brightwood\Collections\Cards\PlayerCollection;
+use Brightwood\JsonDataLoader;
 use Brightwood\Models\Cards\Actions\Eights\SixGiftAction;
 use Brightwood\Models\Cards\Card;
 use Brightwood\Models\Cards\Games\EightsGame;
@@ -148,9 +149,7 @@ final class EightsDataTest extends SerializationTestCase
 
     public function testDeserialize(): void
     {
-        $jsonStr = file_get_contents('brightwood_tests/Files/eights_data.json');
-
-        $jsonData = json_decode($jsonStr, true, 512, JSON_THROW_ON_ERROR);
+        $jsonData = JsonDataLoader::load('brightwood_tests/Files/eights_data.json');
 
         $this->assertIsArray($jsonData);
 

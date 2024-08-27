@@ -15,7 +15,7 @@ class EightsDataSerializer implements SerializerInterface
         RootDeserializerInterface $rootDeserializer,
         object $obj,
         array $data
-    ) : EightsData
+    ): EightsData
     {
         return $obj
             ->withPlayerCount($data['player_count'])

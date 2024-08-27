@@ -28,7 +28,7 @@ class EightsGameSerializer extends CardGameSerializer
         RootDeserializerInterface $rootDeserializer,
         object $obj,
         array $data
-    ) : EightsGame
+    ): EightsGame
     {
         /** @var EightsGame */
         $obj = parent::deserialize($rootDeserializer, $obj, $data);
