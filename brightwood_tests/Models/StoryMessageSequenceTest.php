@@ -98,4 +98,59 @@ final class StoryMessageSequenceTest extends TestCase
             ]
         ];
     }
+
+    public function testMergeMergesVars()
+    {
+        $sequence1 = StoryMessageSequence::empty()
+            ->withVars([
+                'first' => 1,
+                'second' => 2,
+            ]);
+
+        $sequence2 = StoryMessageSequence::empty()
+            ->withVars([
+                'second' => 10,
+                'third' => 3,
+            ]);
+
+        $merged = $sequence1->merge($sequence2);
+        $vars = $merged->vars();
+
+        $this->assertCount(3, $vars);
+        $this->assertEquals(1, $vars['first']);
+        $this->assertEquals(10, $vars['second']);
+        $this->assertEquals(3, $vars['third']);
+    }
+
+    /**
+     * @dataProvider mergeStageProvider
+     */
+    public function testMergeMergesStage(?string $stage1, ?string $stage2, ?string $expected)
+    {
+        $sequence1 = StoryMessageSequence::empty();
+        $sequence2 = StoryMessageSequence::empty();
+
+        if ($stage1) {
+            $sequence1->withStage($stage1);
+        }
+
+        if ($stage2) {
+            $sequence2->withStage($stage2);
+        }
+
+        $merged = $sequence1->merge($sequence2);
+        $stage = $merged->stage();
+
+        $this->assertEquals($expected, $stage);
+    }
+
+    public function mergeStageProvider(): array
+    {
+        return [
+            [null, null, null],
+            ['stage1', null, 'stage1'],
+            [null, 'stage2', 'stage2'],
+            ['stage1', 'stage2', 'stage2'],
+        ];
+    }
 }

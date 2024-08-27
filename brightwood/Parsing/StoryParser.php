@@ -10,6 +10,9 @@ use Plasticode\Semantics\Gender;
 
 class StoryParser
 {
+    private const DEFAULT_LANGUAGE = Language::RU; // for historical reasons
+    private const DEFAULT_GENDER = Gender::MAS;
+
     private MessageRendererFactory $rendererFactory;
     private TranslatorFactoryInterface $translatorFactory;
 
@@ -28,11 +31,12 @@ class StoryParser
     public function parse(
         ActorInterface $actor,
         string $text,
-        ?array $vars = null
+        ?array $vars = null,
+        ?string $defaultLangCode = null
     ): string
     {
-        $langCode = $actor->languageCode() ?? Language::RU;
-        $gender = $actor->gender() ?? Gender::MAS;
+        $langCode = $actor->languageCode() ?? $defaultLangCode ?? self::DEFAULT_LANGUAGE;
+        $gender = $actor->gender() ?? self::DEFAULT_GENDER;
 
         $translator = ($this->translatorFactory)($langCode);
 

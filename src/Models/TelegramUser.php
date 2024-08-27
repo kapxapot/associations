@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Interfaces\ActorInterface;
 use App\Models\Interfaces\NamedInterface;
+use App\Models\Traits\Actor;
 use App\Models\Traits\Meta;
 use Exception;
 use Plasticode\Models\Generic\DbModel;
@@ -26,6 +27,7 @@ use Plasticode\Models\Traits\UpdatedAt;
  */
 class TelegramUser extends DbModel implements CreatedAtInterface, ActorInterface, NamedInterface, UpdatedAtInterface
 {
+    use Actor;
     use CreatedAt;
     use Meta;
     use UpdatedAt;
@@ -155,12 +157,7 @@ class TelegramUser extends DbModel implements CreatedAtInterface, ActorInterface
         return $this->dirty;
     }
 
-    // ActorInterface
-
-    public function hasGender(): bool
-    {
-        return $this->genderId !== null;
-    }
+    // ActorInterface (see Actor for the rest)
 
     public function gender(): ?int
     {

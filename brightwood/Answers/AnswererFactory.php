@@ -26,7 +26,7 @@ class AnswererFactory
         TelegramTransportFactory $telegramFactory
     )
     {
-        $this->invoker = fn (TelegramUser $tgUser) => new Answerer(
+        $this->invoker = fn (TelegramUser $tgUser, string $tgLangCode) => new Answerer(
             $logger,
             $settingsProvider,
             $linker,
@@ -34,12 +34,13 @@ class AnswererFactory
             $storyService,
             $parser,
             $telegramFactory,
-            $tgUser
+            $tgUser,
+            $tgLangCode
         );
     }
 
-    public function __invoke(TelegramUser $tgUser): Answerer
+    public function __invoke(TelegramUser $tgUser, string $tgLangCode): Answerer
     {
-        return ($this->invoker)($tgUser);
+        return ($this->invoker)($tgUser, $tgLangCode);
     }
 }

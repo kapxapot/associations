@@ -276,6 +276,17 @@ class StoryMessageSequence implements SequencableInterface
         $sequence = new self(...$this->messages);
         $sequence->add(...$other->messages());
 
+        $sequence->withVars($this->vars());
+        $sequence->withVars($other->vars());
+
+        if ($this->stage()) {
+            $sequence->withStage($this->stage());
+        }
+
+        if ($other->stage()) {
+            $sequence->withStage($other->stage());
+        }
+
         return $sequence->finalize(
             $other->isFinalized()
         );

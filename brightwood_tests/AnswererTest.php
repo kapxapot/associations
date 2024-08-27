@@ -94,7 +94,7 @@ final class AnswererTest extends TestCase
             'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug1.json')
         ]);
 
-        $answerer = ($this->answererFactory)($tgUser);
+        $answerer = ($this->answererFactory)($tgUser, Language::RU);
         $answers = $answerer->getAnswers('♻ Начать заново');
 
         $this->assertInstanceOf(StoryMessageSequence::class, $answers);
@@ -118,7 +118,7 @@ final class AnswererTest extends TestCase
             'json_data' => file_get_contents('brightwood_tests/Files/eights_data_debug2.json')
         ]);
 
-        $answerer = ($this->answererFactory)($tgUser);
+        $answerer = ($this->answererFactory)($tgUser, Language::RU);
         $answers = $answerer->getAnswers('4');
 
         $this->assertInstanceOf(StoryMessageSequence::class, $answers);

@@ -9,7 +9,6 @@ use App\Models\Language;
 use App\Models\TelegramUser;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
-use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
@@ -45,12 +44,17 @@ class Answerer
 
     const BRIGHTWOOD_STAGE = 'brightwood_stage';
 
+    private const STAGE_GENDER = 'gender';
+    private const STAGE_LANGUAGE = 'language';
     private const STAGE_UPLOAD = 'upload';
     private const STAGE_EXISTING_STORY = 'existing_story';
     private const STAGE_NOT_ALLOWED_STORY = 'not_allowed_story';
 
     private const MB = 1024 * 1024; // 1 Mb
     private const MAX_JSON_SIZE = 1; // Mb
+
+    private const ACTION_EN = '🇬🇧 English';
+    private const ACTION_RU = '🇷🇺 Русский';
 
     private const ACTION_MAS = '👦 [[Boy]]';
     private const ACTION_FEM = '👧 [[Girl]]';
@@ -72,6 +76,7 @@ class Answerer
     private TelegramTransportInterface $telegram;
 
     private TelegramUser $tgUser;
+    private string $tgLangCode;
 
     public function __construct(
         LoggerInterface $logger,
@@ -81,7 +86,8 @@ class Answerer
         StoryService $storyService,
         StoryParser $parser,
         TelegramTransportFactory $telegramFactory,
-        TelegramUser $tgUser
+        TelegramUser $tgUser,
+        string $tgLangCode
     )
     {
         $this->withLogger($logger);
@@ -95,6 +101,7 @@ class Answerer
         $this->telegram = ($telegramFactory)();
 
         $this->tgUser = $tgUser;
+        $this->tgLangCode = $tgLangCode;
     }
 
     public function getAnswers(
@@ -102,15 +109,28 @@ class Answerer
         ?array $documentInfo = null
     ): StoryMessageSequence
     {
+        $stage = $this->tgUser->getMetaValue(self::BRIGHTWOOD_STAGE);
+
+        // check language
+        if ($stage === self::STAGE_LANGUAGE) {
+            return $this->readLanguage($text);
+        }
+
+        // check gender
+        if ($stage === self::STAGE_GENDER) {
+            return $this->readGender($text);
+        }
+
         // start command
         if (Strings::startsWith($text, BotCommand::CODE_START)) {
             return $this->startCommand();
         }
 
-        // check gender
-        // todo: use stage for this? but must be mandatory
-        if (!$this->tgUser->hasGender()) {
-            return $this->readGender($text);
+        // check required stages
+        $requiredStageMessages = $this->getRequiredStageMessages();
+
+        if (!$requiredStageMessages->isEmpty()) {
+            return $requiredStageMessages;
         }
 
         // try executing story-specific commands
@@ -119,7 +139,7 @@ class Answerer
 
             if (!$executionResults->isEmpty()) {
                 return $executionResults->merge(
-                    $this->currentStatusMessages()
+                    $this->whereAreWe()
                 );
             }
         }
@@ -182,8 +202,6 @@ class Answerer
             return $this->storyUpload();
         }
 
-        $stage = $this->tgUser->getMetaValue(self::BRIGHTWOOD_STAGE);
-
         if ($text === BotCommand::CODE_CANCEL_UPLOAD) {
             if (in_array($stage, $this->uploadStages())) {
                 return $this->uploadCanceled();
@@ -224,8 +242,47 @@ class Answerer
             );
         }
 
+        $status = $this->getStatus();
+
+        $cluelessMessage = new TextMessage(self::MESSAGE_CLUELESS);
+
+        if (!$status) {
+            return StoryMessageSequence::mash(
+                $cluelessMessage,
+                $this->whereAreWe()
+            );
+        }
+
         // default - next step
-        return $this->nextStep($text);
+        $nextStepSequence = $this->nextStep($status, $text);
+
+        if (!$nextStepSequence->isEmpty()) {
+            return $nextStepSequence;
+        }
+
+        return StoryMessageSequence::mash(
+            $cluelessMessage,
+            $this->whereAreWe()
+        );
+    }
+
+    private function whereAreWe(): StoryMessageSequence
+    {
+        // check for required stages
+        $requiredMessages = $this->getRequiredStageMessages();
+
+        if (!$requiredMessages->isEmpty()) {
+            return $requiredMessages;
+        }
+
+        $status = $this->getStatus();
+
+        // new player
+        if (!$status) {
+            return $this->storySelection();
+        }
+
+        return $this->statusToMessages($status, true);
     }
 
     private function errorMessage(string $message, ?array $vars = null): StoryMessageSequence
@@ -233,32 +290,82 @@ class Answerer
         return
             StoryMessageSequence::mash(
                 new TextMessage("❌ {$message}"),
-                $this->currentStatusMessages()
+                $this->whereAreWe()
             )
             ->withVars($vars);
     }
 
     private function startCommand(): StoryMessageSequence
     {
-        $status = $this->getStatus();
-        $isReader = $status !== null;
+        $greeting = $this->isNewPlayer()
+            ? '[[Welcome, <b>{user_name}</b>!]]'
+            : '[[Welcome back, <b>{user_name}</b>!]]';
 
-        $greeting = $isReader
-            ? '[[Welcome back, <b>{user_name}</b>!]]'
-            : '[[Welcome, <b>{user_name}</b>!]]';
-
-        $sequence = StoryMessageSequence::text($greeting)
+        return
+            StoryMessageSequence::mash(
+                new TextMessage($greeting),
+                $this->whereAreWe()
+            )
             ->withVar('user_name', $this->tgUser->privateName());
+    }
 
-        if (!$this->tgUser->hasGender()) {
-            return $sequence->add(
-                $this->askGender()
+    /**
+     * Checks if the user has to go through a required stage such as
+     * gender or language selection.
+     */
+    private function getRequiredStageMessages(): StoryMessageSequence
+    {
+        $stages = [
+            self::STAGE_LANGUAGE => [
+                'check' => fn () => $this->tgUser->hasLanguageCode(),
+                'messages' => fn () => $this->askLanguage(),
+            ],
+            self::STAGE_GENDER => [
+                'check' => fn () => $this->tgUser->hasGender(),
+                'messages' => fn () => $this->askGender(),
+            ],
+        ];
+
+        foreach ($stages as $stage) {
+            if (!($stage['check'])()) {
+                return ($stage['messages'])();
+            }
+        }
+
+        return StoryMessageSequence::empty();
+    }
+
+    private function readLanguage(string $text): StoryMessageSequence
+    {
+        /** @var string|null */
+        $langCode = null;
+
+        switch ($text) {
+            case self::ACTION_EN:
+                $langCode = Language::EN;
+                break;
+
+            case self::ACTION_RU:
+                $langCode = Language::RU;
+                break;
+        }
+
+        if (!$langCode) {
+            return StoryMessageSequence::mash(
+                new TextMessage('[[You\'ve written something wrong.]] 🤔'),
+                $this->askLanguage()
             );
         }
 
-        return $sequence->merge(
-            $this->storySelection()
-        );
+        $this->tgUser->withLangCode($langCode);
+
+        return
+            StoryMessageSequence::mash(
+                new TextMessage(
+                    '[[Thank you! Your language preference has been saved and will now be taken into account.]] 👌'
+                ),
+                $this->whereAreWe()
+            );
     }
 
     private function readGender(string $text): StoryMessageSequence
@@ -277,10 +384,8 @@ class Answerer
                 break;
         }
 
-        $genderIsOk = ($gender !== null);
-
-        if (!$genderIsOk) {
-            return new StoryMessageSequence(
+        if (!$gender) {
+            return StoryMessageSequence::mash(
                 new TextMessage('[[You\'ve written something wrong.]] 🤔'),
                 $this->askGender()
             );
@@ -288,20 +393,37 @@ class Answerer
 
         $this->tgUser->withGenderId($gender);
 
-        return StoryMessageSequence::mash(
-            new TextMessage(
-                '[[Thank you, dear {👦|👧}, your gender has been saved and will now be taken into account.]] 👌'
-            ),
-            $this->storySelection()
-        );
+        return
+            StoryMessageSequence::mash(
+                new TextMessage(
+                    '[[Thank you, dear {👦|👧}, your gender has been saved and will now be taken into account.]] 👌'
+                ),
+                $this->whereAreWe()
+            );
     }
 
-    private function askGender(): MessageInterface
+    private function askLanguage(): StoryMessageSequence
     {
-        return new Message(
-            ['[[For better story texts, please provide your <b>gender</b>]]:'],
-            [self::ACTION_MAS, self::ACTION_FEM]
-        );
+        return
+            StoryMessageSequence::make(
+                new Message(
+                    ['[[Please, select your preferred <b>language</b>]]:'],
+                    [self::ACTION_EN, self::ACTION_RU]
+                )
+            )
+            ->withStage(self::STAGE_LANGUAGE);
+    }
+
+    private function askGender(): StoryMessageSequence
+    {
+        return
+            StoryMessageSequence::make(
+                new Message(
+                    ['[[For better story texts, please provide your <b>gender</b>]]:'],
+                    [self::ACTION_MAS, self::ACTION_FEM]
+                )
+            )
+            ->withStage(self::STAGE_GENDER);
     }
 
     private function executeStoryCommand(string $command): StoryMessageSequence
@@ -323,19 +445,8 @@ class Answerer
         );
     }
 
-    private function nextStep(string $text): StoryMessageSequence
+    private function nextStep(StoryStatus $status, string $text): StoryMessageSequence
     {
-        $status = $this->getStatus();
-
-        $cluelessMessage = new TextMessage(self::MESSAGE_CLUELESS);
-
-        if (!$status) {
-            return StoryMessageSequence::mash(
-                $cluelessMessage,
-                $this->storySelection()
-            );
-        }
-
         $story = $this->getStatusStory($status);
         $node = $story->getNode($status->stepId);
 
@@ -345,19 +456,21 @@ class Answerer
 
         $sequence = $story->go($this->tgUser, $node, $data, $text);
 
-        if ($sequence) {
-            $status->stepId = $sequence->nodeId();
-            $status->jsonData = json_encode($sequence->data());
-
-            $this->storyStatusRepository->save($status);
-
-            return $sequence;
+        if (!$sequence) {
+            return StoryMessageSequence::empty();
         }
 
-        return StoryMessageSequence::mash(
-            $cluelessMessage,
-            $this->currentStatusMessages()
-        );
+        $this->updateStatus($status, $sequence);
+
+        return $sequence;
+    }
+
+    private function updateStatus(StoryStatus $status, StoryMessageSequence $sequence): void
+    {
+        $status->stepId = $sequence->nodeId();
+        $status->jsonData = json_encode($sequence->data());
+
+        $this->storyStatusRepository->save($status);
     }
 
     private function storySelection(): StoryMessageSequence
@@ -678,15 +791,6 @@ class Answerer
         return StoryMessageSequence::textFinalized('✅ [[Story upload canceled.]]');
     }
 
-    private function currentStatusMessages(): StoryMessageSequence
-    {
-        $status = $this->getStatus();
-
-        Assert::notNull($status);
-
-        return $this->statusToMessages($status, true);
-    }
-
     private function statusToMessages(
         StoryStatus $status,
         bool $ignoreFinish = false
@@ -710,11 +814,6 @@ class Answerer
     private function getStory(int $storyId): ?Story
     {
         return $this->storyService->getStory($storyId);
-    }
-
-    private function getStatus(): ?StoryStatus
-    {
-        return $this->storyStatusRepository->getByTelegramUser($this->tgUser);
     }
 
     private function getStatusStory(StoryStatus $status): Story
@@ -773,6 +872,16 @@ class Answerer
 
     private function parse(string $text, ?array $vars = null): string
     {
-        return $this->parser->parse($this->tgUser, $text, $vars);
+        return $this->parser->parse($this->tgUser, $text, $vars, $this->tgLangCode);
+    }
+
+    private function isNewPlayer(): bool
+    {
+        return !$this->getStatus();
+    }
+
+    private function getStatus(): ?StoryStatus
+    {
+        return $this->storyStatusRepository->getByTelegramUser($this->tgUser);
     }
 }

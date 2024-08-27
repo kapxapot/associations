@@ -110,9 +110,11 @@ class BrightwoodBotController
         $document = $message['document'] ?? null;
 
         $from = $message['from'];
+        $tgLangCode = $from['language_code'];
+
         $tgUser = $this->getTelegramUser($from);
 
-        return $this->tryGetAnswers($tgUser, $chatId, $text, $document);
+        return $this->tryGetAnswers($tgUser, $tgLangCode, $chatId, $text, $document);
     }
 
     private function getTelegramUser(array $data): TelegramUser
@@ -128,13 +130,14 @@ class BrightwoodBotController
 
     private function tryGetAnswers(
         TelegramUser $tgUser,
+        string $tgLangCode,
         string $chatId,
         ?string $text,
         ?array $document
     ): ArrayCollection
     {
         try {
-            return $this->getAnswers($tgUser, $chatId, $text, $document);
+            return $this->getAnswers($tgUser, $tgLangCode, $chatId, $text, $document);
         } catch (Exception $ex) {
             $this->logger->error($ex->getMessage());
 
@@ -150,6 +153,7 @@ class BrightwoodBotController
                 $chatId,
                 $this->parse(
                     $tgUser,
+                    $tgLangCode,
                     '[[Something went wrong.]] 😐'
                 )
             )
@@ -161,12 +165,13 @@ class BrightwoodBotController
      */
     private function getAnswers(
         TelegramUser $tgUser,
+        string $tgLangCode,
         string $chatId,
         ?string $text,
         ?array $document
     ): ArrayCollection
     {
-        $answerer = ($this->answererFactory)($tgUser);
+        $answerer = ($this->answererFactory)($tgUser, $tgLangCode);
         $sequence = $answerer->getAnswers($text, $document);
 
         $this->updateTelegramUser($tgUser, $sequence->stage());
@@ -197,6 +202,7 @@ class BrightwoodBotController
                     fn (MessageInterface $message) =>
                         $this->toTelegramMessage(
                             $tgUser,
+                            $tgLangCode,
                             $chatId,
                             $message,
                             $defaultActions,
@@ -228,6 +234,7 @@ class BrightwoodBotController
      */
     private function toTelegramMessage(
         TelegramUser $tgUser,
+        string $tgLangCode,
         string $chatId,
         MessageInterface $message,
         array $defaultActions,
@@ -238,7 +245,7 @@ class BrightwoodBotController
             $message->appendActions(...$defaultActions);
         }
 
-        $message = $this->parseMessage($tgUser, $message, $vars);
+        $message = $this->parseMessage($tgUser, $tgLangCode, $message, $vars);
         $actions = $message->actions();
 
         Assert::notEmpty(
@@ -270,6 +277,7 @@ class BrightwoodBotController
 
     private function parseMessage(
         TelegramUser $tgUser,
+        string $tgLangCode,
         MessageInterface $message,
         array $vars
     ): MessageInterface
@@ -279,7 +287,7 @@ class BrightwoodBotController
             $vars
         );
 
-        $parse = fn (string $text) => $this->parse($tgUser, $text, $combinedVars);
+        $parse = fn (string $text) => $this->parse($tgUser, $tgLangCode, $text, $combinedVars);
 
         $lines = array_map($parse, $message->lines());
         $actions = array_map($parse, $message->actions());
@@ -292,8 +300,13 @@ class BrightwoodBotController
         return Text::sparseJoin($message->lines());
     }
 
-    private function parse(TelegramUser $tgUser, string $text, ?array $vars = null): string
+    private function parse(
+        TelegramUser $tgUser,
+        string $tgLangCode,
+        string $text,
+        ?array $vars = null
+    ): string
     {
-        return $this->parser->parse($tgUser, $text, $vars);
+        return $this->parser->parse($tgUser, $text, $vars, $tgLangCode);
     }
 }
