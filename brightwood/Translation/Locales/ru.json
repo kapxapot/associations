@@ -50,5 +50,7 @@
     "Upload error. Try again.": "Ошибка загрузки. Попробуйте еще раз.",
     "The story <b>{story_title}</b> was successfully updated!": "История <b>{story_title}</b> успешно обновлена!",
     "Please, select your preferred <b>language</b>": "Пожалуйста, выберите удобный для вас <b>язык</b>",
-    "Thank you! Your language preference has been saved and will now be taken into account.": "Спасибо! Ваш выбор языка сохранен и теперь будет учитываться."
+    "Thank you! Your language preference has been saved and will now be taken into account.": "Спасибо! Ваш выбор языка сохранен и теперь будет учитываться.",
+    "You cannot access this story anymore, sorry.": "У вас больше нет доступа к этой истории, извините.",
+    "Please, select another story.": "Пожалуйста, выберите другую историю."
 }

@@ -243,7 +243,6 @@ class Answerer
         }
 
         $status = $this->getStatus();
-
         $cluelessMessage = new TextMessage(self::MESSAGE_CLUELESS);
 
         if (!$status) {
@@ -448,6 +447,20 @@ class Answerer
     private function nextStep(StoryStatus $status, string $text): StoryMessageSequence
     {
         $story = $this->getStatusStory($status);
+
+        if ($text === $this->parse(BotCommand::RESTART)) {
+            $playable = $this->storyService->isStoryPlayableBy($story, $this->tgUser);
+
+            if ($playable) {
+                return $this->startStory($story);
+            }
+
+            return StoryMessageSequence::textFinalized(
+                '[[You cannot access this story anymore, sorry.]]',
+                '[[Please, select another story.]]'
+            );
+        }
+
         $node = $story->getNode($status->stepId);
 
         Assert::notNull($node);
@@ -793,16 +806,17 @@ class Answerer
 
     private function statusToMessages(
         StoryStatus $status,
-        bool $ignoreFinish = false
+        bool $omitFinish = false
     ): StoryMessageSequence
     {
         $story = $this->getStatusStory($status);
-        $node = $story->getNode($status->stepId);
-        $data = $story->makeData($status->data());
 
-        if ($ignoreFinish && $node->isFinish($data)) {
+        if ($omitFinish && $story->isFinished($status)) {
             return StoryMessageSequence::makeFinalized();
         }
+
+        $node = $story->getNode($status->stepId);
+        $data = $story->makeData($status->data());
 
         return $story->renderNode(
             $status->telegramUser(),

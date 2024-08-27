@@ -5,7 +5,6 @@ namespace Brightwood\Models\Stories\Core;
 use App\Models\TelegramUser;
 use App\Models\Traits\Created;
 use Brightwood\Collections\StoryNodeCollection;
-use Brightwood\Models\BotCommand;
 use Brightwood\Models\Command;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Interfaces\CommandProviderInterface;
@@ -15,6 +14,7 @@ use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\AbstractStoryNode;
+use Brightwood\Models\StoryStatus;
 use Brightwood\Models\StoryVersion;
 use InvalidArgumentException;
 use Plasticode\Exceptions\InvalidConfigurationException;
@@ -213,6 +213,14 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
         );
     }
 
+    public function isFinished(StoryStatus $status): bool
+    {
+        $node = $this->getNode($status->stepId);
+        $data = $this->makeData($status->data());
+
+        return $node->isFinish($data);
+    }
+
     /**
      * Attempts to go to the next node + renders it.
      *
@@ -228,12 +236,6 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
         string $input
     ): ?StoryMessageSequence
     {
-        if ($node->isFinish($data)) {
-            return ($input === BotCommand::RESTART)
-                ? $this->start($tgUser)
-                : null;
-        }
-
         if ($node instanceof FunctionNode) {
             return $this->renderNode($tgUser, $node, $data, $input);
         }
