@@ -594,7 +594,7 @@ class Answerer
     private function editorTips(): string
     {
         return Text::join([
-            '🔹 ⚠ [[At the moment the editor works only on a desktop!]]',
+            '🔹 ⚠ [[At the moment, the editor works correctly only on a <b>desktop</b>!]]',
             '🔹 [[After editing the story export it into a JSON file and upload it here, using the {upload_command} command.]]'
         ]);
     }
@@ -711,7 +711,8 @@ class Answerer
 
     private function processOverwrite(string $stage, string $text): StoryMessageSequence
     {
-        if ($text === self::ACTION_CANCEL) {
+        // action label must be translated here
+        if ($text === $this->parse(self::ACTION_CANCEL)) {
             $this->storyService->deleteStoryCandidateFor($this->tgUser);
             return $this->uploadCanceled();
         }
@@ -726,7 +727,11 @@ class Answerer
             );
         }
 
-        if ($stage === self::STAGE_EXISTING_STORY && $text === self::ACTION_UPDATE_STORY) {
+        // action label must be translated here
+        if (
+            $stage === self::STAGE_EXISTING_STORY
+            && $text === $this->parse(self::ACTION_UPDATE_STORY)
+        ) {
             $story = $this->storyService->getStoryByUuid($storyCandidate->uuid);
 
             // if the story was deleted for some reason...

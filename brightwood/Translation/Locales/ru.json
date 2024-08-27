@@ -37,7 +37,7 @@
     "A new story <b>{story_title}</b> has been successfully created!": "Новая история <b>{story_title}</b> успешно создана!",
     "Play": "Играть",
     "Upload the story JSON file exported from the editor.": "Загрузите JSON-файл истории, экспортированный из редактора.",
-    "At the moment the editor works only on a desktop!": "На данный момент редактор работает только на компьютере!",
+    "At the moment, the editor works correctly only on a <b>desktop</b>!": "На данный момент редактор работает корректно только на <b>компьютере</b>!",
     "After editing the story export it into a JSON file and upload it here, using the {upload_command} command.": "После редактирования истории экспортируйте ее в JSON-файл и загрузите его сюда, используя команду {upload_command}",
     "Cancel the upload": "Отменить загрузку",
     "The file size cannot exceed {max_json_size} MB. Upload a smaller file, please.": "Размер файла не может превышать {max_json_size} Мб. Загрузите файл поменьше, пожалуйста.",
