@@ -69,10 +69,10 @@ class StoryService
             : null;
     }
 
-    public function getStoriesPlayableBy(TelegramUser $tgUser): StoryCollection
+    public function getStoriesPlayableBy(TelegramUser $tgUser, ?string $langCode = null): StoryCollection
     {
         return $this->toRichStories(
-            $this->storyRepository->getAllPlayableBy($tgUser)
+            $this->storyRepository->getAllPlayableBy($tgUser, $langCode)
         );
     }
 

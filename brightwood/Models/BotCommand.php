@@ -14,4 +14,5 @@ class BotCommand
     const CODE_NEW = '/new';
     const CODE_UPLOAD = '/upload';
     const CODE_CANCEL_UPLOAD = '/cancel_upload';
+    const CODE_STORY_LANG_UNKNOWN = '/story_lang_' . Language::UNKNOWN;
 }

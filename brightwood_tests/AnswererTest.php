@@ -2,13 +2,13 @@
 
 namespace Brightwood\Tests;
 
-use App\Models\Language;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\LinkerMock;
 use Brightwood\Answers\AnswererFactory;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Models\Data\EightsData;
+use Brightwood\Models\Language;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Parsing\StoryParserFactory;

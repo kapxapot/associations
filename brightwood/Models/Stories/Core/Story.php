@@ -25,6 +25,7 @@ use Webmozart\Assert\Assert;
 
 /**
  * @property integer $id
+ * @property string|null $langCode
  * @property integer|null $sourceStoryId
  * @property string|null $uuid
  * @method StoryVersion|null currentVersion()

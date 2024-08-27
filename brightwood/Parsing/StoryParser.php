@@ -4,7 +4,7 @@ namespace Brightwood\Parsing;
 
 use App\Bots\Factories\MessageRendererFactory;
 use App\Models\Interfaces\ActorInterface;
-use App\Models\Language;
+use Brightwood\Models\Language;
 use Brightwood\Translation\Interfaces\TranslatorFactoryInterface;
 use Plasticode\Semantics\Gender;
 

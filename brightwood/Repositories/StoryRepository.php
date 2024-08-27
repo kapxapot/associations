@@ -60,16 +60,20 @@ class StoryRepository extends IdiormRepository implements StoryRepositoryInterfa
         );
     }
 
-    public function getAllPlayableBy(TelegramUser $tgUser): StoryCollection
+    public function getAllPlayableBy(TelegramUser $tgUser, ?string $langCode = null): StoryCollection
     {
         $user = $tgUser->user();
 
         $query = $this
             ->query()
             ->whereRaw(
-                'created_by is null or created_by = ?',
+                '(created_by is null or created_by = ?)',
                 [$user->getId()]
             );
+
+        if ($langCode) {
+            $query = $query->where('lang_code', $langCode);
+        }
 
         return StoryCollection::from($query);
     }

@@ -5,10 +5,10 @@ namespace Brightwood\Answers;
 use App\Core\Interfaces\LinkerInterface;
 use App\External\Interfaces\TelegramTransportInterface;
 use App\External\TelegramTransport;
-use App\Models\Language;
 use App\Models\TelegramUser;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
+use Brightwood\Models\Language;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
@@ -20,9 +20,12 @@ use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
 use Brightwood\Util\Uuid;
 use Exception;
+use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Semantics\Gender;
+use Plasticode\Semantics\Sentence;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
+use Plasticode\Util\Sort;
 use Plasticode\Util\Strings;
 use Plasticode\Util\Text;
 use Psr\Log\LoggerInterface;
@@ -486,20 +489,75 @@ class Answerer
         $this->storyStatusRepository->save($status);
     }
 
-    private function storySelection(): StoryMessageSequence
+    private function storySelection(?string $langCode = null): StoryMessageSequence
     {
         $stories = $this->storyService->getStoriesPlayableBy($this->tgUser);
 
-        if ($stories->isEmpty()) {
-            return StoryMessageSequence::textFinalized('⛔ [[No stories.]]');
+        $knownLangCodes = Language::allCodes();
+
+        $groups = $stories->group(
+            fn (Story $story) =>
+                $knownLangCodes->contains($story->langCode)
+                    ? $story->langCode
+                    : Language::UNKNOWN
+        );
+
+        $curLangCode = $langCode ?? $this->tgUser->languageCode();
+        $curLangStories = $groups[$curLangCode] ?? null;
+        $curLang = Language::fromCode($curLangCode);
+
+        if (!$curLangStories || $curLangStories->isEmpty()) {
+            return StoryMessageSequence::textFinalized("⛔ [[No stories in {language}.]]")
+                ->withVar('language', $curLang);
         }
 
-        return
+        $sequence =
             StoryMessageSequence::mash(
-                new TextMessage('[[Select a story]]:'),
-                $stories->toInfo()
+                new TextMessage("[[Select a story in {language}]]:"),
+                $curLangStories->toInfo()
             )
-            ->finalize();
+            ->withVar('language', $curLang);
+
+        $groupInfos = ArrayCollection::empty();
+
+        foreach ($groups as $langCode => $group) {
+            if ($langCode === $curLangCode) {
+                continue;
+            }
+
+            $groupInfos = $groupInfos->add([
+                'language' => Language::fromCode($langCode),
+                'stories' => $group,
+                'count' => count($group),
+            ]);
+        }
+
+        if (!empty($groupInfos)) {
+            $sequence->addText(
+                '[[There are also stories in other languages]]:',
+                Text::join(
+                    $groupInfos
+                        ->orderBy('count', Sort::DESC)
+                        ->stringize(
+                            function (array $info) {
+                                $language = $info['language'];
+
+                                return sprintf(
+                                    '🔹 %s (%s) %s',
+                                    $language ?? '[[Unknown language]]',
+                                    $info['count'],
+                                    $language
+                                        ? $language->toCommand()->codeString()
+                                        : BotCommand::CODE_STORY_LANG_UNKNOWN
+                                );
+                            }
+                        )
+                        ->toArray()
+                )
+            );
+        }
+
+        return $sequence->finalize();
     }
 
     private function startStory(Story $story): StoryMessageSequence

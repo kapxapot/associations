@@ -10,6 +10,7 @@ use Brightwood\Models\Cards\Players\Human;
 use Brightwood\Models\Cards\Rank;
 use Brightwood\Models\Cards\Suit;
 use Brightwood\Models\Data\EightsData;
+use Brightwood\Models\Language;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
@@ -52,7 +53,10 @@ class EightsStory extends Story
         Cases $cases
     )
     {
-        parent::__construct(['id' => self::ID]);
+        parent::__construct([
+            'id' => self::ID,
+            'lang_code' => Language::RU,
+        ]);
 
         $this->rootDeserializer = $rootDeserializer;
         $this->cases = $cases;

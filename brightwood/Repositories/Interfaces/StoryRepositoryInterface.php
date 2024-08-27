@@ -15,7 +15,7 @@ interface StoryRepositoryInterface extends GetRepositoryInterface
 
     public function getAll(): StoryCollection;
 
-    public function getAllPlayableBy(TelegramUser $tgUser): StoryCollection;
+    public function getAllPlayableBy(TelegramUser $tgUser, ?string $langCode = null): StoryCollection;
 
     public function getAllEditableBy(TelegramUser $tgUser): StoryCollection;
 

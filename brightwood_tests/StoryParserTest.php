@@ -2,8 +2,8 @@
 
 namespace Brightwood\Tests;
 
-use App\Models\Language;
 use App\Models\TelegramUser;
+use Brightwood\Models\Language;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Parsing\StoryParserFactory;
 use Brightwood\Testing\Factories\TranslatorTestFactory;

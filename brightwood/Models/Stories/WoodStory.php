@@ -3,6 +3,7 @@
 namespace Brightwood\Models\Stories;
 
 use Brightwood\Models\Data\WoodData;
+use Brightwood\Models\Language;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\StoryBuilder;
 
@@ -44,7 +45,10 @@ class WoodStory extends Story
 
     public function __construct()
     {
-        parent::__construct(['id' => self::ID]);
+        parent::__construct([
+            'id' => self::ID,
+            'lang_code' => Language::RU,
+        ]);
 
         $this->title = self::TITLE;
         $this->description = self::DESCRIPTION;
