@@ -219,6 +219,14 @@ class Answerer
             }
         }
 
+        if ($text === BotCommand::CODE_LANGUAGE) {
+            return $this->askLanguage();
+        }
+
+        if ($text === BotCommand::CODE_GENDER) {
+            return $this->askGender();
+        }
+
         $documentUploaded = !empty($documentInfo);
 
         if ($stage === self::STAGE_UPLOAD) {

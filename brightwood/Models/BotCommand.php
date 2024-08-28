@@ -16,6 +16,8 @@ class BotCommand
     const CODE_NEW = '/new';
     const CODE_UPLOAD = '/upload';
     const CODE_CANCEL_UPLOAD = '/cancel_upload';
+    const CODE_LANGUAGE = '/language';
+    const CODE_GENDER = '/gender';
 
     public static function story(Story $story): string
     {
