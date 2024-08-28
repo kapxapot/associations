@@ -56,7 +56,12 @@ class WoodStory extends Story
         $this->prepare();
     }
 
-    public function makeData(?array $data = null): WoodData
+    public function newData(): WoodData
+    {
+        return new WoodData();
+    }
+
+    public function loadData(array $data): WoodData
     {
         return new WoodData($data);
     }

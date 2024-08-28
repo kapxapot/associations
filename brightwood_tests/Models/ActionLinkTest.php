@@ -20,7 +20,7 @@ final class ActionLinkTest extends TestCase
 
     public function testEmptyMutatePreservesData() : void
     {
-        $data = $this->story->makeData();
+        $data = $this->story->newData();
 
         $this->assertNotNull($data);
 
@@ -34,7 +34,7 @@ final class ActionLinkTest extends TestCase
 
     public function testMutateMutatesData() : void
     {
-        $data = $this->story->makeData();
+        $data = $this->story->newData();
 
         $this->assertNotNull($data);
 

@@ -67,15 +67,16 @@ class EightsStory extends Story
         $this->prepare();
     }
 
+    public function newData(): EightsData
+    {
+        return new EightsData();
+    }
+
     /**
      * @throws InvalidArgumentException
      */
-    public function makeData(?array $data = null): EightsData
+    public function loadData(array $data): EightsData
     {
-        if ($data === null) {
-            return new EightsData();
-        }
-
         return $this->rootDeserializer->deserialize($data);
     }
 

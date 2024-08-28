@@ -20,6 +20,7 @@ use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
 use Brightwood\Util\Uuid;
 use Exception;
+use InvalidArgumentException;
 use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Interfaces\ArrayableInterface;
 use Plasticode\Semantics\Gender;
@@ -475,7 +476,11 @@ class Answerer
 
         Assert::notNull($node);
 
-        $data = $story->makeData($status->data());
+        try {
+            $data = $story->loadData($status->data());
+        } catch (InvalidArgumentException $ex) {
+            return $this->failedToLoadStory();
+        }
 
         $sequence = $story->go($this->tgUser, $node, $data, $text);
 
@@ -888,12 +893,24 @@ class Answerer
         }
 
         $node = $story->getNode($status->stepId);
-        $data = $story->makeData($status->data());
+
+        try {
+            $data = $story->loadData($status->data());
+        } catch (InvalidArgumentException $ex) {
+            return $this->failedToLoadStory();
+        }
 
         return $story->renderNode(
             $status->telegramUser(),
             $node,
             $data
+        );
+    }
+
+    private function failedToLoadStory(): StoryMessageSequence
+    {
+        return StoryMessageSequence::textFinalized(
+            '⛔ [[Failed to load the story. Please, start again or select another story.]]'
         );
     }
 

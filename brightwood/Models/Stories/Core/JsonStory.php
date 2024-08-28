@@ -63,10 +63,17 @@ class JsonStory extends Story
         );
     }
 
-    public function makeData(?array $data = null): JsonStoryData
+    public function newData(): JsonStoryData
     {
         return new JsonStoryData(
-            $this->getValue('data') ?? null,
+            $this->getValue('data')
+        );
+    }
+
+    public function loadData(array $data): JsonStoryData
+    {
+        return new JsonStoryData(
+            $this->getValue('data'),
             $data
         );
     }

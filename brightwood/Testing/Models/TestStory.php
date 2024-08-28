@@ -21,7 +21,12 @@ class TestStory extends Story
         $this->prepare();
     }
 
-    public function makeData(?array $data = null): TestData
+    public function newData(): TestData
+    {
+        return new TestData();
+    }
+
+    public function loadData(array $data): TestData
     {
         return new TestData($data);
     }

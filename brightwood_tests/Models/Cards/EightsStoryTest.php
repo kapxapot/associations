@@ -45,9 +45,9 @@ final class EightsStoryTest extends TestCase
         $this->assertNotNull($sequence);
     }
 
-    public function testMakeData(): void
+    public function testLoadData(): void
     {
-        $data = $this->story->makeData([
+        $data = $this->story->loadData([
             'type' => EightsData::class,
             'data' => [
                 'player_count' => 2,
@@ -70,7 +70,7 @@ final class EightsStoryTest extends TestCase
             'gender_id' => Gender::MAS
         ]);
 
-        $data = $this->story->makeData($jsonData);
+        $data = $this->story->loadData($jsonData);
 
         $this->assertInstanceOf(EightsData::class, $data);
     }

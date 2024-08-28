@@ -87,7 +87,12 @@ class Story extends DbModel implements CreatedInterface
         return $this->startNode;
     }
 
-    public function makeData(?array $data = null): StoryData
+    public function newData(): StoryData
+    {
+        return new StoryData();
+    }
+
+    public function loadData(array $data): StoryData
     {
         // overload this
 
@@ -176,7 +181,7 @@ class Story extends DbModel implements CreatedInterface
     public function start(TelegramUser $tgUser): StoryMessageSequence
     {
         $node = $this->startNode();
-        $data = $this->makeData();
+        $data = $this->newData();
 
         return $this->renderNode($tgUser, $node, $data);
     }
@@ -214,7 +219,12 @@ class Story extends DbModel implements CreatedInterface
     public function isFinished(StoryStatus $status): bool
     {
         $node = $this->getNode($status->stepId);
-        $data = $this->makeData($status->data());
+
+        try {
+            $data = $this->loadData($status->data());
+        } catch (InvalidArgumentException $ex) {
+            return true;
+        }
 
         return $node->isFinish($data);
     }

@@ -81,5 +81,6 @@
     "You cannot access this story anymore, sorry.": "У вас больше нет доступа к этой истории, извините.",
     "Please, select another story.": "Пожалуйста, выберите другую историю.",
     "There are also stories in other languages": "Также есть истории на других языках",
-    "Unknown language": "Неизвестный язык"
+    "Unknown language": "Неизвестный язык",
+    "Failed to load the story. Please, start again or select another story.": "Не удалось загрузить историю. Пожалуйста, начните заново или выберите другую историю."
 }

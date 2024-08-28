@@ -36,7 +36,7 @@ final class StoryTest extends TestCase
     {
         $tgUser = new TelegramUser();
         $node = $this->story->getNode(6);
-        $data = $this->story->makeData();
+        $data = $this->story->newData();
 
         $sequence = $this->story->renderNode($tgUser, $node, $data);
 
@@ -46,7 +46,7 @@ final class StoryTest extends TestCase
     public function testGo(): void
     {
         $node = $this->story->getNode(6);
-        $data = $this->story->makeData();
+        $data = $this->story->newData();
 
         $this->assertNotNull($data);
 
@@ -61,17 +61,17 @@ final class StoryTest extends TestCase
         $this->assertNotNull($sequence->data());
     }
 
-    public function testDefaultMakeData(): void
+    public function testNewData(): void
     {
-        $data = $this->story->makeData();
+        $data = $this->story->newData();
 
         $this->assertInstanceOf(TestData::class, $data);
         $this->assertEquals(1, $data->day);
     }
 
-    public function testPredefinedMakeData(): void
+    public function testLoadData(): void
     {
-        $data = $this->story->makeData(['day' => 2]);
+        $data = $this->story->loadData(['day' => 2]);
 
         $this->assertInstanceOf(TestData::class, $data);
         $this->assertEquals(2, $data->day);
@@ -81,7 +81,7 @@ final class StoryTest extends TestCase
     {
         $tgUser = new TelegramUser();
         $node = $this->story->getNode(4);
-        $data = $this->story->makeData();
+        $data = $this->story->newData();
 
         $sequence = $this->story->renderNode($tgUser, $node, $data);
 
@@ -98,7 +98,7 @@ final class StoryTest extends TestCase
     {
         $tgUser = new TelegramUser();
         $node = $this->story->getNode(8);
-        $data = $this->story->makeData();
+        $data = $this->story->newData();
 
         $sequence = $this->story->renderNode($tgUser, $node, $data);
 
