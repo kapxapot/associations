@@ -13,6 +13,7 @@ use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Parsing\StoryParser;
+use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
@@ -32,6 +33,7 @@ class BrightwoodBotController
     private SettingsProviderInterface $settingsProvider;
     private LoggerInterface $logger;
 
+    private StoryStatusRepositoryInterface $storyStatusRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
     private TelegramUserService $telegramUserService;
     private TelegramTransportInterface $telegram;
@@ -41,6 +43,7 @@ class BrightwoodBotController
     public function __construct(
         SettingsProviderInterface $settingsProvider,
         LoggerInterface $logger,
+        StoryStatusRepositoryInterface $storyStatusRepository,
         TelegramUserRepositoryInterface $telegramUserRepository,
         TelegramUserService $telegramUserService,
         TelegramTransportFactory $telegramFactory,
@@ -51,6 +54,7 @@ class BrightwoodBotController
         $this->settingsProvider = $settingsProvider;
         $this->logger = $logger;
 
+        $this->storyStatusRepository = $storyStatusRepository;
         $this->telegramUserRepository = $telegramUserRepository;
         $this->telegramUserService = $telegramUserService;
         $this->telegram = ($telegramFactory)();
@@ -190,9 +194,17 @@ class BrightwoodBotController
         $defaultActions = $sequence->actions();
 
         if (empty($defaultActions)) {
-            $defaultActions = $sequence->isFinalized()
-                ? [BotCommand::RESTART, BotCommand::STORY_SELECTION]
-                : [BotCommand::TROUBLESHOOT];
+            if ($sequence->isFinalized()) {
+                $defaultActions = [];
+
+                if ($this->storyStatusRepository->getByTelegramUser($tgUser)) {
+                    $defaultActions[] = BotCommand::RESTART;
+                }
+
+                $defaultActions[] = BotCommand::STORY_SELECTION;
+            } else {
+                $defaultActions = [BotCommand::TROUBLESHOOT];
+            }
         }
 
         return ArrayCollection::from(
