@@ -47,12 +47,14 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
         return $this->stories;
     }
 
-    public function getAllPlayableBy(TelegramUser $tgUser): StoryCollection
+    public function getAllPlayableBy(TelegramUser $tgUser, ?string $langCode = null): StoryCollection
     {
         $user = $tgUser->user();
 
         return $this->stories->where(
-            fn (Story $s) => !$s->creator() || $s->creator()->equals($user)
+            fn (Story $s) =>
+                (!$s->creator() || $s->creator()->equals($user))
+                && (!$langCode || $s->langCode() == $langCode)
         );
     }
 
