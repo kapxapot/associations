@@ -67,20 +67,16 @@ class EightsStory extends Story
         $this->prepare();
     }
 
+    /**
+     * @throws InvalidArgumentException
+     */
     public function makeData(?array $data = null): EightsData
     {
-        if ($data !== null) {
-            try {
-                return $this->rootDeserializer->deserialize($data);
-            } catch (InvalidArgumentException $ex) {
-                throw $ex;
-                // ??
-                // just ignore it
-                // this is needed for parsing a data without a type
-            }
+        if ($data === null) {
+            return new EightsData();
         }
 
-        return new EightsData($data);
+        return $this->rootDeserializer->deserialize($data);
     }
 
     public function executeCommand(string $command): StoryMessageSequence

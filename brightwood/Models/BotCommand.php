@@ -2,6 +2,8 @@
 
 namespace Brightwood\Models;
 
+use Brightwood\Models\Stories\Core\Story;
+
 class BotCommand
 {
     const RESTART = '♻ [[Start again]]';
@@ -14,4 +16,14 @@ class BotCommand
     const CODE_NEW = '/new';
     const CODE_UPLOAD = '/upload';
     const CODE_CANCEL_UPLOAD = '/cancel_upload';
+
+    public static function story(Story $story): string
+    {
+        return sprintf('%s_%s', self::CODE_STORY, $story->getId());
+    }
+
+    public static function edit(Story $story): string
+    {
+        return sprintf('%s_%s', self::CODE_EDIT, $story->getId());
+    }
 }

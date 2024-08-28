@@ -21,10 +21,11 @@ use Brightwood\Services\StoryService;
 use Brightwood\Util\Uuid;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;
+use Plasticode\Interfaces\ArrayableInterface;
 use Plasticode\Semantics\Gender;
-use Plasticode\Semantics\Sentence;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
+use Plasticode\Util\Arrays;
 use Plasticode\Util\Sort;
 use Plasticode\Util\Strings;
 use Plasticode\Util\Text;
@@ -512,10 +513,18 @@ class Answerer
                 ->withVar('language', $curLang);
         }
 
+        $lines = $curLangStories->stringize(
+            fn (Story $story) => sprintf(
+                '%s %s',
+                $story->title(),
+                BotCommand::story($story)
+            )
+        );
+
         $sequence =
-            StoryMessageSequence::mash(
-                new TextMessage("[[Select a story in {$curLang}]]:"),
-                $curLangStories->toInfo()
+            StoryMessageSequence::text(
+                "[[Select a story in {$curLang}]]:",
+                Text::join($this->indexLines($lines))
             )
             ->withVar('language', $curLang);
 
@@ -586,21 +595,22 @@ class Answerer
     {
         $stories = $this->storyService->getStoriesEditableBy($this->tgUser);
 
-        $text = $stories->isEmpty()
-            ? ['⛔ [[You have no stories available for edit.]]']
-            : [
-                '[[You can edit the following stories]]:',
-                Text::join(
-                    $stories->map(
-                        fn (Story $s) => sprintf(
-                            '🔹 %s %s_%s',
-                            $s->title(),
-                            BotCommand::CODE_EDIT,
-                            $s->getId()
-                        )
-                    )
+        if ($stories->isEmpty()) {
+            $text = ['⛔ [[You have no stories available for edit.]]'];
+        } else {
+            $lines = $stories->stringize(
+                fn (Story $story) => sprintf(
+                    '%s %s',
+                    $story->title(),
+                    BotCommand::edit($story)
                 )
+            );
+
+            $text = [
+                '[[You can edit the following stories]]:',
+                Text::join($this->indexLines($lines))
             ];
+        }
 
         $text[] = Text::join([
             '[[Create a new story]]: ' . BotCommand::CODE_NEW,
@@ -801,7 +811,7 @@ class Answerer
             return
                 StoryMessageSequence::textFinalized(
                     "✅ [[The story <b>{story_title}</b> was successfully updated!]]",
-                    '[[Play]]: ' . $updatedStory->toCommand()->codeString()
+                    '[[Play]]: ' . BotCommand::story($updatedStory)
                 )
                 ->withVar('story_title', $updatedStory->title());
         }
@@ -831,7 +841,7 @@ class Answerer
         return
             StoryMessageSequence::textFinalized(
                 "✅ [[A new story <b>{story_title}</b> has been successfully created!]]",
-                '[[Play]]: ' . $newStory->toCommand()->codeString()
+                '[[Play]]: ' . BotCommand::story($newStory)
             )
             ->withVar('story_title', $newStory->title());
     }
@@ -959,5 +969,22 @@ class Answerer
     private function getStatus(): ?StoryStatus
     {
         return $this->storyStatusRepository->getByTelegramUser($this->tgUser);
+    }
+
+    /**
+     * @param string[]|ArrayableInterface $lines
+     * @return string[]
+     */
+    private function indexLines($lines, ?int $start = null): array
+    {
+        $lines = array_values(Arrays::adopt($lines));
+        $start = $start ?? 0;
+        $result = [];
+
+        foreach ($lines as $index => $line) {
+            $result[] = sprintf('%s. %s', $start + $index + 1, $line);
+        }
+
+        return $result;
     }
 }

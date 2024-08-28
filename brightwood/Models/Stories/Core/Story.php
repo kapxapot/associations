@@ -5,12 +5,9 @@ namespace Brightwood\Models\Stories\Core;
 use App\Models\TelegramUser;
 use App\Models\Traits\Created;
 use Brightwood\Collections\StoryNodeCollection;
-use Brightwood\Models\Command;
 use Brightwood\Models\Data\StoryData;
-use Brightwood\Models\Interfaces\CommandProviderInterface;
 use Brightwood\Models\Links\ActionLink;
 use Brightwood\Models\Messages\StoryMessageSequence;
-use Brightwood\Models\Messages\TextMessage;
 use Brightwood\Models\Nodes\ActionNode;
 use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\AbstractStoryNode;
@@ -33,7 +30,7 @@ use Webmozart\Assert\Assert;
  * @method Story|null sourceStory()
  * @method static withSourceStory(Story|callable|null $sourceStory)
  */
-class Story extends DbModel implements CommandProviderInterface, CreatedInterface
+class Story extends DbModel implements CreatedInterface
 {
     use Created;
 
@@ -295,28 +292,5 @@ class Story extends DbModel implements CommandProviderInterface, CreatedInterfac
         foreach ($this->nodes as $node) {
             $node->checkIntegrity();
         }
-    }
-
-    public function toInfo(): TextMessage
-    {
-        $msg = new TextMessage(
-            $this->toCommand()
-        );
-
-        if ($this->description()) {
-            $msg->appendLines($this->description());
-        };
-
-        return $msg;
-    }
-
-    // CommandProviderInterface
-
-    public function toCommand(): Command
-    {
-        return new Command(
-            'story_' . $this->getId(),
-            $this->title()
-        );
     }
 }
