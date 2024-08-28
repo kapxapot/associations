@@ -185,6 +185,12 @@ class Answerer
             );
         }
 
+        // story language command
+        if (preg_match("#^/story_lang(?:\s+|_)(\w+)$#i", $text, $matches)) {
+            $langCode = $matches[1];
+            return $this->storySelection($langCode);
+        }
+
         // translate the action label here
         if (
             $text === $this->parse(BotCommand::STORY_SELECTION)
@@ -508,7 +514,7 @@ class Answerer
 
         $sequence =
             StoryMessageSequence::mash(
-                new TextMessage("[[Select a story in {language}]]:"),
+                new TextMessage("[[Select a story in {$curLang}]]:"),
                 $curLangStories->toInfo()
             )
             ->withVar('language', $curLang);
@@ -538,12 +544,10 @@ class Answerer
                                 $language = $info['language'];
 
                                 return sprintf(
-                                    '🔹 %s (%s) %s',
-                                    $language ?? '[[Unknown language]]',
+                                    '[[%s]] (%s) %s',
+                                    $language,
                                     $info['count'],
-                                    $language
-                                        ? $language->toCommand()->codeString()
-                                        : BotCommand::CODE_STORY_LANG_UNKNOWN
+                                    $language->toCommand()->codeString()
                                 );
                             }
                         )
