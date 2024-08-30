@@ -14,12 +14,13 @@ use Brightwood\Testing\Mocks\Repositories\StoryRepositoryMock;
 use Brightwood\Testing\Mocks\Repositories\StoryVersionRepositoryMock;
 use Brightwood\Testing\Seeders\StorySeeder;
 use Plasticode\ObjectProxy;
-use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Cases;
 
 class StoryServiceTestFactory
 {
-    public static function make(SettingsProviderInterface $settingsProvider): StoryService
+    public static function make(
+        TelegramUserService $telegramUserService
+    ): StoryService
     {
         $woodStory = new WoodStory();
 
@@ -27,8 +28,6 @@ class StoryServiceTestFactory
             RootDeserializerTestFactory::make(),
             new Cases()
         );
-
-        $telegramUserService = new TelegramUserService($settingsProvider);
 
         $storyRepository = new StoryRepositoryMock(
             $telegramUserService,

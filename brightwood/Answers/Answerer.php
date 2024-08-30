@@ -19,6 +19,9 @@ use Brightwood\Models\StoryStatus;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
+use Brightwood\Services\TelegramUserService;
+use Brightwood\Util\Format;
+use Brightwood\Util\Join;
 use Brightwood\Util\Uuid;
 use Exception;
 use InvalidArgumentException;
@@ -78,6 +81,7 @@ class Answerer
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private StoryService $storyService;
     private StoryParser $parser;
+    private TelegramUserService $telegramUserService;
     private TelegramTransportInterface $telegram;
 
     private TelegramUser $tgUser;
@@ -90,6 +94,7 @@ class Answerer
         StoryStatusRepositoryInterface $storyStatusRepository,
         StoryService $storyService,
         StoryParser $parser,
+        TelegramUserService $telegramUserService,
         TelegramTransportFactory $telegramFactory,
         TelegramUser $tgUser,
         string $tgLangCode
@@ -104,6 +109,7 @@ class Answerer
         $this->storyService = $storyService;
         $this->parser = $parser;
         $this->telegram = ($telegramFactory)();
+        $this->telegramUserService = $telegramUserService;
 
         $this->tgUser = $tgUser;
         $this->tgLangCode = $tgLangCode;
@@ -156,12 +162,8 @@ class Answerer
             $storyId = (int)$matches[1];
             $story = $this->getStory($storyId);
 
-            if ($story) {
-                $playable = $this->storyService->isStoryPlayableBy($story, $this->tgUser);
-
-                if ($playable) {
-                    return $this->showStory($story);
-                }
+            if ($this->isPlayable($story)) {
+                return $this->showStory($story);
             }
 
             return $this->errorMessage(
@@ -194,12 +196,8 @@ class Answerer
             $storyId = (int)$matches[1];
             $story = $this->getStory($storyId);
 
-            if ($story) {
-                $editable = $this->storyService->isStoryEditableBy($story, $this->tgUser);
-
-                if ($editable) {
-                    return $this->editStoryLink($story);
-                }
+            if ($this->isEditable($story)) {
+                return $this->editStoryLink($story);
             }
 
             return $this->errorMessage(
@@ -601,19 +599,44 @@ class Answerer
 
     private function showStory(Story $story): StoryMessageSequence
     {
-        $creator = $story->creator();
-        $you = $this->tgUser->user()->equals($creator);
-        $youChunk = $you ? ' ([[That\'s you!]])' : '';
+        $text = [
+            "<b>{$story->title()}</b>",
+            $story->description(),
+        ];
 
-        return
-            StoryMessageSequence::text(
-                "<b>{$story->title()}</b>",
-                $story->description(),
-                $creator
-                    ? '[[Author]]: <b>' . $creator->displayName() . '</b>' . $youChunk
-                    : '',
-                BotCommand::START_STORY . ': ' . BotCommand::CODE_START_STORY
-            )
+        $creator = $story->creator();
+
+        if ($creator) {
+            $you = $this->tgUser->user()->equals($creator);
+
+            $text[] = Join::space(
+                '[[Author]]:',
+                '<b>' . $creator->displayName() . '</b>',
+                $you ? '([[That\'s you!]])' : ''
+            );
+        }
+
+        if ($this->isAdmin()) {
+            $createdAt = $story->createdAt;
+            $dates = ['[[Created at]]: ' . Format::utc($createdAt)];
+
+            if ($story->currentVersion()) {
+                $updatedAt = $story->currentVersion()->createdAt;
+                $dates[] = '[[Updated at]]: ' . Format::utc($updatedAt);
+            }
+
+            $text[] = Text::join($dates);
+        }
+
+        $text[] = BotCommand::START_STORY . ': ' . BotCommand::CODE_START_STORY;
+
+        $sequence = StoryMessageSequence::text(...$text);
+
+        if ($this->isEditable($story)) {
+            $sequence->addText('✒ [[Edit]]: ' . BotCommand::edit($story));
+        }
+
+        return $sequence
             ->withActions(BotCommand::START_STORY, BotCommand::STORY_SELECTION)
             ->withStage(self::STAGE_STORY)
             ->withMetaValue(MetaKey::STORY_ID, $story->getId());
@@ -621,9 +644,7 @@ class Answerer
 
     private function tryStartStory(Story $story): StoryMessageSequence
     {
-        $playable = $this->storyService->isStoryPlayableBy($story, $this->tgUser);
-
-        if ($playable) {
+        if ($this->isPlayable($story)) {
             return $this->startStory($story);
         }
 
@@ -806,7 +827,7 @@ class Answerer
             }
 
             // 11. if the story exists, check that the current user can update the story
-            $canUpdate = $this->storyService->isStoryEditableBy($story, $this->tgUser);
+            $canUpdate = $this->isEditable($story);
 
             // 12. if they can update it, ask them if they want to create a new version or create a new story (mark the original story as a source story)
             if ($canUpdate) {
@@ -1068,5 +1089,24 @@ class Answerer
     private function getMetaValue(string $key)
     {
         return $this->tgUser->getMetaValue($key);
+    }
+
+    private function isAdmin(): bool
+    {
+        return $this->telegramUserService->isAdmin($this->tgUser);
+    }
+
+    private function isPlayable(?Story $story): bool
+    {
+        return $story
+            ? $this->storyService->isStoryPlayableBy($story, $this->tgUser)
+            : false;
+    }
+
+    private function isEditable(?Story $story): bool
+    {
+        return $story
+            ? $this->storyService->isStoryEditableBy($story, $this->tgUser)
+            : false;
     }
 }

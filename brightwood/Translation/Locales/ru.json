@@ -87,5 +87,8 @@
     "You can change your language at any time using the {language_command} command.": "Вы можете изменить язык в любой момент, используя команду {language_command}",
     "Start": "Начать",
     "Author": "Автор",
-    "That's you!": "Это вы!"
+    "That's you!": "Это вы!",
+    "Created at": "Создана",
+    "Updated at": "Обновлена",
+    "Edit": "Редактировать"
 }

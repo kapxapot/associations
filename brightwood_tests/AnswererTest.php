@@ -13,6 +13,7 @@ use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\EightsStory;
 use Brightwood\Parsing\StoryParserFactory;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
+use Brightwood\Services\TelegramUserService;
 use Brightwood\Testing\Factories\LoggerTestFactory;
 use Brightwood\Testing\Factories\SettingsProviderTestFactory;
 use Brightwood\Testing\Factories\StoryServiceTestFactory;
@@ -36,7 +37,8 @@ final class AnswererTest extends TestCase
         parent::setUp();
 
         $settingsProvider = SettingsProviderTestFactory::make();
-        $storyService = StoryServiceTestFactory::make($settingsProvider);
+        $telegramUserService = new TelegramUserService($settingsProvider);
+        $storyService = StoryServiceTestFactory::make($telegramUserService);
 
         $this->telegramUserRepository = TelegramUserRepositoryTestFactory::make();
 
@@ -63,6 +65,7 @@ final class AnswererTest extends TestCase
             $this->storyStatusRepository,
             $storyService,
             ($storyParserFactory)(),
+            $telegramUserService,
             new TelegramTransportFactory($settingsProvider)
         );
     }

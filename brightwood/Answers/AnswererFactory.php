@@ -8,6 +8,7 @@ use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
+use Brightwood\Services\TelegramUserService;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Psr\Log\LoggerInterface;
 
@@ -23,6 +24,7 @@ class AnswererFactory
         StoryStatusRepositoryInterface $storyStatusRepository,
         StoryService $storyService,
         StoryParser $parser,
+        TelegramUserService $telegramUserService,
         TelegramTransportFactory $telegramFactory
     )
     {
@@ -33,6 +35,7 @@ class AnswererFactory
             $storyStatusRepository,
             $storyService,
             $parser,
+            $telegramUserService,
             $telegramFactory,
             $tgUser,
             $tgLangCode

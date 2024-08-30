@@ -3,6 +3,7 @@
 namespace Brightwood\Models;
 
 use Brightwood\Models\Stories\Core\Story;
+use Brightwood\Util\Join;
 
 class BotCommand
 {
@@ -23,11 +24,11 @@ class BotCommand
 
     public static function story(Story $story): string
     {
-        return sprintf('%s_%s', self::CODE_STORY, $story->getId());
+        return Join::underline(self::CODE_STORY, $story->getId());
     }
 
     public static function edit(Story $story): string
     {
-        return sprintf('%s_%s', self::CODE_EDIT, $story->getId());
+        return Join::underline(self::CODE_EDIT, $story->getId());
     }
 }
