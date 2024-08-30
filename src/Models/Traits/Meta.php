@@ -26,18 +26,44 @@ trait Meta
     }
 
     /**
+     * Sets several meta values at once. If a value is `null`, the corresponding meta key is deleted.
+     *
+     * @return $this
+     */
+    public function setMeta(array $meta): self
+    {
+        $this->initMeta();
+
+        foreach ($meta as $key => $value) {
+            $this->setMetaValue($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * @param mixed $value
      */
     public function setMetaValue(string $key, $value): void
     {
         $this->initMeta();
-        $this->metaData[$key] = $value;
+
+        if ($this->getMetaValue($key) !== $value) {
+            if ($value === null) {
+                $this->deleteMetaValue($key);
+            } else {
+                $this->metaData[$key] = $value;
+            }
+        }
     }
 
     public function deleteMetaValue(string $key): void
     {
         $this->initMeta();
-        unset($this->metaData[$key]);
+
+        if (array_key_exists($key, $this->metaData)) {
+            unset($this->metaData[$key]);
+        }
     }
 
     public function encodeMeta(): ?string

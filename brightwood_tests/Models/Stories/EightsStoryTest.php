@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Tests\Models\Cards;
+namespace Brightwood\Tests\Models\Stories;
 
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;

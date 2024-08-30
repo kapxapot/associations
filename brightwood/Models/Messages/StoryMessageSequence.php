@@ -8,6 +8,7 @@ use Brightwood\Collections\StoryMessageCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Interfaces\SequencableInterface;
+use Brightwood\Models\MetaKey;
 use Plasticode\Collections\Generic\Collection;
 
 class StoryMessageSequence implements SequencableInterface
@@ -17,17 +18,16 @@ class StoryMessageSequence implements SequencableInterface
     private MessageCollection $messages;
 
     /** @var string[] */
-    private array $actions;
+    private array $actions = [];
 
     private ?StoryData $data = null;
-    private ?string $stage = null;
+    private array $meta = [];
 
     private bool $isFinalized = false;
 
     public function __construct(MessageInterface ...$messages)
     {
         $this->messages = MessageCollection::make($messages);
-        $this->actions = [];
     }
 
     public function messages(): MessageCollection
@@ -40,9 +40,14 @@ class StoryMessageSequence implements SequencableInterface
         return $this->messages->storyMessages();
     }
 
+    public function meta(): array
+    {
+        return $this->meta;
+    }
+
     public function stage(): ?string
     {
-        return $this->stage;
+        return $this->meta[MetaKey::STAGE] ?? null;
     }
 
     /**
@@ -56,7 +61,7 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * @return $this
      */
-    public function addText(string ...$lines): self
+    public function addText(?string ...$lines): self
     {
         $this->messages = $this->messages->add(
             new TextMessage(...$lines)
@@ -78,7 +83,7 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * Makes a finalized sequence from one TextMessage.
      */
-    public static function textFinalized(string ...$lines): self
+    public static function textFinalized(?string ...$lines): self
     {
         return self::text(...$lines)->finalize();
     }
@@ -94,7 +99,7 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * Makes a sequence from one TextMessage.
      */
-    public static function text(string ...$lines): self
+    public static function text(?string ...$lines): self
     {
         return self::make(
             new TextMessage(...$lines)
@@ -140,6 +145,18 @@ class StoryMessageSequence implements SequencableInterface
     public function isEmpty(): bool
     {
         return $this->messages->isEmpty();
+    }
+
+    /**
+     * Returns the sequence itself if it's not empty. Otherwise, returns `$other`.
+     *
+     * @return $this|self
+     */
+    public function or(self $other): self
+    {
+        return $this->isEmpty()
+            ? $other
+            : $this;
     }
 
     /**
@@ -197,10 +214,30 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * @return $this
      */
+    public function withMetaValue(string $key, $value): self
+    {
+        $this->meta[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withMeta(array $meta): self
+    {
+        foreach ($meta as $key => $value) {
+            $this->withMetaValue($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function withStage(string $stage): self
     {
-        $this->stage = $stage;
-        return $this;
+        return $this->withMetaValue(MetaKey::STAGE, $stage);
     }
 
     /**
@@ -312,14 +349,9 @@ class StoryMessageSequence implements SequencableInterface
         $sequence->withVars($this->vars());
         $sequence->withVars($other->vars());
 
-        // stage - override if defined
-        if ($this->stage()) {
-            $sequence->withStage($this->stage());
-        }
-
-        if ($other->stage()) {
-            $sequence->withStage($other->stage());
-        }
+        // meta - merge
+        $sequence->withMeta($this->meta());
+        $sequence->withMeta($other->meta());
 
         // finalized - override
         return $sequence->finalize(

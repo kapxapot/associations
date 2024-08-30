@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Tests\Models;
+namespace Brightwood\Tests\Models\Data;
 
 use Brightwood\Models\Data\WoodData;
 use PHPUnit\Framework\TestCase;

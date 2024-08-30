@@ -115,8 +115,10 @@ class TelegramUser extends DbModel implements CreatedAtInterface, ActorInterface
      */
     public function withBotAdmin(bool $botAdmin): self
     {
-        $this->setMetaValue(self::META_BOT_ADMIN, $botAdmin);
-        $this->dirty = true;
+        if ($this->isBotAdmin() !== $botAdmin) {
+            $this->setMetaValue(self::META_BOT_ADMIN, $botAdmin ?: null);
+            $this->dirty = true;
+        }
 
         return $this;
     }
@@ -141,6 +143,28 @@ class TelegramUser extends DbModel implements CreatedAtInterface, ActorInterface
     {
         if ($this->langCode !== $langCode) {
             $this->langCode = $langCode;
+            $this->dirty = true;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function withMeta(array $meta): self
+    {
+        $needUpdate = false;
+
+        foreach ($meta as $key => $value) {
+            if ($this->getMetaValue($key) !== $value) {
+                $needUpdate = true;
+                break;
+            }
+        }
+
+        if ($needUpdate) {
+            $this->setMeta($meta);
             $this->dirty = true;
         }
 

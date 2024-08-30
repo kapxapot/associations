@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Tests\Models\Cards;
+namespace Brightwood\Tests\Models\Data;
 
 use App\Models\TelegramUser;
 use Brightwood\Collections\Cards\CardCollection;

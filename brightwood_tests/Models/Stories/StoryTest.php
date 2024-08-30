@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Tests\Models;
+namespace Brightwood\Tests\Models\Stories;
 
 use App\Models\TelegramUser;
 use Brightwood\Testing\Models\TestData;

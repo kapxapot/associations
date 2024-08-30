@@ -4,6 +4,7 @@ namespace Brightwood\Models\Messages;
 
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
+use Plasticode\Util\Arrays;
 
 class Message implements MessageInterface
 {
@@ -14,7 +15,7 @@ class Message implements MessageInterface
     protected array $actions;
 
     /**
-     * @param string[]|null $lines
+     * @param (string|null)[]|null $lines
      * @param string[]|null $actions
      */
     public function __construct(
@@ -22,7 +23,7 @@ class Message implements MessageInterface
         ?array $actions = null
     )
     {
-        $this->lines = $lines ?? [];
+        $this->lines = $lines ? Arrays::clean($lines) : [];
         $this->actions = $actions ?? [];
     }
 
@@ -60,10 +61,10 @@ class Message implements MessageInterface
     /**
      * @return static
      */
-    public function prependLines(string ...$lines): self
+    public function prependLines(?string ...$lines): self
     {
         $this->lines = array_merge(
-            $lines,
+            Arrays::clean($lines),
             $this->lines
         );
 
@@ -73,11 +74,11 @@ class Message implements MessageInterface
     /**
      * @return static
      */
-    public function appendLines(string ...$lines): self
+    public function appendLines(?string ...$lines): self
     {
         $this->lines = array_merge(
             $this->lines,
-            $lines
+            Arrays::clean($lines)
         );
 
         return $this;

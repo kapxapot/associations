@@ -63,6 +63,24 @@ class JsonStory extends Story
         );
     }
 
+    public function languageCode(): ?string
+    {
+        if (parent::languageCode()) {
+            return parent::languageCode();
+        }
+
+        $langCode = $this->getValue('language');
+
+        if (!$langCode) {
+            return null;
+        }
+
+        return Strings::trunc(
+            $langCode,
+            self::MAX_LANG_CODE_LENGTH
+        );
+    }
+
     public function newData(): JsonStoryData
     {
         return new JsonStoryData(

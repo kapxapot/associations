@@ -36,6 +36,7 @@ class Story extends DbModel implements CreatedInterface
 
     protected const MAX_TITLE_LENGTH = 250;
     protected const MAX_DESCRIPTION_LENGTH = 1000;
+    protected const MAX_LANG_CODE_LENGTH = 10;
 
     protected string $title = 'Untitled';
     protected ?string $description = null;
@@ -70,6 +71,11 @@ class Story extends DbModel implements CreatedInterface
             $this->description,
             self::MAX_DESCRIPTION_LENGTH
         );
+    }
+
+    public function languageCode(): ?string
+    {
+        return $this->langCode;
     }
 
     public function hasUuid(): bool
@@ -244,6 +250,10 @@ class Story extends DbModel implements CreatedInterface
         string $input
     ): ?StoryMessageSequence
     {
+        if ($node->isFinish($data)) {
+            return null;
+        }
+
         if ($node instanceof FunctionNode) {
             return $this->renderNode($tgUser, $node, $data, $input);
         }

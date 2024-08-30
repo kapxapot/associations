@@ -12,6 +12,7 @@ use Brightwood\Models\Language;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
+use Brightwood\Models\MetaKey;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\StoryCandidate;
 use Brightwood\Models\StoryStatus;
@@ -47,10 +48,9 @@ class Answerer
 
     const DEFAULT_LANGUAGE = Language::EN;
 
-    const BRIGHTWOOD_STAGE = 'brightwood_stage';
-
     private const STAGE_GENDER = 'gender';
     private const STAGE_LANGUAGE = 'language';
+    private const STAGE_STORY = 'story';
     private const STAGE_UPLOAD = 'upload';
     private const STAGE_EXISTING_STORY = 'existing_story';
     private const STAGE_NOT_ALLOWED_STORY = 'not_allowed_story';
@@ -70,7 +70,7 @@ class Answerer
     private const ACTION_CANCEL = '❌ [[Cancel]]';
 
     private const MESSAGE_CLUELESS = '[[Huh? I didn\'t get it...]] 🧐';
-    private const MESSAGE_STORY_NOT_FOUND = '[[Story with id = {storyId} not found.]]';
+    private const MESSAGE_STORY_NOT_FOUND = '[[Story with id = {story_id} not found.]]';
 
     private SettingsProviderInterface $settingsProvider;
     private LinkerInterface $linker;
@@ -114,7 +114,7 @@ class Answerer
         ?array $documentInfo = null
     ): StoryMessageSequence
     {
-        $stage = $this->tgUser->getMetaValue(self::BRIGHTWOOD_STAGE);
+        $stage = $this->getMetaValue(MetaKey::STAGE);
 
         // check language
         if ($stage === self::STAGE_LANGUAGE) {
@@ -127,7 +127,7 @@ class Answerer
         }
 
         // start command
-        if (Strings::startsWith($text, BotCommand::CODE_START)) {
+        if ($text === BotCommand::CODE_START) {
             return $this->startCommand();
         }
 
@@ -139,6 +139,8 @@ class Answerer
         }
 
         // try executing story-specific commands
+        // probably, this can be moved to the bottom when we check the current story
+        // but this way the story's commands override all the global ones
         if (Strings::startsWith($text, '/')) {
             $executionResults = $this->executeStoryCommand($text);
 
@@ -158,7 +160,7 @@ class Answerer
                 $playable = $this->storyService->isStoryPlayableBy($story, $this->tgUser);
 
                 if ($playable) {
-                    return $this->startStory($story);
+                    return $this->showStory($story);
                 }
             }
 
@@ -166,6 +168,25 @@ class Answerer
                 self::MESSAGE_STORY_NOT_FOUND,
                 ['story_id' => $storyId]
             );
+        }
+
+        // start story from its card
+        if (
+            $stage === self::STAGE_STORY
+            && (
+                $text === $this->parse(BotCommand::START_STORY)
+                || $text === BotCommand::CODE_START_STORY
+            )
+        ) {
+            $storyId = (int)$this->getMetaValue(MetaKey::STORY_ID);
+
+            if ($storyId) {
+                $story = $this->getStory($storyId);
+
+                if ($story) {
+                    return $this->tryStartStory($story);
+                }
+            }
         }
 
         // story edit command
@@ -261,25 +282,32 @@ class Answerer
             );
         }
 
+        // we checked everything unrelated to the current story
+        // let's check if there IS a current story
         $status = $this->getStatus();
-        $cluelessMessage = new TextMessage(self::MESSAGE_CLUELESS);
 
         if (!$status) {
-            return StoryMessageSequence::mash(
-                $cluelessMessage,
-                $this->whereAreWe()
-            );
+            return $this->cluelessMessage();
         }
 
-        // default - next step
-        $nextStepSequence = $this->nextStep($status, $text);
+        // there is a current story + status
+        $story = $this->getStatusStory($status);
 
-        if (!$nextStepSequence->isEmpty()) {
-            return $nextStepSequence;
+        if ($text === $this->parse(BotCommand::RESTART)) {
+            return $this->tryStartStory($story);
         }
 
+        $nextStepSequence = $this->nextStep($story, $status, $text);
+
+        return $nextStepSequence->or(
+            $this->cluelessMessage()
+        );
+    }
+
+    private function cluelessMessage(): StoryMessageSequence
+    {
         return StoryMessageSequence::mash(
-            $cluelessMessage,
+            new TextMessage(self::MESSAGE_CLUELESS),
             $this->whereAreWe()
         );
     }
@@ -380,10 +408,12 @@ class Answerer
         return
             StoryMessageSequence::mash(
                 new TextMessage(
-                    '[[Thank you! Your language preference has been saved and will now be taken into account.]] 👌'
+                    '[[Thank you! Your language preference has been saved and will now be taken into account.]] 👌',
+                    '[[You can change your language at any time using the {language_command} command.]]'
                 ),
                 $this->whereAreWe()
-            );
+            )
+            ->withVar('language_command', BotCommand::CODE_LANGUAGE);
     }
 
     private function readGender(string $text): StoryMessageSequence
@@ -414,10 +444,12 @@ class Answerer
         return
             StoryMessageSequence::mash(
                 new TextMessage(
-                    '[[Thank you, dear {👦|👧}, your gender has been saved and will now be taken into account.]] 👌'
+                    '[[Thank you, dear {👦|👧}, your gender has been saved and will now be taken into account.]] 👌',
+                    '[[You can change your gender at any time using the {gender_command} command.]]'
                 ),
                 $this->whereAreWe()
-            );
+            )
+            ->withVar('gender_command', BotCommand::CODE_GENDER);
     }
 
     private function askLanguage(): StoryMessageSequence
@@ -463,23 +495,12 @@ class Answerer
         );
     }
 
-    private function nextStep(StoryStatus $status, string $text): StoryMessageSequence
+    private function nextStep(
+        Story $story,
+        StoryStatus $status,
+        string $text
+    ): StoryMessageSequence
     {
-        $story = $this->getStatusStory($status);
-
-        if ($text === $this->parse(BotCommand::RESTART)) {
-            $playable = $this->storyService->isStoryPlayableBy($story, $this->tgUser);
-
-            if ($playable) {
-                return $this->startStory($story);
-            }
-
-            return StoryMessageSequence::textFinalized(
-                '[[You cannot access this story anymore, sorry.]]',
-                '[[Please, select another story.]]'
-            );
-        }
-
         $node = $story->getNode($status->stepId);
 
         Assert::notNull($node);
@@ -537,7 +558,7 @@ class Answerer
         $sequence =
             StoryMessageSequence::text(
                 "[[Select a story in {$curLang}]]:",
-                Text::join($this->indexLines($lines))
+                ...$this->indexLines($lines)
             )
             ->withVar('language', $curLang);
 
@@ -558,27 +579,58 @@ class Answerer
         if (!empty($groupInfos)) {
             $sequence->addText(
                 '[[There are also stories in other languages]]:',
-                Text::join(
-                    $groupInfos
-                        ->orderBy('count', Sort::DESC)
-                        ->stringize(
-                            function (array $info) {
-                                $language = $info['language'];
+                ...$groupInfos
+                    ->orderBy('count', Sort::DESC)
+                    ->map(
+                        function (array $info) {
+                            $language = $info['language'];
 
-                                return sprintf(
-                                    '[[%s]] (%s) %s',
-                                    $language,
-                                    $info['count'],
-                                    $language->toCommand()->codeString()
-                                );
-                            }
-                        )
-                        ->toArray()
-                )
+                            return sprintf(
+                                '[[%s]] (%s) %s',
+                                $language,
+                                $info['count'],
+                                $language->toCommand()->codeString()
+                            );
+                        }
+                    )
             );
         }
 
         return $sequence->finalize();
+    }
+
+    private function showStory(Story $story): StoryMessageSequence
+    {
+        $creator = $story->creator();
+        $you = $this->tgUser->user()->equals($creator);
+        $youChunk = $you ? ' ([[That\'s you!]])' : '';
+
+        return
+            StoryMessageSequence::text(
+                "<b>{$story->title()}</b>",
+                $story->description(),
+                $creator
+                    ? '[[Author]]: <b>' . $creator->displayName() . '</b>' . $youChunk
+                    : '',
+                BotCommand::START_STORY . ': ' . BotCommand::CODE_START_STORY
+            )
+            ->withActions(BotCommand::START_STORY, BotCommand::STORY_SELECTION)
+            ->withStage(self::STAGE_STORY)
+            ->withMetaValue(MetaKey::STORY_ID, $story->getId());
+    }
+
+    private function tryStartStory(Story $story): StoryMessageSequence
+    {
+        $playable = $this->storyService->isStoryPlayableBy($story, $this->tgUser);
+
+        if ($playable) {
+            return $this->startStory($story);
+        }
+
+        return StoryMessageSequence::textFinalized(
+            '[[You cannot access this story anymore, sorry.]]',
+            '[[Please, select another story.]]'
+        );
     }
 
     private function startStory(Story $story): StoryMessageSequence
@@ -608,8 +660,10 @@ class Answerer
     {
         $stories = $this->storyService->getStoriesEditableBy($this->tgUser);
 
+        $sequence = StoryMessageSequence::makeFinalized();
+
         if ($stories->isEmpty()) {
-            $text = ['⛔ [[You have no stories available for edit.]]'];
+            $sequence->addText('⛔ [[You have no stories available for edit.]]');
         } else {
             $lines = $stories->stringize(
                 fn (Story $story) => sprintf(
@@ -619,18 +673,16 @@ class Answerer
                 )
             );
 
-            $text = [
+            $sequence->addText(
                 '[[You can edit the following stories]]:',
-                Text::join($this->indexLines($lines))
-            ];
+                ...$this->indexLines($lines)
+            );
         }
 
-        $text[] = Text::join([
+        return $sequence->addText(
             '[[Create a new story]]: ' . BotCommand::CODE_NEW,
-            '[[Upload a new or an edited story]]: ' . BotCommand::CODE_UPLOAD,
-        ]);
-
-        return StoryMessageSequence::textFinalized(...$text);
+            '[[Upload a new or an edited story]]: ' . BotCommand::CODE_UPLOAD
+        );
     }
 
     private function editStoryLink(Story $story): StoryMessageSequence
@@ -1011,5 +1063,10 @@ class Answerer
         }
 
         return $result;
+    }
+
+    private function getMetaValue(string $key)
+    {
+        return $this->tgUser->getMetaValue($key);
     }
 }

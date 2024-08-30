@@ -1,6 +1,6 @@
 <?php
 
-namespace Brightwood\Tests\Models;
+namespace Brightwood\Tests\Models\Messages;
 
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessage;
@@ -163,6 +163,29 @@ final class StoryMessageSequenceTest extends TestCase
         $this->assertEquals(3, $vars['third']);
     }
 
+    public function testMergeMergesMeta()
+    {
+        $sequence1 = StoryMessageSequence::empty()
+            ->withMeta([
+                'first' => 1,
+                'second' => 2,
+            ]);
+
+        $sequence2 = StoryMessageSequence::empty()
+            ->withMeta([
+                'second' => 10,
+                'third' => 3,
+            ]);
+
+        $merged = $sequence1->merge($sequence2);
+        $meta = $merged->meta();
+
+        $this->assertCount(3, $meta);
+        $this->assertEquals(1, $meta['first']);
+        $this->assertEquals(10, $meta['second']);
+        $this->assertEquals(3, $meta['third']);
+    }
+
     /**
      * @dataProvider mergeStageProvider
      */
@@ -193,5 +216,55 @@ final class StoryMessageSequenceTest extends TestCase
             [null, 'stage2', 'stage2'],
             ['stage1', 'stage2', 'stage2'],
         ];
+    }
+
+    public function testAddText(): void
+    {
+        $sequence = StoryMessageSequence::text(
+            'one',
+            null,
+            'two',
+            '',
+            'three'
+        );
+
+        $this->assertEquals(
+            ['one', 'two', 'three'],
+            $sequence->messages()->first()->lines()
+        );
+    }
+
+    public function testMakeText(): void
+    {
+        $sequence = StoryMessageSequence::text(
+            'one',
+            null,
+            'two',
+            '',
+            'three'
+        );
+
+        $this->assertEquals(
+            ['one', 'two', 'three'],
+            $sequence->messages()->first()->lines()
+        );
+    }
+
+    public function testMakeTextFinalized(): void
+    {
+        $sequence = StoryMessageSequence::textFinalized(
+            'one',
+            null,
+            'two',
+            '',
+            'three'
+        );
+
+        $this->assertEquals(
+            ['one', 'two', 'three'],
+            $sequence->messages()->first()->lines()
+        );
+
+        $this->assertTrue($sequence->isFinalized());
     }
 }

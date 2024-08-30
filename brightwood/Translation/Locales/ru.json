@@ -82,5 +82,10 @@
     "Please, select another story.": "Пожалуйста, выберите другую историю.",
     "There are also stories in other languages": "Также есть истории на других языках",
     "Unknown language": "Неизвестный язык",
-    "Failed to load the story. Please, start again or select another story.": "Не удалось загрузить историю. Пожалуйста, начните заново или выберите другую историю."
+    "Failed to load the story. Please, start again or select another story.": "Не удалось загрузить историю. Пожалуйста, начните заново или выберите другую историю.",
+    "You can change your gender at any time using the {gender_command} command.": "Вы можете изменить свой пол в любой момент, используя команду {gender_command}",
+    "You can change your language at any time using the {language_command} command.": "Вы можете изменить язык в любой момент, используя команду {language_command}",
+    "Start": "Начать",
+    "Author": "Автор",
+    "That's you!": "Это вы!"
 }

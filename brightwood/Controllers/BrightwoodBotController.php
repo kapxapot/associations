@@ -6,12 +6,12 @@ use App\External\Interfaces\TelegramTransportInterface;
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
-use Brightwood\Answers\Answerer;
 use Brightwood\Answers\AnswererFactory;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
+use Brightwood\Models\MetaKey;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Exception;
@@ -178,7 +178,7 @@ class BrightwoodBotController
         $answerer = ($this->answererFactory)($tgUser, $tgLangCode);
         $sequence = $answerer->getAnswers($text, $document);
 
-        $this->updateTelegramUser($tgUser, $sequence->stage());
+        $this->updateTelegramUser($tgUser, $sequence->meta());
 
         if ($sequence->isFinalized()) {
             if (!$sequence->hasText()) {
@@ -224,17 +224,13 @@ class BrightwoodBotController
         );
     }
 
-    private function updateTelegramUser(TelegramUser $tgUser, ?string $stage): void
+    private function updateTelegramUser(TelegramUser $tgUser, array $meta): void
     {
-        $key = Answerer::BRIGHTWOOD_STAGE;
-
-        if ($stage) {
-            $tgUser->setMetaValue($key, $stage);
-            $tgUser->setDirty(true);
-        } elseif ($tgUser->getMetaValue($key)) {
-            $tgUser->deleteMetaValue($key);
-            $tgUser->setDirty(true);
+        foreach (MetaKey::all() as $key) {
+            $meta[$key] ??= null;
         }
+
+        $tgUser->withMeta($meta);
 
         if ($tgUser->isDirty()) {
             $this->telegramUserRepository->save($tgUser);
