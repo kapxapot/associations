@@ -16,8 +16,12 @@ class TelegramUserService
         $this->settingsProvider = $settingsProvider;
     }
 
-    public function isAdmin(TelegramUser $tgUser): bool
+    public function isAdmin(?TelegramUser $tgUser): bool
     {
+        if (!$tgUser) {
+            return false;
+        }
+
         return $tgUser->telegramId ==
             $this->settingsProvider->get('brightwood.admin_telegram_user_id');
     }

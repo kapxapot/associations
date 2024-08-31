@@ -83,6 +83,11 @@ class Story extends DbModel implements CreatedInterface
         return strlen($this->uuid) > 0;
     }
 
+    public function isEditable(): bool
+    {
+        return false;
+    }
+
     public function nodes(): StoryNodeCollection
     {
         return $this->nodes;

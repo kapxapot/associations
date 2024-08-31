@@ -6,20 +6,21 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Models\Association;
 use App\Models\Game;
 use App\Models\Word;
+use Brightwood\Models\Stories\Core\JsonStory;
 use Brightwood\Models\Stories\Core\Story;
 use Plasticode\Core\Linker as BaseLinker;
 use Plasticode\Models\Generic\DbModel;
 
 class Linker extends BaseLinker implements LinkerInterface
 {
-    private function check(DbModel $model): bool
+    private function checkPersisted(DbModel $model): bool
     {
-        return $model !== null && $model->isPersisted();
+        return $model && $model->isPersisted();
     }
 
     public function association(Association $association): ?string
     {
-        if (!$this->check($association)) {
+        if (!$this->checkPersisted($association)) {
             return null;
         }
 
@@ -31,7 +32,7 @@ class Linker extends BaseLinker implements LinkerInterface
 
     public function game(Game $game): ?string
     {
-        if (!$this->check($game)) {
+        if (!$this->checkPersisted($game)) {
             return null;
         }
 
@@ -40,7 +41,7 @@ class Linker extends BaseLinker implements LinkerInterface
 
     public function word(Word $word): ?string
     {
-        if (!$this->check($word)) {
+        if (!$this->checkPersisted($word)) {
             return null;
         }
 
@@ -49,7 +50,7 @@ class Linker extends BaseLinker implements LinkerInterface
 
     public function story(Story $story): ?string
     {
-        if (!$this->check($story) || !$story->hasUuid()) {
+        if (!$this->checkPersisted($story) || !$story->isEditable()) {
             return null;
         }
 

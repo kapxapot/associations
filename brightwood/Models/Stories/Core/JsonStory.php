@@ -9,6 +9,9 @@ use InvalidArgumentException;
 use Plasticode\Util\Strings;
 use Webmozart\Assert\Assert;
 
+/**
+ * @property string $uuid
+ */
 class JsonStory extends Story
 {
     private ?array $values = null;
@@ -94,6 +97,11 @@ class JsonStory extends Story
             $this->getValue('data'),
             $data
         );
+    }
+
+    public function isEditable(): bool
+    {
+        return true;
     }
 
     protected function build(): void

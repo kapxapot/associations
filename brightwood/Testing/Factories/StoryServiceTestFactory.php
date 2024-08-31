@@ -30,7 +30,6 @@ class StoryServiceTestFactory
         );
 
         $storyRepository = new StoryRepositoryMock(
-            $telegramUserService,
             new StorySeeder($woodStory, $eightsStory)
         );
 

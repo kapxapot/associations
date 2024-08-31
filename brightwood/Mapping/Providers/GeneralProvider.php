@@ -19,7 +19,6 @@ use Brightwood\Repositories\StoryStatusRepository;
 use Brightwood\Repositories\StoryVersionRepository;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Brightwood\Serialization\Cards\RootDeserializer;
-use Brightwood\Services\TelegramUserService;
 use Brightwood\Translation\Interfaces\TranslatorFactoryInterface;
 use Brightwood\Translation\TranslatorFactory;
 use Plasticode\Mapping\Providers\Generic\MappingProvider;
@@ -35,8 +34,7 @@ class GeneralProvider extends MappingProvider
             StoryRepositoryInterface::class =>
                 fn (ContainerInterface $c) => new StoryRepository(
                     $c->get(RepositoryContext::class),
-                    $this->proxy($c, StoryHydrator::class),
-                    $c->get(TelegramUserService::class)
+                    $this->proxy($c, StoryHydrator::class)
                 ),
 
             StoryCandidateRepositoryInterface::class =>

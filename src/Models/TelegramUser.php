@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Interfaces\ActorInterface;
 use App\Models\Interfaces\NamedInterface;
+use App\Models\Interfaces\UserInterface;
 use App\Models\Traits\Actor;
 use App\Models\Traits\Meta;
 use Exception;
@@ -25,7 +26,7 @@ use Plasticode\Models\Traits\UpdatedAt;
  * @method User|null user()
  * @method static withUser(User|callable|null $user)
  */
-class TelegramUser extends DbModel implements CreatedAtInterface, ActorInterface, NamedInterface, UpdatedAtInterface
+class TelegramUser extends DbModel implements CreatedAtInterface, ActorInterface, NamedInterface, UpdatedAtInterface, UserInterface
 {
     use Actor;
     use CreatedAt;
@@ -198,5 +199,17 @@ class TelegramUser extends DbModel implements CreatedAtInterface, ActorInterface
     public function name(): string
     {
         return $this->publicName();
+    }
+
+    // UserInterface
+
+    public function toUser(): ?User
+    {
+        return $this->user();
+    }
+
+    public function toTelegramUser(): TelegramUser
+    {
+        return $this;
     }
 }

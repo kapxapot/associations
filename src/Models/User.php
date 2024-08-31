@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Interfaces\GenderedInterface;
+use App\Models\Interfaces\UserInterface;
 use App\Models\Traits\Gendered;
 use App\Policies\UserPolicy;
 use Plasticode\Models\User as UserBase;
@@ -25,7 +26,7 @@ use Plasticode\Util\Date;
  * @method static withSberUser(SberUser|callable|null $sberUser)
  * @method static withTelegramUser(TelegramUser|callable|null $telegramUser)
  */
-class User extends UserBase implements GenderedInterface
+class User extends UserBase implements GenderedInterface, UserInterface
 {
     use Gendered;
 
@@ -114,6 +115,18 @@ class User extends UserBase implements GenderedInterface
         return $this->isTelegramUser()
             ? $this->telegramUser()->gender()
             : null;
+    }
+
+    // UserInterface
+
+    public function toUser(): User
+    {
+        return $this;
+    }
+
+    public function toTelegramUser(): ?TelegramUser
+    {
+        return $this->telegramUser();
     }
 
     // serialization

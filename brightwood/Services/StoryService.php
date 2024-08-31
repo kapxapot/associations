@@ -2,6 +2,7 @@
 
 namespace Brightwood\Services;
 
+use App\Models\Interfaces\UserInterface;
 use App\Models\TelegramUser;
 use Brightwood\Collections\StoryCollection;
 use Brightwood\Models\Stories\Core\JsonStory;
@@ -71,16 +72,26 @@ class StoryService
 
     public function getStoriesPlayableBy(TelegramUser $tgUser, ?string $langCode = null): StoryCollection
     {
-        return $this->toRichStories(
-            $this->storyRepository->getAllPlayableBy($tgUser, $langCode)
-        );
+        $playableStories = $this
+            ->storyRepository
+            ->getAllByLanguage($langCode)
+            ->where(
+                fn (Story $s) => $this->isStoryPlayableBy($s, $tgUser)
+            );
+
+        return $this->toRichStories($playableStories);
     }
 
     public function getStoriesEditableBy(TelegramUser $tgUser): StoryCollection
     {
-        return $this->toRichStories(
-            $this->storyRepository->getAllEditableBy($tgUser)
-        );
+        $editableStories = $this
+            ->storyRepository
+            ->getAll()
+            ->where(
+                fn (Story $s) => $this->isStoryEditableBy($s, $tgUser)
+            );
+
+        return $this->toRichStories($editableStories);
     }
 
     public function getDefaultStoryId(): int
@@ -183,44 +194,59 @@ class StoryService
     }
 
     /**
-     * Admin can play any story.
+     * Story is playable by user if any:
+     * - the story is public
+     * - the user is an admin
+     * - the user is the creator
      */
-    public function isStoryPlayableBy(Story $story, TelegramUser $tgUser): bool
+    public function isStoryPlayableBy(Story $story, UserInterface $user): bool
     {
-        $creator = $story->creator();
-
-        if (!$creator) {
-            return true;
-        }
-
-        $isAdmin = $this->telegramUserService->isAdmin($tgUser);
-
-        if ($isAdmin) {
-            return true;
-        }
-
-        $user = $tgUser->user();
-
-        return $creator->equals($user);
+        return $this->isStoryPublic($story)
+            || $this->isAdminOrStoryCreator($story, $user);
     }
 
     /**
-     * Admin can edit any story.
+     * Story is editable by user if both:
+     * - the story is editable
+     * - the user is an admin or the author
      */
-    public function isStoryEditableBy(Story $story, TelegramUser $tgUser): bool
+    public function isStoryEditableBy(Story $story, UserInterface $user): bool
     {
-        if (!$story->hasUuid()) {
-            return false;
-        }
+        return $story->isEditable()
+            && $this->isAdminOrStoryCreator($story, $user);
+    }
 
+    /**
+     * Story is public if any:
+     * - it has no creator
+     * - the creator is an admin
+     * ? the story is published
+     */
+    public function isStoryPublic(Story $story): bool
+    {
         $creator = $story->creator();
 
-        if ($creator) {
-            $user = $tgUser->user();
-            return $creator->equals($user);
-        }
+        return !$creator || $this->isAdmin($creator);
+    }
 
-        return $this->telegramUserService->isAdmin($tgUser);
+    public function isAdminOrStoryCreator(Story $story, UserInterface $user): bool
+    {
+        return $this->isAdmin($user)
+            || $this->isStoryCreator($story, $user);
+    }
+
+    public function isStoryCreator(Story $story, UserInterface $user): bool
+    {
+        $creator = $story->creator();
+
+        return $creator && $creator->equals($user->toUser());
+    }
+
+    public function isAdmin(UserInterface $user): bool
+    {
+        return $this->telegramUserService->isAdmin(
+            $user->toTelegramUser()
+        );
     }
 
     public function applyVersion(Story $story, ?StoryVersion $storyVersion): Story

@@ -5,6 +5,7 @@ namespace Brightwood\Answers;
 use App\Core\Interfaces\LinkerInterface;
 use App\External\Interfaces\TelegramTransportInterface;
 use App\External\TelegramTransport;
+use App\Models\Interfaces\UserInterface;
 use App\Models\TelegramUser;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\BotCommand;
@@ -546,10 +547,10 @@ class Answerer
         }
 
         $lines = $curLangStories->stringize(
-            fn (Story $story) => sprintf(
-                '%s %s',
+            fn (Story $story) => Join::space(
                 $story->title(),
-                BotCommand::story($story)
+                BotCommand::story($story),
+                $this->isAdmin() && $this->storyService->isStoryPublic($story) ? '👁' : ''
             )
         );
 
@@ -583,10 +584,9 @@ class Answerer
                         function (array $info) {
                             $language = $info['language'];
 
-                            return sprintf(
-                                '[[%s]] (%s) %s',
-                                $language,
-                                $info['count'],
+                            return Join::space(
+                                "[[{$language}]]",
+                                "({$info['count']})",
                                 $language->toCommand()->codeString()
                             );
                         }
@@ -607,7 +607,9 @@ class Answerer
         $creator = $story->creator();
 
         if ($creator) {
-            $you = $this->tgUser->user()->equals($creator);
+            $you = $creator->equals(
+                $this->tgUser->user()
+            );
 
             $text[] = Join::space(
                 '[[Author]]:',
@@ -1091,9 +1093,9 @@ class Answerer
         return $this->tgUser->getMetaValue($key);
     }
 
-    private function isAdmin(): bool
+    private function isAdmin(?UserInterface $user = null): bool
     {
-        return $this->telegramUserService->isAdmin($this->tgUser);
+        return $this->storyService->isAdmin($user ?? $this->tgUser);
     }
 
     private function isPlayable(?Story $story): bool
