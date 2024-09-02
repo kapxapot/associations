@@ -9,6 +9,7 @@ use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Interfaces\SequencableInterface;
 use Brightwood\Models\MetaKey;
+use Brightwood\Models\Stories\Core\Story;
 use Plasticode\Collections\Generic\Collection;
 
 class StoryMessageSequence implements SequencableInterface
@@ -24,6 +25,7 @@ class StoryMessageSequence implements SequencableInterface
     private array $meta = [];
 
     private bool $isFinalized = false;
+    private bool $isStuck = false;
 
     public function __construct(MessageInterface ...$messages)
     {
@@ -45,17 +47,20 @@ class StoryMessageSequence implements SequencableInterface
         return $this->meta;
     }
 
-    public function stage(): ?string
-    {
-        return $this->meta[MetaKey::STAGE] ?? null;
-    }
-
     /**
      * Is message sequence "finished" (no further interaction is expected).
      */
     public function isFinalized(): bool
     {
         return $this->isFinalized;
+    }
+
+    /**
+     * Is message sequence "stuck" and cannot continue.
+     */
+    public function isStuck(): bool
+    {
+        return $this->isStuck;
     }
 
     /**
@@ -97,6 +102,14 @@ class StoryMessageSequence implements SequencableInterface
     }
 
     /**
+     * Makes a stuck sequence from one TextMessage.
+     */
+    public static function textStuck(?string ...$lines): self
+    {
+        return self::text(...$lines)->stuck();
+    }
+
+    /**
      * Makes a sequence from one TextMessage.
      */
     public static function text(?string ...$lines): self
@@ -117,11 +130,15 @@ class StoryMessageSequence implements SequencableInterface
     /**
      * "Mashes" together messages and sequences, returning a resulting sequence.
      */
-    public static function mash(SequencableInterface ...$items): self
+    public static function mash(?SequencableInterface ...$items): self
     {
         $sequence = new self();
 
         foreach ($items as $item) {
+            if (!$item) {
+                continue;
+            }
+
             if ($item instanceof MessageInterface) {
                 $sequence->add($item);
             }
@@ -241,13 +258,32 @@ class StoryMessageSequence implements SequencableInterface
     }
 
     /**
-     * Changes isFinalized property.
+     * @return $this
+     */
+    public function withStory(Story $story): self
+    {
+        return $this->withMetaValue(MetaKey::STORY_ID, $story->getId());
+    }
+
+    /**
+     * Changes `isFinalized` property.
      *
      * @return $this
      */
     public function finalize(bool $state = true): self
     {
         $this->isFinalized = $state;
+        return $this;
+    }
+
+    /**
+     * Changes `isStuck` property.
+     *
+     * @return $this
+     */
+    public function stuck(bool $state = true): self
+    {
+        $this->isStuck = $state;
         return $this;
     }
 
@@ -321,12 +357,17 @@ class StoryMessageSequence implements SequencableInterface
     }
 
     /**
-     * Concats messages and creates a NEW sequence.
+     * Concats messages and creates a NEW sequence if `$other` is not null.
+     * Otherwise, returns the sequence itself.
      *
-     * `isFinalized` is taken from the `$other` sequence.
+     * @return $this|self
      */
-    public function merge(self $other): self
+    public function merge(?self $other): self
     {
+        if (!$other) {
+            return $this;
+        }
+
         // messages - merge
         $sequence = new self(...$this->messages);
         $sequence->add(...$other->messages());
@@ -353,10 +394,14 @@ class StoryMessageSequence implements SequencableInterface
         $sequence->withMeta($this->meta());
         $sequence->withMeta($other->meta());
 
-        // finalized - override
-        return $sequence->finalize(
-            $other->isFinalized()
-        );
+        // finalized & stuck - override
+        return $sequence
+            ->finalize(
+                $other->isFinalized()
+            )
+            ->stuck(
+                $other->isStuck()
+            );
     }
 
     public function hasText(): bool
@@ -372,5 +417,10 @@ class StoryMessageSequence implements SequencableInterface
     public function hasActions(): bool
     {
         return !empty($this->actions);
+    }
+
+    private function hasMetaKey(string $key): bool
+    {
+        return array_key_exists($key, $this->meta);
     }
 }

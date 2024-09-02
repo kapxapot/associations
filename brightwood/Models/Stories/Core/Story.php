@@ -4,6 +4,7 @@ namespace Brightwood\Models\Stories\Core;
 
 use App\Models\TelegramUser;
 use App\Models\Traits\Created;
+use App\Models\User;
 use Brightwood\Collections\StoryNodeCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Links\ActionLink;
@@ -13,14 +14,17 @@ use Brightwood\Models\Nodes\FunctionNode;
 use Brightwood\Models\Nodes\AbstractStoryNode;
 use Brightwood\Models\StoryStatus;
 use Brightwood\Models\StoryVersion;
+use Brightwood\Models\ValidationResult;
+use Exception;
 use InvalidArgumentException;
-use Plasticode\Exceptions\InvalidConfigurationException;
 use Plasticode\Models\Generic\DbModel;
 use Plasticode\Models\Interfaces\CreatedInterface;
 use Plasticode\Util\Strings;
 use Webmozart\Assert\Assert;
 
 /**
+ * @property string|null $deletedAt
+ * @property integer|null $deletedBy
  * @property integer $id
  * @property string|null $langCode
  * @property integer|null $sourceStoryId
@@ -29,6 +33,8 @@ use Webmozart\Assert\Assert;
  * @method static withCurrentVersion(StoryVersion|callable|null $currentVersion)
  * @method Story|null sourceStory()
  * @method static withSourceStory(Story|callable|null $sourceStory)
+ * @method User|null deleter()
+ * @method static withDeleter(User|callable|null $deleter)
  */
 class Story extends DbModel implements CreatedInterface
 {
@@ -86,6 +92,16 @@ class Story extends DbModel implements CreatedInterface
     public function isEditable(): bool
     {
         return false;
+    }
+
+    public function isDeletable(): bool
+    {
+        return false;
+    }
+
+    public function isDeleted(): bool
+    {
+        return $this->deletedAt !== null;
     }
 
     public function nodes(): StoryNodeCollection
@@ -197,6 +213,18 @@ class Story extends DbModel implements CreatedInterface
         return $this->renderNode($tgUser, $node, $data);
     }
 
+    public function renderStatus(StoryStatus $status): StoryMessageSequence
+    {
+        $node = $this->getNode($status->stepId);
+        $data = $this->loadData($status->data());
+
+        return $this->renderNode(
+            $status->telegramUser(),
+            $node,
+            $data
+        );
+    }
+
     /**
      * Gets node's message (auto moving through nodes if possible).
      */
@@ -227,37 +255,60 @@ class Story extends DbModel implements CreatedInterface
         );
     }
 
-    public function isFinished(StoryStatus $status): bool
+    /**
+     * Status must be validated before calling this method.
+     */
+    public function isFinish(StoryStatus $status): bool
     {
         $node = $this->getNode($status->stepId);
-
-        try {
-            $data = $this->loadData($status->data());
-        } catch (InvalidArgumentException $ex) {
-            return true;
-        }
+        $data = $this->loadData($status->data());
 
         return $node->isFinish($data);
     }
 
     /**
-     * Attempts to go to the next node + renders it.
+     * @throws Exception
+     */
+    public function validateStatus(StoryStatus $status): ValidationResult
+    {
+        $nodeId = $status->stepId;
+        $node = $this->getNode($nodeId);
+
+        if (!$node) {
+            return ValidationResult::error(
+                $this->nodeNotFound($nodeId)
+            );
+        }
+
+        try {
+            $this->loadData($status->data());
+        } catch (InvalidArgumentException $ex) {
+            return ValidationResult::error(
+                StoryMessageSequence::text(
+                    '[[Failed to restore the story state.]]'
+                )
+            );
+        }
+
+        return ValidationResult::ok();
+    }
+
+    /**
+     * Attempts to continue the story.
+     *
+     * Status must be validated before calling this method.
      *
      * Empty result sequence means here that story failed to move further due to some
      * reasons, e.g., incorrect input.
-     *
-     * @throws InvalidConfigurationException
      */
-    public function go(
+    public function continue(
         TelegramUser $tgUser,
-        AbstractStoryNode $node,
-        StoryData $data,
+        StoryStatus $status,
         string $input
-    ): ?StoryMessageSequence
+    ): StoryMessageSequence
     {
-        if ($node->isFinish($data)) {
-            return null;
-        }
+        $node = $this->getNode($status->stepId);
+        $data = $this->loadData($status->data());
 
         if ($node instanceof FunctionNode) {
             return $this->renderNode($tgUser, $node, $data, $input);
@@ -267,36 +318,45 @@ class Story extends DbModel implements CreatedInterface
             return $this->renderActionNode($tgUser, $node, $data, $input);
         }
 
-        throw new InvalidConfigurationException(
-            sprintf(
-                'Incorrect node type: %s.',
-                get_class($node)
-            )
+        return StoryMessageSequence::textStuck(
+            '[[Incorrect node type]]: ' . get_class($node) . '.'
         );
     }
 
-    // todo: move this inside of the action node somehow
+    /**
+     * todo: move this inside of the action node somehow
+     */
     private function renderActionNode(
         TelegramUser $tgUser,
         ActionNode $node,
         StoryData $data,
         string $input
-    ): ?StoryMessageSequence
+    ): StoryMessageSequence
     {
-        $link = $node
-            ->links()
-            ->satisfying($data)
-            ->first(
-                fn (ActionLink $al) => $al->action() === $input
-            );
+        $satisfyingLinks = $node->links()->satisfying($data);
 
-        if (!$link) {
-            return null;
+        if ($satisfyingLinks->isEmpty()) {
+            return
+                StoryMessageSequence::textStuck(
+                    '[[Action node {node_id} doesn\'t have available links.]]'
+                )
+                ->withVar('node_id', $this->id);
         }
 
-        $nextNode = $this->getNode($link->nodeId());
+        $link = $satisfyingLinks->first(
+            fn (ActionLink $al) => $al->action() === $input
+        );
 
-        Assert::notNull($nextNode);
+        if (!$link) {
+            return StoryMessageSequence::empty();
+        }
+
+        $nextNodeId = $link->nodeId();
+        $nextNode = $this->getNode($nextNodeId);
+
+        if (!$nextNode) {
+            return $this->nodeNotFound($nextNodeId);
+        }
 
         return $this->renderNode(
             $tgUser,
@@ -317,5 +377,14 @@ class Story extends DbModel implements CreatedInterface
         foreach ($this->nodes as $node) {
             $node->checkIntegrity();
         }
+    }
+
+    private function nodeNotFound(int $nodeId): StoryMessageSequence
+    {
+        return
+            StoryMessageSequence::textStuck(
+                '[[Node {node_id} not found.]]'
+            )
+            ->withVar('node_id', $nodeId);
     }
 }

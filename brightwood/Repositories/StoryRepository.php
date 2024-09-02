@@ -5,6 +5,7 @@ namespace Brightwood\Repositories;
 use Brightwood\Collections\StoryCollection;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
+use Plasticode\Data\Query;
 use Plasticode\Repositories\Idiorm\Generic\IdiormRepository;
 use Plasticode\Repositories\Idiorm\Traits\CreatedRepository;
 
@@ -21,13 +22,18 @@ class StoryRepository extends IdiormRepository implements StoryRepositoryInterfa
 
     public function get(?int $id): ?Story
     {
-        return $this->getEntity($id);
+        return $this
+            ->activeQuery()
+            ->apply(
+                fn (Query $q) => $this->filterById($q, $id)
+            )
+            ->one();
     }
 
     public function getByUuid(string $uuid): ?Story
     {
         return $this
-            ->query()
+            ->activeQuery()
             ->where('uuid', $uuid)
             ->one();
     }
@@ -35,7 +41,7 @@ class StoryRepository extends IdiormRepository implements StoryRepositoryInterfa
     public function getAll(): StoryCollection
     {
         return StoryCollection::from(
-            $this->query()
+            $this->activeQuery()
         );
     }
 
@@ -46,12 +52,28 @@ class StoryRepository extends IdiormRepository implements StoryRepositoryInterfa
         }
 
         return StoryCollection::from(
-            $this->query()->where('lang_code', $langCode)
+            $this
+                ->activeQuery()
+                ->where('lang_code', $langCode)
         );
     }
 
     public function store(array $data): Story
     {
         return $this->storeEntity($data);
+    }
+
+    public function save(Story $story): Story
+    {
+        return $this->saveEntity($story);
+    }
+
+    // queries
+
+    private function activeQuery(): Query
+    {
+        return $this
+            ->query()
+            ->whereNull('deleted_at');
     }
 }

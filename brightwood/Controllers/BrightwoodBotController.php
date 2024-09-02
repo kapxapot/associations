@@ -6,14 +6,16 @@ use App\External\Interfaces\TelegramTransportInterface;
 use App\Models\TelegramUser;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
+use Brightwood\Answers\Action;
 use Brightwood\Answers\AnswererFactory;
+use Brightwood\Answers\BotCommand;
 use Brightwood\Factories\TelegramTransportFactory;
-use Brightwood\Models\BotCommand;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
 use Brightwood\Models\MetaKey;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
+use Brightwood\Services\TelegramUserService as BrightwoodTelegramUserService;
 use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
@@ -36,6 +38,8 @@ class BrightwoodBotController
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private TelegramUserRepositoryInterface $telegramUserRepository;
     private TelegramUserService $telegramUserService;
+    private BrightwoodTelegramUserService $brightwoodTelegramUserService;
+
     private TelegramTransportInterface $telegram;
     private AnswererFactory $answererFactory;
     private StoryParser $parser;
@@ -46,6 +50,7 @@ class BrightwoodBotController
         StoryStatusRepositoryInterface $storyStatusRepository,
         TelegramUserRepositoryInterface $telegramUserRepository,
         TelegramUserService $telegramUserService,
+        BrightwoodTelegramUserService $brightwoodTelegramUserService,
         TelegramTransportFactory $telegramFactory,
         AnswererFactory $answererFactory,
         StoryParser $parser
@@ -57,6 +62,8 @@ class BrightwoodBotController
         $this->storyStatusRepository = $storyStatusRepository;
         $this->telegramUserRepository = $telegramUserRepository;
         $this->telegramUserService = $telegramUserService;
+        $this->brightwoodTelegramUserService = $brightwoodTelegramUserService;
+
         $this->telegram = ($telegramFactory)();
         $this->answererFactory = $answererFactory;
 
@@ -194,16 +201,26 @@ class BrightwoodBotController
         $defaultActions = $sequence->actions();
 
         if (empty($defaultActions)) {
-            if ($sequence->isFinalized()) {
+            if ($sequence->isFinalized() || $sequence->isStuck()) {
                 $defaultActions = [];
 
                 if ($this->storyStatusRepository->getByTelegramUser($tgUser)) {
-                    $defaultActions[] = BotCommand::RESTART;
+                    $defaultActions[] = Action::RESTART;
                 }
 
-                $defaultActions[] = BotCommand::STORY_SELECTION;
+                $defaultActions[] = Action::STORY_SELECTION;
             } else {
-                $defaultActions = [BotCommand::TROUBLESHOOT];
+                $defaultActions = [Action::TROUBLESHOOT];
+            }
+        }
+
+        if ($this->brightwoodTelegramUserService->isAdmin($tgUser)) {
+            if ($sequence->isFinalized()) {
+                $sequence->addText('[FINALIZED]');
+            }
+
+            if ($sequence->isStuck()) {
+                $sequence->addText('[STUCK]');
             }
         }
 

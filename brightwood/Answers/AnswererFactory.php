@@ -2,14 +2,12 @@
 
 namespace Brightwood\Answers;
 
-use App\Core\Interfaces\LinkerInterface;
 use App\Models\TelegramUser;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\StoryService;
 use Brightwood\Services\TelegramUserService;
-use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Psr\Log\LoggerInterface;
 
 class AnswererFactory
@@ -19,24 +17,22 @@ class AnswererFactory
 
     public function __construct(
         LoggerInterface $logger,
-        SettingsProviderInterface $settingsProvider,
-        LinkerInterface $linker,
         StoryStatusRepositoryInterface $storyStatusRepository,
         StoryService $storyService,
         StoryParser $parser,
         TelegramUserService $telegramUserService,
-        TelegramTransportFactory $telegramFactory
+        TelegramTransportFactory $telegramFactory,
+        UrlBuilder $urlBuilder
     )
     {
         $this->invoker = fn (TelegramUser $tgUser, string $tgLangCode) => new Answerer(
             $logger,
-            $settingsProvider,
-            $linker,
             $storyStatusRepository,
             $storyService,
             $parser,
             $telegramUserService,
             $telegramFactory,
+            $urlBuilder,
             $tgUser,
             $tgLangCode
         );

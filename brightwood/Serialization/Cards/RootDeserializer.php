@@ -73,20 +73,39 @@ class RootDeserializer implements RootDeserializerInterface
         return $this->suitSerializer->deserialize($rawSuit);
     }
 
+    public function players(): PlayerCollection
+    {
+        return $this->players;
+    }
+
+    /**
+     * @return $this
+     */
     public function addPlayers(Player ...$players): self
     {
-        $this->players = $this->players->add(...$players);
+        foreach ($players as $player) {
+            $existingPlayer = $this->getPlayer($player->id());
+
+            if (!$existingPlayer) {
+                $this->players = $this->players->add($player);
+            }
+        }
 
         return $this;
     }
 
-    function resolvePlayer(?string $id): ?Player
+    public function getPlayer(?string $id): ?Player
+    {
+        return $this->players->find($id);
+    }
+
+    public function resolvePlayer(?string $id): ?Player
     {
         if (strlen($id) === 0) {
             return null;
         }
 
-        $player = $this->players->find($id);
+        $player = $this->getPlayer($id);
 
         if ($player) {
             return $player;

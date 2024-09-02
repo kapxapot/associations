@@ -17,4 +17,6 @@ interface StoryRepositoryInterface extends GetRepositoryInterface
     public function getAllByLanguage(?string $langCode = null): StoryCollection;
 
     public function store(array $data): Story;
+
+    public function save(Story $story): Story;
 }

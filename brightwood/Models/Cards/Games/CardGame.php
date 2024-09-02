@@ -12,6 +12,7 @@ use Brightwood\Models\Cards\Sets\Pile;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Serialization\Interfaces\SerializableInterface;
 use Brightwood\Serialization\UniformSerializer;
+use InvalidArgumentException;
 use Webmozart\Assert\Assert;
 
 abstract class CardGame implements SerializableInterface
@@ -285,7 +286,7 @@ abstract class CardGame implements SerializableInterface
      * Tries to deal $amount cards to every player.
      * If there is not enough cards in deck or $amount = 0, deals all cards.
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function deal(int $amount = 0): void
     {
@@ -320,7 +321,7 @@ abstract class CardGame implements SerializableInterface
      *
      * Otherwise, `null` is returned (which means that no cards where drawn).
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function drawToHand(Player $player, int $amount = 1): ?DrawEvent
     {
@@ -352,7 +353,7 @@ abstract class CardGame implements SerializableInterface
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function takeFromDiscard(Player $player, int $amount = 1): CardCollection
     {
@@ -369,7 +370,7 @@ abstract class CardGame implements SerializableInterface
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function discardFromHand(Player $player, Card $card): void
     {
@@ -397,7 +398,7 @@ abstract class CardGame implements SerializableInterface
     }
 
     /**
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function trashFromHand(Player $player, Card $card): void
     {

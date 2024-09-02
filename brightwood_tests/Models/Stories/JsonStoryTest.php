@@ -5,6 +5,7 @@ namespace Brightwood\Tests\Models\Stories;
 use App\Models\TelegramUser;
 use Brightwood\Models\Data\JsonStoryData;
 use Brightwood\Models\Stories\Core\JsonStory;
+use Brightwood\Models\StoryStatus;
 use Brightwood\Services\TelegramUserService;
 use Brightwood\Testing\Factories\SettingsProviderTestFactory;
 use Brightwood\Testing\Factories\StoryServiceTestFactory;
@@ -43,17 +44,20 @@ final class JsonStoryTest extends TestCase
         $this->assertNotNull($sequence->data());
     }
 
-    public function testGo(): void
+    public function testContinue(): void
     {
-        $node = $this->story->getNode(6);
         $data = $this->story->newData();
 
         $this->assertNotNull($data);
 
-        $sequence = $this->story->go(
+        $status = new StoryStatus([
+            'step_id' => 6,
+            'json_data' => json_encode($data),
+        ]);
+
+        $sequence = $this->story->continue(
             new TelegramUser(),
-            $node,
-            $data,
+            $status,
             'Сесть на пенек и заплакать'
         );
 

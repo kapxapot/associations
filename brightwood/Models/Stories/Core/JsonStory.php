@@ -104,6 +104,11 @@ class JsonStory extends Story
         return true;
     }
 
+    public function isDeletable(): bool
+    {
+        return true;
+    }
+
     protected function build(): void
     {
         $this->validate();

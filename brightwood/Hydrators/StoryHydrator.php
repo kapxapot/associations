@@ -40,6 +40,9 @@ class StoryHydrator extends Hydrator
             )
             ->withCreator(
                 fn () => $this->userRepository->get($entity->createdBy)
+            )
+            ->withDeleter(
+                fn () => $this->userRepository->get($entity->deletedBy)
             );
     }
 }

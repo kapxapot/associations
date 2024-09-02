@@ -7,6 +7,7 @@ use App\Core\Interfaces\LinkerInterface;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Brightwood\Answers\AnswererFactory;
+use Brightwood\Answers\UrlBuilder;
 use Brightwood\Config\SerializationConfig;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Hydrators\StoryCandidateHydrator;
@@ -71,8 +72,9 @@ final class GeneralProviderTest extends AbstractProviderTest
 
     public function testWiring(): void
     {
-        $this->check(AnswererFactory::class);
+        $this->check(UrlBuilder::class);
         $this->check(StoryParser::class);
+        $this->check(AnswererFactory::class);
 
         // hydrators
 

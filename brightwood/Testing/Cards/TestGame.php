@@ -4,7 +4,7 @@ namespace Brightwood\Testing\Cards;
 
 use Brightwood\Models\Cards\Games\CardGame;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
-use Brightwood\Models\Messages\Message;
+use Brightwood\Models\Messages\TextMessage;
 
 class TestGame extends CardGame
 {
@@ -13,8 +13,8 @@ class TestGame extends CardGame
         return 2;
     }
 
-    protected function dealing() : MessageInterface
+    protected function dealing(): MessageInterface
     {
-        return new Message(['Dealing...']);
+        return new TextMessage('Dealing...');
     }
 }

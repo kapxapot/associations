@@ -4,16 +4,20 @@ namespace Brightwood\Services;
 
 use App\Models\Interfaces\UserInterface;
 use App\Models\TelegramUser;
+use Brightwood\Answers\Messages;
 use Brightwood\Collections\StoryCollection;
+use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Stories\Core\JsonStory;
 use Brightwood\Models\Stories\Core\Story;
 use Brightwood\Models\Stories\WoodStory;
 use Brightwood\Models\StoryCandidate;
+use Brightwood\Models\StoryStatus;
 use Brightwood\Models\StoryVersion;
 use Brightwood\Repositories\Interfaces\StaticStoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryCandidateRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
+use Plasticode\Util\Date;
 
 class StoryService
 {
@@ -217,6 +221,17 @@ class StoryService
     }
 
     /**
+     * Story is deletable by user if any:
+     * - the story is deletable
+     * - the user is an admin or the author
+     */
+    public function isStoryDeletableBy(Story $story, UserInterface $user): bool
+    {
+        return $story->isDeletable()
+            && $this->isAdminOrStoryCreator($story, $user);
+    }
+
+    /**
      * Story is public if any:
      * - it has no creator
      * - the creator is an admin
@@ -262,6 +277,39 @@ class StoryService
         return new JsonStory($storyCopy);
     }
 
+    /**
+     * Returns the status story with the status story version applied.
+     */
+    public function getStatusStory(StoryStatus $status): Story
+    {
+        return $this->applyVersion(
+            $status->story(),
+            $status->storyVersion()
+        );
+    }
+
+    public function validateStatus(StoryStatus $status): StoryMessageSequence
+    {
+        $validationResult = $this->getStatusStory($status)->validateStatus($status);
+
+        if ($validationResult->isOk()) {
+            return StoryMessageSequence::empty();
+        }
+
+        return Messages::invalidStoryState(
+            $validationResult->errors()
+        );
+    }
+
+    public function deleteStory(Story $story): Story
+    {
+        $story->deletedAt = Date::dbNow();
+        $deletedStory = $this->storyRepository->save($story);
+        $this->deleteFromCache($deletedStory);
+
+        return $deletedStory;
+    }
+
     private function deleteStoryCandidate(StoryCandidate $candidate): bool
     {
         return $this->storyCandidateRepository->delete($candidate);
@@ -277,17 +325,6 @@ class StoryService
                 fn (Story $s) => $this->getCachedOrAddJsonStory($s)
             )
         );
-    }
-
-    private function addToCache(Story $story): Story
-    {
-        $this->cache[$story->getId()] = $story;
-        return $story;
-    }
-
-    private function getFromCache(int $id): ?Story
-    {
-        return $this->cache[$id] ?? null;
     }
 
     private function getJsonStory(int $id): ?JsonStory
@@ -310,5 +347,25 @@ class StoryService
         return $this->addToCache(
             new JsonStory($story)
         );
+    }
+
+    private function addToCache(Story $story): Story
+    {
+        $this->cache[$story->getId()] = $story;
+        return $story;
+    }
+
+    private function getFromCache(int $id): ?Story
+    {
+        return $this->cache[$id] ?? null;
+    }
+
+    private function deleteFromCache(Story $story): void
+    {
+        $id = $story->getId();
+
+        if (array_key_exists($id, $this->cache)) {
+            unset($this->cache[$id]);
+        }
     }
 }

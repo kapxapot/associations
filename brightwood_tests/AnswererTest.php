@@ -5,6 +5,7 @@ namespace Brightwood\Tests;
 use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Testing\Mocks\LinkerMock;
 use Brightwood\Answers\AnswererFactory;
+use Brightwood\Answers\UrlBuilder;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Hydrators\StoryStatusHydrator;
 use Brightwood\Models\Data\EightsData;
@@ -60,13 +61,12 @@ final class AnswererTest extends TestCase
 
         $this->answererFactory = new AnswererFactory(
             LoggerTestFactory::make(),
-            $settingsProvider,
-            new LinkerMock(),
             $this->storyStatusRepository,
             $storyService,
             ($storyParserFactory)(),
             $telegramUserService,
-            new TelegramTransportFactory($settingsProvider)
+            new TelegramTransportFactory($settingsProvider),
+            new UrlBuilder($settingsProvider, new LinkerMock())
         );
     }
 

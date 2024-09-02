@@ -3,6 +3,7 @@
 namespace Brightwood\Serialization\Cards\Serializers\Games;
 
 use Brightwood\Models\Cards\Games\EightsGame;
+use Brightwood\Models\Cards\Players\Player;
 use Brightwood\Parsing\StoryParser;
 use Brightwood\Serialization\Cards\Interfaces\RootDeserializerInterface;
 use Plasticode\Util\Cases;

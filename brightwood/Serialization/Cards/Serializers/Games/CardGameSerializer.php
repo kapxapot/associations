@@ -21,7 +21,9 @@ abstract class CardGameSerializer implements SerializerInterface
     {
         $players = PlayerCollection::from(
             Collection::make($data['players'])->map(
-                fn (array $p) => $rootDeserializer->deserialize($p)
+                fn (array $playerData) =>
+                    $rootDeserializer->getPlayer($playerData['data']['id'] ?? null)
+                        ?? $rootDeserializer->deserialize($playerData)
             )
         );
 

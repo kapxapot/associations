@@ -6,6 +6,7 @@ use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\StoryMessage;
 use Brightwood\Models\Messages\StoryMessageSequence;
 use Brightwood\Models\Messages\TextMessage;
+use Brightwood\Models\MetaKey;
 use PHPUnit\Framework\TestCase;
 
 final class StoryMessageSequenceTest extends TestCase
@@ -203,7 +204,7 @@ final class StoryMessageSequenceTest extends TestCase
         }
 
         $merged = $sequence1->merge($sequence2);
-        $stage = $merged->stage();
+        $stage = $merged->meta()[MetaKey::STAGE] ?? null;
 
         $this->assertEquals($expected, $stage);
     }

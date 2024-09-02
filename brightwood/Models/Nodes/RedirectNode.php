@@ -81,9 +81,17 @@ class RedirectNode extends AbstractLinkedNode
     ): StoryMessageSequence
     {
         $data = $this->mutate($data);
-        $link = $this->links->satisfying($data)->choose();
+        $satisfyingLinks = $this->links->satisfying($data);
 
-        Assert::notNull($link);
+        if ($satisfyingLinks->isEmpty()) {
+            return
+                StoryMessageSequence::textStuck(
+                    '[[Redirect node {node_id} doesn\'t have available links.]]'
+                )
+                ->withVar('node_id', $this->id);
+        }
+
+        $link = $satisfyingLinks->choose();
 
         $nextNode = $this->resolveNode($link->nodeId());
         $data = $link->mutate($data);

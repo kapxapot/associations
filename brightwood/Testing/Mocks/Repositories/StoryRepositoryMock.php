@@ -23,21 +23,21 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
 
     public function get(?int $id): ?Story
     {
-        return $this->stories->first(
-            fn (Story $s) => $s->getId() == $id
+        return $this->activeStories()->first(
+            fn (Story $story) => $story->getId() == $id
         );
     }
 
     public function getByUuid(string $uuid): ?Story
     {
-        return $this->stories->first(
-            fn (Story $s) => $s->uuid == $uuid
+        return $this->activeStories()->first(
+            fn (Story $story) => $story->uuid() == $uuid
         );
     }
 
     public function getAll(): StoryCollection
     {
-        return $this->stories;
+        return $this->activeStories();
     }
 
     public function getAllByLanguage(?string $langCode = null): StoryCollection
@@ -46,8 +46,8 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
             return $this->getAll();
         }
 
-        return $this->stories->where(
-            fn (Story $s) => $s->langCode() == $langCode
+        return $this->activeStories()->where(
+            fn (Story $story) => $story->langCode() == $langCode
         );
     }
 
@@ -57,7 +57,7 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
         return $this->save($story);
     }
 
-    private function save(Story $story): Story
+    public function save(Story $story): Story
     {
         if ($this->stories->contains($story)) {
             return $story;
@@ -69,7 +69,13 @@ class StoryRepositoryMock extends RepositoryMock implements StoryRepositoryInter
 
         $this->stories = $this->stories->add($story);
 
-        // return $this->hydrator->hydrate($version);
         return $story;
+    }
+
+    private function activeStories(): StoryCollection
+    {
+        return $this->stories->where(
+            fn (Story $story) => !$story->deletedAt
+        );
     }
 }
