@@ -92,7 +92,7 @@
     "Updated at": "Обновлена",
     "Edit": "Редактировать",
     "Delete": "Удалить",
-    "A permanent story": "Фиксированная история",
+    "A permanent story": "Перманентная история",
     "Are you sure you want to delete the story <b>{story_title}</b>?": "Вы уверены, что хотите удалить историю <b>{story_title}</b>?",
     "Deletion canceled.": "Удаление отменено.",
     "Invalid dialog state.": "Некорректное состояние диалога.",
