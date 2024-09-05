@@ -61,28 +61,33 @@ class Language implements CommandProviderInterface
         );
     }
 
-    public static function fromCode(string $code): ?Language
+    public static function fromCode(string $code): Language
     {
         $language = self::all()->first(
             fn (Language $l) => $l->code === $code
         );
 
-        if ($code === self::UNKNOWN) {
-            return new Language(
-                self::UNKNOWN,
-                'Unknown language',
-                '🌐'
-            );
+        if ($language) {
+            return $language;
         }
 
-        return $language;
+        return new Language(
+            self::UNKNOWN,
+            'Unknown language',
+            '🌐'
+        );
     }
 
     public static function purifyCode(?string $code): string
     {
-        return self::allCodes()->contains($code)
+        return self::isKnown($code)
             ? $code
             : self::UNKNOWN;
+    }
+
+    public static function isKnown(?string $code): bool
+    {
+        return self::allCodes()->contains($code);
     }
 
     public function toString(): string

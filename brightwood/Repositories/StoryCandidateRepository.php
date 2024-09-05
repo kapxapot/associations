@@ -21,10 +21,7 @@ class StoryCandidateRepository extends IdiormRepository implements StoryCandidat
     public function getByCreator(User $user): ?StoryCandidate
     {
         return $this
-            ->filterByCreator(
-                $this->query(),
-                $user
-            )
+            ->filterByCreator($this->query(), $user)
             ->one();
     }
 

@@ -27,6 +27,7 @@ use Exception;
 use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Traits\LoggerAwareTrait;
 use Plasticode\Util\Sort;
+use Plasticode\Util\SortStep;
 use Plasticode\Util\Strings;
 use Plasticode\Util\Text;
 use Psr\Log\LoggerInterface;
@@ -43,10 +44,8 @@ class Answerer
 {
     use LoggerAwareTrait;
 
-    const DEFAULT_LANGUAGE = Language::EN;
-
-    private const MB = 1024 * 1024; // 1 Mb
-    private const MAX_JSON_SIZE = 1; // Mb
+    private const MB = 1024 * 1024; // 1 MB
+    private const MAX_JSON_SIZE = 1; // MB
 
     private StoryStatusRepositoryInterface $storyStatusRepository;
     private StoryService $storyService;
@@ -133,19 +132,6 @@ class Answerer
 
         if (!$requiredStageMessages->isEmpty()) {
             return $requiredStageMessages;
-        }
-
-        // try executing story-specific commands
-        // probably, this can be moved to the bottom when we check the current story
-        // but this way the story's commands override all the global ones
-        if (Strings::startsWith($text, '/')) {
-            $executionResults = $this->executeStoryCommand($text);
-
-            if (!$executionResults->isEmpty()) {
-                return $executionResults->merge(
-                    $this->whereAreWe()
-                );
-            }
         }
 
         // story switch command
@@ -260,6 +246,10 @@ class Answerer
             return $this->processOverwrite($stage, $text);
         }
 
+        if ($stage === Stage::STORY_LANGUAGE) {
+            return $this->processStoryLanguage($text);
+        }
+
         if (strlen($text) === 0) {
             if ($documentUploaded) {
                 return
@@ -277,17 +267,37 @@ class Answerer
 
         // we checked everything unrelated to the current story
         // let's check if there IS a current story
+
+        // is there a status?
         $status = $this->getStatus();
 
         if (!$status) {
             return $this->cluelessMessage();
         }
 
-        // there is a current story + status
+        // is the status valid?
+        $validationMessages = $this->storyService->validateStatus($status);
+
+        if (!$validationMessages->isEmpty()) {
+            return $validationMessages;
+        }
+
+        // there is a current story + a valid status
         $story = $this->getStatusStory($status);
 
         if ($text === $this->parse(Action::RESTART)) {
             return $this->tryStartStory($story);
+        }
+
+        // try executing story-specific commands
+        if (Strings::startsWith($text, '/')) {
+            $executionResults = $story->executeCommand($text);
+
+            if (!$executionResults->isEmpty()) {
+                return $executionResults->merge(
+                    $this->whereAreWe()
+                );
+            }
         }
 
         $sequence = $this->continueStory($story, $status, $text);
@@ -398,29 +408,12 @@ class Answerer
         return StoryMessageSequence::empty();
     }
 
-    private function executeStoryCommand(string $command): StoryMessageSequence
-    {
-        $status = $this->getStatus();
-
-        if (!$status) {
-            return StoryMessageSequence::empty();
-        }
-
-        return $this->getStatusStory($status)->executeCommand($command);
-    }
-
     private function continueStory(
         Story $story,
         StoryStatus $status,
         string $text
     ): StoryMessageSequence
     {
-        $validationMessages = $this->storyService->validateStatus($status);
-
-        if (!$validationMessages->isEmpty()) {
-            return $validationMessages;
-        }
-
         if ($story->isFinish($status)) {
             return StoryMessageSequence::empty();
         }
@@ -458,7 +451,7 @@ class Answerer
             fn (Story $story) => Join::space(
                 $story->title(),
                 BotCommand::story($story),
-                $this->isAdmin() && $this->storyService->isStoryPublic($story) ? '👁' : ''
+                $this->isAdmin() && $this->storyService->isStoryPublic($story) ? '👁' : null
             )
         );
 
@@ -477,6 +470,7 @@ class Answerer
             }
 
             $groupInfos = $groupInfos->add([
+                'lang_code' => $langCode,
                 'language' => Language::fromCode($langCode),
                 'stories' => $group,
                 'count' => count($group),
@@ -487,7 +481,13 @@ class Answerer
             $sequence->addText(
                 '[[There are also stories in other languages]]:',
                 ...$groupInfos
-                    ->orderBy('count', Sort::DESC)
+                    ->sortBy(
+                        SortStep::byFuncDesc(
+                            fn (array $info) => $info['lang_code'] !== Language::UNKNOWN,
+                            Sort::BOOL
+                        ),
+                        SortStep::byFieldDesc('count')
+                    )
                     ->map(
                         function (array $info) {
                             $language = $info['language'];
@@ -522,7 +522,7 @@ class Answerer
             $text[] = Join::space(
                 '[[Author]]:',
                 Format::bold($creator->displayName()),
-                $you ? '([[That\'s you!]])' : ''
+                $you ? '([[That\'s you!]])' : null
             );
         }
 
@@ -703,7 +703,7 @@ class Answerer
                 throw new Exception('[[Invalid file. Upload a valid JSON file, please.]]');
             }
 
-            // 6. get story id, check that it's a valid uuid (!!!)
+            // 6. get the story id, check that it's a valid uuid (!!!)
             $storyUuid = $jsonData['id'];
 
             if (!Uuid::isValid($storyUuid)) {
@@ -716,10 +716,10 @@ class Answerer
             // 8. store the JSON to the user's story candidate record
             $storyCandidate = $this->storyService->saveStoryCandidate($this->tgUser, $jsonData);
 
-            // 9. get the story by id
+            // 9. get the story by uuid
             $story = $this->storyService->getStoryByUuid($storyUuid);
 
-            // 10. if the story doesn't exist, create new story
+            // 10. if the story doesn't exist or is deleted, create a new story
             if (!$story) {
                 return $this->newStory($storyCandidate);
             }
@@ -729,27 +729,28 @@ class Answerer
 
             // 12. if they can update it, ask them if they want to create a new version or create a new story (mark the original story as a source story)
             if ($canUpdate) {
-                $sequence =
+                return
                     StoryMessageSequence::text(
                         '⚠ [[The story <b>{story_title}</b> already exists.]]',
                         '[[Would you like to update it or to create a new one?]]',
                         Messages::uploadTips()
                     )
-                    ->withVar('story_title', $story->title());
-
-                return Stage::setStage($sequence, Stage::EXISTING_STORY);
+                    ->withVar('story_title', $story->title())
+                    ->withStage(Stage::EXISTING_STORY)
+                    ->withActions(Action::UPDATE, Action::NEW, Action::CANCEL);
             }
 
             // 13. if they can't update it, tell them that access is denied, but they can save it as a new story (mark the original story as a source story)
-            $sequence = StoryMessageSequence::text(
-                '⛔ [[You are trying to upload a story that you don\'t have access to.]]',
-                '[[Strictly speaking, you shouldn\'t do this.]] 🤔',
-                '[[But since we are already here, you can create a new story.]]',
-                '[[Create a new story?]]',
-                Messages::uploadTips()
-            );
-
-            return Stage::setStage($sequence, Stage::NOT_ALLOWED_STORY);
+            return
+                StoryMessageSequence::text(
+                    '⛔ [[You are trying to upload a story that you don\'t have access to.]]',
+                    '[[Strictly speaking, you shouldn\'t do this.]] 🤔',
+                    '[[But since we are already here, you can create a new story.]]',
+                    '[[Create a new story?]]',
+                    Messages::uploadTips()
+                )
+                ->withStage(Stage::NOT_ALLOWED_STORY)
+                ->withActions(Action::NEW, Action::CANCEL);
         } catch (Exception $ex) {
             return 
                 StoryMessageSequence::textFinalized(
@@ -769,14 +770,10 @@ class Answerer
             return Messages::uploadCanceled();
         }
 
-        $storyCandidate = $this->storyService->getStoryCandidateFor($this->tgUser);
+        $storyCandidate = $this->getStoryCandidate();
 
         if (!$storyCandidate) {
-            $this->logger->error("Story candidate for Telegram user [{$this->tgUser->getId()}] not found.");
-
-            return StoryMessageSequence::textFinalized(
-                '❌ [[Upload error. Try again.]]'
-            );
+            return $this->failedToLoadStoryCandidate();
         }
 
         // action label must be translated here
@@ -791,14 +788,21 @@ class Answerer
                 return $this->newStory($storyCandidate);
             }
 
-            $updatedStory = $this->storyService->updateStory($story, $storyCandidate);
+            // we need to update the story language
+            // if the story language is not set, we just set it (in the update)
+            // otherwise, we need to check if languages match
+            // if they don't, the user must choose one of the languages
+            $storyLangCode = $story->languageCode();
+            $candidateLangCode = $storyCandidate->language();
 
-            return
-                StoryMessageSequence::textFinalized(
-                    '✅ [[The story <b>{story_title}</b> was successfully updated!]]',
-                    '🕹 [[Play]]: ' . BotCommand::story($updatedStory)
-                )
-                ->withVar('story_title', $updatedStory->title());
+            if ($storyLangCode && $candidateLangCode && $storyLangCode !== $candidateLangCode) {
+                return $this->chooseStoryLanguage(
+                    $this->formatLanguage($storyLangCode),
+                    $this->formatLanguage($candidateLangCode)
+                );
+            }
+
+            return $this->updateStory($story, $storyCandidate);
         }
 
         // action label must be translated here
@@ -807,13 +811,116 @@ class Answerer
         }
 
         // we stay put
-        return Stage::setStage(
+        return
             StoryMessageSequence::text(
                 Messages::CLUELESS,
                 Messages::uploadTips()
-            ),
-            $stage
+            )
+            ->withStage($stage)
+            ->withActions(
+                $stage === Stage::EXISTING_STORY
+                    ? Action::UPDATE
+                    : null,
+                Action::NEW,
+                Action::CANCEL
+            );
+    }
+
+    private function chooseStoryLanguage(
+        string $oldLanguage,
+        string $newLanguage
+    ): StoryMessageSequence
+    {
+        return
+            StoryMessageSequence::text(
+                '⚠ [[The new story language [{new_language}] doesn\'t match the previous story language [{old_language}].]]',
+                '[[Please, choose the story language]]:',
+                Messages::uploadTips()
+            )
+            ->withVars([
+                'old_language' => $oldLanguage,
+                'new_language' => $newLanguage,
+            ])
+            ->withStage(Stage::STORY_LANGUAGE)
+            ->withActions($oldLanguage, $newLanguage);
+    }
+
+    /**
+     * Process the story language selection as a part of the story update process.
+     */
+    private function processStoryLanguage(string $text): StoryMessageSequence
+    {
+        $storyCandidate = $this->getStoryCandidate();
+
+        if (!$storyCandidate) {
+            return $this->failedToLoadStoryCandidate();
+        }
+
+        $story = $this->storyService->getStoryByUuid($storyCandidate->uuid);
+
+        // if the story was deleted for some reason...
+        if (!$story) {
+            return $this->newStory($storyCandidate);
+        }
+
+        $storyLangCode = $story->languageCode();
+        $candidateLangCode = $storyCandidate->language();
+
+        $oldLanguage = $this->formatLanguage($storyLangCode);
+        $newLanguage = $this->formatLanguage($candidateLangCode);
+
+        if ($text === $oldLanguage) {
+            return $this->updateStory($story, $storyCandidate, $storyLangCode);
+        }
+
+        if ($text === $newLanguage) {
+            return $this->updateStory($story, $storyCandidate);
+        }
+
+        return Messages::writtenSomethingWrong(
+            $this->chooseStoryLanguage($oldLanguage, $newLanguage)
         );
+    }
+
+    /**
+     * Updates the story with a candidate and a language override as a new story version.
+     *
+     * The resulting language code priority (from highest to lowest):
+     * - $langCode param
+     * - story candidate's language
+     * - story language
+     *
+     * @param string|null $langCode If provided, the story language is updated with it instead of the candidate's language.
+     */
+    private function updateStory(
+        Story $story,
+        StoryCandidate $storyCandidate,
+        ?string $langCode = null
+    ): StoryMessageSequence
+    {
+        $oldLangCode = $story->languageCode();
+
+        $updatedStory = $this->storyService->updateStory($story, $storyCandidate, $langCode);
+
+        $text = [
+            '✅ [[The story <b>{story_title}</b> was successfully updated!]]'
+        ];
+
+        $vars = [
+            'story_title' => $updatedStory->title(),
+        ];
+
+        $newLangCode = $updatedStory->languageCode();
+
+        if ($oldLangCode !== $newLangCode) {
+            $text[] = '[[The story language was set to [{language}].]]';
+            $vars['language'] = $this->formatLanguage($newLangCode);
+        }
+
+        $text[] = '🕹 [[Play]]: ' . BotCommand::story($updatedStory);
+
+        return StoryMessageSequence::textFinalized(...$text)
+            ->withVars($vars);
     }
 
     private function newStory(
@@ -823,12 +930,31 @@ class Answerer
     {
         $newStory = $this->storyService->newStory($storyCandidate, $uuid);
 
+        $uuidMessage = null;
+
+        if ($uuid) {
+            $uuidMessage = Text::join([
+                '[[The story has got a new id]]:',
+                $uuid
+            ]);
+        }
+
         return
             StoryMessageSequence::textFinalized(
                 '✅ [[A new story <b>{story_title}</b> has been successfully created!]]',
+                $uuidMessage,
                 '🕹 [[Play]]: ' . BotCommand::story($newStory)
             )
             ->withVar('story_title', $newStory->title());
+    }
+
+    private function failedToLoadStoryCandidate(): StoryMessageSequence
+    {
+        $this->logger->error("Story candidate for Telegram user [{$this->tgUser->getId()}] not found.");
+
+        return StoryMessageSequence::textFinalized(
+            '❌ [[Upload error. Try again.]]'
+        );
     }
 
     private function enterDeleteStory($story): StoryMessageSequence
@@ -870,17 +996,11 @@ class Answerer
 
     private function getStory(int $storyId): ?Story
     {
-        return $this->storyService->getStory($storyId);
-    }
+        $story = $this->storyService->getStory($storyId);
 
-    private function getLanguageCode(): string
-    {
-        return $this->tgUser->languageCode() ?? self::DEFAULT_LANGUAGE;
-    }
-
-    private function parse(string $text, ?array $vars = null): string
-    {
-        return $this->parser->parse($this->tgUser, $text, $vars, $this->tgLangCode);
+        return $story && !$story->isDeleted()
+            ? $story
+            : null;
     }
 
     private function isNewPlayer(): bool
@@ -896,6 +1016,11 @@ class Answerer
     private function getStatusStory(StoryStatus $status): Story
     {
         return $this->storyService->getStatusStory($status);
+    }
+
+    private function getStoryCandidate(): ?StoryCandidate
+    {
+        return $this->storyService->getStoryCandidateFor($this->tgUser);
     }
 
     private function getMetaStory(): ?Story
@@ -949,5 +1074,31 @@ class Answerer
         }
 
         return $this->storyService->isStoryDeletableBy($story, $this->tgUser);
+    }
+
+    private function formatLanguage(string $langCode): string
+    {
+        if (!Language::isKnown($langCode)) {
+            return $langCode;
+        }
+
+        return $this->translate(
+            Language::fromCode($langCode)->toString()
+        );
+    }
+
+    private function translate(string $text): string
+    {
+        return $this->parse("[[{$text}]]");
+    }
+
+    private function parse(string $text, ?array $vars = null): string
+    {
+        return $this->parser->parse($this->tgUser, $text, $vars, $this->tgLangCode);
+    }
+
+    private function getLanguageCode(): string
+    {
+        return $this->tgUser->languageCode() ?? $this->tgLangCode;
     }
 }

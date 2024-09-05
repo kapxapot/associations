@@ -160,4 +160,24 @@ final class StoryParserTest extends TestCase
             $this->parser->parse($this->default, $text)
         );
     }
+
+    public function testTranslateManyBrackets(): void
+    {
+        $text = '[[[word1]]] [[[[word2]]]]';
+
+        $this->assertEquals(
+            '[word1] [[word2]]',
+            $this->parser->parse($this->default, $text)
+        );
+    }
+
+    public function testNestedBrackets(): void
+    {
+        $text = '[[Legen [wait for it] dary]]';
+
+        $this->assertEquals(
+            'Legen [wait for it] dary',
+            $this->parser->parse($this->default, $text)
+        );
+    }
 }

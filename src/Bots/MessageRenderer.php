@@ -70,7 +70,7 @@ class MessageRenderer implements MessageRendererInterface
     {
         if ($this->translator) {
             $text = preg_replace_callback(
-                "/\\[\\[([^\\]]+)\\]\\]/",
+                '/\[\[(.+)\]\]/U',
                 fn (array $m) => $this->translateMatch($m[1]),
                 $text
             );

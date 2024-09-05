@@ -20,4 +20,29 @@ class StoryCandidate extends DbModel implements CreatedInterface, UpdatedAtInter
 {
     use Created;
     use UpdatedAt;
+
+    private ?array $storyData = null;
+
+    /**
+     * @return $this
+     */
+    public function withJsonData(string $jsonData): self
+    {
+        $this->jsonData = $jsonData;
+        $this->storyData = null;
+
+        return $this;
+    }
+
+    public function data(): array
+    {
+        $this->storyData ??= json_decode($this->jsonData, true);
+
+        return $this->storyData;
+    }
+
+    public function language(): ?string
+    {
+        return $this->data()['language'] ?? null;
+    }
 }

@@ -22,12 +22,7 @@ class StoryRepository extends IdiormRepository implements StoryRepositoryInterfa
 
     public function get(?int $id): ?Story
     {
-        return $this
-            ->activeQuery()
-            ->apply(
-                fn (Query $q) => $this->filterById($q, $id)
-            )
-            ->one();
+        return $this->getEntity($id);
     }
 
     public function getByUuid(string $uuid): ?Story

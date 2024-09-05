@@ -8,12 +8,24 @@ use Plasticode\Repositories\Interfaces\Generic\GetRepositoryInterface;
 
 interface StoryRepositoryInterface extends GetRepositoryInterface
 {
+    /**
+     * Can return a deleted story.
+     */
     public function get(?int $id): ?Story;
 
+    /**
+     * Cannot return a deleted story.
+     */
     public function getByUuid(string $uuid): ?Story;
 
+    /**
+     * Filters out deleted stories.
+     */
     public function getAll(): StoryCollection;
 
+    /**
+     * Filters out deleted stories.
+     */
     public function getAllByLanguage(?string $langCode = null): StoryCollection;
 
     public function store(array $data): Story;

@@ -116,13 +116,14 @@ class StoryService
         $user = $tgUser->user();
         $candidate = $this->storyCandidateRepository->getByCreator($user);
 
-        if (!$candidate) {
-            $candidate = StoryCandidate::create([
-                'created_by' => $user->getId()
-            ]);
-        }
+        $candidate ??= StoryCandidate::create([
+            'created_by' => $user->getId()
+        ]);
 
-        $candidate->jsonData = json_encode($jsonData);
+        $candidate->withJsonData(
+            json_encode($jsonData)
+        );
+
         $candidate->uuid = $jsonData['id'];
 
         return $this->storyCandidateRepository->save($candidate);
@@ -139,20 +140,21 @@ class StoryService
         ?string $uuid = null
     ): JsonStory
     {
+        $data = $storyCandidate->data();
+
         $story = $this->storyRepository->store([
             'uuid' => $uuid ?? $storyCandidate->uuid,
-            'created_by' => $storyCandidate->createdBy
+            'created_by' => $storyCandidate->createdBy,
+            'lang_code' => $data['language'] ?? null
         ]);
 
-        $jsonData = $storyCandidate->jsonData;
-
         if ($uuid) {
-            $jsonData['id'] = $uuid;
+            $data['id'] = $uuid;
         }
 
         $this->storyVersionRepository->store([
             'story_id' => $story->getId(),
-            'json_data' => $jsonData,
+            'json_data' => json_encode($data),
             'created_by' => $storyCandidate->createdBy
         ]);
 
@@ -162,10 +164,28 @@ class StoryService
     }
 
     /**
-     * Applies story candidate to the story as a new story version.
+     * Applies story candidate to the story and a language override as a new story version.
+     *
+     * The resulting language code priority (from highest to lowest):
+     * - $langCode param
+     * - story candidate's language
+     * - story language
+     *
+     * @param string|null $langCode If provided, the story language is updated with it instead of the candidate's language.
      */
-    public function updateStory(Story $story, StoryCandidate $storyCandidate): JsonStory
+    public function updateStory(
+        Story $story,
+        StoryCandidate $storyCandidate,
+        ?string $langCode = null
+    ): JsonStory
     {
+        $language = $langCode ?? $storyCandidate->language();
+
+        if ($language && $story->languageCode() !== $language) {
+            $story->langCode = $language;
+            $this->storyRepository->save($story);
+        }
+
         $currentVersion = $story->currentVersion();
 
         $newVersion = $this->storyVersionRepository->store([
@@ -352,6 +372,7 @@ class StoryService
     private function addToCache(Story $story): Story
     {
         $this->cache[$story->getId()] = $story;
+
         return $story;
     }
 

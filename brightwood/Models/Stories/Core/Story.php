@@ -40,9 +40,9 @@ class Story extends DbModel implements CreatedInterface
 {
     use Created;
 
-    protected const MAX_TITLE_LENGTH = 250;
-    protected const MAX_DESCRIPTION_LENGTH = 1000;
-    protected const MAX_LANG_CODE_LENGTH = 10;
+    const MAX_TITLE_LENGTH = 250;
+    const MAX_DESCRIPTION_LENGTH = 1000;
+    const MAX_LANG_CODE_LENGTH = 10;
 
     protected string $title = 'Untitled';
     protected ?string $description = null;
@@ -271,6 +271,15 @@ class Story extends DbModel implements CreatedInterface
      */
     public function validateStatus(StoryStatus $status): ValidationResult
     {
+        if ($this->isDeleted()) {
+            return ValidationResult::error(
+                StoryMessageSequence::text(
+                    '[[The story {story_title} is deleted.]]'
+                )
+                ->withVar('story_title', $this->title())
+            );
+        }
+
         $nodeId = $status->stepId;
         $node = $this->getNode($nodeId);
 

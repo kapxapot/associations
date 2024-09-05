@@ -87,11 +87,11 @@ class Message implements MessageInterface
     /**
      * @return static
      */
-    public function appendActions(string ...$actions): self
+    public function appendActions(?string ...$actions): self
     {
         $this->actions = array_merge(
             $this->actions,
-            $actions
+            Arrays::clean($actions)
         );
 
         return $this;

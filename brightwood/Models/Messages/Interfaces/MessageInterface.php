@@ -22,7 +22,7 @@ interface MessageInterface extends SequencableInterface
 
     public function hasActions(): bool;
 
-    public function appendActions(string ...$actions): self;
+    public function appendActions(?string ...$actions): self;
 
     public function data(): ?StoryData;
 

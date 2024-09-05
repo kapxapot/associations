@@ -4,26 +4,26 @@ namespace Brightwood\Hydrators;
 
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Brightwood\Models\Stories\Core\Story;
-use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
+use Brightwood\Services\StoryService;
 use Plasticode\Hydrators\Generic\Hydrator;
 use Plasticode\Models\Generic\DbModel;
 
 class StoryHydrator extends Hydrator
 {
-    private StoryRepositoryInterface $storyRepository;
     private StoryVersionRepositoryInterface $storyVersionRepository;
     private UserRepositoryInterface $userRepository;
+    private StoryService $storyService;
 
     public function __construct(
-        StoryRepositoryInterface $storyRepository,
         StoryVersionRepositoryInterface $storyVersionRepository,
-        UserRepositoryInterface $userRepository
+        UserRepositoryInterface $userRepository,
+        StoryService $storyService
     )
     {
-        $this->storyRepository = $storyRepository;
         $this->storyVersionRepository = $storyVersionRepository;
         $this->userRepository = $userRepository;
+        $this->storyService = $storyService;
     }
 
     /**
@@ -36,7 +36,7 @@ class StoryHydrator extends Hydrator
                 fn () => $this->storyVersionRepository->getCurrentVersion($entity)
             )
             ->withSourceStory(
-                fn () => $this->storyRepository->get($entity->sourceStoryId)
+                fn () => $this->storyService->getStory($entity->sourceStoryId)
             )
             ->withCreator(
                 fn () => $this->userRepository->get($entity->createdBy)

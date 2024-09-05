@@ -11,6 +11,7 @@ use Brightwood\Models\Messages\Interfaces\SequencableInterface;
 use Brightwood\Models\MetaKey;
 use Brightwood\Models\Stories\Core\Story;
 use Plasticode\Collections\Generic\Collection;
+use Plasticode\Util\Arrays;
 
 class StoryMessageSequence implements SequencableInterface
 {
@@ -204,14 +205,15 @@ class StoryMessageSequence implements SequencableInterface
      *
      * @return $this
      */
-    public function withActions(string ...$actions): self
+    public function withActions(?string ...$actions): self
     {
+        /** @var MessageInterface|null */
         $last = $this->messages->last();
 
         if ($last) {
             $last->appendActions(...$actions);
         } else {
-            $this->actions = $actions;
+            $this->actions = Arrays::clean($actions);
         }
 
         return $this;
