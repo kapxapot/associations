@@ -834,7 +834,7 @@ class Answerer
         return
             StoryMessageSequence::text(
                 '⚠ [[The new story language [{new_language}] doesn\'t match the previous story language [{old_language}].]]',
-                '[[Please, choose the story language]]:',
+                '[[Please, choose the story language.]] 👇',
                 Messages::uploadTips()
             )
             ->withVars([
