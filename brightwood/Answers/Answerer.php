@@ -512,6 +512,17 @@ class Answerer
             $story->description(),
         ];
 
+        $meta = [];
+
+        $langCode = $story->languageCode();
+
+        if ($langCode) {
+            $meta[] = Join::space(
+                '[[Language]]:',
+                $this->formatLanguage($langCode)
+            );
+        }
+
         $creator = $story->creator();
 
         if ($creator) {
@@ -519,11 +530,15 @@ class Answerer
                 $this->tgUser->user()
             );
 
-            $text[] = Join::space(
+            $meta[] = Join::space(
                 '[[Author]]:',
                 Format::bold($creator->displayName()),
                 $you ? '([[That\'s you!]])' : null
             );
+        }
+
+        if (!empty($meta)) {
+            $text[] = Text::join($meta);
         }
 
         if ($this->isAdmin()) {

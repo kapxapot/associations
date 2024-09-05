@@ -101,5 +101,6 @@
     "The story {story_title} is deleted.": "История {story_title} удалена.",
     "The story language was set to [{language}].": "Язык истории был изменен на [{language}].",
     "The new story language [{new_language}] doesn't match the previous story language [{old_language}].": "Новый язык истории [{new_language}] не совпадает с предыдущим языком истории [{old_language}].",
-    "Please, choose the story language.": "Пожалуйста, выберите язык истории."
+    "Please, choose the story language.": "Пожалуйста, выберите язык истории.",
+    "Language": "Язык"
 }
