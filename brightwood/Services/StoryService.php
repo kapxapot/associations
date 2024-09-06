@@ -17,6 +17,7 @@ use Brightwood\Repositories\Interfaces\StaticStoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryCandidateRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryRepositoryInterface;
 use Brightwood\Repositories\Interfaces\StoryVersionRepositoryInterface;
+use Brightwood\Util\Uuid;
 use Plasticode\Util\Date;
 
 class StoryService
@@ -133,24 +134,35 @@ class StoryService
      * Creates a story + a story version from a story candidate.
      * Then deletes the candidate.
      *
-     * @param string|null $uuid If uuid is provided, a story with this uuid is created.
+     * @param boolean $fork If it's a fork, a new uuid is generated.
      */
     public function newStory(
         StoryCandidate $storyCandidate,
-        ?string $uuid = null
+        bool $fork = false
     ): JsonStory
     {
         $data = $storyCandidate->data();
 
-        $story = $this->storyRepository->store([
-            'uuid' => $uuid ?? $storyCandidate->uuid,
+        $story = Story::create([
             'created_by' => $storyCandidate->createdBy,
-            'lang_code' => $data['language'] ?? null
+            'lang_code' => $data['language'] ?? null,
         ]);
 
-        if ($uuid) {
-            $data['id'] = $uuid;
+        if ($fork) {
+            $story->uuid = Uuid::new();
+
+            $sourceStory = $this->getStoryByUuid($storyCandidate->uuid);
+
+            if ($sourceStory) {
+                $story->sourceStoryId = $sourceStory->getId();
+            }
+
+            $data['id'] = $story->uuid;
+        } else {
+            $story->uuid = $storyCandidate->uuid;
         }
+
+        $story = $this->storyRepository->save($story);
 
         $this->storyVersionRepository->store([
             'story_id' => $story->getId(),

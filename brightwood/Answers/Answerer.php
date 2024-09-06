@@ -734,7 +734,7 @@ class Answerer
             // 9. get the story by uuid
             $story = $this->storyService->getStoryByUuid($storyUuid);
 
-            // 10. if the story doesn't exist or is deleted, create a new story
+            // 10. if the story not found, create a new story
             if (!$story) {
                 return $this->newStory($storyCandidate);
             }
@@ -798,7 +798,7 @@ class Answerer
         ) {
             $story = $this->storyService->getStoryByUuid($storyCandidate->uuid);
 
-            // if the story was deleted for some reason...
+            // if the story not found for some reason...
             if (!$story) {
                 return $this->newStory($storyCandidate);
             }
@@ -822,7 +822,7 @@ class Answerer
 
         // action label must be translated here
         if ($text === $this->parse(Action::NEW)) {
-            return $this->newStory($storyCandidate, Uuid::new());
+            return $this->forkStory($storyCandidate);
         }
 
         // we stay put
@@ -873,7 +873,7 @@ class Answerer
 
         $story = $this->storyService->getStoryByUuid($storyCandidate->uuid);
 
-        // if the story was deleted for some reason...
+        // if the story not found for some reason...
         if (!$story) {
             return $this->newStory($storyCandidate);
         }
@@ -938,19 +938,24 @@ class Answerer
             ->withVars($vars);
     }
 
+    private function forkStory(StoryCandidate $storyCandidate): StoryMessageSequence
+    {
+        return $this->newStory($storyCandidate, true);
+    }
+
     private function newStory(
         StoryCandidate $storyCandidate,
-        ?string $uuid = null
+        bool $fork = false
     ): StoryMessageSequence
     {
-        $newStory = $this->storyService->newStory($storyCandidate, $uuid);
+        $newStory = $this->storyService->newStory($storyCandidate, $fork);
 
         $uuidMessage = null;
 
-        if ($uuid) {
+        if ($fork) {
             $uuidMessage = Text::join([
                 '[[The story has got a new id]]:',
-                $uuid
+                $newStory->uuid
             ]);
         }
 
