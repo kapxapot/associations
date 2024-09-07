@@ -77,26 +77,24 @@ class StoryService
 
     public function getStoriesPlayableBy(TelegramUser $tgUser, ?string $langCode = null): StoryCollection
     {
-        $playableStories = $this
-            ->storyRepository
-            ->getAllByLanguage($langCode)
+        return $this
+            ->toRichStories(
+                $this->storyRepository->getAllByLanguage($langCode)
+            )
             ->where(
-                fn (Story $s) => $this->isStoryPlayableBy($s, $tgUser)
+                fn (Story $story) => $this->isStoryPlayableBy($story, $tgUser)
             );
-
-        return $this->toRichStories($playableStories);
     }
 
     public function getStoriesEditableBy(TelegramUser $tgUser): StoryCollection
     {
-        $editableStories = $this
-            ->storyRepository
-            ->getAll()
+        return $this
+            ->toRichStories(
+                $this->storyRepository->getAll()
+            )
             ->where(
-                fn (Story $s) => $this->isStoryEditableBy($s, $tgUser)
+                fn (Story $story) => $this->isStoryEditableBy($story, $tgUser)
             );
-
-        return $this->toRichStories($editableStories);
     }
 
     public function getDefaultStoryId(): int

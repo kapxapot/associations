@@ -451,7 +451,8 @@ class Answerer
             fn (Story $story) => Join::space(
                 $story->title(),
                 BotCommand::story($story),
-                $this->isAdmin() && $this->storyService->isStoryPublic($story) ? '👁' : null
+                $this->isAdmin() && $this->storyService->isStoryPublic($story) ? '👁' : null,
+                $this->isEditable($story) ? '🖊' : null
             )
         );
 
@@ -563,7 +564,8 @@ class Answerer
         $sequence = StoryMessageSequence::text(...$text);
 
         if ($this->isEditable($story)) {
-            $sequence->addText(Action::EDIT .': ' . BotCommand::edit($story));
+            $sequence->addText(Action::EDIT . ': ' . BotCommand::edit($story));
+            $sequence->addText(Action::UPDATE . ': ' . BotCommand::UPLOAD);
         }
 
         if ($this->isDeletable($story)) {
