@@ -11,6 +11,7 @@ class TelegramTransport implements TelegramTransportInterface
     const API_BASE_URL = 'https://api.telegram.org';
 
     const COMMAND_SEND_MESSAGE = 'sendMessage';
+    const COMMAND_SEND_PHOTO = 'sendPhoto';
     const COMMAND_GET_CHAT_MEMBER = 'getChatMember';
     const COMMAND_GET_FILE = 'getFile';
 
@@ -32,6 +33,14 @@ class TelegramTransport implements TelegramTransportInterface
     public function sendMessage(array $message): string
     {
         return $this->executeCommand(self::COMMAND_SEND_MESSAGE, $message);
+    }
+
+    /**
+     * @throws Exception
+     */
+    public function sendPhoto(array $message): string
+    {
+        return $this->executeCommand(self::COMMAND_SEND_PHOTO, $message);
     }
 
     /**

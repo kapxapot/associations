@@ -100,7 +100,11 @@ class BrightwoodBotController
                 }
 
                 try {
-                    $result = $this->telegram->sendMessage($answer);
+                    if (isset($answer['photo'])) {
+                        $result = $this->telegram->sendPhoto($answer);
+                    } else {
+                        $result = $this->telegram->sendMessage($answer);
+                    }
                 } catch (Exception $ex) {
                     $result = $ex->getMessage();
                 }
@@ -293,11 +297,23 @@ class BrightwoodBotController
 
     private function buildTelegramMessage(string $chatId, string $text): array
     {
-        return [
+        $result = [
             'chat_id' => $chatId,
             'parse_mode' => 'html',
-            'text' => $text,
         ];
+
+        if ($this->isImageUrl($text)) {
+            $result['photo'] = $text;
+        } else {
+            $result['text'] = $text;
+        }
+
+        return $result;
+    }
+
+    private function isImageUrl(string $text): bool
+    {
+        return preg_match('/^https?:\/\/.*\.(png|jpe?g|gif|webp)$/i', $text);
     }
 
     private function parseMessage(
