@@ -8,7 +8,6 @@ use App\Repositories\Interfaces\TelegramUserRepositoryInterface;
 use App\Services\TelegramUserService;
 use Brightwood\Answers\Action;
 use Brightwood\Answers\AnswererFactory;
-use Brightwood\Answers\BotCommand;
 use Brightwood\Factories\TelegramTransportFactory;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Message;
@@ -17,6 +16,7 @@ use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\TelegramUserService as BrightwoodTelegramUserService;
 use Exception;
+use InvalidArgumentException;
 use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Debug;
@@ -208,8 +208,11 @@ class BrightwoodBotController
             if ($sequence->isFinalized() || $sequence->isStuck()) {
                 $defaultActions = [];
 
-                if ($this->storyStatusRepository->getByTelegramUser($tgUser)) {
+                $status = $this->storyStatusRepository->getByTelegramUser($tgUser);
+
+                if ($status) {
                     $defaultActions[] = Action::RESTART;
+                    $defaultActions[] = Action::SHOW_STORY;
                 }
 
                 $defaultActions[] = Action::STORY_SELECTION;
@@ -228,20 +231,19 @@ class BrightwoodBotController
             }
         }
 
+        $messages = $sequence->splitImageMessages();
+
         return ArrayCollection::from(
-            $sequence
-                ->messages()
-                ->map(
-                    fn (MessageInterface $message) =>
-                        $this->toTelegramMessage(
-                            $tgUser,
-                            $tgLangCode,
-                            $chatId,
-                            $message,
-                            $defaultActions,
-                            $sequence->vars()
-                        )
+            $messages->map(
+                fn (MessageInterface $message) => $this->toTelegramMessage(
+                    $tgUser,
+                    $tgLangCode,
+                    $chatId,
+                    $message,
+                    $defaultActions,
+                    $sequence->vars()
                 )
+            )
         );
     }
 
@@ -274,8 +276,8 @@ class BrightwoodBotController
             $message->appendActions(...$defaultActions);
         }
 
-        $message = $this->parseMessage($tgUser, $tgLangCode, $message, $vars);
-        $actions = $message->actions();
+        $parsedMessage = $this->parseMessage($tgUser, $tgLangCode, $message, $vars);
+        $actions = $parsedMessage->actions();
 
         Assert::notEmpty(
             $actions,
@@ -284,7 +286,8 @@ class BrightwoodBotController
 
         $answer = $this->buildTelegramMessage(
             $chatId,
-            $this->messageToText($message)
+            $this->messageToText($parsedMessage),
+            $message->image()
         );
 
         $answer['reply_markup'] = [
@@ -295,25 +298,33 @@ class BrightwoodBotController
         return $answer;
     }
 
-    private function buildTelegramMessage(string $chatId, string $text): array
+    /**
+     * @throws InvalidArgumentException
+     */
+    private function buildTelegramMessage(
+        string $chatId,
+        ?string $text = null,
+        ?string $image = null
+    ): array
     {
+        Assert::true(
+            strlen($text) > 0 || strlen($image) > 0,
+            'Either text or image must be provided.'
+        );
+
         $result = [
             'chat_id' => $chatId,
             'parse_mode' => 'html',
         ];
 
-        if ($this->isImageUrl($text)) {
-            $result['photo'] = $text;
+        if (strlen($image) > 0) {
+            $result['photo'] = $image;
+            $result['caption'] = $text;
         } else {
             $result['text'] = $text;
         }
 
         return $result;
-    }
-
-    private function isImageUrl(string $text): bool
-    {
-        return preg_match('/^https?:\/\/.*\.(png|jpe?g|gif|webp)$/i', $text);
     }
 
     private function parseMessage(

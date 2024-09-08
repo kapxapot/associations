@@ -289,6 +289,10 @@ class Answerer
             return $this->tryStartStory($story);
         }
 
+        if ($text === $this->parse(Action::SHOW_STORY)) {
+            return $this->showStory($story);
+        }
+
         // try executing story-specific commands
         if (Strings::startsWith($text, '/')) {
             $executionResults = $story->executeCommand($text);

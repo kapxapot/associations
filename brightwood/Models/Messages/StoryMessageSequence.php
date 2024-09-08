@@ -4,14 +4,14 @@ namespace Brightwood\Models\Messages;
 
 use App\Bots\Traits\Vars;
 use Brightwood\Collections\MessageCollection;
-use Brightwood\Collections\StoryMessageCollection;
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Interfaces\SequencableInterface;
 use Brightwood\Models\MetaKey;
 use Brightwood\Models\Stories\Core\Story;
+use Brightwood\Util\Regex;
+use Brightwood\Util\Util;
 use Plasticode\Collections\Generic\Collection;
-use Plasticode\Util\Arrays;
 
 class StoryMessageSequence implements SequencableInterface
 {
@@ -36,11 +36,6 @@ class StoryMessageSequence implements SequencableInterface
     public function messages(): MessageCollection
     {
         return $this->messages;
-    }
-
-    public function storyMessages(): StoryMessageCollection
-    {
-        return $this->messages->storyMessages();
     }
 
     public function meta(): array
@@ -213,7 +208,7 @@ class StoryMessageSequence implements SequencableInterface
         if ($last) {
             $last->appendActions(...$actions);
         } else {
-            $this->actions = Arrays::clean($actions);
+            $this->actions = Util::clean($actions);
         }
 
         return $this;
@@ -292,9 +287,14 @@ class StoryMessageSequence implements SequencableInterface
     public function nodeId(): ?int
     {
         /** @var StoryMessage|null */
-        $last = $this->storyMessages()->last(
-            fn (StoryMessage $m) => $m->nodeId() > 0
-        );
+        $last = $this
+            ->messages
+            ->where(
+                fn (MessageInterface $message) => $message instanceof StoryMessage
+            )
+            ->last(
+                fn (StoryMessage $m) => $m->nodeId() > 0
+            );
 
         return $last
             ? $last->nodeId()
@@ -419,6 +419,73 @@ class StoryMessageSequence implements SequencableInterface
     public function hasActions(): bool
     {
         return !empty($this->actions);
+    }
+
+    /**
+     * Splits messages with images into separate messages.
+     *
+     * If an image is found, it starts a new message. All previous lines are put into a TextMessage.
+     */
+    public function splitImageMessages(): MessageCollection
+    {
+        $splitMessages = [];
+
+        /** @var MessageInterface $message */
+        foreach ($this->messages as $message) {
+            $lines = $message->lines();
+            $imageIndexes = [];
+
+            foreach ($lines as $index => $line) {
+                if (Regex::isImageUrl($line)) {
+                    $imageIndexes[] = $index;
+                }
+            }
+
+            $imageCount = count($imageIndexes);
+
+            if (!$imageCount) {
+                $splitMessages[] = $message;
+                continue;
+            }
+
+            // e.g., we have an array of 10 lines
+            // and we have 3 image indexes: 2, 4, 7
+            // we will split the array into 4 messages:
+            // - lines 0-1 (start .. index1 - 1)
+            // - lines 2-3 (index1 .. index2 - 1)
+            // - lines 4-6 (index2 .. index3 - 1)
+            // - lines 7-9 (index3 .. end)
+
+            // if the first message is not an image,
+            // cut the beginning of the array and create a text message
+            $firstIndex = $imageIndexes[0];
+
+            if ($firstIndex > 0) {
+                $slice = array_slice($lines, 0, $firstIndex);
+                $splitMessages[] = new TextMessage(...$slice);
+            }
+
+            for ($i = 0; $i < $imageCount; $i++) {
+                $index = $imageIndexes[$i];
+                $image = $lines[$index];
+                $index++;
+
+                if ($i < $imageCount - 1) {
+                    // not last
+                    $nextIndex = $imageIndexes[$i + 1];
+                    $slice = array_slice($lines, $index, $nextIndex - $index);
+                    $splitMessage = new TextMessage(...$slice);
+                } else {
+                    // last
+                    $slice = array_slice($lines, $index);
+                    $splitMessage = $message->withLines(...$slice);
+                }
+
+                $splitMessages[] = $splitMessage->withImage($image);
+            }
+        }
+
+        return MessageCollection::make($splitMessages);
     }
 
     private function hasMetaKey(string $key): bool

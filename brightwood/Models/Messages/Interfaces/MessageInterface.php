@@ -11,9 +11,20 @@ interface MessageInterface extends SequencableInterface
      */
     public function lines(): array;
 
-    public function prependLines(string ...$lines): self;
+    /**
+     * @return $this
+     */
+    public function prependLines(?string ...$lines): self;
 
-    public function appendLines(string ...$lines): self;
+    /**
+     * @return $this
+     */
+    public function appendLines(?string ...$lines): self;
+
+    /**
+     * @return $this
+     */
+    public function withLines(?string ...$lines): self;
 
     /**
      * @return string[]
@@ -22,9 +33,19 @@ interface MessageInterface extends SequencableInterface
 
     public function hasActions(): bool;
 
+    /**
+     * @return $this
+     */
     public function appendActions(?string ...$actions): self;
 
     public function data(): ?StoryData;
 
     public function hasData(): bool;
+
+    public function image(): ?string;
+
+    /**
+     * @return $this
+     */
+    public function withImage(string $image): self;
 }

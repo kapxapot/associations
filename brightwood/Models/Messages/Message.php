@@ -4,7 +4,7 @@ namespace Brightwood\Models\Messages;
 
 use Brightwood\Models\Data\StoryData;
 use Brightwood\Models\Messages\Interfaces\MessageInterface;
-use Plasticode\Util\Arrays;
+use Brightwood\Util\Util;
 
 class Message implements MessageInterface
 {
@@ -14,17 +14,21 @@ class Message implements MessageInterface
     /** @var string[] */
     protected array $actions;
 
+    protected ?string $image;
+
     /**
      * @param (string|null)[]|null $lines
-     * @param string[]|null $actions
+     * @param (string|null)[]|null $actions
      */
     public function __construct(
         ?array $lines = null,
-        ?array $actions = null
+        ?array $actions = null,
+        ?string $image = null
     )
     {
-        $this->lines = $lines ? Arrays::clean($lines) : [];
-        $this->actions = $actions ?? [];
+        $this->lines = Util::clean($lines);
+        $this->actions = Util::clean($actions);
+        $this->image = $image;
     }
 
     /**
@@ -43,6 +47,11 @@ class Message implements MessageInterface
         return $this->actions;
     }
 
+    public function image(): ?string
+    {
+        return $this->image;
+    }
+
     public function hasActions(): bool
     {
         return !empty($this->actions);
@@ -58,42 +67,45 @@ class Message implements MessageInterface
         return $this->data() !== null;
     }
 
-    /**
-     * @return static
-     */
     public function prependLines(?string ...$lines): self
     {
         $this->lines = array_merge(
-            Arrays::clean($lines),
+            Util::clean($lines),
             $this->lines
         );
 
         return $this;
     }
 
-    /**
-     * @return static
-     */
     public function appendLines(?string ...$lines): self
     {
         $this->lines = array_merge(
             $this->lines,
-            Arrays::clean($lines)
+            Util::clean($lines)
         );
 
         return $this;
     }
 
-    /**
-     * @return static
-     */
+    public function withLines(?string ...$lines): self
+    {
+        $this->lines = Util::clean($lines);
+        return $this;
+    }
+
     public function appendActions(?string ...$actions): self
     {
         $this->actions = array_merge(
             $this->actions,
-            Arrays::clean($actions)
+            Util::clean($actions)
         );
 
+        return $this;
+    }
+
+    public function withImage(string $image): self
+    {
+        $this->image = $image;
         return $this;
     }
 }

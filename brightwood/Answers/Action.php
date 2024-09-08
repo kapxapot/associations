@@ -18,6 +18,7 @@ class Action
 
     const START_STORY = '🚀 [[Start]]';
     const RESTART = '♻ [[Start again]]';
+    const SHOW_STORY = '🎭 [[Story]]';
     const STORY_SELECTION = '📚 [[Select story]]';
 
     const TROUBLESHOOT = '🛠 [[The bot is broken! Fix it!]]';
