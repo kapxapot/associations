@@ -27,6 +27,7 @@ class EightsStory extends Story
     const ID = 3;
     const TITLE = '♠ Карточная игра «Восьмерки»';
     const DESCRIPTION = 'Простая карточная игра с ботами. Сложность: 3/5';
+    const COVER = 'https://i.imgur.com/xR4HkR5.png';
 
     private const RULES_COMMAND = '/rules';
     private const DRAW_CARD_COMMAND = '🎴 Взять карту';
@@ -63,6 +64,7 @@ class EightsStory extends Story
 
         $this->title = self::TITLE;
         $this->description = self::DESCRIPTION;
+        $this->cover = self::COVER;
 
         $this->prepare();
     }

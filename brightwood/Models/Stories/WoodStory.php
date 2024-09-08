@@ -12,6 +12,7 @@ class WoodStory extends Story
     const ID = 1;
     const TITLE = '🌲 Лес';
     const DESCRIPTION = 'Вы заблудились в лесу и пытаетесь из него выбраться. Или не пытаетесь. Сложность: 3/5';
+    const COVER = 'https://i.imgur.com/2gykp3B.png';
 
     private const START = 1;
     private const STARVED = 2;
@@ -52,6 +53,7 @@ class WoodStory extends Story
 
         $this->title = self::TITLE;
         $this->description = self::DESCRIPTION;
+        $this->cover = self::COVER;
 
         $this->prepare();
     }
