@@ -140,9 +140,9 @@ class EightsStory extends Story
             self::PLAYERS_NUMBER_CHOICE,
             'Выберите количество игроков:',
             [
-                self::TWO_PLAYERS => '2',
-                self::THREE_PLAYERS => '3',
-                self::FOUR_PLAYERS => '4',
+                [self::TWO_PLAYERS, '2'],
+                [self::THREE_PLAYERS, '3'],
+                [self::FOUR_PLAYERS, '4'],
             ]
         );
 

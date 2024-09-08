@@ -17,7 +17,7 @@ class RedirectNode extends AbstractLinkedNode
 
     /**
      * @param string[] $text
-     * @param (RedirectLink|array|int)[] $links
+     * @param (RedirectLink|array|int)[] $links [nodeId, weight] or just `nodeId`
      *
      * @throws InvalidArgumentException
      */

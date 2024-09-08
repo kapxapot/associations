@@ -142,13 +142,12 @@ class JsonStory extends Story
                 return $builder->addActionNode(
                     $id,
                     $data['text'] ?? [],
-                    array_reduce(
-                        $data['actions'],
-                        function ($result, $item) {
-                            $result[$item['id']] = $item['label'];
-                            return $result;
-                        },
-                        []
+                    array_map(
+                        fn (array $item) => [
+                            $item['id'],
+                            $item['label'],
+                        ],
+                        $data['actions']
                     )
                 );
 

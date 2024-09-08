@@ -21,7 +21,7 @@ class StoryBuilder
 
     /**
      * @param string|string[] $text
-     * @param array<int, string> $links NodeId -> Text
+     * @param (ActionLink|array)[] $links [nodeId, action]
      */
     public function addActionNode(int $id, $text, array $links): ActionNode
     {
@@ -39,7 +39,6 @@ class StoryBuilder
     {
         $text = $this->arraify($text);
         $node = new FinishNode($id, $text);
-
         $this->story->addNode($node);
 
         return $node;
@@ -47,7 +46,7 @@ class StoryBuilder
 
     /**
      * @param string|string[] $text
-     * @param (RedirectLink|array|int)[] $links
+     * @param (RedirectLink|array|int)[] $links [nodeId, weight] or just `nodeId`
      *
      * @throws InvalidArgumentException
      */
@@ -55,7 +54,6 @@ class StoryBuilder
     {
         $text = $this->arraify($text);
         $node = new RedirectNode($id, $text, $links);
-
         $this->story->addNode($node);
 
         return $node;
@@ -68,7 +66,6 @@ class StoryBuilder
     {
         $text = $this->arraify($text);
         $node = new SkipNode($id, $nextNodeId, $text);
-
         $this->story->addNode($node);
 
         return $node;
@@ -81,7 +78,6 @@ class StoryBuilder
     ): FunctionNode
     {
         $node = new FunctionNode($id, $actionFunc, $finishFunc);
-
         $this->story->addNode($node);
 
         return $node;

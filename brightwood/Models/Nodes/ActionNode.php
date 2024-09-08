@@ -17,21 +17,46 @@ class ActionNode extends AbstractLinkedNode
 
     /**
      * @param string[] $text
-     * @param array<int, string> $links NodeId -> Text
+     * @param (ActionLink|array)[] $links [nodeId, action]
      */
     public function __construct(int $id, array $text, array $links)
     {
         parent::__construct($id, $text);
 
-        Assert::notEmpty($links);
+        $this->links = $this->parseLinks($links);
 
-        $this->links = ActionLinkCollection::make(
-            array_map(
-                fn (int $nodeId, string $text) => new ActionLink($nodeId, $text),
-                array_keys($links),
-                $links
-            )
-        );
+        Assert::notEmpty($this->links);
+    }
+
+    /**
+     * @param (ActionLink|array)[] $links
+     *
+     * @throws InvalidArgumentException
+     */
+    private function parseLinks(array $links): ActionLinkCollection
+    {
+        $result = ActionLinkCollection::empty();
+
+        foreach ($links as $link) {
+            if ($link instanceof ActionLink) {
+                $result = $result->add($link);
+                continue;
+            }
+
+            if (is_array($link)) {
+                [$nodeId, $action] = $link;
+
+                $result = $result->add(
+                    new ActionLink($nodeId, $action)
+                );
+
+                continue;
+            }
+
+            throw new InvalidArgumentException("Invalid action link format.");
+        }
+
+        return $result;
     }
 
     public function links(): ActionLinkCollection

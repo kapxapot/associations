@@ -2,6 +2,7 @@
 
 namespace Brightwood\Models\Data;
 
+use InvalidArgumentException;
 use Plasticode\Exceptions\InvalidOperationException;
 use Webmozart\Assert\Assert;
 
@@ -97,7 +98,7 @@ class WoodData extends StoryData
      * Hits the player for $amount HP down to 0.
      *
      * @param int $amount Must be non-negative.
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function hit(int $amount): self
     {
@@ -117,7 +118,7 @@ class WoodData extends StoryData
      * If the player is already dead, they can't be healed (nothing happens).
      *
      * @param int $amount Must be non-negative int.
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function heal(int $amount): self
     {
