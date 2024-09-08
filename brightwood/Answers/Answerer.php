@@ -512,10 +512,16 @@ class Answerer
 
     private function showStory(Story $story): StoryMessageSequence
     {
-        $text = [
+        $message = new TextMessage(
             Format::bold($story->title()),
-            $story->description(),
-        ];
+            $story->description()
+        );
+
+        $cover = $story->cover();
+
+        if ($cover) {
+            $message->withImage($cover);
+        }
 
         $meta = [];
 
@@ -543,7 +549,7 @@ class Answerer
         }
 
         if (!empty($meta)) {
-            $text[] = Text::join($meta);
+            $message->appendLines(Text::join($meta));
         }
 
         if ($this->isAdmin()) {
@@ -560,12 +566,12 @@ class Answerer
                 $dates[] = '[[Updated at]]: ' . Format::utc($updatedAt);
             }
 
-            $text[] = Text::join($dates);
+            $message->appendLines(Text::join($dates));
         }
 
-        $text[] = Action::START_STORY . ': ' . BotCommand::START_STORY;
+        $message->appendLines(Action::START_STORY . ': ' . BotCommand::START_STORY);
 
-        $sequence = StoryMessageSequence::text(...$text);
+        $sequence = StoryMessageSequence::make($message);
 
         if ($this->isEditable($story)) {
             $sequence->addText(Action::EDIT . ': ' . BotCommand::edit($story));

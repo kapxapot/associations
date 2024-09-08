@@ -5,6 +5,7 @@ namespace Brightwood\Models\Stories\Core;
 use Brightwood\Models\Data\JsonStoryData;
 use Brightwood\Models\Nodes\AbstractStoryNode;
 use Brightwood\StoryBuilder;
+use Closure;
 use InvalidArgumentException;
 use Plasticode\Util\Strings;
 use Webmozart\Assert\Assert;
@@ -40,29 +41,28 @@ class JsonStory extends Story
 
     public function title(): string
     {
-        $title = $this->getValue('title');
-
-        if (!$title) {
-            return parent::title();
-        }
-
-        return Strings::trunc(
-            $title,
+        return $this->getStoryValue(
+            'title',
+            fn () => parent::title(),
             self::MAX_TITLE_LENGTH
         );
     }
 
     public function description(): ?string
     {
-        $description = $this->getValue('description');
-
-        if (!$description) {
-            return parent::description();
-        }
-
-        return Strings::trunc(
-            $description,
+        return $this->getStoryValue(
+            'description',
+            fn () => parent::description(),
             self::MAX_DESCRIPTION_LENGTH
+        );
+    }
+
+    public function cover(): ?string
+    {
+        return $this->getStoryValue(
+            'cover',
+            fn () => parent::cover(),
+            self::MAX_COVER_LENGTH
         );
     }
 
@@ -130,6 +130,21 @@ class JsonStory extends Story
                 $this->setStartNode($node);
             }
         }
+    }
+
+    private function getStoryValue(
+        string $key,
+        Closure $fallback,
+        int $maxLength
+    ): ?string
+    {
+        $value = $this->getValue($key);
+
+        if (!$value) {
+            return ($fallback)();
+        }
+
+        return Strings::trunc($value, $maxLength);
     }
 
     private function buildNode(StoryBuilder $builder, array $data): AbstractStoryNode

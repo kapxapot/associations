@@ -42,10 +42,12 @@ class Story extends DbModel implements CreatedInterface
 
     const MAX_TITLE_LENGTH = 250;
     const MAX_DESCRIPTION_LENGTH = 1000;
+    const MAX_COVER_LENGTH = 500;
     const MAX_LANG_CODE_LENGTH = 10;
 
     protected string $title = 'Untitled';
     protected ?string $description = null;
+    protected ?string $cover = null;
 
     protected StoryNodeCollection $nodes;
     protected ?AbstractStoryNode $startNode = null;
@@ -76,6 +78,18 @@ class Story extends DbModel implements CreatedInterface
         return Strings::trunc(
             $this->description,
             self::MAX_DESCRIPTION_LENGTH
+        );
+    }
+
+    public function cover(): ?string
+    {
+        if (!$this->cover) {
+            return null;
+        }
+
+        return Strings::trunc(
+            $this->cover,
+            self::MAX_COVER_LENGTH
         );
     }
 
