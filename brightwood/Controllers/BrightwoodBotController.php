@@ -298,20 +298,12 @@ class BrightwoodBotController
         return $answer;
     }
 
-    /**
-     * @throws InvalidArgumentException
-     */
     private function buildTelegramMessage(
         string $chatId,
         ?string $text = null,
         ?string $image = null
     ): array
     {
-        Assert::true(
-            strlen($text) > 0 || strlen($image) > 0,
-            'Either text or image must be provided.'
-        );
-
         $result = [
             'chat_id' => $chatId,
             'parse_mode' => 'html',
