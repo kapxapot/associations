@@ -17,11 +17,13 @@ class Language implements CommandProviderInterface
     const EN = 'en';
     const ES = 'es';
     const FR = 'fr';
+    const HI = 'hi';
     const HY = 'hy';
     const IT = 'it';
     const JA = 'ja';
     const KA = 'ka';
     const KO = 'ko';
+    const PT = 'pt';
     const RU = 'ru';
     const UK = 'uk';
     const ZH = 'zh';
@@ -43,11 +45,13 @@ class Language implements CommandProviderInterface
             new Language(self::EN, 'English', '🇬🇧'),
             new Language(self::ES, 'Español', '🇪🇸'),
             new Language(self::FR, 'Français', '🇫🇷'),
+            new Language(self::HI, 'हिन्दी', '🇮🇳'),
             new Language(self::HY, 'Հայերեն', '🇦🇲'),
             new Language(self::IT, 'Italiano', '🇮🇹'),
             new Language(self::JA, '日本語', '🇯🇵'),
             new Language(self::KA, 'ქართული', '🇬🇪'),
             new Language(self::KO, '한국어', '🇰🇷'),
+            new Language(self::PT, 'Português', '🇵🇹'),
             new Language(self::RU, 'Русский', '🇷🇺'),
             new Language(self::UK, 'Українська', '🇺🇦'),
             new Language(self::ZH, '中文', '🇨🇳'),
