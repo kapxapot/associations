@@ -9,7 +9,7 @@
 {% set word_upper = word.full_display_name|upper %}
 {% set title = word_upper ~ ' - Слова' %}
 
-{% block content %}
+{% block inner_content %}
     <div class="panel panel-primary">
         {{ lm.panel_header(_context, word_upper, {
             'breadcrumbs': [

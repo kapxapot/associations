@@ -5,6 +5,23 @@
 {% set no_social = true %}
 {% set sidebar = true %}
 
+{% block content %}
+    <style>
+        @media (max-width: 767px) {
+            .small-mt {
+                margin-top: 1rem;
+            }
+        }
+    </style>
+    <div class="small-mt" style="text-align: center; margin-bottom: 1rem; background: linear-gradient(90deg, rgba(131,58,180,1) 0%, rgba(253,29,29,1) 50%, rgba(252,176,69,1) 100%); border-radius: 10px; padding-top: 5px; padding-bottom: 5px; text-wrap: balance">
+        <a href="https://t.me/GPToid_Bot?start=wc1" style="color: white; text-decoration: none">
+            Общайтесь с ChatGPT легко и просто!<br />
+            <b>GPToid</b> — Телеграм-бот от создателя Warcry.ru
+        </a>
+    </div>
+    {% block inner_content %}{% endblock %}
+{% endblock %}
+
 {% set more_angular %}
     {% if not debug %}
         $scope.postSuccess = (data) => {

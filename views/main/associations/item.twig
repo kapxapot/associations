@@ -8,7 +8,7 @@
 
 {% set title = lm.association(association, null, true, true)|upper %}
 
-{% block content %}
+{% block inner_content %}
     <div class="panel panel-primary">
         {{ lm.panel_header(_context, title, { 'no_breadcrumbs': true }) }}
 
