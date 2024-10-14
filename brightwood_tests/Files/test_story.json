@@ -2,7 +2,7 @@
     "id": "some-uuid",
     "title": "Лес",
     "startId": 1,
-    "prefix": "День: {day}",
+    "prefix": "День: {{day}}",
     "data": {
         "init": {
             "day": 1

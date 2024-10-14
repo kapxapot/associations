@@ -20,22 +20,22 @@ abstract class AbstractAnswerer
     protected const STATE_COMMANDS = 'commands';
     protected const STATE_COMMAND_CONFIRM = 'command_confirm';
 
-    protected const MESSAGE_CLUELESS = 'Извини{att:те}, не понял{|а}.';
-    protected const MESSAGE_WELCOME = '{hello}! Поиграем в ассоциации?';
-    protected const MESSAGE_WELCOME_BACK = 'С возвращением! Чтобы напомнить, как играть, скажите {cmd:rules}.';
-    protected const MESSAGE_BYE = '{att:До свидания|Пока}! Заходи{att:те} ещё!';
+    protected const MESSAGE_CLUELESS = 'Извини{{att:те}}, не понял{{|а}}.';
+    protected const MESSAGE_WELCOME = '{{hello}}! Поиграем в ассоциации?';
+    protected const MESSAGE_WELCOME_BACK = 'С возвращением! Чтобы напомнить, как играть, скажите {{cmd:rules}}.';
+    protected const MESSAGE_BYE = '{{att:До свидания|Пока}}! Заходи{{att:те}} ещё!';
 
-    protected const CHUNK_RULES = 'Чтобы узнать, как играть, скажи{att:те} {cmd:rules}.';
-    protected const CHUNK_COMMANDS = 'Чтобы узнать, как управлять игрой, скажи{att:те} {cmd:commands}.';
-    protected const CHUNK_PLAY = 'Чтобы перейти к игре, скажи{att:те} {cmd:play}.';
+    protected const CHUNK_RULES = 'Чтобы узнать, как играть, скажи{{att:те}} {{cmd:rules}}.';
+    protected const CHUNK_COMMANDS = 'Чтобы узнать, как управлять игрой, скажи{{att:те}} {{cmd:commands}}.';
+    protected const CHUNK_PLAY = 'Чтобы перейти к игре, скажи{{att:те}} {{cmd:play}}.';
 
-    protected const MESSAGE_DEMO = 'Игра идёт в демо-режиме. Для полной игры, пожалуйста, авторизуй{att:тесь|ся}.';
+    protected const MESSAGE_DEMO = 'Игра идёт в демо-режиме. Для полной игры, пожалуйста, авторизуй{{att:тесь|ся}}.';
 
-    private const MESSAGE_RULES = 'В игре в ассоциации мы с {att:вами|тобой} говорим по очереди слово, которое ассоциируется с предыдущим. Например, я говорю {q:лес}, {att:вы|ты} отвечае{att:те|шь} {q:заяц}, я говорю {q:морковка} и так далее.';
+    private const MESSAGE_RULES = 'В игре в ассоциации мы с {{att:вами|тобой}} говорим по очереди слово, которое ассоциируется с предыдущим. Например, я говорю {{q:лес}}, {{att:вы|ты}} отвечае{{att:те|шь}} {{q:заяц}}, я говорю {{q:морковка}} и так далее.';
 
-    protected const MESSAGE_COMMANDS_APPLICATION = 'Для пропуска слова скажи{att:те} {cmd:skip}. Для выхода скажи{att:те} {cmd:enough}.';
+    protected const MESSAGE_COMMANDS_APPLICATION = 'Для пропуска слова скажи{{att:те}} {{cmd:skip}}. Для выхода скажи{{att:те}} {{cmd:enough}}.';
 
-    protected const MESSAGE_COMMANDS_USER = 'Для пропуска слова скажи{att:те} {cmd:skip}. Для повтора слова скажи{att:те} {cmd:repeat}. Спроси{att:те} {cmd:what}, чтобы узнать значение слова. Если {att:вам|тебе} не нравится слово или ассоциация, скажи{att:те} {cmd:word_dislike} или {cmd:association_dislike}. Для выхода скажи{att:те} {cmd:enough}.';
+    protected const MESSAGE_COMMANDS_USER = 'Для пропуска слова скажи{{att:те}} {{cmd:skip}}. Для повтора слова скажи{{att:те}} {{cmd:repeat}}. Спроси{{att:те}} {{cmd:what}}, чтобы узнать значение слова. Если {{att:вам|тебе}} не нравится слово или ассоциация, скажи{{att:те}} {{cmd:word_dislike}} или {{cmd:association_dislike}}. Для выхода скажи{{att:те}} {{cmd:enough}}.';
 
     protected const MESSAGE_SKIP = 'Хорошо.';
     protected const MESSAGE_START_ANEW = 'Новое слово:';
@@ -447,8 +447,8 @@ abstract class AbstractAnswerer
     {
         return $this->randomString(
             'Ой! Надеюсь, рядом нет детей.',
-            '{att:В|Т}ы вгоняе{att:те|шь} меня в краску.',
-            'Ну у {att:вас|тебя} и словечки!',
+            '{{att:В|Т}}ы вгоняе{{att:те|шь}} меня в краску.',
+            'Ну у {{att:вас|тебя}} и словечки!',
             'Хм... Как скажете.'
         );
     }

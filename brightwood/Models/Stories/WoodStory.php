@@ -72,7 +72,7 @@ class WoodStory extends Story
     {
         $builder = new StoryBuilder($this);
 
-        $this->setPrefixMessage('День: {day}, Здоровье: {hp}');
+        $this->setPrefixMessage('День: {{day}}, Здоровье: {{hp}}');
 
         $start = $builder->addSkipNode(
             self::START,

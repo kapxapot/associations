@@ -51,7 +51,7 @@ class LanguageStage extends AbstractStage
         return
             StoryMessageSequence::text(
                 '[[Thank you! Your language preference has been saved and will now be taken into account.]] 👌',
-                '[[You can change your language at any time using the {language_command} command.]]'
+                '[[You can change your language at any time using the {{language_command}} command.]]'
             )
             ->merge($successSequence)
             ->withVar('language_command', BotCommand::LANGUAGE);

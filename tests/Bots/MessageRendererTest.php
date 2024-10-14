@@ -40,7 +40,7 @@ final class MessageRendererTest extends TestCase
 
     public function testGenderedText(): void
     {
-        $text = 'hello, {male|female} friend';
+        $text = 'hello, {{male|female}} friend';
 
         $this->assertEquals(
             'hello, male friend',
@@ -55,7 +55,7 @@ final class MessageRendererTest extends TestCase
 
     public function testValidVarAndSemiEmptyGender(): void
     {
-        $text = '{hello}, приятель{|ница}!';
+        $text = '{{hello}}, приятель{{|ница}}!';
 
         $this->renderer->withVar('hello', 'Привет');
 
@@ -72,7 +72,7 @@ final class MessageRendererTest extends TestCase
 
     public function testInvalidVar(): void
     {
-        $text = 'Здоровье: {hp}';
+        $text = 'Здоровье: {{hp}}';
 
         $this->assertEquals(
             'Здоровье: hp',
@@ -82,7 +82,7 @@ final class MessageRendererTest extends TestCase
 
     public function testQuoteHandler(): void
     {
-        $text = '{q:ёлка}';
+        $text = '{{q:ёлка}}';
 
         $this->assertEquals(
             '«ёлка»',
@@ -92,7 +92,7 @@ final class MessageRendererTest extends TestCase
 
     public function testCommandHandler(): void
     {
-        $text = '{cmd:enough}';
+        $text = '{{cmd:enough}}';
 
         $this->assertEquals(
             '«хватит»',
@@ -102,7 +102,7 @@ final class MessageRendererTest extends TestCase
 
     public function testUnknownCommandHandler(): void
     {
-        $text = '{cmd:bark}';
+        $text = '{{cmd:bark}}';
 
         $this->assertEquals(
             '«bark»',
@@ -112,7 +112,7 @@ final class MessageRendererTest extends TestCase
 
     public function testAttitudeVar(): void
     {
-        $text = '{att:Здравствуйте|Привет}, {att:уважаемый|чувак}!';
+        $text = '{{att:Здравствуйте|Привет}}, {{att:уважаемый|чувак}}!';
 
         $this->assertEquals(
             'Здравствуйте, уважаемый!',
@@ -127,7 +127,7 @@ final class MessageRendererTest extends TestCase
 
     public function testAttitudeShortVar(): void
     {
-        $text = 'скажи{att:те}';
+        $text = 'скажи{{att:те}}';
 
         $this->assertEquals(
             'скажите',

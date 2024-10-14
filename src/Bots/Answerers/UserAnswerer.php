@@ -207,7 +207,7 @@ class UserAnswerer extends AbstractAnswerer
         return $this
             ->buildResponse(
                 $prependMessages,
-                'Для подтверждения команды повтори{att:те} её или скажи{att:те} слово {cmd:command}. Если {att:в|т}ы хо{att:тите|чешь} сказать слово {cmd:' . $command . '} в игре, скажи{att:те} {cmd:playing}.'
+                'Для подтверждения команды повтори{{att:те}} её или скажи{{att:те}} слово {{cmd:command}}. Если {{att:в|т}}ы хо{{att:тите|чешь}} сказать слово {{cmd:' . $command . '}} в игре, скажи{{att:те}} {{cmd:playing}}.'
             )
             ->withUserVar(self::VAR_STATE, self::STATE_COMMAND_CONFIRM)
             ->withUserVar(self::VAR_COMMAND, $command)
@@ -273,7 +273,7 @@ class UserAnswerer extends AbstractAnswerer
     {
         return $this->currentGameResponse(
             $botUser,
-            'Я не могу выполнить эту команду в игре. Скажи{att:те} {cmd:enough}, чтобы выйти.',
+            'Я не могу выполнить эту команду в игре. Скажи{{att:те}} {{cmd:enough}}, чтобы выйти.',
             'А мое слово:'
         );
     }
@@ -327,7 +327,7 @@ class UserAnswerer extends AbstractAnswerer
         $parsedDefinition = $this->wordService->getParsedTransitiveDefinition($word);
 
         if ($parsedDefinition === null) {
-            return 'Я не знаю, что такое {q:' . $wordStr . '}.';
+            return 'Я не знаю, что такое {{q:' . $wordStr . '}}.';
         }
 
         $definitionWord = $parsedDefinition->word();
@@ -343,7 +343,7 @@ class UserAnswerer extends AbstractAnswerer
     {
         return $this->currentGameResponse(
             $botUser,
-            'Давай{att:те} не больше {word_limit} сразу. Итак, я говорю:'
+            'Давай{{att:те}} не больше {{word_limit}} сразу. Итак, я говорю:'
         );
     }
 
@@ -357,7 +357,7 @@ class UserAnswerer extends AbstractAnswerer
 
         return $this->newGameResponse(
             $botUser,
-            'Спасибо, {att:ваш|твой} отзыв сохранен.',
+            'Спасибо, {{att:ваш|твой}} отзыв сохранен.',
             self::MESSAGE_START_ANEW
         );
     }
@@ -369,7 +369,7 @@ class UserAnswerer extends AbstractAnswerer
         if ($association === null) {
             return $this->currentGameResponse(
                 $botUser,
-                'Названо только одно слово, и ассоциации ещё нет. Скажи{att:те} {cmd:word_dislike}, если {att:вам|тебе} не нравится слово.',
+                'Названо только одно слово, и ассоциации ещё нет. Скажи{{att:те}} {{cmd:word_dislike}}, если {{att:вам|тебе}} не нравится слово.',
                 'Я говорю:'
             );
         }
@@ -380,7 +380,7 @@ class UserAnswerer extends AbstractAnswerer
 
         return $this->newGameResponse(
             $botUser,
-            'Спасибо, {att:ваш|твой} отзыв сохранен.',
+            'Спасибо, {{att:ваш|твой}} отзыв сохранен.',
             self::MESSAGE_START_ANEW
         );
     }
@@ -515,7 +515,7 @@ class UserAnswerer extends AbstractAnswerer
 
         return $turn !== null
             ? $this->renderWord($turn->word())
-            : 'Мне нечего сказать. Начинай{att:те} {att:в|т}ы.';
+            : 'Мне нечего сказать. Начинай{{att:те}} {{att:в|т}}ы.';
     }
 
     /**

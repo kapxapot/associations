@@ -41,13 +41,13 @@ class Messages
     }
 
     /**
-     * Add {upload_command} var.
+     * Add {{upload_command}} var.
      */
     public static function editorTips(): string
     {
         return Text::join([
             '🔹 ⚠ [[At the moment, the editor works correctly only on a <b>desktop</b>!]]',
-            '🔹 [[After editing the story export it into a JSON file and upload it here, using the {upload_command} command.]]'
+            '🔹 [[After editing the story export it into a JSON file and upload it here, using the {{upload_command}} command.]]'
         ]);
     }
 

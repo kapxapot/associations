@@ -242,7 +242,7 @@ class EightsStory extends Story
             $card = Card::tryParse($input);
 
             if (!$playableCards->contains($card)) {
-                $sequence->addText('У вас нет такой карты. Вы что, шулер{|ка}? 🤔');
+                $sequence->addText('У вас нет такой карты. Вы что, шулер{{|ка}}? 🤔');
             } else {
                 $events = $game->putCard($player, $card);
 

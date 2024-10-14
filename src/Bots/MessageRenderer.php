@@ -12,10 +12,10 @@ use Plasticode\Semantics\Gender;
  * Renders the following constructs:
  *
  * - [[text]] - translates text using the provided translator
- * - {one|two|three} - based on genders (1, 2, 3)
- * - {var_name} - renders var value
- * - {handler:text} - applies handler to text
- * - {var_name:one|two|three} - based on var value (1, 2, 3)
+ * - {{one|two|three}} - based on genders (masculine, feminine, neutral)
+ * - {{var_name}} - renders var value
+ * - {{handler:text}} - applies handler to text
+ * - {{var_name:one|two|three}} - based on var value (1, 2, 3)
  */
 class MessageRenderer implements MessageRendererInterface
 {
@@ -77,8 +77,8 @@ class MessageRenderer implements MessageRendererInterface
         }
 
         return preg_replace_callback(
-            "/{(?:([^:}]+):)?([^}]+)}/",
-            fn (array $m) => $this->renderMatch($m[1], $m[2]),
+            "/{{(.+)}}/U",
+            fn (array $m) => $this->renderMatch($m[1]),
             $text
         );
     }
@@ -93,12 +93,20 @@ class MessageRenderer implements MessageRendererInterface
     }
 
     /**
-     * @param array<string, mixed> $context
-     *
      * @throws InvalidConfigurationException
      */
-    private function renderMatch(string $tag, string $text): string
+    private function renderMatch(string $match): string
     {
+        $colonPos = mb_strpos($match, ':');
+
+        if ($colonPos === false) {
+            $tag = null;
+            $text = $match;
+        } else {
+            $tag = mb_substr($match, 0, $colonPos);
+            $text = mb_substr($match, $colonPos + 1);
+        }
+
         if (strlen($tag) > 0) {
             // render with selector
             if ($this->hasHandler($tag)) {

@@ -86,7 +86,7 @@ class RedirectNode extends AbstractLinkedNode
         if ($satisfyingLinks->isEmpty()) {
             return
                 StoryMessageSequence::textStuck(
-                    '[[Redirect node {node_id} doesn\'t have available links.]]'
+                    '[[Redirect node {{node_id}} doesn\'t have available links.]]'
                 )
                 ->withVar('node_id', $this->id);
         }

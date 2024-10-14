@@ -255,7 +255,7 @@ class Answerer
                 return
                     StoryMessageSequence::textFinalized(
                         '❌ [[You\'ve uploaded a document, but in a wrong place.]]',
-                        '[[If you want to upload a story, use the {upload_command} command.]]'
+                        '[[If you want to upload a story, use the {{upload_command}} command.]]'
                     )
                     ->withVar('upload_command', BotCommand::UPLOAD);
             }
@@ -366,7 +366,7 @@ class Answerer
     {
         return
             StoryMessageSequence::mash(
-                new TextMessage('❌ [[Story with id = {story_id} not found.]]'),
+                new TextMessage('❌ [[Story with id = {{story_id}} not found.]]'),
                 $this->whereAreWe()
             )
             ->withVar('story_id', $storyId);
@@ -375,8 +375,8 @@ class Answerer
     private function startCommand(): StoryMessageSequence
     {
         $greeting = $this->isNewPlayer()
-            ? '[[Welcome, <b>{user_name}</b>!]]'
-            : '[[Welcome back, <b>{user_name}</b>!]]';
+            ? '[[Welcome, <b>{{user_name}}</b>!]]'
+            : '[[Welcome back, <b>{{user_name}}</b>!]]';
 
         return
             StoryMessageSequence::mash(
@@ -447,7 +447,7 @@ class Answerer
         $curLang = Language::fromCode($curLangCode);
 
         if (!$curLangStories || $curLangStories->isEmpty()) {
-            return StoryMessageSequence::textFinalized("⛔ [[No stories in {language}.]]")
+            return StoryMessageSequence::textFinalized("⛔ [[No stories in {{language}}.]]")
                 ->withVar('language', $curLang);
         }
 
@@ -658,7 +658,7 @@ class Answerer
 
         return
             StoryMessageSequence::textFinalized(
-                '[[Follow the link to edit the story <b>{story_title}</b>]]:',
+                '[[Follow the link to edit the story <b>{{story_title}}</b>]]:',
                 $url,
                 Messages::editorTips()
             )
@@ -699,7 +699,7 @@ class Answerer
                 // translate the message right away because we need to set the var
                 throw new Exception(
                     $this->parse(
-                        '[[The file size cannot exceed {max_json_size} MB. Upload a smaller file, please.]]',
+                        '[[The file size cannot exceed {{max_json_size}} MB. Upload a smaller file, please.]]',
                         ['max_json_size' => self::MAX_JSON_SIZE]
                     )
                 );
@@ -758,7 +758,7 @@ class Answerer
             if ($canUpdate) {
                 return
                     StoryMessageSequence::text(
-                        '⚠ [[The story <b>{story_title}</b> already exists.]]',
+                        '⚠ [[The story <b>{{story_title}}</b> already exists.]]',
                         '[[Would you like to update it or to create a new one?]]',
                         Messages::uploadTips()
                     )
@@ -860,7 +860,7 @@ class Answerer
     {
         return
             StoryMessageSequence::text(
-                '⚠ [[The new story language [{new_language}] doesn\'t match the previous story language [{old_language}].]]',
+                '⚠ [[The new story language [{{new_language}}] doesn\'t match the previous story language [{{old_language}}].]]',
                 '[[Please, choose the story language.]] 👇',
                 Messages::uploadTips()
             )
@@ -930,7 +930,7 @@ class Answerer
         $updatedStory = $this->storyService->updateStory($story, $storyCandidate, $langCode);
 
         $text = [
-            '✅ [[The story <b>{story_title}</b> was successfully updated!]]'
+            '✅ [[The story <b>{{story_title}}</b> was successfully updated!]]'
         ];
 
         $vars = [
@@ -940,7 +940,7 @@ class Answerer
         $newLangCode = $updatedStory->languageCode();
 
         if ($oldLangCode !== $newLangCode) {
-            $text[] = '[[The story language was set to [{language}].]]';
+            $text[] = '[[The story language was set to [{{language}}].]]';
             $vars['language'] = $this->formatLanguage($newLangCode);
         }
 
@@ -973,7 +973,7 @@ class Answerer
 
         return
             StoryMessageSequence::textFinalized(
-                '✅ [[A new story <b>{story_title}</b> has been successfully created!]]',
+                '✅ [[A new story <b>{{story_title}}</b> has been successfully created!]]',
                 $uuidMessage,
                 '🕹 [[Play]]: ' . BotCommand::story($newStory)
             )
@@ -993,7 +993,7 @@ class Answerer
     {
         return
             StoryMessageSequence::text(
-                '🗑 [[Are you sure you want to delete the story <b>{story_title}</b>?]]'
+                '🗑 [[Are you sure you want to delete the story <b>{{story_title}}</b>?]]'
             )
             ->withVar('story_title', $story->title())
             ->withActions(Action::DELETE, Action::CANCEL)
@@ -1016,7 +1016,7 @@ class Answerer
 
             return
                 StoryMessageSequence::textFinalized(
-                    '✅ [[The story <b>{story_title}</b> was successfully deleted!]]'
+                    '✅ [[The story <b>{{story_title}}</b> was successfully deleted!]]'
                 )
                 ->withVar('story_title', $title);
         }

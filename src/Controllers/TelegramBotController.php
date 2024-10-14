@@ -27,6 +27,7 @@ use Plasticode\Core\Response;
 use Plasticode\Exceptions\ValidationException;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Traits\LoggerAwareTrait;
+use Plasticode\Util\Strings;
 use Plasticode\Util\Text;
 use Plasticode\Validation\Interfaces\ValidatorInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -290,7 +291,7 @@ class TelegramBotController
      */
     private function getAnswer(TelegramUser $tgUser, string $text): array
     {
-        if (strpos($text, self::COMMAND_START) === 0) {
+        if (Strings::startsWith($text, self::COMMAND_START)) {
             return $this->startCommand($tgUser);
         }
 
@@ -300,16 +301,16 @@ class TelegramBotController
             return $this->readAge($tgUser, $text);
         }
 
-        if (strpos($text, '/skip') === 0) {
+        if (Strings::startsWith($text, '/skip')) {
             return $this->skipCommand($tgUser);
         }
 
-        if (strpos($text, '/what') === 0) {
+        if (Strings::startsWith($text, '/what')) {
             $commandText = $this->extractCommandText($text);
             return $this->whatCommand($tgUser, $commandText);
         }
 
-        if (strpos($text, '/say') === 0) {
+        if (Strings::startsWith($text, '/say')) {
             $text = $this->extractCommandText($text);
 
             if (strlen($text) === 0) {

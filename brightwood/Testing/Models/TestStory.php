@@ -35,7 +35,7 @@ class TestStory extends Story
     {
         $builder = new StoryBuilder($this);
 
-        $this->setPrefixMessage('День: {day}');
+        $this->setPrefixMessage('День: {{day}}');
 
         $start = $builder->addActionNode(
             1,

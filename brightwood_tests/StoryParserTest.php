@@ -26,7 +26,7 @@ final class StoryParserTest extends TestCase
             new TranslatorTestFactory([
                 Language::RU => [
                     'two' => 'два',
-                    'two {day}' => 'два {day}',
+                    'two {{day}}' => 'два {{day}}',
                     'key.exact' => 'exact value',
                     'key' => [
                         'exact' => 'never',
@@ -73,7 +73,7 @@ final class StoryParserTest extends TestCase
 
     public function testGenderedText(): void
     {
-        $text = 'hello, {male|female} friend';
+        $text = 'hello, {{male|female}} friend';
 
         $this->assertEquals(
             'hello, male friend',
@@ -88,7 +88,7 @@ final class StoryParserTest extends TestCase
 
     public function testValidVar(): void
     {
-        $text = 'День: {day}';
+        $text = 'День: {{day}}';
 
         $this->assertEquals(
             'День: 1',
@@ -98,7 +98,7 @@ final class StoryParserTest extends TestCase
 
     public function testInvalidVar(): void
     {
-        $text = 'Здоровье: {hp}';
+        $text = 'Здоровье: {{hp}}';
 
         $this->assertEquals(
             'Здоровье: hp',
@@ -123,7 +123,7 @@ final class StoryParserTest extends TestCase
 
     public function testTranslateWithVar(): void
     {
-        $text = 'one [[two {day}]] three';
+        $text = 'one [[two {{day}}]] three';
 
         $this->assertEquals(
             'one два 1 three',

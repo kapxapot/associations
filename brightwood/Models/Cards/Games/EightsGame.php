@@ -297,7 +297,7 @@ class EightsGame extends CardGame
             ]
             : [
                 new TextMessage(
-                    $this->parser()->parse($player, $player . ' выиграл{|а}!')
+                    $this->parser()->parse($player, $player . ' выиграл{{|а}}!')
                 ),
                 new TextMessage('🙁'),
             ];

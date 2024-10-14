@@ -288,7 +288,7 @@ class Story extends DbModel implements CreatedInterface
         if ($this->isDeleted()) {
             return ValidationResult::error(
                 StoryMessageSequence::text(
-                    '[[The story {story_title} is deleted.]]'
+                    '[[The story {{story_title}} is deleted.]]'
                 )
                 ->withVar('story_title', $this->title())
             );
@@ -361,7 +361,7 @@ class Story extends DbModel implements CreatedInterface
         if ($satisfyingLinks->isEmpty()) {
             return
                 StoryMessageSequence::textStuck(
-                    '[[Action node {node_id} doesn\'t have available links.]]'
+                    '[[Action node {{node_id}} doesn\'t have available links.]]'
                 )
                 ->withVar('node_id', $this->id);
         }
@@ -406,7 +406,7 @@ class Story extends DbModel implements CreatedInterface
     {
         return
             StoryMessageSequence::textStuck(
-                '[[Node {node_id} not found.]]'
+                '[[Node {{node_id}} not found.]]'
             )
             ->withVar('node_id', $nodeId);
     }

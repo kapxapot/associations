@@ -51,8 +51,8 @@ class GenderStage extends AbstractStage
 
         return
             StoryMessageSequence::text(
-                '[[Thank you, dear {👦|👧}, your gender has been saved and will now be taken into account.]] 👌',
-                '[[You can change your gender at any time using the {gender_command} command.]]'
+                '[[Thank you, dear {{👦|👧}}, your gender has been saved and will now be taken into account.]] 👌',
+                '[[You can change your gender at any time using the {{gender_command}} command.]]'
             )
             ->merge($successSequence)
             ->withVar('gender_command', BotCommand::GENDER);
