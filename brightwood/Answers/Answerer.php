@@ -507,7 +507,9 @@ class Answerer
             );
         }
 
-        return $sequence->finalize();
+        return $sequence
+            ->withActions(Action::STORY_SELECTION)
+            ->finalize();
     }
 
     private function showStory(Story $story): StoryMessageSequence

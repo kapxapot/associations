@@ -11,7 +11,7 @@ class Message implements MessageInterface
     /** @var string[] */
     protected array $lines;
 
-    /** @var string[] */
+    /** @var (string|string[])[] */
     protected array $actions;
 
     protected ?string $image;
@@ -40,7 +40,7 @@ class Message implements MessageInterface
     }
 
     /**
-     * @return string[]
+     * @return (string|string[])[]
      */
     public function actions(): array
     {
@@ -93,7 +93,7 @@ class Message implements MessageInterface
         return $this;
     }
 
-    public function appendActions(?string ...$actions): self
+    public function appendActions(...$actions): self
     {
         $this->actions = array_merge(
             $this->actions,

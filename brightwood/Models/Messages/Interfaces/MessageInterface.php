@@ -27,16 +27,18 @@ interface MessageInterface extends SequencableInterface
     public function withLines(?string ...$lines): self;
 
     /**
-     * @return string[]
+     * @return (string|string[])[]
      */
     public function actions(): array;
 
     public function hasActions(): bool;
 
     /**
+     * @param (string|string[]|null)[] $actions
+     *
      * @return $this
      */
-    public function appendActions(?string ...$actions): self;
+    public function appendActions(...$actions): self;
 
     public function data(): ?StoryData;
 

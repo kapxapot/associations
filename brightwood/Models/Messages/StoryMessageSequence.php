@@ -9,7 +9,7 @@ use Brightwood\Models\Messages\Interfaces\MessageInterface;
 use Brightwood\Models\Messages\Interfaces\SequencableInterface;
 use Brightwood\Models\MetaKey;
 use Brightwood\Models\Stories\Core\Story;
-use Brightwood\Util\Regex;
+use Brightwood\Util\Image;
 use Brightwood\Util\Util;
 use Plasticode\Collections\Generic\Collection;
 
@@ -198,9 +198,10 @@ class StoryMessageSequence implements SequencableInterface
      * Appends actions to the last message if there is any.
      * Otherwise, sets them to the sequence itself.
      *
+     * @param (string|string[])[] $actions
      * @return $this
      */
-    public function withActions(?string ...$actions): self
+    public function withActions(...$actions): self
     {
         /** @var MessageInterface|null */
         $last = $this->messages->last();
@@ -302,7 +303,7 @@ class StoryMessageSequence implements SequencableInterface
     }
 
     /**
-     * @return string[]
+     * @return (string|string[])[]
      */
     public function actions(): array
     {
@@ -433,15 +434,17 @@ class StoryMessageSequence implements SequencableInterface
         /** @var MessageInterface $message */
         foreach ($this->messages as $message) {
             $lines = $message->lines();
-            $imageIndexes = [];
+            $images = [];
 
             foreach ($lines as $index => $line) {
-                if (Regex::isImageUrl($line)) {
-                    $imageIndexes[] = $index;
+                $imageUrl = Image::getImageUrl($line);
+
+                if ($imageUrl) {
+                    $images[$index] = $imageUrl;
                 }
             }
 
-            $imageCount = count($imageIndexes);
+            $imageCount = count($images);
 
             if (!$imageCount) {
                 $splitMessages[] = $message;
@@ -458,6 +461,7 @@ class StoryMessageSequence implements SequencableInterface
 
             // if the first message is not an image,
             // cut the beginning of the array and create a text message
+            $imageIndexes = array_keys($images);
             $firstIndex = $imageIndexes[0];
 
             if ($firstIndex > 0) {
@@ -467,7 +471,7 @@ class StoryMessageSequence implements SequencableInterface
 
             for ($i = 0; $i < $imageCount; $i++) {
                 $index = $imageIndexes[$i];
-                $image = $lines[$index];
+                $image = $images[$index];
                 $index++;
 
                 if ($i < $imageCount - 1) {

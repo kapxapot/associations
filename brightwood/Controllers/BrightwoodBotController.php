@@ -16,7 +16,6 @@ use Brightwood\Parsing\StoryParser;
 use Brightwood\Repositories\Interfaces\StoryStatusRepositoryInterface;
 use Brightwood\Services\TelegramUserService as BrightwoodTelegramUserService;
 use Exception;
-use InvalidArgumentException;
 use Plasticode\Collections\Generic\ArrayCollection;
 use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 use Plasticode\Util\Debug;
@@ -215,7 +214,7 @@ class BrightwoodBotController
                     $defaultActions[] = Action::SHOW_STORY;
                 }
 
-                $defaultActions[] = Action::STORY_SELECTION;
+                $defaultActions[] = [Action::STORY_SELECTION]; // separate line!
             } else {
                 $defaultActions = [Action::TROUBLESHOOT];
             }
@@ -261,7 +260,7 @@ class BrightwoodBotController
     }
 
     /**
-     * @param string[] $defaultActions The actions that are used if the message doesn't have its own actions.
+     * @param (string|string[])[] $defaultActions The actions that are used if the message doesn't have its own actions.
      */
     private function toTelegramMessage(
         TelegramUser $tgUser,
@@ -291,11 +290,46 @@ class BrightwoodBotController
         );
 
         $answer['reply_markup'] = [
-            'keyboard' => [$actions],
+            'keyboard' => $this->groupActions($actions),
             'resize_keyboard' => true,
         ];
 
         return $answer;
+    }
+
+    /**
+     * Groups actions to string arrays.
+     *
+     * @param (string|string[])[] $actions
+     * @return string[][]
+     */
+    private function groupActions(array $actions): array
+    {
+        $result = [];
+        $accumulator = [];
+
+        $flush = function() use (&$result, &$accumulator) {
+            if (empty($accumulator)) {
+                return;
+            }
+
+            $result[] = $accumulator;
+            $accumulator = [];
+        };
+
+        foreach ($actions as $action) {
+            if (is_array($action)) {
+                $flush();
+                $result[] = $action;
+                continue;
+            }
+
+            $accumulator[] = $action;
+        }
+
+        $flush();
+
+        return $result;
     }
 
     private function buildTelegramMessage(
@@ -334,7 +368,13 @@ class BrightwoodBotController
         $parse = fn (string $text) => $this->parse($tgUser, $tgLangCode, $text, $combinedVars);
 
         $lines = array_map($parse, $message->lines());
-        $actions = array_map($parse, $message->actions());
+
+        $actions = array_map(
+            fn ($action) => is_array($action)
+                ? array_map($parse, $action)
+                : $parse($action),
+            $message->actions()
+        );
 
         return new Message($lines, $actions);
     }
