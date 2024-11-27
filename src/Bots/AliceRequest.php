@@ -54,7 +54,7 @@ class AliceRequest extends AbstractBotRequest
     {
         return array_merge(
             parent::getTrashTokens(),
-            ['алиса', 'алис']
+            ['алиса', 'алис', 'алисонька']
         );
     }
 

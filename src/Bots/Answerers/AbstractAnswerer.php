@@ -22,7 +22,7 @@ abstract class AbstractAnswerer
 
     protected const MESSAGE_CLUELESS = 'Извини{{att:те}}, не понял{{|а}}.';
     protected const MESSAGE_WELCOME = '{{hello}}! Поиграем в ассоциации?';
-    protected const MESSAGE_WELCOME_BACK = 'С возвращением! Чтобы напомнить, как играть, скажите {{cmd:rules}}.';
+    protected const MESSAGE_WELCOME_BACK = 'С возвращением! Чтобы напомнить, как играть, скажи{{att:те}} {{cmd:rules}}.';
     protected const MESSAGE_BYE = '{{att:До свидания|Пока}}! Заходи{{att:те}} ещё!';
 
     protected const CHUNK_RULES = 'Чтобы узнать, как играть, скажи{{att:те}} {{cmd:rules}}.';
@@ -232,6 +232,7 @@ abstract class AbstractAnswerer
             'выключись',
             'выключить',
             'выруби',
+            'вырубись',
             'выходить',
             'домой',
             'достала',
