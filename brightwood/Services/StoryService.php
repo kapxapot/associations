@@ -331,9 +331,11 @@ class StoryService
         );
     }
 
-    public function deleteStory(Story $story): Story
+    public function deleteStory(TelegramUser $tgUser, Story $story): Story
     {
         $story->deletedAt = Date::dbNow();
+        $story->deletedBy = $tgUser->user()->getId();
+
         $deletedStory = $this->storyRepository->save($story);
         $this->deleteFromCache($deletedStory);
 

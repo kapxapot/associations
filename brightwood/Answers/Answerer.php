@@ -115,11 +115,9 @@ class Answerer
         if ($stage === Stage::DELETE) {
             $story = $this->getMetaStory();
 
-            if (!$story) {
-                return $this->invalidDialogState();
-            }
-
-            return $this->processDeleteStory($story, $text);
+            return $story
+                ? $this->processDeleteStory($story, $text)
+                : $this->invalidDialogState();
         }
 
         // start command
@@ -991,7 +989,7 @@ class Answerer
         );
     }
 
-    private function enterDeleteStory($story): StoryMessageSequence
+    private function enterDeleteStory(Story $story): StoryMessageSequence
     {
         return
             StoryMessageSequence::text(
@@ -1014,7 +1012,7 @@ class Answerer
         if ($text === $this->parse(Action::DELETE)) {
             $title = $story->title();
 
-            $this->storyService->deleteStory($story);
+            $this->storyService->deleteStory($this->tgUser, $story);
 
             return
                 StoryMessageSequence::textFinalized(
@@ -1057,15 +1055,16 @@ class Answerer
         return $this->storyService->getStoryCandidateFor($this->tgUser);
     }
 
+    /**
+     * Get a story from metadata.
+     */
     private function getMetaStory(): ?Story
     {
         $storyId = (int)$this->getMetaValue(MetaKey::STORY_ID);
 
-        if (!$storyId) {
-            return null;
-        }
-
-        return $this->getStory($storyId);
+        return $storyId
+            ? $this->getStory($storyId)
+            : null;
     }
 
     private function getMetaValue(string $key)

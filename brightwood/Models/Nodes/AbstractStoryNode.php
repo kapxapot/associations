@@ -68,7 +68,7 @@ abstract class AbstractStoryNode implements EquatableInterface
     {
         $node = $this->story->getNode($id);
 
-        Assert::notNull($node);
+        Assert::notNull($node, "Node {$id} not found.");
 
         return $node;
     }
