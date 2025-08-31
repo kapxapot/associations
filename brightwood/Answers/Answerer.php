@@ -556,14 +556,14 @@ class Answerer
             $createdAt = $story->createdAt;
 
             if ($createdAt) {
-                $dates[] = '[[Created at]]: ' . Format::utc($createdAt);
+                $dates[] = '[[Created on]]: ' . Format::utc($createdAt);
             } else {
                 $dates[] = '📌 <i>[[A permanent story]]</i>';
             }
 
             if ($story->currentVersion()) {
                 $updatedAt = $story->currentVersion()->createdAt;
-                $dates[] = '[[Updated at]]: ' . Format::utc($updatedAt);
+                $dates[] = '[[Updated on]]: ' . Format::utc($updatedAt);
             }
 
             $message->appendLines(Text::join($dates));
