@@ -144,9 +144,11 @@ class WordController extends Controller
                     );
 
                 return $words->any()
-                    ? $this->renderer->component(
-                        'word_list',
-                        ['words' => $words]
+                    ? $this->view->fetch(
+                        'components/word_list.twig',
+                        $this->buildParams([
+                            'params' => ['words' => $words],
+                        ])
                     )
                     : $this->translate('No words yet. :(');
             }

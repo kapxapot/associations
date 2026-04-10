@@ -75,9 +75,15 @@ class AssociationController extends Controller
                     );
 
                 return $associations->any()
-                    ? $this->renderer->component(
-                        'association_list',
-                        ['associations' => $associations]
+                    ? $this->view->fetch(
+                        'components/association_list.twig',
+                        $this->buildParams(
+                            [
+                                'params' => [
+                                    'associations' => $associations,
+                                ],
+                            ]
+                        )
                     )
                     : $this->translate('No associations yet. :(');
             }
