@@ -9,10 +9,11 @@ class ChunkCacheService
 
     private string $cacheDir;
 
-    public function __construct(?string $cacheDir = null)
+    public function __construct()
     {
-        $this->cacheDir = $cacheDir
-            ?? sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'associations_chunk_cache';
+        $this->cacheDir = sys_get_temp_dir()
+            . DIRECTORY_SEPARATOR
+            . 'associations_chunk_cache';
     }
 
     public function remember(string $key, callable $producer): string
