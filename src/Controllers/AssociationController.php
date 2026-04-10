@@ -64,26 +64,25 @@ class AssociationController extends Controller
         $user = $this->auth->getUser();
 
         $language = $this->languageService->getCurrentLanguageFor($user);
+        $result = $this->getServerCachedChunk(
+            sprintf('chunks:latest:associations:%d', $language->getId()),
+            function () use ($language) {
+                $associations = $this
+                    ->associationRepository
+                    ->getLastAddedByLanguage(
+                        $language,
+                        $this->associationConfig->associationLastAddedLimit()
+                    );
 
-        $associations = $this
-            ->associationRepository
-            ->getLastAddedByLanguage(
-                $language,
-                $this->associationConfig->associationLastAddedLimit()
-            );
+                return $associations->any()
+                    ? $this->renderer->component(
+                        'association_list',
+                        ['associations' => $associations]
+                    )
+                    : $this->translate('No associations yet. :(');
+            }
+        );
 
-        return $associations->any()
-            ? $this->render(
-                $response,
-                'components/association_list.twig',
-                $this->buildParams(
-                    [
-                        'params' => [
-                            'associations' => $associations,
-                        ],
-                    ]
-                )
-            )
-            : Response::text($response, $this->translate('No associations yet. :('));
+        return Response::text($response, $result);
     }
 }

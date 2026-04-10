@@ -133,22 +133,25 @@ class WordController extends Controller
         $user = $this->auth->getUser();
 
         $language = $this->languageService->getCurrentLanguageFor($user);
+        $result = $this->getServerCachedChunk(
+            sprintf('chunks:latest:words:%d', $language->getId()),
+            function () use ($language) {
+                $words = $this
+                    ->wordRepository
+                    ->getLastAddedByLanguage(
+                        $language,
+                        $this->wordConfig->wordLastAddedLimit()
+                    );
 
-        $words = $this
-            ->wordRepository
-            ->getLastAddedByLanguage(
-                $language,
-                $this->wordConfig->wordLastAddedLimit()
-            );
+                return $words->any()
+                    ? $this->renderer->component(
+                        'word_list',
+                        ['words' => $words]
+                    )
+                    : $this->translate('No words yet. :(');
+            }
+        );
 
-        return $words->any()
-            ? $this->render(
-                $response,
-                'components/word_list.twig',
-                $this->buildParams([
-                    'params' => ['words' => $words],
-                ])
-            )
-            : Response::text($response, $this->translate('No words yet. :('));
+        return Response::text($response, $result);
     }
 }

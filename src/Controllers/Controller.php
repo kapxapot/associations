@@ -14,6 +14,7 @@ use App\Semantics\PartOfSpeech;
 use App\Semantics\Scope;
 use App\Semantics\Severity;
 use App\Services\CasesService;
+use App\Services\ChunkCacheService;
 use App\Services\LanguageService;
 use Plasticode\Controllers\Controller as BaseController;
 use Plasticode\Core\AppContext;
@@ -30,6 +31,7 @@ class Controller extends BaseController
     protected WordRepositoryInterface $wordRepository;
 
     protected CasesService $casesService;
+    protected ChunkCacheService $chunkCacheService;
     protected LanguageService $languageService;
 
     protected AssociationConfigInterface $associationConfig;
@@ -54,6 +56,7 @@ class Controller extends BaseController
             $container->get(WordRepositoryInterface::class);
 
         $this->casesService = $container->get(CasesService::class);
+        $this->chunkCacheService = $container->get(ChunkCacheService::class);
         $this->languageService = $container->get(LanguageService::class);
 
         $this->associationConfig = $container->get(AssociationConfigInterface::class);
@@ -142,5 +145,24 @@ class Controller extends BaseController
     )
     {
         return $request->getQueryParams()[$param] ?? $default;
+    }
+
+    protected function getServerCachedChunk(
+        string $cacheKey,
+        callable $producer
+    ): string
+    {
+        return $this->chunkCacheService->remember(
+            $cacheKey,
+            function () use ($producer) {
+                $produced = $producer();
+
+                if ($produced instanceof ResponseInterface) {
+                    return strval($produced->getBody());
+                }
+
+                return strval($produced);
+            }
+        );
     }
 }
