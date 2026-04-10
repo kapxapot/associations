@@ -96,6 +96,11 @@ class User extends UserBase implements GenderedInterface, UserInterface
         return $this->sberUser() !== null;
     }
 
+    public function isGoogleUser(): bool
+    {
+        return strlen(strval($this->googleId ?? '')) > 0;
+    }
+
     public function isGroup(): bool
     {
         $tgUser = $this->telegramUser();
@@ -147,6 +152,7 @@ class User extends UserBase implements GenderedInterface, UserInterface
             'is_telegram' => $this->isTelegramUser(),
             'is_alice' => $this->isAliceUser(),
             'is_sber' => $this->isSberUser(),
+            'is_google' => $this->isGoogleUser(),
         ];
     }
 

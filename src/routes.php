@@ -7,6 +7,7 @@ use App\Controllers\AssociationRecountController;
 use App\Controllers\ChunkController;
 use App\Controllers\FeedbackController;
 use App\Controllers\GameController;
+use App\Controllers\GoogleAuthController;
 use App\Controllers\IndexController;
 use App\Controllers\JobController;
 use App\Controllers\LanguageController;
@@ -62,6 +63,11 @@ $app->group(
                     '/captcha',
                     CaptchaController::class
                 );
+                $this->post(
+                    '/auth/google',
+                    GoogleAuthController::class . ':signIn'
+                )->setName('api.auth.google');
+
 
                 $this->get(
                     '/search/{query}',
@@ -378,6 +384,11 @@ $app->group(
                     '/signin',
                     AuthController::class . ':signIn'
                 )->setName('auth.signin');
+
+                $this->post(
+                    '/google',
+                    GoogleAuthController::class . ':signIn'
+                )->setName('auth.google');
             }
         );
 
