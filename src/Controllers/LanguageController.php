@@ -27,40 +27,44 @@ class LanguageController extends Controller
         $user = $this->auth->getUser();
 
         $language = $this->languageService->getCurrentLanguageFor($user);
+        $result = $this->getServerCachedChunk(
+            sprintf('chunks:stats:language:%d', $language->getId()),
+            function () use ($language) {
+                $wordCount = $this
+                    ->wordRepository
+                    ->getCountByLanguage($language);
 
-        $wordCount = $this
-            ->wordRepository
-            ->getCountByLanguage($language);
+                $wordCountStr = $this
+                    ->casesService
+                    ->wordCount($wordCount);
 
-        $wordCountStr = $this
-            ->casesService
-            ->wordCount($wordCount);
+                $associationCount = $this
+                    ->associationRepository
+                    ->getCountByLanguage($language);
 
-        $associationCount = $this
-            ->associationRepository
-            ->getCountByLanguage($language);
+                $associationCountStr = $this
+                    ->casesService
+                    ->associationCount($associationCount);
 
-        $associationCountStr = $this
-            ->casesService
-            ->associationCount($associationCount);
+                return $this->renderer->component(
+                    'language_stats',
+                    [
+                        'word_count' => $wordCount,
+                        'word_count_str' => $wordCountStr,
 
-        $result = $this->renderer->component(
-            'language_stats',
-            [
-                'word_count' => $wordCount,
-                'word_count_str' => $wordCountStr,
+                        'word_anniversary' => $this
+                            ->anniversaryService
+                            ->toAnniversary($wordCount),
 
-                'word_anniversary' => $this
-                    ->anniversaryService
-                    ->toAnniversary($wordCount),
+                        'association_count' => $associationCount,
+                        'association_count_str' => $associationCountStr,
 
-                'association_count' => $associationCount,
-                'association_count_str' => $associationCountStr,
-
-                'association_anniversary' => $this
-                    ->anniversaryService
-                    ->toAnniversary($associationCount),
-            ]
+                        'association_anniversary' => $this
+                            ->anniversaryService
+                            ->toAnniversary($associationCount),
+                    ]
+                );
+            }
         );
 
         return Response::text($response, $result);
