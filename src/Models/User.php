@@ -11,6 +11,7 @@ use Plasticode\Util\Date;
 
 /**
  * @property integer $age
+ * @property string|null $googleId
  * @method AliceUser|null aliceUser()
  * @method Game|null currentGame()
  * @method bool isMature()
@@ -98,7 +99,7 @@ class User extends UserBase implements GenderedInterface, UserInterface
 
     public function isGoogleUser(): bool
     {
-        return strlen(strval($this->googleId ?? '')) > 0;
+        return strlen($this->googleId) > 0;
     }
 
     public function isGroup(): bool

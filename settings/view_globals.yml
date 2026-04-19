@@ -25,12 +25,13 @@ folders:
 mde: true
 
 disqus_alias: associ
-google_analytics_id: {GOOGLE_ANALYTICS_ID}
-google_auth_client_id: {GOOGLE_AUTH_WEB_CLIENT_ID}
 telegram_bot_name: AssociRuBot
 twitter_alias: AssociRu
 alice_url: https://dialogs.yandex.ru/store/skills/36d6b4ed-associacii
 sber_url: https://apps.sber.ru/salute-apps/f04d7fe5-000f-4980-aa0b-dc904f639ed4/
+
+google_analytics_id: {GOOGLE_ANALYTICS_ID}
+google_auth_client_id: {GOOGLE_AUTH_WEB_CLIENT_ID}
 
 angular:
   app: bsApp

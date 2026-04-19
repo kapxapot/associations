@@ -13,7 +13,6 @@ use Plasticode\Settings\Interfaces\SettingsProviderInterface;
 class GoogleAuthService
 {
     private const TOKEN_LENGTH = 16;
-    private const DEFAULT_COOKIE_KEY = 'auth_token';
 
     private Client $httpClient;
     private SettingsProviderInterface $settingsProvider;
@@ -23,15 +22,13 @@ class GoogleAuthService
         Client $httpClient,
         SettingsProviderInterface $settingsProvider,
         UserRepositoryInterface $userRepository
-    ) {
+    )
+    {
         $this->httpClient = $httpClient;
         $this->settingsProvider = $settingsProvider;
         $this->userRepository = $userRepository;
     }
 
-    /**
-     * @return array{token:string,user:User,expires_at:string,cookie_key:string}
-     */
     public function signIn(string $idToken): array
     {
         $payload = $this->verifyIdToken($idToken);
@@ -50,8 +47,7 @@ class GoogleAuthService
             ])
             ->save();
 
-        $cookieKey = $this->settingsProvider->get('auth_token_key')
-            ?: self::DEFAULT_COOKIE_KEY;
+        $cookieKey = $this->settingsProvider->get('auth_token_key');
 
         return [
             'token' => $token,
