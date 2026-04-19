@@ -34,5 +34,25 @@
     <div class="checkbox">
         <label><input type="checkbox" name="su_remember" id="su_remember" checked>Запомнить</label>
     </div>
+
+    {% if google_auth_client_id %}
+        <hr />
+        <div class="text-center mb-1">или</div>
+        <div class="text-center">
+            <div id="g_id_onload"
+                data-client_id="{{ google_auth_client_id }}"
+                data-context="signup"
+                data-callback="onGoogleAuth"
+                data-auto_prompt="false"></div>
+            <div class="g_id_signin"
+                data-type="standard"
+                data-shape="rectangular"
+                data-theme="outline"
+                data-text="signup_with"
+                data-size="large"
+                data-logo_alignment="left"></div>
+        </div>
+    {% endif %}
+
     <span class="help-block">Уже зарегистрированы? <a href="javascript:void(0);" ng-click="switchFromTo('{{ modal_name }}', 'signIn')">Войдите</a>.</span>
 {% endblock %}
