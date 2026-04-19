@@ -75,6 +75,19 @@ class StoryService
             : null;
     }
 
+    public function getPublicJsonStories(): StoryCollection
+    {
+        return $this
+            ->toRichStories(
+                $this->storyRepository->getAll()
+            )
+            ->where(
+                fn (Story $story) => $story instanceof JsonStory
+                    && $story->currentVersion() !== null
+                    && $this->isStoryPublic($story)
+            );
+    }
+
     public function getStoriesPlayableBy(TelegramUser $tgUser, ?string $langCode = null): StoryCollection
     {
         return $this

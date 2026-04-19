@@ -88,4 +88,62 @@ class StoryController
             ->withStatus($statusCode);
         }
     }
+
+    public function index(
+        ServerRequestInterface $request,
+        ResponseInterface $response
+    ): ResponseInterface
+    {
+        try {
+            $stories = $this->storyService->getPublicJsonStories();
+
+            $result = [];
+
+            foreach ($stories as $story) {
+                $currentVersion = $story->currentVersion();
+
+                if (!$currentVersion) {
+                    $this->logger->error("Story [id = {$story->getId()}] doesn't have a version.");
+                    continue;
+                }
+
+                $creator = $story->creator();
+
+                $result[] = [
+                    'uuid' => $story->uuid,
+                    'created_at' => $story->createdAtIso(),
+                    'updated_at' => $currentVersion->createdAtIso(),
+                    'current_version_id' => $currentVersion->getId(),
+                    'author' => $creator ? $creator->serializePublic() : null,
+                    'language' => $story->languageCode(),
+                    'title' => $story->title(),
+                    'description' => $story->description(),
+                ];
+            }
+
+            $response = $response->withHeader('Access-Control-Allow-Origin', '*');
+
+            return Response::json(
+                $response,
+                $result
+            );
+        } catch (Exception $ex) {
+            $this->logger->error($ex->getMessage());
+
+            $lines = Debug::exceptionTrace($ex);
+            $this->logger->info(Text::join($lines));
+
+            $statusCode = 500;
+
+            return Response::json(
+                $response,
+                [
+                    'error' => true,
+                    'statusCode' => $statusCode,
+                    'message' => 'Server error.',
+                ]
+            )
+            ->withStatus($statusCode);
+        }
+    }
 }

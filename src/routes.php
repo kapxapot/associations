@@ -79,6 +79,11 @@ $app->group(
                 )->setName('api.public.words');
 
                 $this->get(
+                    '/stories',
+                    StoryController::class . ':index'
+                )->setName('api.stories.index');
+
+                $this->get(
                     '/stories/{uuid}',
                     StoryController::class . ':get'
                 )->setName('api.stories.get');
