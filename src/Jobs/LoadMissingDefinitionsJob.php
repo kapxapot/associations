@@ -39,7 +39,7 @@ class LoadMissingDefinitionsJob implements ModelJobInterface
             $this
                 ->wordRepository
                 ->getAllUndefined($limit)
-                ->map(
+                ->cleanMap(
                     fn (Word $w) => $this->definitionService->loadByWord($w)
                 )
         );

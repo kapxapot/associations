@@ -37,7 +37,13 @@ class DictionaryApi implements DefinitionSourceInterface
         $client = new Client();
 
         try {
-            $response = $client->get($url);
+            $response = $client->get(
+                $url,
+                [
+                    'connect_timeout' => 3,
+                    'timeout' => 5,
+                ]
+            );
         } catch (ClientException $ex) {
             $response = $ex->getResponse();
         } catch (GuzzleException $ex) {
