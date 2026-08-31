@@ -98,5 +98,30 @@
 {% block more_js %}
     <script src="{{ folders.local }}js/main.js"></script>
 
+    {% if google_auth_client_id %}
+        <script src="https://accounts.google.com/gsi/client" async defer></script>
+        <script>
+            window.onGoogleAuth = (response) => {
+                if (!response || !response.credential) {
+                    return;
+                }
+
+                $.post('{{ path_for('auth.google') }}', {
+                    credential: response.credential,
+                }).done(() => {
+                    reloadWindow();
+                }).fail((xhr) => {
+                    let error = 'Google auth failed.';
+
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        error = xhr.responseJSON.message;
+                    }
+
+                    alert(error);
+                });
+            };
+        </script>
+    {% endif %}
+
     {{ even_more_js }}
 {% endblock %}
