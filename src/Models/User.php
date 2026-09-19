@@ -11,6 +11,7 @@ use Plasticode\Util\Date;
 
 /**
  * @property integer $age
+ * @property string|null $googleId
  * @method AliceUser|null aliceUser()
  * @method Game|null currentGame()
  * @method bool isMature()
@@ -96,6 +97,11 @@ class User extends UserBase implements GenderedInterface, UserInterface
         return $this->sberUser() !== null;
     }
 
+    public function isGoogleUser(): bool
+    {
+        return strlen($this->googleId) > 0;
+    }
+
     public function isGroup(): bool
     {
         $tgUser = $this->telegramUser();
@@ -147,6 +153,7 @@ class User extends UserBase implements GenderedInterface, UserInterface
             'is_telegram' => $this->isTelegramUser(),
             'is_alice' => $this->isAliceUser(),
             'is_sber' => $this->isSberUser(),
+            'is_google' => $this->isGoogleUser(),
         ];
     }
 

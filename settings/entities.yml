@@ -412,11 +412,15 @@ users:
       name: Тип
       attributes: [readonly, no_sort]
       template: >
-        (row.is_telegram ? 'Telegram' : '') + (row.is_alice ? 'Alice' : '') + (row.is_sber ? 'Sber' : '')
+        (row.is_telegram ? 'Telegram' : '') + (row.is_alice ? 'Alice' : '') + (row.is_sber ? 'Sber' : '') + (row.is_google ? 'Google' : '')
 
     email:
       name: E-mail
       type: email
+      attributes: [hidden, nullable]
+
+    google_id:
+      name: Google ID
       attributes: [hidden, nullable]
 
     gender:

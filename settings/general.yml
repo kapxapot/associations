@@ -24,6 +24,10 @@ captcha_digits: 2
 # in hours
 token_ttl: 168
 
+
+google_auth:
+  client_ids: {GOOGLE_AUTH_CLIENT_IDS}
+
 # folders for PHP code
 folders:
   root: {ROOT_PATH}
