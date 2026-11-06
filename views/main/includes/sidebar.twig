@@ -1,4 +1,6 @@
 {% include 'main/includes/sidebar/bots.twig' %}
 {% include 'main/includes/sidebar/language.twig' %}
-{% include 'main/includes/sidebar/links.twig' %}
+{% if index %}
+    {% include 'main/includes/sidebar/links.twig' %}
+{% endif %}
 {% include 'main/includes/sidebar/donations.twig' %}
